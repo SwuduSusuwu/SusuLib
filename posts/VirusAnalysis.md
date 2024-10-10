@@ -405,8 +405,28 @@ static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-
 /* #if SUSUWU_POSIX, `return (0 == geteuid());` #elif SUSUWU_WIN32 `return IsUserAnAdmin();` #endif `return false;` */
 const bool classSysHasRoot();
 /* #if SUSUWU_POSIX, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
- * Usage: classSysSetRoot(true); functionsWhichRequireRoot; classSysSetRoot(false); */
+ * Usage: classSysSetRoot(true); classSysKernelSetHook(...); classSysSetRoot(false); */
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
+
+/* Effect: `(callback(args...) ? func(args...) : decltype(func(args...))())` */
+template<typename func, typename callback, typename... Args>
+auto classSysKernelCallback(Args... args) -> decltype(func(args...)) {
+	const auto ret = callback(args...);
+	return static_cast<bool>(ret) ? func(args...) : ret;
+}
+/* Usage: `classSysKernelSetHook(download, classSysKernelCallback<download, virusAnalysisDownloadCallback>);`
+ * Effect: `:%s/func(/classSysKernelCallback<func, callback>(/`
+ * @pre @code classSysHasRoot() @endof */
+template<typename Func, typename Lambda>
+const bool classSysKernelSetHook(Func func, Lambda callback) {
+	if(classSysHasRoot()) {
+		SUSUWU_WARNING("classSysKernelSetHook: TODO");
+//		return true; /* TODO: hook `func` */
+	} else {
+		SUSUWU_ERROR("classSysKernelSetHook: if(!classSysHasRoot()) {/* kernel hook impossible to use */}");
+	}
+	return false;
+}
 
 /* Filesystems */
 /* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
@@ -454,9 +474,9 @@ inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthe
 	}
 	return os;
 }
-template<class List>
-inline const typename List::value_type classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
-	typename List::value_type str = (parenthesis ? "{" : "");
+template<template<class> class List, class Str>
+inline const Str classSysColoredParamStr(const List<Str> &argvS, const bool parenthesis/* {...} */ = true) {
+	Str str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
 			str += ", ";
@@ -1331,6 +1351,7 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
+/* `clang-tidy` suppress: NOLINTBEGIN(readability-implicit-bool-conversion) */
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
@@ -1360,6 +1381,16 @@ const bool virusAnalysisHookTests() {
 	}
 	return true;
 }
+const bool virusAnalysisImpl(const PortableExecutable &file) {
+	switch(virusAnalysis(file)) {
+	case virusAnalysisPass:
+		return true; /* launch this */
+	case virusAnalysisRequiresReview:
+		return (virusAnalysisPass == virusAnalysisManualReview(file));
+	default:
+		return false; /* abort */
+	}
+};
 const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ignore depth-of-1 recursion: NOLINT(misc-no-recursion) */
 	const VirusAnalysisHook originalHookStatus = globalVirusAnalysisHook;
 	if(virusAnalysisHookQuery == hookStatus || originalHookStatus == hookStatus) {
@@ -1369,26 +1400,29 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 		/* TODO: undo OS-specific "hook"s/"callback"s */
 		globalVirusAnalysisHook = virusAnalysisHookDefault;
 	}
-	auto lambdaScan = [](const PortableExecutable &file) {
-		switch(virusAnalysis(file)) {
-		case virusAnalysisPass:
-			return true; /* launch this */
-		case virusAnalysisRequiresReview:
-			return (virusAnalysisPass == virusAnalysisManualReview(file));
-		default:
-			return false; /* abort */
-		}
-	};
 	if(virusAnalysisHookExec & hookStatus) {
-		/* callbackHook("exec*", lambdaScan); */ /* TODO: OS-specific "hook"/"callback" for `exec()`/app-launches */
+#ifdef SUSUWU_POSIX
+		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) {
+			return static_cast<int>(virusAnalysisImpl(PortableExecutable(pathname)));
+		};
+		classSysKernelSetHook(execv, lambdaScanExecv);
+#elif defined(SUSUWU_WIN32) /* def SUSUWU_POSIX else */
+		auto lambdaScanCreateProcessA = [](LPCSTR lpApplicationName, LPSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR                lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation) {
+			return virusAnalysisImpl(PortableExecutable(lpApplicationName));
+		};
+		classSysKernelSetHook(CreateProcessA, lambdaScanCreateProcessA);
+#else /* defined(SUSUWU_WIN32) else */
+		SUSUWU_ERROR("virusAnalysisHook(virusAnalysisHookExec) { if(!SUSUWU_POSIX && !SUSUWU_WIN32) { /* TODO: you can contribute or post to https://github.com/SwuduSusuwu/SubStack/issues/new */ } }");
+#endif /* defined(SUSUWU_WIN32) else */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookExec);
 	}
 	if(virusAnalysisHookNewFile & hookStatus) {
-		/* callbackHook("fwrite", lambdaScan); */ /* TODO: OS-specific "hook"/"callback" for new files/downloads */
+//		classSysKernelSetHook(fwrite, lambdaScanFwrite); /* TODO: OS-specific "hook"/"callback" for new files/downloads */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookNewFile);
 	}
 	return virusAnalysisGetHook();
 }
+/* `clang-tidy` on: NOLINTEND(readability-implicit-bool-conversion) */
 
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
 	const auto fileHash = classSha2(file.bytecode);

@@ -5,8 +5,8 @@
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysHasRoot classSysHexStr classSysSetRoot execvex */
-#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERRSTR SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
+#include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
+#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
 #include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
 #include <algorithm> /* std::sort */
 #include <cassert> /* assert */
@@ -20,6 +20,11 @@
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string std::to_string */
 #include <tuple> /* std::tuple std::get */
+#ifdef SUSUWU_POSIX
+#include <unistd.h> /* execv */
+#elif defined(SUSUWU_WIN32)
+#include <processthreadsapi.h> /* CreateProcessA BOOL DWORD LPCSTR LPPROCESS_INFORMATION LPSECURITY_ATTRIBUTES LPSTARTUPINFOA LPSTR LPVOID */
+#endif /* elif DEFINED(SUSUWU_WIN32) */
 #include <vector> /* std::vector */
 /* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
 namespace Susuwu {
@@ -127,6 +132,16 @@ const bool virusAnalysisHookTests() {
 	}
 	return true;
 }
+const bool virusAnalysisImpl(const PortableExecutable &file) {
+	switch(virusAnalysis(file)) {
+	case virusAnalysisPass:
+		return true; /* launch this */
+	case virusAnalysisRequiresReview:
+		return (virusAnalysisPass == virusAnalysisManualReview(file));
+	default:
+		return false; /* abort */
+	}
+};
 const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ignore depth-of-1 recursion: NOLINT(misc-no-recursion) */
 	const VirusAnalysisHook originalHookStatus = globalVirusAnalysisHook;
 	if(virusAnalysisHookQuery == hookStatus || originalHookStatus == hookStatus) {
@@ -136,22 +151,24 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 		/* TODO: undo OS-specific "hook"s/"callback"s */
 		globalVirusAnalysisHook = virusAnalysisHookDefault;
 	}
-	auto lambdaScan = [](const PortableExecutable &file) {
-		switch(virusAnalysis(file)) {
-		case virusAnalysisPass:
-			return true; /* launch this */
-		case virusAnalysisRequiresReview:
-			return (virusAnalysisPass == virusAnalysisManualReview(file));
-		default:
-			return false; /* abort */
-		}
-	};
 	if(virusAnalysisHookExec & hookStatus) {
-		/* callbackHook("exec*", lambdaScan); */ /* TODO: OS-specific "hook"/"callback" for `exec()`/app-launches */
+#ifdef SUSUWU_POSIX
+		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) {
+			return static_cast<int>(virusAnalysisImpl(PortableExecutable(pathname)));
+		};
+		classSysKernelSetHook(execv, lambdaScanExecv);
+#elif defined(SUSUWU_WIN32) /* def SUSUWU_POSIX else */
+		auto lambdaScanCreateProcessA = [](LPCSTR lpApplicationName, LPSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR                lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation) {
+			return virusAnalysisImpl(PortableExecutable(lpApplicationName));
+		};
+		classSysKernelSetHook(CreateProcessA, lambdaScanCreateProcessA);
+#else /* defined(SUSUWU_WIN32) else */
+		SUSUWU_ERROR("virusAnalysisHook(virusAnalysisHookExec) { if(!SUSUWU_POSIX && !SUSUWU_WIN32) { /* TODO: you can contribute or post to https://github.com/SwuduSusuwu/SubStack/issues/new */ } }");
+#endif /* defined(SUSUWU_WIN32) else */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookExec);
 	}
 	if(virusAnalysisHookNewFile & hookStatus) {
-		/* callbackHook("fwrite", lambdaScan); */ /* TODO: OS-specific "hook"/"callback" for new files/downloads */
+//		classSysKernelSetHook(fwrite, lambdaScanFwrite); /* TODO: OS-specific "hook"/"callback" for new files/downloads */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookNewFile);
 	}
 	return virusAnalysisGetHook();

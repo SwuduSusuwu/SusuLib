@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
 #include "ClassPortableExecutable.hxx" /* FilePath */
-#include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS, SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX */
+#include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_WARNING */
 #include <cassert> /* assert */
 #include <chrono> /* std::chrono */
 #include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
@@ -48,8 +48,28 @@ static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-
 /* #if SUSUWU_POSIX, `return (0 == geteuid());` #elif SUSUWU_WIN32 `return IsUserAnAdmin();` #endif `return false;` */
 const bool classSysHasRoot();
 /* #if SUSUWU_POSIX, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
- * Usage: classSysSetRoot(true); functionsWhichRequireRoot; classSysSetRoot(false); */
+ * Usage: classSysSetRoot(true); classSysKernelSetHook(...); classSysSetRoot(false); */
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
+
+/* Effect: `(callback(args...) ? func(args...) : decltype(func(args...))())` */
+template<typename func, typename callback, typename... Args>
+auto classSysKernelCallback(Args... args) -> decltype(func(args...)) {
+	const auto ret = callback(args...);
+	return static_cast<bool>(ret) ? func(args...) : ret;
+}
+/* Usage: `classSysKernelSetHook(download, classSysKernelCallback<download, virusAnalysisDownloadCallback>);`
+ * Effect: `:%s/func(/classSysKernelCallback<func, callback>(/`
+ * @pre @code classSysHasRoot() @endof */
+template<typename Func, typename Lambda>
+const bool classSysKernelSetHook(Func func, Lambda callback) {
+	if(classSysHasRoot()) {
+		SUSUWU_WARNING("classSysKernelSetHook: TODO");
+//		return true; /* TODO: hook `func` */
+	} else {
+		SUSUWU_ERROR("classSysKernelSetHook: if(!classSysHasRoot()) {/* kernel hook impossible to use */}");
+	}
+	return false;
+}
 
 /* Filesystems */
 /* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
