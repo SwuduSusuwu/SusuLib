@@ -1369,30 +1369,22 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 		/* TODO: undo OS-specific "hook"s/"callback"s */
 		globalVirusAnalysisHook = virusAnalysisHookDefault;
 	}
+	auto lambdaScan = [](const PortableExecutable &file) {
+		switch(virusAnalysis(file)) {
+		case virusAnalysisPass:
+			return true; /* launch this */
+		case virusAnalysisRequiresReview:
+			return (virusAnalysisPass == virusAnalysisManualReview(file));
+		default:
+			return false; /* abort */
+		}
+	};
 	if(virusAnalysisHookExec & hookStatus) {
-		/* callbackHook("exec*", */ [](const PortableExecutable &file) { /* TODO: OS-specific "hook"/"callback" for `exec()`/app-launches */
-			switch(virusAnalysis(file)) {
-			case virusAnalysisPass:
-				return true; /* launch this */
-			case virusAnalysisRequiresReview:
-				return (virusAnalysisPass == virusAnalysisManualReview(file));
-			default:
-				return false; /* abort */
-			}
-		} /* ) */ ;
+		/* callbackHook("exec*", lambdaScan); */ /* TODO: OS-specific "hook"/"callback" for `exec()`/app-launches */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookExec);
 	}
 	if(virusAnalysisHookNewFile & hookStatus) {
-		/* callbackHook("fwrite", */ [](const PortableExecutable &file) { /* TODO: OS-specific "hook"/"callback" for new files/downloads */
-			switch(virusAnalysis(file)) {
-			case virusAnalysisPass:
-				return true; /* launch this */
-			case virusAnalysisRequiresReview:
-				return (virusAnalysisPass == virusAnalysisManualReview(file));
-			default:
-				return false; /* abort */
-			}
-		} /* ) */ ;
+		/* callbackHook("fwrite", lambdaScan); */ /* TODO: OS-specific "hook"/"callback" for new files/downloads */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookNewFile);
 	}
 	return virusAnalysisGetHook();
