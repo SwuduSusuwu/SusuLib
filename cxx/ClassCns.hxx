@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
 #include "ClassObject.hxx" /* Object */
-#include "Macros.hxx" /* SUSUWU_CXX17 */
+#include "Macros.hxx" /* NOEXCEPT SUSUWU_CXX17 */
 #include <cassert> /* assert */
 #include <cstddef> /* size_t */
 #include <string> /* std::string */
@@ -24,10 +24,15 @@ typedef enum CnsMode : char {
 
 typedef class Cns : Object {
 public:
-	const std::string getName() const {return "Susuwu::class Cns";}
-	virtual ~Cns() = default;
-	virtual const bool hasImplementation() const {return typeid(Cns) != typeid(this);}
-	virtual const bool isInitialized() const {return initialized;}
+	const std::string getName() const override {return "Susuwu::class Cns";}
+	~Cns() override = default;
+	Cns() = default; /* Default constructor */
+	Cns(const Cns &) = default; /* Copy constructor */
+	Cns& operator=(const Cns &) = default; /* Copy assignment */
+	Cns(Cns&&) NOEXCEPT = default; /* Move constructor */
+	Cns& operator=(Cns &&) NOEXCEPT = default; /* Move assignment */
+	const bool hasImplementation() const override {return typeid(Cns) != typeid(this);}
+	const bool isInitialized() const override {return initialized;}
 	virtual void setInitialized(const bool is) {initialized = is;}
 	virtual void setInputMode(CnsMode x) {inputMode = x;}
 	virtual void setOutputMode(CnsMode x) {outputMode = x;}
@@ -41,7 +46,7 @@ public:
 	// template<Intput, Output> virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* @pre @code isInitialized() @endcode */
 	// template<Input, Output> virtual const Output process(Input input);
-#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) \
+#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): can't have templates virtual */ /* NOLINTBEGIN(misc-unused-parameters): TODO */ \
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, bool>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeBool;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, char>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeChar;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, int>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeInt;}\
@@ -60,7 +65,7 @@ public:
 	virtual const int processToInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0;}\
 	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeUint == outputMode); return 0;}\
 	virtual const float processToFloat(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeFloat == outputMode); return 0;}\
-	virtual const double processToDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 9;}\
+	virtual const double processToDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 0;}\
 	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorBool == outputMode); return {};}\
 	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorChar == outputMode); return {};}\
 	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorInt == outputMode); return {};}\
@@ -81,10 +86,11 @@ public:
 	templateWorkaround(cnsModeVectorFloat, std::vector<float>)
 	templateWorkaround(cnsModeVectorDouble, std::vector<double>)
 	templateWorkaround(cnsModeString, std::string)
+	/* NOLINTEND(misc-unused-parameters) */
 private:
-	bool initialized;
-	CnsMode inputMode, outputMode;
-	size_t inputNeurons, outputNeurons, layersOfNeurons, neuronsPerLayer;
+	bool initialized = false;
+	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;
+	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
 } Cns;
 
 #ifdef USE_HSOM_CNS

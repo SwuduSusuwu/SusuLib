@@ -5,7 +5,6 @@
 #include <cassert> /* assert */
 #include <cctype> /* size_t */
 #include <cstdlib> /* exit EXIT_FAILURE */
-#include <vector> /* std::vector */
 namespace Susuwu {
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
@@ -13,6 +12,7 @@ namespace Susuwu {
  * Documentation: `less HSOM/README.md` `less HSOM/Documentation.md` */
 /* "If you're using Python >3.5, PyString_FromString() is PyUnicode_FromString()" */
 #include <Python.h> /* Sources: `pkg install python` */
+#include <vector> /* std::vector */
 typedef class HsomCns : Cns { /* TODO. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
 	//template<Input, Output> void setupSynapses(const std::vector<std::tuple<Input, Output>>) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
 	void setupSynapses(const std::vector<std::tuple<float, float>>) {

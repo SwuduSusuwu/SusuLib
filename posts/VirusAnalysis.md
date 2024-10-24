@@ -668,16 +668,21 @@ typedef enum CnsMode : char {
 
 typedef class Cns : Object {
 public:
-	const std::string getName() const {return "Susuwu::class Cns";}
-	virtual ~Cns() = default;
-	virtual const bool hasImplementation() const {return typeid(Cns) != typeid(this);}
-	virtual const bool isInitialized() const {return initialized;}
+	const std::string getName() const override {return "Susuwu::class Cns";}
+	~Cns() override = default;
+	Cns() = default; /* Default constructor */
+	Cns(const Cns &) = default; /* Copy constructor */
+	Cns& operator=(const Cns &) = default; /* Copy assignment */
+	Cns(Cns&&) NOEXCEPT = default; /* Move constructor */
+	Cns& operator=(Cns &&) NOEXCEPT = default; /* Move assignment */
+	const bool hasImplementation() const override {return typeid(Cns) != typeid(this);}
+	const bool isInitialized() const override {return initialized;}
 	virtual void setInitialized(const bool is) {initialized = is;}
 	virtual void setInputMode(CnsMode x) {inputMode = x;}
 	virtual void setOutputMode(CnsMode x) {outputMode = x;}
 	virtual void setInputNeurons(size_t x) {inputNeurons = x;}
 	virtual void setOutputNeurons(size_t x) {outputNeurons = x;}
-	virtual void setLayersOfNeurons(size_t x) {layersOfNeurons = x;}
+	virtual void setLayersOfNeurons(size_t x) {layersOfNeurons = x;} 
 	virtual void setNeuronsPerLayer(size_t x) {neuronsPerLayer = x;}
 	/* @throw bad_alloc
 	 * @pre @code hasImplementation() @endcode
@@ -685,7 +690,7 @@ public:
 	// template<Intput, Output> virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* @pre @code isInitialized() @endcode */
 	// template<Input, Output> virtual const Output process(Input input);
-#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) \
+#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): can't have templates virtual */ /* NOLINTBEGIN(misc-unused-parameters): TODO */ \
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, bool>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeBool;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, char>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeChar;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, int>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeInt;}\
@@ -699,19 +704,19 @@ public:
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<float>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorFloat;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<double>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorDouble;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::string>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeString;}\
-	virtual const bool processToBool(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0;}\
-	virtual const char processToChar(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0;}\
-	virtual const int processToInt(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0;}\
-	virtual const unsigned int processToUint(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeUint == outputMode); return 0;}\
-	virtual const float processToFloat(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeFloat == outputMode); return 0;}\
-	virtual const double processToDouble(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 9;}\
-	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorBool == outputMode); return {};}\
-	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorChar == outputMode); return {};}\
-	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorInt == outputMode); return {};}\
-	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorUint == outputMode); return {};}\
-	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorFloat == outputMode); return {};}\
-	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorDouble == outputMode); return {};}\
-	virtual const std::string processToString(const INPUT_TYPEDEF (INPUT_TYPEDEF &input) const {auto val = processToVectorChar(input); return std::string(&val[0], val.size());}
+	virtual const bool processToBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0;}\
+	virtual const char processToChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0;}\
+	virtual const int processToInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0;}\
+	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeUint == outputMode); return 0;}\
+	virtual const float processToFloat(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeFloat == outputMode); return 0;}\
+	virtual const double processToDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 0;}\
+	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorBool == outputMode); return {};}\
+	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorChar == outputMode); return {};}\
+	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorInt == outputMode); return {};}\
+	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorUint == outputMode); return {};}\
+	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorFloat == outputMode); return {};}\
+	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorDouble == outputMode); return {};}\
+	virtual const std::string processToString(const INPUT_TYPEDEF &input) const {auto val = processToVectorChar(input); return std::string(&val[0], val.size());}
 	templateWorkaround(cnsModeBool, bool)
 	templateWorkaround(cnsModeChar, char)
 	templateWorkaround(cnsModeInt, int)
@@ -725,10 +730,11 @@ public:
 	templateWorkaround(cnsModeVectorFloat, std::vector<float>)
 	templateWorkaround(cnsModeVectorDouble, std::vector<double>)
 	templateWorkaround(cnsModeString, std::string)
+	/* NOLINTEND(misc-unused-parameters) */
 private:
-	bool initialized;
-	CnsMode inputMode, outputMode;
-	size_t inputNeurons, outputNeurons, layersOfNeurons, neuronsPerLayer;
+	bool initialized = false;
+	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;
+	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
 } Cns;
 
 #ifdef USE_HSOM_CNS
@@ -761,6 +767,7 @@ typedef class ApxrCns : Cns {
  * Documentation: `less HSOM/README.md` `less HSOM/Documentation.md` */
 /* "If you're using Python >3.5, PyString_FromString() is PyUnicode_FromString()" */
 #include <Python.h> /* Sources: `pkg install python` */
+#include <vector> /* Sources: `pkg install python` */
 typedef class HsomCns : Cns { /* TODO. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
 	//template<Input, Output> void setupSynapses(const std::vector<std::tuple<Input, Output>>) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
 	void setupSynapses(const std::vector<std::tuple<float, float>>) {
