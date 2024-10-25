@@ -8,13 +8,16 @@ Targets: Windows/Linux/Android/OSX/iOS; all C++ compilers, requires some extensi
 
 Usage: `./build.sh` produces `*.o` static libraries (for distribution to others,) plus `a.out` to do unit tests (test harnesses). Allowed flags; `--debug` (default; includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), `--release` (excludes `--debug`, strips frame-pointers/symbols, optimizes with `-O2`), `--mingw` (if on _Linux_, can use with `--release` or `--debug`, produces _Portable Executable_ for _Windows_. If on _Windows_, the default is to produce _Portable Executable_'s for _Windows_)
     Optional flags (`vim build.sh` to use):
-        `-DSUSUWU_USE_STDERR` to replace `std::cerr` with `fprintf(stderr, ...)`, default is `!defined(__cplusplus)`.
+        `-DSUSUWU_SH_PREFER_STDIO` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`, default is `!defined(__cplusplus)`.
         `-DSUSUWU_SH_SKIP_BRACKETS = true` sets output format to `WARN_LEVEL: message`, default is `false`.
         `-DSUSUWU_SH_FILE = true` sets output format to `[__FILE__: WARN_LEVEL: message]`, default is `!defined(NDEBUG)`.
         `-DSUSUWU_SH_LINE = true` sets output format to `[__LINE__: WARN_LEVEL: message]`, default is `!defined(NDEBUG)`.
         `-DSUSUWU_SH_FUNC = true` sets output format to `[__func__: WARN_LEVEL: message]`, default is `false`.
         `-DSUSUWU_SH_SKIP_COLORS = true` to omit _VT100_ (_ANSI_) colors, default is `defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
         `-DSUSUWU_SH_SKIP_COLORS = false` to force (even if unsupported) _VT100_ (_ANSI_) color use.
+    Flags which https://github.com/SwuduSusuwu/SubStack/issues/17 will introduce (TODO):
+        `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use Operating System Commands,) default is undefined.
+        `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` `termcmp`/`GetConsoleMode()` (for choices on whether or not to use colors,) default is undefined.
         To match `g++`/`clang++` output rules, use `-DSUSUWU_SKIP_BRACKETS = true, -DSUSUWU_SH_FILE = true, -DSUSUWU_SH_LINE = true, -DSUSUWU_SH_FUNC = false, -DSUSUWU_SKIP_COLORS = false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
 
 Linter: `clang-tidy cxx/*.cxx` /* uses `.clang_tidy` options */

@@ -8,54 +8,66 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build`
 `less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) /* follow URL for whole Macros.hxx */
 ```
+#ifdef __cplusplus
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#else /* !(defined __cplusplus */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	define SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
+#endif /* !(defined __cplusplus */
+
 #define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
 #define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
 #define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
+#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
+#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
+#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
 
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
-# define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
+#	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
 #else
-# define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) FALSE
+#	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) FALSE
 #endif
 
 #ifdef SUSUWU_SH_USE_FILE
-# define IF_SUSUWU_SH_FILE(U /* wrap clauses which print __FILE__ to `cerr`/`cout` */) U /* printout */
+#	define IF_SUSUWU_SH_FILE(U /* wrap clauses which print __FILE__ to `cerr`/`cout` */) U /* printout */
 #else
-# define IF_SUSUWU_SH_FILE(U) /* don't printout */
+#	define IF_SUSUWU_SH_FILE(U) /* don't printout */
 #endif
 #ifdef SUSUWU_SH_USE_LINE
-# define IF_SUSUWU_SH_LINE(U /* wrap clauses which print __LINE__ to `cerr`/`cout` */) U /* printout */
+#	define IF_SUSUWU_SH_LINE(U /* wrap clauses which print __LINE__ to `cerr`/`cout` */) U /* printout */
 #else
-# define IF_SUSUWU_SH_LINE(U) /* don't printout */
+#	define IF_SUSUWU_SH_LINE(U) /* don't printout */
 #endif
 #ifdef SUSUWU_SH_USE_FUNC
-# define IF_SUSUWU_SH_FUNC(U /* wrap clauses which print __func__ to `cerr`/`cout` */) U /* printout */
+#	define IF_SUSUWU_SH_FUNC(U /* wrap clauses which print __func__ to `cerr`/`cout` */) U /* printout */
 #else
-# define IF_SUSUWU_SH_FUNC(U) /* don't printout */
+#	define IF_SUSUWU_SH_FUNC(U) /* don't printout */
 #endif
 #if defined(SUSUWU_SH_USE_FILE) || defined(SUSUWU_SH_USE_LINE) || defined(SUSUWU_SH_USE_FUNC)
-# define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U /* wrap clauses common to `__FILE__`, `__LINE__`, `__func__` use */) U /* printout */
+#	define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U /* wrap clauses common to `__FILE__`, `__LINE__`, `__func__` use */) U /* printout */
 #else
-# define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U) /* don't printout */
+#	define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U) /* don't printout */
 #endif
 
-#define SUSUWU_SH_DEFAULT "\033[0m"
-#define SUSUWU_SH_BLACK "\033[0;30m"
-#define SUSUWU_SH_DARK_GRAY "\033[1;30m"
-#define SUSUWU_SH_RED "\033[0;31m"
-#define SUSUWU_SH_LIGHT_RED "\033[1;31m"
-#define SUSUWU_SH_GREEN "\033[0;32m"
-#define SUSUWU_SH_LIGHT_GREEN "\033[1;32m"
-#define SUSUWU_SH_BROWN "\033[0;33m"
-#define SUSUWU_SH_YELLOW "\033[1;33m"
-#define SUSUWU_SH_BLUE "\033[0;34m"
-#define SUSUWU_SH_LIGHT_BLUE "\033[1;34m"
-#define SUSUWU_SH_PURPLE "\033[0;35m"
-#define SUSUWU_SH_LIGHT_PURPLE "\033[1;35m"
-#define SUSUWU_SH_CYAN "\033[0;36m"
-#define SUSUWU_SH_LIGHT_CYAN "\033[1;36m"
-#define SUSUWU_SH_LIGHT_GRAY "\033[0;37m"
-#define SUSUWU_SH_WHITE "\033[1;37m"
+#define SUSUWU_SH_ESC "\033" /* Escape */
+#define SUSUWU_SH_CSI SUSUWU_SH_ESC "[" /* Control Sequence Introducer */
+#define SUSUWU_SH_DEFAULT	SUSUWU_SH_CSI "0m"
+#define SUSUWU_SH_BLACK	SUSUWU_SH_CSI "0;30m"
+#define SUSUWU_SH_DARK_GRAY	SUSUWU_SH_CSI "1;30m"
+#define SUSUWU_SH_RED	SUSUWU_SH_CSI "0;31m"
+#define SUSUWU_SH_LIGHT_RED	SUSUWU_SH_CSI "1;31m"
+#define SUSUWU_SH_GREEN	SUSUWU_SH_CSI "0;32m"
+#define SUSUWU_SH_LIGHT_GREEN	SUSUWU_SH_CSI "1;32m"
+#define SUSUWU_SH_BROWN	SUSUWU_SH_CSI "0;33m"
+#define SUSUWU_SH_YELLOW	SUSUWU_SH_CSI "1;33m"
+#define SUSUWU_SH_BLUE	SUSUWU_SH_CSI "0;34m"
+#define SUSUWU_SH_LIGHT_BLUE	SUSUWU_SH_CSI "1;34m"
+#define SUSUWU_SH_PURPLE	SUSUWU_SH_CSI "0;35m"
+#define SUSUWU_SH_LIGHT_PURPLE	SUSUWU_SH_CSI "1;35m"
+#define SUSUWU_SH_CYAN	SUSUWU_SH_CSI "0;36m"
+#define SUSUWU_SH_LIGHT_CYAN	SUSUWU_SH_CSI "1;36m"
+#define SUSUWU_SH_LIGHT_GRAY	SUSUWU_SH_CSI "0;37m"
+#define SUSUWU_SH_WHITE	SUSUWU_SH_CSI "1;37m"
 #define SUSUWU_SH_FILE __FILE__ ":"
 #define SUSUWU_SH_PREFIX IF_SUSUWU_SH_BRACKETS("[", "") SUSUWU_SH_WHITE
 #define SUSUWU_SH_ERROR SUSUWU_SH_RED "Error: " SUSUWU_SH_WHITE
@@ -75,16 +87,10 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_CERR(WARN_LEVEL, x) std::cerr << SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(<< std::string(SUSUWU_SH_FILE)) IF_SUSUWU_SH_LINE(<< std::to_string(__LINE__) << ":") IF_SUSUWU_SH_FUNC(<< std::string(__func__) << ":") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(<< ' ') << SUSUWU_CERR_IMP(WARN_LEVEL, x) << SUSUWU_SH_POSTFIX << std::endl
 #define SUSUWU_STDERR(WARN_LEVEL, x) SUSUWU_STDERR_IMP(WARN_LEVEL, SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE("%i:") IF_SUSUWU_SH_FUNC("%s:") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(" "), SUSUWU_SH_POSTFIX "\n", x, IF_SUSUWU_SH_LINE(__LINE__ SUSUWU_COMMA) IF_SUSUWU_SH_FUNC(__func__ SUSUWU_COMMA))
 /* Use this to do C versus C++ agnostic code */
-#ifdef __cplusplus
-# define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
-#else /* !(defined __cplusplus */
-# define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
-# define SUSUWU_USE_STDERR
-#endif /* !(defined __cplusplus */
-#ifdef SUSUWU_USE_STDERR
-# define SUSUWU_PRINT(LEVEL, x) SUSUWU_STDERR(LEVEL, x)
+#ifdef SUSUWU_SH_PREFER_STDIO
+#	define SUSUWU_PRINT(LEVEL, x) SUSUWU_STDERR(LEVEL, x)
 #else
-# define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
+#	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
 #endif
 #define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
 #define SUSUWU_WARNING(x) SUSUWU_PRINT(WARNING, x)
@@ -93,13 +99,13 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 
 /* Use this to limit notices/diagnostics to release builds (+ do conditional execution) */
 #ifdef NDEBUG
-# define SUSUWU_NOTICE(x) (true)/* skip */
-# define SUSUWU_DEBUG(x) (true)/* skip */
-# define SUSUWU_DEBUGEXECUTE(x) (true)/*skip*/
+#	define SUSUWU_NOTICE(x) (true)/* skip */
+#	define SUSUWU_DEBUG(x) (true)/* skip */
+#	define SUSUWU_DEBUGEXECUTE(x) (true)/*skip*/
 #else /* !(defined NDEBUG) */
-# define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
-# define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
-# define SUSUWU_DEBUGEXECUTE(x) x
+#	define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
+#	define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
+#	define SUSUWU_DEBUGEXECUTE(x) x
 #endif /* !(defined NDEBUG) */
 
 /* Use this to reduce (conditional) print + (unconditional) execute into single statement */
@@ -113,16 +119,16 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_DEBUG_DEBUGEXECUTE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_DEBUGEXECUTE(x))
 
 #if (defined __cplusplus && 201102 < __cplusplus)
-# define SUSUWU_CXX11
+#	define SUSUWU_CXX11
 #endif /* if (defined __cplusplus && 201402 <= __cplusplus) */
 #if (defined __cplusplus && 201402 <= __cplusplus)
-# define SUSUWU_CXX14
+#	define SUSUWU_CXX14
 #endif /* if (defined __cplusplus && 201402 < __cplusplus) */
 #if (defined __cplusplus && 201702 < __cplusplus)
-# define SUSUWU_CXX17
+#	define SUSUWU_CXX17
 #endif /* if (defined __cplusplus && 201702 < __cplusplus) */
 #if (defined __cplusplus && 202002 <= __cplusplus)
-# define SUSUWU_CXX20
+#	define SUSUWU_CXX20
 #endif /* if (defined __cplusplus && 202002 <= __cplusplus) */
 #if defined(SUSUWU_CXX11)
 #	define NOEXCEPT noexcept /* Usage: `void versionInfo() NOEXCEPT;` is close to `void versionInfo() [[ensures: true]];` or `versionInfo(); !UNREACHABLE;*/
@@ -308,7 +314,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef _POSIX_VERSION */
-# undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
+#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
 #endif /* ndef _POSIX_VERSION */
 }
@@ -317,17 +323,17 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	waitpid(pid, &wstatus, 0);
-# ifndef NDEBUG /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
+#	ifndef NDEBUG /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
 		SUSUWU_PRINT(WARNING, "execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_DEBUG(...);}}: WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT);
 	} else if(WIFSIGNALED(wstatus)) {
 		SUSUWU_PRINT(WARNING, "execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_PRINT(WARNING, ...);}}: WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT);
 	}
-# endif /* ndef NDEBUG */ /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
+#	endif /* ndef NDEBUG */ /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef _POSIX_VERSION */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
-# define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
+#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
 #endif /* ndef _POSIX_VERSION */
 }
 
@@ -351,15 +357,15 @@ const bool classSysSetRoot(bool root) {
 			SUSUWU_PRINT(WARNING, "classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
 		}
 #if 0
-# ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
-# else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
+#	ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
+#	else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
 		/* TODO: polkit? Until this is finished, you must use chmod (to give setuid to executable), or execute new processes (with `sudo`/`su`) if you wish to use firewall/antivirus (which require root) */
-# endif /* __APPLE__ else */
+#	endif /* __APPLE__ else */
 #endif /* 0 */
 	} else {
-# if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
+#	if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
 		uid_t sudoUid = audit_getloginuid();
-# else /* !def linux */
+#	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
 			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = nullptr;
@@ -373,7 +379,7 @@ const bool classSysSetRoot(bool root) {
 				}
 			}
 		}
-# endif /* !def LINUX */
+#	endif /* !def LINUX */
 		if(0 == sudoUid) {
 			SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(0 == sudoUid) /* stuck as root */}");
 		} else if(-1 == seteuid(sudoUid)) {
@@ -796,7 +802,7 @@ node_count = 5
 winner_count = 1
 initial_range = (-0.5, 0.5)
 
-# Create layersOfNeurons+1 hierarchical layers of sizes = neuronsPerLayer, and outputNeurons for last
+#	Create layersOfNeurons+1 hierarchical layers of sizes = neuronsPerLayer, and outputNeurons for last
 self_organizing_network = SelfOrganizingNetwork(
 	input_size=input_size,
 	layer_sizes=layer_sizes,
@@ -807,7 +813,7 @@ self_organizing_network = SelfOrganizingNetwork(
 	winner_counts=winner_count,
 	initial_ranges=initial_range)
 
-# Create a set of sparse samples
+#	Create a set of sparse samples
 samples = []");
 	foreach(inputsToOutputs as sample) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
 		PyRun_SimpleString("samples.append(" + sample.first() +" -> " + sample.last() + ")");
@@ -1548,7 +1554,7 @@ const std::vector<FilePath> assistantParseUrls(const FilePath &localXhtml) {
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
 #else /* else !BOOST_VERSION */
-# pragma message("TODO: process XHTML without Boost")
+#	pragma message("TODO: process XHTML without Boost")
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
