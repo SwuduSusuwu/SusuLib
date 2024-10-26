@@ -14,6 +14,7 @@
 #else
 typedef int pid_t;
 #endif
+#include <type_traits> /* std::remove_const */
 #include <vector> /* std::vector */
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 namespace Susuwu {
@@ -59,10 +60,44 @@ inline Os &classSysHexOs(Os &os, const Str &value) {
 	return os;
 }
 template<class Str>
-inline Str classSysHexStr(const Str &value) {
+inline const Str classSysHexStr(const Str &value) {
 	std::stringstream os;
 	classSysHexOs(os, value);
 	return os.str();
+}
+template<class Os, class List>
+inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthesis/* {...} */ = true) {
+	if(parenthesis) {
+		os << '{';
+	}
+	for(const auto &it: argvS) {
+		if(&it != &*argvS.cbegin()) {
+			os << ", ";
+		}
+		os << SUSUWU_SH_GREEN "\"";
+		os << it;
+		os << "\"" SUSUWU_SH_DEFAULT;
+	}
+	if(parenthesis) {
+		os << '}';
+	}
+	return os;
+}
+template<class List>
+inline const auto classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
+	typename std::remove_const<typename List::value_type>::type str = (parenthesis ? "{" : "");
+	for(const auto &it: argvS) {
+		if(&it != &*argvS.cbegin()) {
+			str += ", ";
+		}
+		str += SUSUWU_SH_GREEN "\"";
+		str += it;
+		str += "\"" SUSUWU_SH_DEFAULT;
+	}
+	if(parenthesis) {
+		str += '}';
+	}
+	return str;
 }
 
 template<typename Func, typename... Args>

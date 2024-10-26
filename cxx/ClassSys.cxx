@@ -10,7 +10,7 @@
 #ifdef _POSIX_VERSION
 #include <stdexcept> /* std::runtime_error */
 #include <sys/types.h> /* pid_t */
-#include <sys/wait.h> /* waitpid */
+#include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
 #include <unistd.h> /* execve execv fork geteuid getuid setuid */
 #else
 # ifdef __WIN32__
@@ -47,6 +47,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	} /* if 0, is fork */
 	const std::vector<std::string> argvSmutable = {argvS.cbegin(), argvS.cend()};
 	std::vector<char *> argv;
+	argv.reserve(argvSmutable.size());
 	//for(auto x : argvSmutable) { /* with `fsanitize=address` this triggers "stack-use-after-scope" */
 	for(const auto &x: argvSmutable /* auto x = argvSmutable.cbegin(); argvSmutable.cend() != x; ++x */) {
 		argv.push_back(const_cast<char *>(x.c_str()));
@@ -70,28 +71,18 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
 #endif /* ndef _POSIX_VERSION */
 }
-static const std::string vectorToStr(const std::vector<std::string> &argvS) {
-	std::string str = "{";
-	for(const auto &it: argvS) {
-		str += SUSUWU_SH_BLUE;
-		str += it;
-		str += ", " SUSUWU_SH_DEFAULT;
-	}
-	str += '}';
-	return str;
-}
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
 #ifdef _POSIX_VERSION
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	waitpid(pid, &wstatus, 0);
-# ifndef NDEBUG
+# ifndef NDEBUG /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
-		SUSUWU_PRINT(WARNING, "execves(" + vectorToStr(argvS) + ", " + vectorToStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_DEBUG(...);}}: WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT);
+		SUSUWU_PRINT(WARNING, "execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_DEBUG(...);}}: WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT);
 	} else if(WIFSIGNALED(wstatus)) {
-		SUSUWU_PRINT(WARNING, "execves(" + vectorToStr(argvS) + ", " + vectorToStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_PRINT(WARNING, ...);}}: WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT);
+		SUSUWU_PRINT(WARNING, "execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_PRINT(WARNING, ...);}}: WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT);
 	}
-# endif /* ndef NDEBUG */
+# endif /* ndef NDEBUG */ /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef _POSIX_VERSION */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
