@@ -14,7 +14,7 @@
 #else
 typedef int pid_t;
 #endif
-#include <type_traits> /* std::remove_const */
+#include <type_traits> /* std::remove_const_t */
 #include <vector> /* std::vector */
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 namespace Susuwu {
@@ -85,7 +85,7 @@ inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthe
 }
 template<class List>
 inline const auto classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
-	typename std::remove_const<typename List::value_type>::type str = (parenthesis ? "{" : "");
+	std::remove_const_t<typename List::value_type> str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
 			str += ", ";

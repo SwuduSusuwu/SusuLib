@@ -207,7 +207,7 @@ inline Os &classSysColoredParamOs(Os &os, const class List &argvS, const bool pa
 }
 template<class List>
 inline const auto classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
-	typename std::remove_const<typename List::value_type>::type str = (parenthesis ? "{" : "");
+	std::remove_const_t<typename List::value_type> str = (parenthesis ? "{" : "");
 	std::string str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
