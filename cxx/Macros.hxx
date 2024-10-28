@@ -167,7 +167,7 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #define SUSUWU_INFO(x) SUSUWU_PRINT(INFO, x)
 #define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
 
-/* Use this to limit notices/diagnostics to release builds (+ do conditional execution) */
+/* Use this to just print debug/notices to `--debug` builds (+ do conditional execution) */
 #ifdef NDEBUG
 #	define SUSUWU_NOTICE(x) (true)/* skip */
 #	define SUSUWU_DEBUG(x) (true)/* skip */
@@ -178,13 +178,15 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #	define SUSUWU_DEBUGEXECUTE(x) x
 #endif /* !(defined NDEBUG) */
 
-/* Use this to reduce (conditional) print + (unconditional) execute into single statement */
+/* Use this to reduce print (NOTICE/DEBUG is conditional) + (unconditional) execute into single statement */
+#define SUSUWU_ERROR_EXECUTE(x) ((SUSUWU_ERROR(#x)), (x))
+#define SUSUWU_WARNING_EXECUTE(x) ((SUSUWU_WARNING(#x)), (x))
 #define SUSUWU_INFO_EXECUTE(x) ((SUSUWU_INFO(#x)), (x))
+#define SUSUWU_SUCCESS_EXECUTE(x) ((SUSUWU_SUCCESS(#x)), (x))
 #define SUSUWU_NOTICE_EXECUTE(x) ((SUSUWU_NOTICE(#x)), (x))
 #define SUSUWU_DEBUG_EXECUTE(x) ((SUSUWU_DEBUG(#x)), (x))
 
 /* Use this to reduce (conditional) print + (conditional) execute into single statement */
-#define SUSUWU_INFO_DEBUGEXECUTE(x) ((SUSUWU_INFO(#x)), SUSUWU_DEBUGEXECUTE(x))
 #define SUSUWU_NOTICE_DEBUGEXECUTE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_DEBUGEXECUTE(x))
 #define SUSUWU_DEBUG_DEBUGEXECUTE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_DEBUGEXECUTE(x))
 
