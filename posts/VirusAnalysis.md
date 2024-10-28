@@ -22,12 +22,24 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
 #endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
 
+#if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
+# define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
+#else
+# define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
+#endif
+
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
 #else
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) FALSE
 #endif
 
+#if (!defined(SUSUWU_SH_FILE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_FILE /* overridable with `-DSUSUWU_SH_FILE true/false` */
+#	define SUSUWU_SH_USE_FILE /* affix `__FILE__ ":"` to `stderr`/`cerr` printout */
+#endif
+#if (!defined(SUSUWU_SH_LINE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_LINE /* overridable with `-DSUSUWU_SH_LINE true/false` */
+#	define SUSUWU_SH_USE_LINE /* affix `__LINE__ ":"` to `stderr`/`cerr` printout */
+#endif
 #ifdef SUSUWU_SH_USE_FILE
 #	define IF_SUSUWU_SH_FILE(U /* wrap clauses which print __FILE__ to `cerr`/`cout` */) U /* printout */
 #else
@@ -98,15 +110,15 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
 
 /* Use this to just print debug/notices to `--debug` builds (+ do conditional execution) */
-#ifdef NDEBUG
-#	define SUSUWU_NOTICE(x) (true)/* skip */
-#	define SUSUWU_DEBUG(x) (true)/* skip */
-#	define SUSUWU_DEBUGEXECUTE(x) (true)/*skip*/
-#else /* !(defined NDEBUG) */
+#if SUSUWU_SH_VERBOSE
 #	define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
 #	define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
-#	define SUSUWU_DEBUGEXECUTE(x) x
-#endif /* !(defined NDEBUG) */
+#	define SUSUWU_EXECUTEVERBOSE(x) x /* about side-effects; do not assume that `--debug` was used. `--release -DSUSUWU_SH_VERBOSE=true` will execute this. */
+#else /* else SUSUWU_SH_VERBOSE */
+#	define SUSUWU_NOTICE(x) (true)/* skip */
+#	define SUSUWU_DEBUG(x) (true)/* skip */
+#	define SUSUWU_EXECUTEVERBOSE(x) (true)/*skip*/ /* about side-effects; do not assume that just `--release` was used. `--debug -DSUSUWU_SH_VERBOSE=false` will skip. */
+#endif /* else SUSUWU_SH_VERBOSE */
 
 /* Use this to reduce print (NOTICE/DEBUG is conditional) + (unconditional) execute into single statement */
 #define SUSUWU_ERROR_EXECUTE(x) ((SUSUWU_ERROR(#x)), (x))
@@ -117,8 +129,8 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_DEBUG_EXECUTE(x) ((SUSUWU_DEBUG(#x)), (x))
 
 /* Use this to reduce (conditional) print + (conditional) execute into single statement */
-#define SUSUWU_NOTICE_DEBUGEXECUTE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_DEBUGEXECUTE(x))
-#define SUSUWU_DEBUG_DEBUGEXECUTE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_DEBUGEXECUTE(x))
+#define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
+#define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
 
 #if (defined __cplusplus && 201102 < __cplusplus)
 #	define SUSUWU_CXX11
@@ -325,13 +337,12 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	waitpid(pid, &wstatus, 0);
-#	ifndef NDEBUG /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
+/* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
-		SUSUWU_PRINT(WARNING, "execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_DEBUG(...);}}: WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT);
+		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	} else if(WIFSIGNALED(wstatus)) {
-		SUSUWU_PRINT(WARNING, "execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_PRINT(WARNING, ...);}}: WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT);
-	}
-#	endif /* ndef NDEBUG */ /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
+		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
+	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef _POSIX_VERSION */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
@@ -1016,8 +1027,8 @@ const bool virusAnalysisTests() {
 	resultListProduceHashes(abortOrNull);
 	produceAbortListSignatures(passOrNull, abortOrNull);
 	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
-	SUSUWU_DEBUGEXECUTE(resultListDumpTo(passOrNull, std::cout, true, true, false));
-	SUSUWU_NOTICE_DEBUGEXECUTE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
+	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
+	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
 	assert(4 == passOrNull.bytecodes.size());
 	assert(passOrNull.bytecodes.size() - 1 /* 2 instances of "SW", discount dup */ == passOrNull.hashes.size());
 	assert(0 == passOrNull.signatures.size()); /* NOLINT(readability-container-size-empty); all `.size()`, intuitive */
@@ -1176,7 +1187,7 @@ const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const Res
 		if(listHasValue(passList.hashes, fileHash)) {
 			return hashAnalysisCaches[fileHash] = virusAnalysisPass;
 		} else if(listHasValue(abortList.hashes, fileHash)) {
-			SUSUWU_PRINT(NOTICE, "hashAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to hash 0x" + classSysHexStr(fileHash) + " (found in `abortList.hashes`). You should treat this as a virus detection if this was not a test. */");
+			SUSUWU_NOTICE("hashAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to hash 0x" + classSysHexStr(fileHash) + " (found in `abortList.hashes`). You should treat this as a virus detection if this was not a test. */");
 			return hashAnalysisCaches[fileHash] = virusAnalysisAbort;
 		} else {
 			return hashAnalysisCaches[fileHash] =  virusAnalysisContinue; /* continue to next tests */
@@ -1191,8 +1202,8 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 	} catch (...) {
 		auto match = listFindSignatureOfValue(abortList.signatures, file.bytecode);
 		if(-1 != match.fileOffset) {
-			SUSUWU_PRINT(NOTICE, "signatureAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to signature 0x" + classSysHexStr(match.signature) + " found at offset=" + std::to_string(match.fileOffset) + ". You should treat this as a virus detection if this was not a test. */");
-				return signatureAnalysisCaches[fileHash] = virusAnalysisAbort;
+			SUSUWU_NOTICE("signatureAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to signature 0x" + classSysHexStr(match.signature) + " found at offset=" + std::to_string(match.fileOffset) + ". You should treat this as a virus detection if this was not a test. */");
+			return signatureAnalysisCaches[fileHash] = virusAnalysisAbort;
 		}
 		return signatureAnalysisCaches[fileHash] = virusAnalysisContinue;
 	}
@@ -1477,8 +1488,8 @@ const bool assistantCnsTests() {
 	assert(responsesOrNull.bytecodes.size() == questionsOrNull.bytecodes.size());
 	assert(4 == questionsOrNull.hashes.size());
 	assert(3 == responsesOrNull.hashes.size());
-	SUSUWU_NOTICE_DEBUGEXECUTE(resultListDumpTo(questionsOrNull, std::cout, true, true, false));
-	SUSUWU_NOTICE_DEBUGEXECUTE((resultListDumpTo(responsesOrNull, std::cout, false, false, false), std::cout << std::endl));
+	SUSUWU_NOTICE_EXECUTEVERBOSE(resultListDumpTo(questionsOrNull, std::cout, true, true, false));
+	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(responsesOrNull, std::cout, false, false, false), std::cout << std::endl));
 	questionsResponsesFromHosts(questionsOrNull, responsesOrNull);
 	produceAssistantCns(questionsOrNull, responsesOrNull, assistantCns);
 	return true;

@@ -36,16 +36,22 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 /* `#pragma S` in macro functions is `_Pragma(S)`, but without this wrap gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`. Use as `SUSUWU_PRAGMA(message("Message"))` */
 #define SUSUWU_PRAGMA(S) _Pragma(#S)
 
+#if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
+# define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
+#else
+# define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
+#endif
+
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
 #else
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) FALSE
 #endif
 
-#if (!defined(SUSUWU_SH_FILE) && !defined(NDEBUG)) || SUSUWU_SH_FILE /* overridable with `-DSUSUWU_SH_FILE true/false` */
+#if (!defined(SUSUWU_SH_FILE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_FILE /* overridable with `-DSUSUWU_SH_FILE true/false` */
 #	define SUSUWU_SH_USE_FILE /* affix `__FILE__ ":"` to `stderr`/`cerr` printout */
 #endif
-#if (!defined(SUSUWU_SH_LINE) && !defined(NDEBUG)) || SUSUWU_SH_LINE /* overridable with `-DSUSUWU_SH_LINE true/false` */
+#if (!defined(SUSUWU_SH_LINE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_LINE /* overridable with `-DSUSUWU_SH_LINE true/false` */
 #	define SUSUWU_SH_USE_LINE /* affix `__LINE__ ":"` to `stderr`/`cerr` printout */
 #endif
 #if defined(SUSUWU_SH_FUNC) && SUSUWU_SH_FUNC /* overridable with `-DSUSUWU_SH_FUNC true/false` */
@@ -168,15 +174,15 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
 
 /* Use this to just print debug/notices to `--debug` builds (+ do conditional execution) */
-#ifdef NDEBUG
-#	define SUSUWU_NOTICE(x) (true)/* skip */
-#	define SUSUWU_DEBUG(x) (true)/* skip */
-#	define SUSUWU_DEBUGEXECUTE(x) (true)/*skip*/
-#else /* !(defined NDEBUG) */
+#if SUSUWU_SH_VERBOSE
 #	define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
 #	define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
-#	define SUSUWU_DEBUGEXECUTE(x) x
-#endif /* !(defined NDEBUG) */
+#	define SUSUWU_EXECUTEVERBOSE(x) x /* about side-effects; do not assume that `--debug` was used. `--release -DSUSUWU_SH_VERBOSE=true` will execute this. */
+#else /* else SUSUWU_SH_VERBOSE */
+#	define SUSUWU_NOTICE(x) (true)/* skip */
+#	define SUSUWU_DEBUG(x) (true)/* skip */
+#	define SUSUWU_EXECUTEVERBOSE(x) (true)/*skip*/ /* about side-effects; do not assume that just `--release` was used. `--debug -DSUSUWU_SH_VERBOSE=false` will skip. */
+#endif /* else SUSUWU_SH_VERBOSE */
 
 /* Use this to reduce print (NOTICE/DEBUG is conditional) + (unconditional) execute into single statement */
 #define SUSUWU_ERROR_EXECUTE(x) ((SUSUWU_ERROR(#x)), (x))
@@ -187,8 +193,8 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #define SUSUWU_DEBUG_EXECUTE(x) ((SUSUWU_DEBUG(#x)), (x))
 
 /* Use this to reduce (conditional) print + (conditional) execute into single statement */
-#define SUSUWU_NOTICE_DEBUGEXECUTE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_DEBUGEXECUTE(x))
-#define SUSUWU_DEBUG_DEBUGEXECUTE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_DEBUGEXECUTE(x))
+#define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
+#define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
 
 #ifndef __has_feature
 #	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
