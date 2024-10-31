@@ -3,6 +3,7 @@
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
 #include "ClassObject.hxx" /* Object */
+#include "Macros.hxx" /* SUSUWU_CXX17 */
 #include <cassert> /* assert */
 #include <cstddef> /* size_t */
 #include <string> /* std::string */
@@ -13,12 +14,12 @@ namespace Susuwu {
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
 	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
-#ifdef CXX_17
+#if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
 	cnsModeString = cnsModeVectorChar /* std::string == std::vector<char> */
-#else /* else !def CXX_17 */
+#else /* else !def SUSUWU_CXX17 */
 /* https://stackoverflow.com/questions/5115166/how-to-construct-a-stdstring-from-a-stdvectorchar */
 	cnsModeString
-#endif /* def CXX_17 else */
+#endif /* def SUSUWU_CXX17 else */
 } CnsMode;
 
 typedef class Cns : Object {

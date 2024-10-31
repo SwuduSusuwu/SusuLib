@@ -153,11 +153,23 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #define SUSUWU_DEBUG_DEBUGEXECUTE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_DEBUGEXECUTE(x))
 
 #ifndef __has_feature
-#define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
+# define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
 #endif /* ndef __has_feature */
 #if (!defined _POSIX_VERSION) && (_POSIX_C_SOURCE)
-#define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix */
+# define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix */
 #endif /* (!defined _POSIX_VERSION) && (_POSIX_C_SOURCE) */
+#if (defined __cplusplus && 201102 < __cplusplus)
+# define SUSUWU_CXX11
+#endif /* if (defined __cplusplus && 201402 <= __cplusplus) */
+#if (defined __cplusplus && 201402 <= __cplusplus)
+# define SUSUWU_CXX14
+#endif /* if (defined __cplusplus && 201402 < __cplusplus) */
+#if (defined __cplusplus && 201702 < __cplusplus)
+# define SUSUWU_CXX17
+#endif /* if (defined __cplusplus && 201702 < __cplusplus) */
+#if (defined __cplusplus && 202002 <= __cplusplus)
+# define SUSUWU_CXX20
+#endif /* if (defined __cplusplus && 202002 <= __cplusplus) */
 
 #if (!defined __WIN32__) && (defined _WIN32 /* || defined __CYGWIN__ should use "#ifdef _POSIX_VERSION" path */ || __MSC_VER)
 # define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
@@ -212,16 +224,16 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #endif /* !def USE_ASSUME */
 /* `clang-tidy` on: NOLINTEND(cppcoreguidelines-macro-usage) */
 
-#if defined(__clang__) && __has_feature(cxx_noexcept) || defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46 || defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114 /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
+#if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define NOEXCEPT noexcept /* Usage: `void versionInfo() NOEXCEPT;` is close to `void versionInfo() [[ensures: true]];` or `versionInfo(); !UNREACHABLE;*/
-#else /* !supports noexcept */
+#else /* C++11 else */
 #	define NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
-#endif /* !supports noexcept */
-#if (defined __has_cpp_attribute) && __has_cpp_attribute(noreturn) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
+#endif /* else no `noexcept` */
+#if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define NORETURN [[noreturn]] /* Usage: `NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); UNREACHABLE;*/
-#else /* !supports [[noreturn]] */
+#else /* C++11 else */
 #	define NORETURN /* old `g++` "error: 'NORETURN' does not name a type" / old `clang++` "error: unknown type name 'NORETURN'" fix */
-#endif /* !supports [[noreturn]] */
+#endif /* else no `[[noreturn]]` */
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_Macros_hxx */
 

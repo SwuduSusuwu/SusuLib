@@ -111,6 +111,29 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_INFO_DEBUGEXECUTE(x) ((SUSUWU_INFO(#x)), SUSUWU_DEBUGEXECUTE(x))
 #define SUSUWU_NOTICE_DEBUGEXECUTE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_DEBUGEXECUTE(x))
 #define SUSUWU_DEBUG_DEBUGEXECUTE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_DEBUGEXECUTE(x))
+
+#if (defined __cplusplus && 201102 < __cplusplus)
+# define SUSUWU_CXX11
+#endif /* if (defined __cplusplus && 201402 <= __cplusplus) */
+#if (defined __cplusplus && 201402 <= __cplusplus)
+# define SUSUWU_CXX14
+#endif /* if (defined __cplusplus && 201402 < __cplusplus) */
+#if (defined __cplusplus && 201702 < __cplusplus)
+# define SUSUWU_CXX17
+#endif /* if (defined __cplusplus && 201702 < __cplusplus) */
+#if (defined __cplusplus && 202002 <= __cplusplus)
+# define SUSUWU_CXX20
+#endif /* if (defined __cplusplus && 202002 <= __cplusplus) */
+#if defined(SUSUWU_CXX11)
+#	define NOEXCEPT noexcept /* Usage: `void versionInfo() NOEXCEPT;` is close to `void versionInfo() [[ensures: true]];` or `versionInfo(); !UNREACHABLE;*/
+#else /* C++11 else */
+#	define NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
+#endif /* else no `noexcept` */
+#if defined(SUSUWU_CXX11) || (defined(__has_cpp_attribute) && __has_cpp_attribute(noreturn))
+#	define NORETURN [[noreturn]] /* Usage: `NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); UNREACHABLE;*/
+#else /* C++11 else */
+#	define NORETURN /* old `g++` "error: 'NORETURN' does not name a type" / old `clang++` "error: unknown type name 'NORETURN'" fix */
+#endif /* else no `[[noreturn]]` */
 ```
 `less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```
@@ -635,12 +658,12 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
 	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
-#ifdef CXX_17
+#if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
 	cnsModeString = cnsModeVectorChar /* std::string == std::vector<char> */
-#else /* else !def CXX_17 */
+#else /* else !def SUSUWU_CXX17 */
 /* https://stackoverflow.com/questions/5115166/how-to-construct-a-stdstring-from-a-stdvectorchar */
 	cnsModeString
-#endif /* def CXX_17 else */
+#endif /* def SUSUWU_CXX17 else */
 } CnsMode;
 
 typedef class Cns : Object {
