@@ -129,9 +129,9 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #endif /* if (defined __cplusplus && 201702 < __cplusplus) */
 #if (defined __cplusplus && 202002 <= __cplusplus)
 #	define SUSUWU_CXX20
-#endif /* if (defined __cplusplus && 202002 <= __cplusplus) */
-#if defined(SUSUWU_CXX11)
-#	define NOEXCEPT noexcept /* Usage: `void versionInfo() NOEXCEPT;` is close to `void versionInfo() [[ensures: true]];` or `versionInfo(); !UNREACHABLE;*/
+#if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && 180021114 <= _MSC_FULL_VER)
+#	define NOEXCEPT noexcept /* Usage: `void info() NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {UNREACHABLE;}} */
+		/* Usage 2: `void versionInfo() NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {UNREACHABLE;}}}` */
 #else /* C++11 else */
 #	define NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
 #endif /* else no `noexcept` */

@@ -267,7 +267,8 @@ namespace Susuwu {
 /* `clang-tidy` on: NOLINTEND(cppcoreguidelines-macro-usage) */
 
 #if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
-#	define NOEXCEPT noexcept /* Usage: `void versionInfo() NOEXCEPT;` is close to `void versionInfo() [[ensures: true]];` or `versionInfo(); !UNREACHABLE;*/
+#	define NOEXCEPT noexcept /* Usage: `void info() NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {UNREACHABLE;}} */
+		/* Usage 2: `void versionInfo() NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {UNREACHABLE;}}}` */
 #else /* C++11 else */
 #	define NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
 #endif /* else no `noexcept` */
