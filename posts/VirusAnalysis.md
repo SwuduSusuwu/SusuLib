@@ -1353,7 +1353,7 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 #include <cstdlib> /* exit */
 #include <iostream> /* std::cout std::flush std::endl */
 namespace Susuwu {
-void noExcept() NOEXCEPT;
+void noExcept() NOEXCEPT(true);
 NORETURN void noReturn();
 void noExcept() NOEXCEPT {std::cout << std::flush;}
 void noReturn() {exit(0);}
