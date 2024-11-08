@@ -132,17 +132,21 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
 
-#if (defined __cplusplus && 201102 < __cplusplus)
+#if (defined(__cplusplus) && 201102 < __cplusplus)
 #	define SUSUWU_CXX11
-#endif /* if (defined __cplusplus && 201402 <= __cplusplus) */
-#if (defined __cplusplus && 201402 <= __cplusplus)
+# define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#	else
+# define SUSUWU_STATIC_ASSERT(condition) assert(condition)
+#endif /* (defined __cplusplus && 201102 <= __cplusplus) else */
+#if (defined(__cplusplus) && 201402 <= __cplusplus)
 #	define SUSUWU_CXX14
-#endif /* if (defined __cplusplus && 201402 < __cplusplus) */
-#if (defined __cplusplus && 201702 < __cplusplus)
+#endif /* if (defined(__cplusplus) && 201402 < __cplusplus) */
+#if (defined(__cplusplus) && 201702 < __cplusplus)
 #	define SUSUWU_CXX17
-#endif /* if (defined __cplusplus && 201702 < __cplusplus) */
-#if (defined __cplusplus && 202002 <= __cplusplus)
+#endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
+#if (defined(__cplusplus) && 202002 <= __cplusplus)
 #	define SUSUWU_CXX20
+#endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
 #if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && 180021114 <= _MSC_FULL_VER)
 #	define NOEXCEPT noexcept /* Usage: `void info() NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {UNREACHABLE;}} */
 		/* Usage 2: `void versionInfo() NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {UNREACHABLE;}}}` */
@@ -701,7 +705,7 @@ public:
 	virtual void setOutputMode(CnsMode x) {outputMode = x;}
 	virtual void setInputNeurons(size_t x) {inputNeurons = x;}
 	virtual void setOutputNeurons(size_t x) {outputNeurons = x;}
-	virtual void setLayersOfNeurons(size_t x) {layersOfNeurons = x;} 
+	virtual void setLayersOfNeurons(size_t x) {layersOfNeurons = x;}
 	virtual void setNeuronsPerLayer(size_t x) {neuronsPerLayer = x;}
 	/* @throw bad_alloc
 	 * @pre @code hasImplementation() @endcode
@@ -1361,7 +1365,7 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* ASSUME EXPECTS ENSURES NOEXCEPT NORETURN */
+#include "Macros.hxx" /* ASSUME EXPECTS ENSURES NOEXCEPT NORETURN UNREACHABLE */
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #include <cstdlib> /* exit */
 #include <iostream> /* std::cout std::flush std::endl */
@@ -1400,6 +1404,7 @@ const int testHarnesses() EXPECTS(true) ENSURES(true) {
 		std::cout << "error" << std::endl;
 	}
 	noReturn();
+	UNREACHABLE;
 }
 }; /* namespace Susuwu */
 int main(int argc, const char **args) {
@@ -1539,7 +1544,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 				auto responseSha2 = sha2(response);
 				if(listHasValue(responsesOrNull.hashes, responseSha2)) { /* TODO */ } else {
 					responsesOrNull.hashes.insert(responseSha2);
-					responsesOrNull.bytecodes.push_back(response); 
+					responsesOrNull.bytecodes.push_back(response);
 				}
 			}
 		}

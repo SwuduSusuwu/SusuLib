@@ -4,7 +4,7 @@
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* ASSUME EXPECTS ENSURES NOEXCEPT NORETURN */
+#include "Macros.hxx" /* ASSUME EXPECTS ENSURES NOEXCEPT NORETURN UNREACHABLE */
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #include <cstdlib> /* exit */
 #include <iostream> /* std::cout std::flush std::endl */
@@ -43,6 +43,7 @@ const int testHarnesses() EXPECTS(true) ENSURES(true) {
 		std::cout << "error" << std::endl;
 	}
 	noReturn();
+	UNREACHABLE;
 }
 }; /* namespace Susuwu */
 int main(int argc, const char **args) {

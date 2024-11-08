@@ -5,7 +5,7 @@
 /* To printout default preprocessor definitions:
  * for X={clang, clang++, gcc, g++, hipcc, icc}: `$X -dM -E -x c++ /dev/null`
  * replace `/dev/null` with a file (such as `cxx/Macros.hxx`) to printout actual preprocessor definitions
- * for MSVC: `git clone --depth 1 https://github.com/MicrosoftDocs/cpp-docs.git && vim cpp-docs/blob/main/docs/preprocessor/predefined-macros.md` or browse to https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros 
+ * for MSVC: `git clone --depth 1 https://github.com/MicrosoftDocs/cpp-docs.git && vim cpp-docs/blob/main/docs/preprocessor/predefined-macros.md` or browse to https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
  * for others: `git clone https://github.com/cpredef/predef.git && vim predef/Compilers.md`
  */ /* To pass new preprocessor definitions (example is `#define USE_CONTRACTS true`):
  * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
@@ -202,30 +202,31 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #if (!defined _POSIX_VERSION) && (_POSIX_C_SOURCE)
 #	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix */
 #endif /* (!defined _POSIX_VERSION) && (_POSIX_C_SOURCE) */
-#if (defined __cplusplus && 201102 < __cplusplus)
+#if (defined(__cplusplus) && 201102 < __cplusplus)
 #	define SUSUWU_CXX11
-#endif /* if (defined __cplusplus && 201402 <= __cplusplus) */
-#if (defined __cplusplus && 201402 <= __cplusplus)
+# define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#	else
+# define SUSUWU_STATIC_ASSERT(condition) assert(condition)
+#endif /* (defined __cplusplus && 201102 <= __cplusplus) else */
+#if (defined(__cplusplus) && 201402 <= __cplusplus)
 #	define SUSUWU_CXX14
-#endif /* if (defined __cplusplus && 201402 < __cplusplus) */
-#if (defined __cplusplus && 201702 < __cplusplus)
+#endif /* if (defined(__cplusplus) && 201402 < __cplusplus) */
+#if (defined(__cplusplus) && 201702 < __cplusplus)
 #	define SUSUWU_CXX17
-#endif /* if (defined __cplusplus && 201702 < __cplusplus) */
-#if (defined __cplusplus && 202002 <= __cplusplus)
+#endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
+#if (defined(__cplusplus) && 202002 <= __cplusplus)
 #	define SUSUWU_CXX20
-#endif /* if (defined __cplusplus && 202002 <= __cplusplus) */
+#endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
 
 #if (!defined __WIN32__) && (defined _WIN32 /* || defined __CYGWIN__ should use "#ifdef _POSIX_VERSION" path */ || __MSC_VER)
 #	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
 #endif
 
 /* `UNREACHABLE` is close to `ASSUME(false)` */
-#if (!defined NDEBUG) && (defined(SUSUWU_CXX11))
+#if !defined(NDEBUG_)
 /* [https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release] [https://stackoverflow.com/questions/2290509/debug-vs-ndebug] */
 /* Debug: Promises unreachable, for static analysis */
-#	define UNREACHABLE static_assert(false)
-#elif (!defined NDEBUG)
-#	define UNREACHABLE assert(false)
+#	define UNREACHABLE assert(false && "UNREACHABLE") /* TODO: `static_assert` does not allow false, not even in unreachable code paths */
 #else
 }; /* namespace Susuwu */
 #	include <version> /* __cpp_lib_unreachable */ /* [https://en.cppreference.com/w/cpp/feature_test] */
@@ -255,12 +256,8 @@ namespace Susuwu {
 /* TODO: choose best of [various possible ASSUME macros](https://stackoverflow.com/questions/44054078/how-to-guide-gcc-optimizations-based-on-assertions-without-runtime-cost) */
 #ifndef NDEBUG
 /* Debug: Promises `(true == (X))`, for static analysis */
-#	ifdef SUSUWU_CXX11
-#		define ASSUME(X) static_assert(X)
-#	else /* def SUSUWU_CXX11 else */
-#		define ASSUME(X) assert(X)
-#	endif /* def SUSUWU_CXX11 else */
-#elif (!defined USE_ASSUME) || USE_ASSUME /* Default: if(!NDEBUG) USE_ASSUME=true; pass `-DUSE_ASSUME=false` to disable this */ 
+#	define ASSUME(X) SUSUWU_STATIC_ASSERT(X)
+#elif (!defined USE_ASSUME) || USE_ASSUME /* Default: if(!NDEBUG) USE_ASSUME=true; pass `-DUSE_ASSUME=false` to disable this */
 /* Release: Promises `(true == (X))`, for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
 #	ifdef IS_MSVC
 #		define ASSUME(X) __assume(X)
