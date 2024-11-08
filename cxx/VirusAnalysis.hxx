@@ -7,7 +7,7 @@
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* sha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* NOEXCEPT */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT */
 #include <map> /* std::map */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
@@ -42,9 +42,9 @@ extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code analysisCns.hasImplementation() && virusFixCns.hasImplementation() @endcode */
 const bool virusAnalysisTests();
-static const bool virusAnalysisTestsNoexcept() NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
-static const bool virusAnalysisHookTestsNoexcept() NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
  * @pre @code (virusAnalysisHookDefault == virusAnalysisGetHook() || virusAnalysisHookExec == virusAnalysisGetHook() || virusAnalysisHookNewFile == virusAnalysisGetHook() || (virusAnalysisHookExec | virusAnalysisHookNewFile) == virusAnalysisGetHook()) @endcode
@@ -100,7 +100,7 @@ extern std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatu
 /* call to use new versions of `passList`/`abortList`
  * @post @code *AnalysisCaches.empty() @encode
  */
-void virusAnalysisResetCaches() NOEXCEPT;
+void virusAnalysisResetCaches() SUSUWU_NOEXCEPT;
 
 typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const ResultListHash &fileHash);
 extern std::vector<typeof(VirusAnalysisFun)> virusAnalyses;

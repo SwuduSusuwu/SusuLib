@@ -148,15 +148,15 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	define SUSUWU_CXX20
 #endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
 #if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && 180021114 <= _MSC_FULL_VER)
-#	define NOEXCEPT noexcept /* Usage: `void info() NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {UNREACHABLE;}} */
-		/* Usage 2: `void versionInfo() NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {UNREACHABLE;}}}` */
+#	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
+		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
 #else /* C++11 else */
-#	define NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
+#	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
 #endif /* else no `noexcept` */
 #if defined(SUSUWU_CXX11) || (defined(__has_cpp_attribute) && __has_cpp_attribute(noreturn))
-#	define NORETURN [[noreturn]] /* Usage: `NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); UNREACHABLE;*/
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;*/
 #else /* C++11 else */
-#	define NORETURN /* old `g++` "error: 'NORETURN' does not name a type" / old `clang++` "error: unknown type name 'NORETURN'" fix */
+#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
 #endif /* else no `[[noreturn]]` */
 ```
 `less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassPortableExecutable.hxx)
@@ -282,7 +282,7 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) {
 
 /* @throw std::runtime_error */
 const bool classSysTests();
-static const bool classSysTestsNoexcept() NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
+static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
 ```
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
 ```
@@ -319,7 +319,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	argv.push_back(nullptr);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
-		execv(argv[0], &argv[0]); /* NORETURN */
+		execv(argv[0], &argv[0]); /* SUSUWU_NORETURN */
 	} else {
 		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()};
 		std::vector<char *> envp;
@@ -328,9 +328,9 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
 		envp.push_back(nullptr);
-		execve(argv[0], &argv[0], &envp[0]); /* NORETURN */
+		execve(argv[0], &argv[0], &envp[0]); /* SUSUWU_NORETURN */
 	}
-	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
+	exit(EXIT_FAILURE); /* execv*() is `SUSUWU_NORETURN`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef _POSIX_VERSION */
 #	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
@@ -432,7 +432,7 @@ const bool classSysTests() {
 typedef FileHash (*Sha2)(const FileBytecode &bytecode);
 extern Sha2 sha2/* = sha256 */; /* To compress, apps can execute `sha2 = sha1;`. To double hash sizes, execute `sha2 = sha512;`. (Notice: this does not recompute hashes which exist) */
 const bool classSha2Tests();
-const bool classSha2TestsNoexcept() NOEXCEPT;
+const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 ```
 `less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.cxx)
 ```
@@ -493,7 +493,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	}
 	return true;
 }
-const bool classSha2TestsNoexcept() NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
 ```
 `less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.hxx)
 ```
@@ -696,8 +696,8 @@ public:
 	Cns() = default; /* Default constructor */
 	Cns(const Cns &) = default; /* Copy constructor */
 	Cns& operator=(const Cns &) = default; /* Copy assignment */
-	Cns(Cns&&) NOEXCEPT = default; /* Move constructor */
-	Cns& operator=(Cns &&) NOEXCEPT = default; /* Move assignment */
+	Cns(Cns&&) SUSUWU_NOEXCEPT = default; /* Move constructor */
+	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT = default; /* Move assignment */
 	const bool hasImplementation() const override {return typeid(Cns) != typeid(this);}
 	const bool isInitialized() const override {return initialized;}
 	virtual void setInitialized(const bool is) {initialized = is;}
@@ -899,9 +899,9 @@ extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code analysisCns.hasImplementation() && virusFixCns.hasImplementation() @endcode */
 const bool virusAnalysisTests();
-static const bool virusAnalysisTestsNoexcept() NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
-static const bool virusAnalysisHookTestsNoexcept() NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
  * @pre @code (virusAnalysisHookDefault == virusAnalysisGetHook() || virusAnalysisHookExec == virusAnalysisGetHook() || virusAnalysisHookNewFile == virusAnalysisGetHook() || (virusAnalysisHookExec | virusAnalysisHookNewFile) == virusAnalysisGetHook()) @endcode
@@ -957,7 +957,7 @@ extern std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatu
 /* call to use new versions of `passList`/`abortList`
  * @post @code *AnalysisCaches.empty() @encode
  */
-void virusAnalysisResetCaches() NOEXCEPT;
+void virusAnalysisResetCaches() SUSUWU_NOEXCEPT;
 
 typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const ResultListHash &fileHash);
 extern std::vector<typeof(VirusAnalysisFun)> virusAnalyses;
@@ -1001,7 +1001,7 @@ std::vector<std::string> syscallPotentialDangers = {
 };
 std::vector<std::string> stracePotentialDangers = {"write(*)"};
 std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, staticAnalysisCaches, cnsAnalysisCaches, sandboxAnalysisCaches, manualReviewCaches; /* temporary caches; memoizes results */
-void virusAnalysisResetCaches() NOEXCEPT {
+void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 	hashAnalysisCaches.clear();
 	signatureAnalysisCaches.clear();
 	staticAnalysisCaches.clear();
@@ -1365,23 +1365,23 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* ASSUME EXPECTS ENSURES NOEXCEPT NORETURN UNREACHABLE */
+#include "Macros.hxx" /* SUSUWU_ASSUME SUSUWU_ENSURES SUSUWU_EXPECTS SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_UNREACHABLE */
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #include <cstdlib> /* exit */
 #include <iostream> /* std::cout std::flush std::endl */
 namespace Susuwu {
-void noExcept() NOEXCEPT(true);
-NORETURN void noReturn();
-void noExcept() NOEXCEPT {std::cout << std::flush;}
+void noExcept() SUSUWU_NOEXCEPT(true);
+SUSUWU_NORETURN void noReturn();
+void noExcept() SUSUWU_NOEXCEPT {std::cout << std::flush;}
 void noReturn() {exit(0);}
-const int testHarnesses() EXPECTS(true) ENSURES(true) {
+const int testHarnesses() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) {
 	const bool consoleHasInput = classSysGetConsoleInput();
 	if(consoleHasInput) {
 		classSysSetConsoleInput(false);
 	}
 	assert(!classSysGetConsoleInput());
 	std::cout << "cxx/Macros.hxx: " << std::flush;
-	ASSUME(true);
+	SUSUWU_ASSUME(true);
 	noExcept();
 	std::cout << "pass" << std::endl;
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
@@ -1427,7 +1427,7 @@ extern std::string assistantCnsResponseDelimiter;
  * @throw std::logic_error
  * @pre @code assistantCns.hasImplementation() @endcode */
 const bool assistantCnsTests();
-static const bool assistantCnsTestsNoexcept() NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
 
 /* Universal Resources Locators of hosts which `questionsResponsesFromHosts()` uses
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )

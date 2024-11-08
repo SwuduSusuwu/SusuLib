@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
 #include "ClassObject.hxx" /* Object */
-#include "Macros.hxx" /* NOEXCEPT SUSUWU_CXX17 */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_CXX17 */
 #include <cassert> /* assert */
 #include <cstddef> /* size_t */
 #include <string> /* std::string */
@@ -29,8 +29,8 @@ public:
 	Cns() = default; /* Default constructor */
 	Cns(const Cns &) = default; /* Copy constructor */
 	Cns& operator=(const Cns &) = default; /* Copy assignment */
-	Cns(Cns&&) NOEXCEPT = default; /* Move constructor */
-	Cns& operator=(Cns &&) NOEXCEPT = default; /* Move assignment */
+	Cns(Cns&&) SUSUWU_NOEXCEPT = default; /* Move constructor */
+	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT = default; /* Move assignment */
 	const bool hasImplementation() const override {return typeid(Cns) != typeid(this);}
 	const bool isInitialized() const override {return initialized;}
 	virtual void setInitialized(const bool is) {initialized = is;}

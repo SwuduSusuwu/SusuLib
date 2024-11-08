@@ -6,7 +6,7 @@
 #include "ClassSys.hxx" /* templateCatchAll */
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode */
 #include "ClassResultList.hxx" /* ResultList */
-#include "Macros.hxx" /* NOEXCEPT */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT */
 #include <iostream> /* std::cout */
 #include <ostream> /* std::ostream */
 #include <string> /* std::string */
@@ -21,7 +21,7 @@ extern std::string assistantCnsResponseDelimiter;
  * @throw std::logic_error
  * @pre @code assistantCns.hasImplementation() @endcode */
 const bool assistantCnsTests();
-static const bool assistantCnsTestsNoexcept() NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
 
 /* Universal Resources Locators of hosts which `questionsResponsesFromHosts()` uses
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )

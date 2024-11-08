@@ -4,7 +4,7 @@
 #include "ClassPortableExecutable.hxx" /* FileBytecode FileHash */
 #include "ClassSha2.hxx"
 #include "ClassSys.hxx" /* classSysHexStr classSysUSecondClock templateCatchAll */
-#include "Macros.hxx" /* NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_PRINT SUSUWU_INFO SUSUWU_NOTICE */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_PRINT SUSUWU_INFO SUSUWU_NOTICE */
 #include <climits> /* CHAR_BIT */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::to_string */
@@ -69,7 +69,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	}
 	return true;
 }
-const bool classSha2TestsNoexcept() NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
 
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_ClassSha2_cxx */

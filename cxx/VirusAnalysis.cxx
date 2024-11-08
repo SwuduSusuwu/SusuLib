@@ -31,7 +31,7 @@ std::vector<std::string> syscallPotentialDangers = {
 };
 std::vector<std::string> stracePotentialDangers = {"write(*)"};
 std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, staticAnalysisCaches, cnsAnalysisCaches, sandboxAnalysisCaches, manualReviewCaches; /* temporary caches; memoizes results */
-void virusAnalysisResetCaches() NOEXCEPT {
+void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 	hashAnalysisCaches.clear();
 	signatureAnalysisCaches.clear();
 	staticAnalysisCaches.clear();
