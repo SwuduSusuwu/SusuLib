@@ -216,6 +216,9 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
 #if (defined(__cplusplus) && 202002 <= __cplusplus)
 #	define SUSUWU_CXX20
+#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute for members which have no size, suchas `class {SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};` (if `std::is_empty<Zero>`). */
+#else /* (defined(__cplusplus) && 202002 <= __cplusplus) else */
+#	define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
 #endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
 
 #if (!defined __WIN32__) && (defined _WIN32 /* || defined __CYGWIN__ should use "#ifdef _POSIX_VERSION" path */ || __MSC_VER)
