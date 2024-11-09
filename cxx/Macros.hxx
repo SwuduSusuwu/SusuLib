@@ -216,7 +216,17 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
 #if (defined(__cplusplus) && 202002 <= __cplusplus)
 #	define SUSUWU_CXX20
-#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute for members which have no size, suchas `class {SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};` (if `std::is_empty<Zero>`). */
+#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subojects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in the test. */
+void macrosNoUniqueAddressTest() {
+	typedef class Zero {} Zero;
+	class SubClassWithBaseSubobject : public Zero {bool boo;};
+	class SubClassWithMemberSubobject {bool boo; public: Zero zero;};
+	class SubClassWithMemberSubobjectNoAddress {bool boo; public: SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};
+	SUSUWU_STATIC_ASSERT(std::is_empty<Zero>::value);
+	SUSUWU_STATIC_ASSERT(sizeof(bool) == sizeof(SubClassWithBaseSubobject));
+	SUSUWU_STATIC_ASSERT(sizeof(bool) < sizeof(SubClassWithMemberSubobject));
+	SUSUWU_STATIC_ASSERT(sizeof(bool) == sizeof(SubClassWithMemberSubobjectNoAddress));
+}
 #else /* (defined(__cplusplus) && 202002 <= __cplusplus) else */
 #	define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
 #endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
