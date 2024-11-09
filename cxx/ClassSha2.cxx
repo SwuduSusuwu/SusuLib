@@ -51,7 +51,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const FileHash hash = sha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
 	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
-	const std::string hashStrTrue = "0xde2f256064a0af797747c2b9755dcb9f3df0de4f489eac731c23ae9ca9cc31";
+	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {
 		SUSUWU_PRINT(WARNING, "0 ms (0 μs) to compute `sha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = inf mbps");
 	} else {

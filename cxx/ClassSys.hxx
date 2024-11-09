@@ -3,9 +3,11 @@
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
 #include "Macros.hxx" /* ERROR SUSUWU_NOEXCEPT SUSUWU_PRINT */
+#include <cassert> /* assert */
 #include <chrono> /* std::chrono */
 #include <exception> /* std::exception */
 #include <iomanip> /* std::dec std::hex */
+#include <ios> /* std::streamsize */
 #include <iostream> /* std::cerr std::cin std::endl */
 #include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */
@@ -31,12 +33,12 @@ inline const auto classSysUSecondClock() {
 }
 typedef decltype(classSysUSecondClock()) ClassSysUSeconds;
 
-/* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork() || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0])); return pid;`
- * @throw std::runtime_error("execvesFork(): {-1 == pid}, errno=" + std::to_string(errno))
+/* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork(); if(-1 != pid) {pid || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0]));} return pid;`
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
-const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
-static const pid_t execvexFork(const std::string &toSh) {return execvesFork({"/bin/sh", "-c", toSh});}
+const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {}) SUSUWU_NOEXCEPT;
+static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
+ * @throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"))
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
@@ -52,11 +54,15 @@ const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests
 
 template<class Os, class Str>
 inline Os &classSysHexOs(Os &os, const Str &value) {
+	const std::ios::fmtflags oldFlags = std::cout.flags();
+	const char oldFill = os.fill();
 	os << std::hex;
-	for(const char ch : value) {
-		os << static_cast<int>(ch);
+	os.fill('0');
+	for(const unsigned char ch : value) {
+		os << std::setw(2)/* `setw` is unset after each use */ << static_cast<int>(ch);
 	}
-	os << std::dec;
+	os.fill(oldFill);
+	os.flags(oldFlags);
 	return os;
 }
 template<class Str>

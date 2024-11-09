@@ -339,12 +339,12 @@ inline const auto classSysUSecondClock() {
 }
 typedef decltype(classSysUSecondClock()) ClassSysUSeconds;
 
-/* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork() || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0])); return pid;`
- * @throw std::runtime_error("execvesFork(): {-1 == pid}, errno=" + std::to_string(errno))
+/* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork(); if(-1 != pid) {pid || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0]));} return pid;`
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
-const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
-static const pid_t execvexFork(const std::string &toSh) {return execvesFork({"/bin/sh", "-c", toSh});}
+const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {}) SUSUWU_NOEXCEPT;
+static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
+ * @throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"))
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
@@ -360,11 +360,15 @@ const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests
 
 template<class Os, class Str>
 inline Os &classSysHexOs(Os &os, const Str &value) {
+	const std::ios::fmtflags oldFlags = std::cout.flags();
+	const char oldFill = os.fill();
 	os << std::hex;
-	for(const char ch : value) {
-		os << static_cast<int>(ch);
+	os.fill('0');
+	for(const unsigned char ch : value) {
+		os << std::setw(2)/* `setw` is unset after each use */ << static_cast<int>(ch);
 	}
-	os << std::dec;
+	os.fill(oldFill);
+	os.flags(oldFlags);
 	return os;
 }
 template<class Str>
@@ -374,7 +378,7 @@ inline const Str classSysHexStr(const Str &value) {
 	return os.str();
 }
 template<class Os, class List>
-inline Os &classSysColoredParamOs(Os &os, const class List &argvS, const bool parenthesis/* {...} */ = true) {
+inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthesis/* {...} */ = true) {
 	if(parenthesis) {
 		os << '{';
 	}
@@ -394,7 +398,6 @@ inline Os &classSysColoredParamOs(Os &os, const class List &argvS, const bool pa
 template<class List>
 inline const auto classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
 	std::remove_const_t<typename List::value_type> str = (parenthesis ? "{" : "");
-	std::string str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
 			str += ", ";
@@ -438,14 +441,12 @@ const bool classSysInit(int argc, const char **args) {
 	return false;
 }
 
-const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
+const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) SUSUWU_NOEXCEPT {
 #ifdef _POSIX_VERSION
 	const pid_t pid = fork();
 	if(0 != pid) {
 		if(-1 == pid) {
-			const std::string error = "execvesFork(): {(-1 == pid)}, errno=" + std::to_string(errno);
-			SUSUWU_ERROR(error);
-			throw std::runtime_error(error);
+			SUSUWU_ERROR("execvesFork(): {(-1 == pid)}, errno=" + std::to_string(errno));
 		}
 		return pid;
 	} /* if 0, is fork */
@@ -458,7 +459,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	argv.push_back(nullptr);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
-		execv(argv[0], &argv[0]); /* SUSUWU_NORETURN */
+		execv(argv[0], &argv[0]); /* NORETURN */
 	} else {
 		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()};
 		std::vector<char *> envp;
@@ -467,18 +468,22 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
 		envp.push_back(nullptr);
-		execve(argv[0], &argv[0], &envp[0]); /* SUSUWU_NORETURN */
+		execve(argv[0], &argv[0], &envp[0]); /* NORETURN */
 	}
-	exit(EXIT_FAILURE); /* execv*() is `SUSUWU_NORETURN`. NOLINT(concurrency-mt-unsafe) */
+	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef _POSIX_VERSION */
-#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
-	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
+# undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
+	SUSUWU_ERROR("execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}");
+    return -1;
 #endif /* ndef _POSIX_VERSION */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
 #ifdef _POSIX_VERSION
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
+	if(-1 == pid) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"));
+	}
 	waitpid(pid, &wstatus, 0);
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
 		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
@@ -488,7 +493,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	return wstatus;
 #else /* ndef _POSIX_VERSION */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
-#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
+# define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
 #endif /* ndef _POSIX_VERSION */
 }
 
@@ -512,15 +517,15 @@ const bool classSysSetRoot(bool root) {
 			SUSUWU_PRINT(WARNING, "classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
 		}
 #if 0
-#	ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
-#	else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
+# ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
+# else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
 		/* TODO: polkit? Until this is finished, you must use chmod (to give setuid to executable), or execute new processes (with `sudo`/`su`) if you wish to use firewall/antivirus (which require root) */
-#	endif /* __APPLE__ else */
+# endif /* __APPLE__ else */
 #endif /* 0 */
 	} else {
-#	if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
+# if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
 		uid_t sudoUid = audit_getloginuid();
-#	else /* !def linux */
+# else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
 			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = nullptr;
@@ -534,7 +539,7 @@ const bool classSysSetRoot(bool root) {
 				}
 			}
 		}
-#	endif /* !def LINUX */
+# endif /* !def LINUX */
 		if(0 == sudoUid) {
 			SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(0 == sudoUid) /* stuck as root */}");
 		} else if(-1 == seteuid(sudoUid)) {
@@ -553,8 +558,22 @@ const bool classSysSetConsoleInput(bool input) {
 	return classSysGetConsoleInput();
 }
 
+static void classSysHexTests(const std::string &value) {
+	const size_t ss = classSysHexStr(value).size();
+	std::stringstream os;
+	if(2 != ss) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+	}
+	classSysHexOs(os, value);
+	if(2 != os.str().size()) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+	}
+}
 const bool classSysTests() {
-	bool retval = true;
+	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
+	classSysHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
+	classSysHexTests("\010" /* test that char <= 0x10 produces 2 hexits */);
+	classSysHexTests("\022" /* test that char >= 0x10 produces 2 hexits */);
 	std::cout << "	execves(): " << std::flush;
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
@@ -613,7 +632,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const FileHash hash = sha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
 	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
-	const std::string hashStrTrue = "0xde2f256064a0af797747c2b9755dcb9f3df0de4f489eac731c23ae9ca9cc31";
+	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {
 		SUSUWU_PRINT(WARNING, "0 ms (0 μs) to compute `sha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = inf mbps");
 	} else {

@@ -1,8 +1,8 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_PRINT WARNING */
-#include "ClassSys.hxx" /* std::string std::to_string std::vector */
+#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_PRINT WARNING */
+#include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include <cassert> /* assert */
 #include <cerrno> /* errno */
 #include <cstdlib> /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
@@ -18,7 +18,8 @@
 # endif /* def __WIN32__ */
 typedef int pid_t;
 #endif /* def _POSIX_VERSION */
-#include <string> /* std::string */
+#include <sstream> /* std::stringstream */
+#include <string> /* std::string std::to_string */
 #include <vector> /* std::vector */
 namespace Susuwu {
 int classSysArgc = 0;
@@ -34,14 +35,12 @@ const bool classSysInit(int argc, const char **args) {
 	return false;
 }
 
-const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
+const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) SUSUWU_NOEXCEPT {
 #ifdef _POSIX_VERSION
 	const pid_t pid = fork();
 	if(0 != pid) {
 		if(-1 == pid) {
-			const std::string error = "execvesFork(): {(-1 == pid)}, errno=" + std::to_string(errno);
-			SUSUWU_ERROR(error);
-			throw std::runtime_error(error);
+			SUSUWU_ERROR("execvesFork(): {(-1 == pid)}, errno=" + std::to_string(errno));
 		}
 		return pid;
 	} /* if 0, is fork */
@@ -68,13 +67,17 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef _POSIX_VERSION */
 # undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
-	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
+	SUSUWU_ERROR("execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}");
+	return -1;
 #endif /* ndef _POSIX_VERSION */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
 #ifdef _POSIX_VERSION
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
+	if(-1 == pid) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"));
+	}
 	waitpid(pid, &wstatus, 0);
 /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
@@ -150,8 +153,22 @@ const bool classSysSetConsoleInput(bool input) {
 	return classSysGetConsoleInput();
 }
 
+static void classSysHexTests(const std::string &value) {
+	const size_t ss = classSysHexStr(value).size();
+	std::stringstream os;
+	if(2 != ss) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+	}
+	classSysHexOs(os, value);
+	if(2 != os.str().size()) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+	}
+}
 const bool classSysTests() {
-	bool retval = true;
+	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
+	classSysHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
+	classSysHexTests("\010" /* test that char <= 0x10 produces 2 hexits */);
+	classSysHexTests("\022" /* test that char >= 0x10 produces 2 hexits */);
 	std::cout << "	execves(): " << std::flush;
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
