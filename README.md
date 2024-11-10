@@ -20,6 +20,7 @@ Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-you
 Targets: Windows/Linux/Android/OSX/iOS; all compilers with `201102 <= __cplusplus` (minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11), due to use of `auto`, `decltype`, `for(x: list) {}`nullptr`, `__func__`). [TODO: It is possible that `[modernize-use-default-member-init]` fix (commit 579a9089248a018005f36522968026ee464fc061) bumped this up to [_C++14_](https://gcc.gnu.org/projects/cxx-status.html#cxx14) (if so will undo, as was told that not all microcontrollers have compilers which support this).]
 
 Usage: [`./build.sh`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/build.sh) produces `*.o` static libraries (for distribution to others,) plus `a.out` to do unit tests (test harnesses).
+- [`./cxx/main.hxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) has constants to use to interpret `a.out`'s return values.
 
 - Allowed flags; `./build.sh --debug` (default; includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), `./build.sh --release` (excludes `--debug`, strips frame-pointers/symbols, optimizes with `-O2`), `./build.sh --mingw` (if on _Linux_, can use with `--release` or `--debug`, produces _Portable Executable_ for _Windows_. If on _Windows_, the default is to produce _Portable Executable_'s for _Windows_)
 - Extra flags (`vim build.sh` to use); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:

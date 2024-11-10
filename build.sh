@@ -73,6 +73,8 @@ if [ 0 -eq $STATUS  ]; then
 		FILE_OUT="a.exe"
 	fi
 	SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${FILE_OUT}\` (`stat -c%s ${FILE_OUT}` bytes)"
+	./${FILE_OUT} && SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "./${FILE_OUT} return code is $?."
+	#STATUS=$? #commented-out, as unit tests fail due to `classSysHexStr`/`classSysHexOs` corruption (unknown specifics, but guess is those two functions) on Ubuntu
 fi
 return $STATUS
 

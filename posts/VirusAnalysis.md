@@ -4,7 +4,7 @@ _[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scann
 Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but _caches_ reduce this to **less than 1ms** (just cost to lookup `ResultList::hashes`, which is `std::unordered_set<decltype(sha2(const FileBytecode &))>`; a hashmap of hashes).
 
 `Licenses: allows all uses ("Creative Commons"/"Apache 2")`
-[Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, from all except `main.cxx`; follow URLs for whole sources]
+[Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, from all except `main.hxx`; follow URLs for whole sources]
 For the most new sources (+ static libs), use apps such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for **iOS**) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for **Android OS**) to run this:
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build`
 `less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) /* removed: disabled color codes + unused OSC codes */
@@ -1491,55 +1491,92 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 	return cns.processToString(file.bytecode);
 }
 ```
-`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx) /* with boilerplate */
+`less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) /* with boilerplate */
 ```
 /* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
-#ifndef INCLUDES_cxx_main_cxx
-#define INCLUDES_cxx_main_cxx
-#include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
-#include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT */
-#include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
-#include <iostream> /* std::cout std::flush std::endl */
+#ifndef INCLUDES_cxx_main_hxx
+#define INCLUDES_cxx_main_hxx
+#ifdef __cplusplus
+extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , such that other languages can execute unit tests */
+#endif /* def __cplusplus */
+typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
+static const int susuwuUnitTestsMacrosBit        = 1 << 0; /*  1: `Macros.hxx`:`macrosTestsNoexcept()` */
+static const int susuwuUnitTestsClassSysBit      = 1 << 1; /*  2: `ClassSys.hxx`:`classSysTestsNoexcept()` */
+static const int susuwuUnitTestsClassSha2Bit     = 1 << 2; /*  4: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
+static const int susuwuUnitTestsVirusAnalysisBit = 1 << 3; /*  8: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
+static const int susuwuUnitTestsAssistantCnsBit  = 1 << 4; /* 16: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
+static const int susuwuUnitTestsConsoleBit       = 1 << 5; /* 32: `classSys.hxx`:`classSysSetConsoleInput()` */
+
+const SusuwuUnitTestsBitmask susuwuTestHarnesses();
+SusuwuUnitTestsBitmask main(int argc, const char **args);
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* def __cplusplus */
+#endif /* ndef INCLUDES_cxx_main_hxx */
+```
+`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
+```
 namespace Susuwu {
-const int testHarnesses() {
+static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept()) SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value) {
+	int susuwuUnitTestsErrno = 0;
+	if(!std::cout.good()) {
+		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
+	}
 	const bool consoleHasInput = classSysGetConsoleInput();
 	if(consoleHasInput) {
-		classSysSetConsoleInput(false);
+		classSysSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/ClassSys.hxx` fails. Notice: this move assumes that the tests above won't block on input */
 	}
-	assert(!classSysGetConsoleInput());
-	std::cout << "macrosTestsNoexcept(): " << std::flush;
+	if(true == classSysGetConsoleInput()) {
+		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
+	}
+	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
 	const int macrosTestsErrno =  macrosTestsNoexcept();
-	std::cout << (0 == macrosTestsErrno ? "pass" : ("error#" + std::to_string(macrosTestsErrno))) << std::endl;
+	if(0 == macrosTestsErrno) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error#" << std::to_string(macrosTestsErrno) << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsMacrosBit;
+	}
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
-	classSysTestsNoexcept();
+	if(true != classSysTestsNoexcept()) {
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassSysBit;
+	}
 	std::cout << "classSha2TestsNoexcept(): " << std::flush;
-	std::cout << (classSha2TestsNoexcept() ? "pass" : "error") << std::endl;
+	if(true == classSha2TestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassSha2Bit;
+	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
 	if(virusAnalysisTestsNoexcept()) {
 		std::cout << "pass" << std::endl;
 	} else {
 		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsVirusAnalysisBit;
 	}
-	if(consoleHasInput) {
-		assert(classSysSetConsoleInput(true));
+	if(consoleHasInput && false == classSysSetConsoleInput(true)) {
+		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "assistantCnsTestsNoexcept(): " << std::flush;
 	if(assistantCnsTestsNoexcept()) {
 		std::cout << "pass" << std::endl;
 	} else {
 		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
-	return 0;
+	return susuwuUnitTestsErrno;
 }
 }; /* namespace Susuwu */
-int main(int argc, const char **args) {
-	const bool classSysInitSuccess = Susuwu::classSysInit(argc, args);
-	assert(classSysInitSuccess);
-	return Susuwu::testHarnesses();
+const SusuwuUnitTestsBitmask susuwuUnitTests() {
+	return Susuwu::unitTestsCxx();
 }
-#endif /* ndef INCLUDES_cxx_main_cxx */
+SusuwuUnitTestsBitmask main(int argc, const char **args) {
+	if(true != Susuwu::classSysInit(argc, args)) {
+		return susuwuUnitTestsClassSysBit;
+	}
+	return Susuwu::unitTestsCxx();
+}
 ```
 To run most of this fast (lag less,) use `CXXFLAGS` which auto-vectorizes/auto-parallelizes, and to setup CNS synapses (`Cns::setupSynapses()`) fast, use _TensorFlow_'s `MapReduce`. Resources: [How to have computers process fast](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
 
