@@ -8,9 +8,9 @@
 #include "ClassSys.hxx" /* classSysHexOs */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include <cstddef> /* size_t */
-#if PREFERENCE_IS_CSTR
+#if SUSUWU_PREFER_CSTR
 #include <cstring> /* strlen memmem */
-#endif /* PREFERENCE_IS_CSTR */
+#endif /* SUSUWU_PREFER_CSTR */
 #include <tuple> /* std::tuple std::get */
 #include <unordered_set> /* std::unordered_set */
 #include <vector> /* std::vector */
@@ -33,14 +33,14 @@ typedef struct ResultList : Object { /* Lists of {metadata, executables (or page
 
 template<class List>
 const size_t listMaxSize(const List &list) {
-#if PREFERENCE_IS_CSTR
+#if SUSUWU_PREFER_CSTR
 	size_t max = 0;
 	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) {max = temp;}}
 	return max; /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
-#else /* else !PREFERENCE_IS_CSTR */
+#else /* else !SUSUWU_PREFER_CSTR */
 	auto it = std::max_element(list.cbegin(), list.cend(), [](const auto &s, const auto &x) { return s.size() < x.size(); });
 	return it->size();
-#endif /* PREFERENCE_IS_CSTR else */
+#endif /* SUSUWU_PREFER_CSTR else */
 }
 
 template<class List, class Os>
@@ -164,13 +164,13 @@ template<class List>
 /* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) {std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]";}` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {
 	for(const auto &signature : list) {
-#if PREFERENCE_IS_CSTR
+#if SUSUWU_PREFER_CSTR
 		auto it = memmem(&value[0], strlen(&value[0]), &signature[0], strlen(&signature[0]));
 		if(NULL != it) {
-#else /* !PREFERENCE_IS_CSTR */
+#else /* !SUSUWU_PREFER_CSTR */
 		auto it = std::search(value.cbegin(), value.cend(), signature.cbegin(), signature.cend(), [](char ch1, char ch2) { return ch1 == ch2; });
 		if(signature.cend() != it) {
-#endif /* !PREFERENCE_IS_CSTR */
+#endif /* !SUSUWU_PREFER_CSTR */
 			return {it - value.cbegin(), signature};
 		}
 	}

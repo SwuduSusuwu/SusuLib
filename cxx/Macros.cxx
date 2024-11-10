@@ -2,12 +2,12 @@
 #ifndef INCLUDES_cxx_Macros_cxx
 #define INCLUDES_cxx_Macros_cxx
 /* This is just unit tests. `Macros.hxx` has all which has actual use. */
-#include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS SUSUWU_ASSUME SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_STATIC_ASSERT SUSUWU_UNREACHABLE */
+#include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS SUSUWU_ASSUME SUSUWU_CONSTEXPR SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_STATIC_ASSERT SUSUWU_UNREACHABLE */
 #include IF_SUSUWU_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit */
 #ifdef SUSUWU_CXX11
 #	include <type_traits> /* is_empty */
 #endif /* def SUSUWU_CXX11 */
-namespace Susuwu {
+namespace Susuwu { /* NOLINTBEGIN(misc-use-anonymous-namespace): can't use functions if anonymouse */
 static void macrosNoUniqueAddressTest() {
 	typedef class Zero {} Zero;
 	class SubClassWithBaseSubobject : public Zero {bool boo;};
@@ -24,20 +24,21 @@ static void macrosNoUniqueAddressTest() {
 	SUSUWU_STATIC_ASSERT(sizeof(bool) < sizeof(SubClassWithMemberSubobjectNoAddress));
 #endif /* def SUSUWU_CXX20 else */
 }
-static const int noExcept() SUSUWU_NOEXCEPT(true);
-SUSUWU_NORETURN static void noReturn();
-static const int noExcept() SUSUWU_NOEXCEPT {return 0;}
-static void noReturn() {exit(0);} /* NOLINT(concurrency-mt-unsafe): is unreachable code */
-static constexpr /* TODO: SUSUWU_CONSTEXPR */ const int macrosTestImpl() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT {
-	return 0;
-}
+
+SUSUWU_NORETURN static void macrosNoReturn();
+SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} /* NOLINT(concurrency-mt-unsafe): is unreachable code */
+SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT;
+SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT {
+	return true;
+} /* NOLINTEND(misc-use-anonymous-namespace): `clang-tidy` back on */
+SUSUWU_STATIC_ASSERT(true); /* test at file-scope, which `assert()` does not support */
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
-	SUSUWU_STATIC_ASSERT(0 == macrosTestImpl());
+	SUSUWU_STATIC_ASSERT(true); /* test at function-scope, which some custom static asserts can't do */
 	SUSUWU_ASSUME(true);
-	noExcept();
+	macrosDeclarationAttributes();
 	if(false) { /* NOLINT(readability-simplify-boolean-expr) */
 		SUSUWU_UNREACHABLE;
-		noReturn();
+		macrosNoReturn();
 	}
 	return 0;
 }

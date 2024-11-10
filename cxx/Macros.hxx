@@ -12,42 +12,66 @@
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
 /* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
-#ifdef __cplusplus
-#	include <cassert> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
-#else /* !(defined __cplusplus */
-#	include <assert.h> /* assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#if defined(SUSUWU_PREFER_C) || !defined(__cplusplus)
 #	define SUSUWU_SH_PREFER_STDIO
-#endif /* !(defined __cplusplus */
+#	define SUSUWU_SH_PREFER_CSTR
+#endif /*defined((SUSUWU_PREFER_C) || !defined(__cplusplus) */
 #ifdef SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
 #	include <stdio.h> /* fprintf stderr stdout */
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
+#ifdef __cplusplus
+#	include <cassert> /* assert static_assert */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	if 201102 < __cplusplus
+#		define SUSUWU_CXX11
+#	endif /* (201102 <= __cplusplus) */
+#	if 201402 <= __cplusplus
+#		define SUSUWU_CXX14
+#	endif /* if (201402 < __cplusplus) */
+#	if 201702 < __cplusplus
+#		define SUSUWU_CXX17
+#	endif /* if (201702 < __cplusplus) */
+#	if 202002 <= __cplusplus
+#		define SUSUWU_CXX20
+#		define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subobjects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
+#	else /* (202002 <= __cplusplus) else */
+#		define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
+#	endif /* if (202002 <= __cplusplus) */
+#	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
+#	else /* C++11 else */
+#	endif /* else no `[[noreturn]]` */
+#else /* def __cplusplus */
+#	include <assert.h> /* assert static_assert */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	if (201112 <= __STDC_VERSION__)
+#		define SUSUWU_C11
+#	endif /* (201112 <= __STDC_VERSION__) */
+#endif /* !(defined __cplusplus */
 
+#define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
+#define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
+#define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
+#define SUSUWU_PRAGMA(S) _Pragma(#S) /* `#pragma S` in macro functions is `_Pragma(S)` (but without this indirection/wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`.) Usage: `SUSUWU_PRAGMA(message("Message"))` */
+
+#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
+#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
+#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
+#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
+#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
+#endif
 #ifndef __has_feature
 #	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
 #endif /* ndef __has_feature */
 
-#if (defined(__cplusplus) && 201102 < __cplusplus)
-#	define SUSUWU_CXX11
-# define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */
+#	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
 #else
-# define SUSUWU_STATIC_ASSERT(condition) assert(condition)
-#endif /* (defined __cplusplus && 201102 <= __cplusplus) else */
-#if (defined(__cplusplus) && 201402 <= __cplusplus)
-#	define SUSUWU_CXX14
-#endif /* if (defined(__cplusplus) && 201402 < __cplusplus) */
-#if (defined(__cplusplus) && 201702 < __cplusplus)
-#	define SUSUWU_CXX17
-#endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
-#if (defined(__cplusplus) && 202002 <= __cplusplus)
-#	define SUSUWU_CXX20
-#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subojects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
-#else /* (defined(__cplusplus) && 202002 <= __cplusplus) else */
-#	define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
-#endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
+#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
+#	define SUSUWU_CONSTEXPR /* No-op */
+#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 #ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
 /* `SUSUWU_EXPECTS(X)` is close to `@pre @code X @endcode` or `SUSUWU_ASSUME(X)` but is for headers; https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2521r2.html */
@@ -65,14 +89,6 @@
 #else /* C++11 else */
 #	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
 #endif /* else no `noexcept` */
-#if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;*/
-#else /* C++11 else */
-#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
-#endif /* else no `[[noreturn]]` */
-
-/* `#pragma S` in macro functions is `_Pragma(S)`, but without this wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`. Use as `SUSUWU_PRAGMA(message("Message"))` */
-#define SUSUWU_PRAGMA(S) _Pragma(#S)
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
@@ -92,8 +108,18 @@
 #	endif /* __cpp_lib_unreachable elif IS_GCC ...*/
 #endif  /* #elif (!defined NDEBUG) ... #else */
 
+#ifdef __cplusplus
 namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
+#endif /* ifdef __cplusplus */
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+
+#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
+#	define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#elif true /* TODO: fix without this */ || defined(_MSC_VER) || defined __GNUC__ || __CLANG__
+#	define SUSUWU_STATIC_ASSERT(condition) typedef char SUSUWU_GLUE(susuwuStaticAssertNum, __COUNTER__)[(condition) ? 1 : -1] /* almost mimics `static_assert(condition, #condition)`. `Num##__COUNTER__` fixes "redefinition of typeof". */
+#else /* defined(_MSC_VER) || defined __GNUC__ || __CLANG__ else */
+#	define SUSUWU_STATIC_ASSERT(condition) (void)sizeof(char[(condition) ? 1 : -1]) /* TODO: support global scope */
+#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 /* `SUSUWU_ASSUME(X)` is close to `@pre @code X @endcode` or `[[expects: x]]` */
 /* TODO: choose best of [various possible SUSUWU_ASSUME macros](https://stackoverflow.com/questions/44054078/how-to-guide-gcc-optimizations-based-on-assertions-without-runtime-cost) */
@@ -113,21 +139,10 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_ASSUME(X)
 #endif /* !def USE_SUSUWU_ASSUME */
 
-#define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
-#define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
-#define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
-
-#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
-#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
-#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
-#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
-#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
-#endif
-
 #if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
-# define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
+#	define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
 #else
-# define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
+#	define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
 #endif
 
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
@@ -283,7 +298,9 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 /* Use this to reduce (conditional) print + (conditional) execute into single statement. */
 #define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
+#ifdef __cplusplus
 }; /* namespace Susuwu */
+#endif /* ifdef __cplusplus */
 /* `clang-tidy` on: NOLINTEND(cppcoreguidelines-macro-usage) */
 #endif /* ndef INCLUDES_cxx_Macros_hxx */
 

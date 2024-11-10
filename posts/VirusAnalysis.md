@@ -4,11 +4,10 @@ _[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scann
 Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but _caches_ reduce this to **less than 1ms** (just cost to lookup `ResultList::hashes`, which is `std::unordered_set<decltype(sha2(const FileBytecode &))>`; a hashmap of hashes).
 
 `Licenses: allows all uses ("Creative Commons"/"Apache 2")`
-[Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, from all except `main.hxx`; follow URLs for whole sources]
+[Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources]
 For the most new sources (+ static libs), use apps such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for **iOS**) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for **Android OS**) to run this:
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build`
 `less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) /* removed: disabled color codes + unused OSC codes */
-Macros.hxx */
 ```
 /* Miscellaneous macros */
 /* To printout default preprocessor definitions:
@@ -20,44 +19,67 @@ Macros.hxx */
  * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
-/* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
-#ifdef __cplusplus
-#	include <cassert> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
-#else /* !(defined __cplusplus */
-#	include <assert.h> /* assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#if defined(SUSUWU_PREFER_C) || !defined(__cplusplus)
 #	define SUSUWU_SH_PREFER_STDIO
-#endif /* !(defined __cplusplus */
+#	define SUSUWU_SH_PREFER_CSTR
+#endif /*defined((SUSUWU_PREFER_C) || !defined(__cplusplus) */
 #ifdef SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
 #	include <stdio.h> /* fprintf stderr stdout */
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
+#endif
+#ifdef __cplusplus
+#	include <cassert> /* assert static_assert */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	if 201102 < __cplusplus
+#		define SUSUWU_CXX11
+#	endif /* (201102 <= __cplusplus) */
+#	if 201402 <= __cplusplus
+#		define SUSUWU_CXX14
+#	endif /* if (201402 < __cplusplus) */
+#	if 201702 < __cplusplus
+#		define SUSUWU_CXX17
+#	endif /* if (201702 < __cplusplus) */
+#	if 202002 <= __cplusplus
+#		define SUSUWU_CXX20
+#		define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subobjects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
+#	else /* (202002 <= __cplusplus) else */
+#		define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
+#	endif /* if (202002 <= __cplusplus) */
+#	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
+#	else /* C++11 else */
+#	endif /* else no `[[noreturn]]` */
+#else /* def __cplusplus */
+#	include <assert.h> /* assert static_assert */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	if (201112 <= __STDC_VERSION__)
+#		define SUSUWU_C11
+#	endif /* (201112 <= __STDC_VERSION__) */
+#endif /* !(defined __cplusplus */
+
+#define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
+#define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
+#define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
+#define SUSUWU_PRAGMA(S) _Pragma(#S) /* `#pragma S` in macro functions is `_Pragma(S)` (but without this indirection/wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`.) Usage: `SUSUWU_PRAGMA(message("Message"))` */
+
+#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
+#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
+#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
+#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
+#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
 #endif
 
 #ifndef __has_feature
 #	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
 #endif /* ndef __has_feature */
 
-#if (defined(__cplusplus) && 201102 < __cplusplus)
-#	define SUSUWU_CXX11
-# include <type_traits> /* is_empty */
-# define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */
+#	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
 #else
-# define SUSUWU_STATIC_ASSERT(condition) assert(condition)
-#endif /* (defined __cplusplus && 201102 <= __cplusplus) else */
-#if (defined(__cplusplus) && 201402 <= __cplusplus)
-#	define SUSUWU_CXX14
-#endif /* if (defined(__cplusplus) && 201402 < __cplusplus) */
-#if (defined(__cplusplus) && 201702 < __cplusplus)
-#	define SUSUWU_CXX17
-#endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
-#if (defined(__cplusplus) && 202002 <= __cplusplus)
-#	define SUSUWU_CXX20
-#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subojects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
-#else /* (defined(__cplusplus) && 202002 <= __cplusplus) else */
-#	define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
-#endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
+#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
+#	define SUSUWU_CONSTEXPR /* No-op */
+#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 #ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
 /* `SUSUWU_EXPECTS(X)` is close to `@pre @code X @endcode` or `SUSUWU_ASSUME(X)` but is for headers; https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2521r2.html */
@@ -75,20 +97,12 @@ Macros.hxx */
 #else /* C++11 else */
 #	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
 #endif /* else no `noexcept` */
-#if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;*/
-#else /* C++11 else */
-#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
-#endif /* else no `[[noreturn]]` */
-
-/* `#pragma S` in macro functions is `_Pragma(S)`, but without this wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`. Use as `SUSUWU_PRAGMA(message("Message"))` */
-#define SUSUWU_PRAGMA(S) _Pragma(#S)
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
 /* [https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release] [https://stackoverflow.com/questions/2290509/debug-vs-ndebug] */
 /* Debug: Promises unreachable, for static analysis */
-#	define SUSUWU_UNREACHABLE assert(false && "UNREACHABLE") /* TODO: `static_assert` does not allow false, not even in unreachable code paths */
+#	define SUSUWU_UNREACHABLE assert(false && "UNREACHABLE") /* TODO: NOLINT(cert-dcl03-c,hicpp-static-assert,misc-static-assert): `static_assert` does not allow false, not even in unreachable code paths */
 #else
 #	include <version> /* __cpp_lib_unreachable */ /* [https://en.cppreference.com/w/cpp/feature_test] */
 #	if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable
@@ -102,7 +116,18 @@ Macros.hxx */
 #	endif /* __cpp_lib_unreachable elif IS_GCC ...*/
 #endif  /* #elif (!defined NDEBUG) ... #else */
 
+#ifdef __cplusplus
+namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
+#endif /* ifdef __cplusplus */
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+
+#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
+#	define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#elif true /* TODO: fix without this */ || defined(_MSC_VER) || defined __GNUC__ || __CLANG__
+#	define SUSUWU_STATIC_ASSERT(condition) typedef char SUSUWU_GLUE(susuwuStaticAssertNum, __COUNTER__)[(condition) ? 1 : -1] /* almost mimics `static_assert(condition, #condition)`. `Num##__COUNTER__` fixes "redefinition of typeof". */
+#else /* defined(_MSC_VER) || defined __GNUC__ || __CLANG__ else */
+#	define SUSUWU_STATIC_ASSERT(condition) (void)sizeof(char[(condition) ? 1 : -1]) /* TODO: support global scope */
+#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 /* `SUSUWU_ASSUME(X)` is close to `@pre @code X @endcode` or `[[expects: x]]` */
 /* TODO: choose best of [various possible SUSUWU_ASSUME macros](https://stackoverflow.com/questions/44054078/how-to-guide-gcc-optimizations-based-on-assertions-without-runtime-cost) */
@@ -122,21 +147,10 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_ASSUME(X)
 #endif /* !def USE_SUSUWU_ASSUME */
 
-#define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
-#define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
-#define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
-
-#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
-#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
-#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
-#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
-#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
-#endif
-
 #if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
-# define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
+#	define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
 #else
-# define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
+#	define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
 #endif
 
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
@@ -177,12 +191,6 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #ifdef SUSUWU_SH_RUNTIME_COLORS
 #	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
 #endif /* #elif !defined(_POSIX_VERSION) TODO */
-#if !defined(_POSIX_VERSION)
-#	define SUSUWU_SH_COLORS_UNSUPPORTED /* assume "dumb terminals" (such as __WIN32__ or __MINGW32__ often has) if built without runtime tests for color attributes, on non-POSIX systems */
-#endif
-#if defined(SUSUWU_SH_COLORS_UNSUPPORTED) && !defined(SUSUWU_SH_SKIP_COLORS)
-#	define SUSUWU_SH_SKIP_COLORS true /* you can use `-DSUSUWU_SH_SKIP_COLORS=false` to force unsupported color use (such as if build is for __WIN32__ but you assume Win10+ `xterm` support) */
-#endif /* SUSUWU_SH_COLORS_UNSUPPORTED && !defined SUSUWU_SH_SKIP_COLORS */
 #define SUSUWU_SH_ESC "\033" /* Escape */
 #define SUSUWU_SH_CSI SUSUWU_SH_ESC "[" /* Control Sequence Introducer */
 #define SUSUWU_SH_DEFAULT	SUSUWU_SH_CSI "0m"
@@ -253,7 +261,6 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 /* Use this to reduce (conditional) print + (conditional) execute into single statement. */
 #define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
-/* `clang-tidy` on: NOLINTEND(cppcoreguidelines-macro-usage) */
 ```
 `less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.cxx)
 ```
@@ -274,20 +281,21 @@ static void macrosNoUniqueAddressTest() {
 	SUSUWU_STATIC_ASSERT(sizeof(bool) < sizeof(SubClassWithMemberSubobjectNoAddress));
 #endif /* def SUSUWU_CXX20 else */
 }
-static void noExcept() SUSUWU_NOEXCEPT(true);
-SUSUWU_NORETURN static void noReturn();
-static void noExcept() SUSUWU_NOEXCEPT {std::cout << std::flush;}
-static void noReturn() {exit(0);}
-static constexpr /* TODO: SUSUWU_CONSTEXPR */ const int macrosTestImpl() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT {
-	return 0;
+
+SUSUWU_NORETURN static void macrosNoReturn();
+SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} /* NOLINT(concurrency-mt-unsafe): is unreachable code */
+SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT;
+SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT {
+	return true;
 }
+SUSUWU_STATIC_ASSERT(true); /* test at file-scope, which `assert()` does not support */
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
-	SUSUWU_STATIC_ASSERT(0 == macrosTestImpl());
+	SUSUWU_STATIC_ASSERT(true); /* test at function-scope, which some custom static asserts can't do */
 	SUSUWU_ASSUME(true);
-	noExcept();
-	if(false) {
+	macrosDeclarationAttributes();
+	if(false) { /* NOLINT(readability-simplify-boolean-expr) */
 		SUSUWU_UNREACHABLE;
-		noReturn();
+		macrosNoReturn();
 	}
 	return 0;
 }
@@ -306,11 +314,9 @@ public:
 	explicit PortableExecutable(FilePath path_ = "") : path(std::move(path_)) {}
 	PortableExecutable(FilePath path_, FileBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
 /*TODO: overload on typedefs which map to the same types:	PortableExecutable(const FilePath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
-/* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
 	const FilePath path; /* Suchas "C:\Program.exe" or "/usr/bin/library.so" */ /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) */
 	FileBytecode bytecode; /* compiled programs; bytecode */
 	std::string hex; /* `hexdump(path)`, hexadecimal, for C string functions */
-/* `clang-tidy` on: NOLINTEND(misc-non-private-member-variables-in-classes) */
 } PortableExecutable;
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
@@ -474,12 +480,11 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	waitpid(pid, &wstatus, 0);
-/* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
 		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	} else if(WIFSIGNALED(wstatus)) {
 		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
-	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
+	}
 	return wstatus;
 #else /* ndef _POSIX_VERSION */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
@@ -646,14 +651,14 @@ typedef struct ResultList : Object { /* Lists of {metadata, executables (or page
 
 template<class List>
 const size_t listMaxSize(const List &list) {
-#if PREFERENCE_IS_CSTR
+#if SUSUWU_PREFER_CSTR
 	size_t max = 0;
 	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) {max = temp;}}
 	return max; /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
-#else /* else !PREFERENCE_IS_CSTR */
+#else /* else !SUSUWU_PREFER_CSTR */
 	auto it = std::max_element(list.cbegin(), list.cend(), [](const auto &s, const auto &x) { return s.size() < x.size(); });
 	return it->size();
-#endif /* PREFERENCE_IS_CSTR else */
+#endif /* SUSUWU_PREFER_CSTR else */
 }
 
 template<class List, class Os>
@@ -777,13 +782,13 @@ template<class List>
 /* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) {std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]";}` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {
 	for(const auto &signature : list) {
-#if PREFERENCE_IS_CSTR
+#if SUSUWU_PREFER_CSTR
 		auto it = memmem(&value[0], strlen(&value[0]), &signature[0], strlen(&signature[0]));
 		if(NULL != it) {
-#else /* !PREFERENCE_IS_CSTR */
+#else /* !SUSUWU_PREFER_CSTR */
 		auto it = std::search(value.cbegin(), value.cend(), signature.cbegin(), signature.cend(), [](char ch1, char ch2) { return ch1 == ch2; });
 		if(signature.cend() != it) {
-#endif /* !PREFERENCE_IS_CSTR */
+#endif /* !SUSUWU_PREFER_CSTR */
 			return {it - value.cbegin(), signature};
 		}
 	}
@@ -846,7 +851,7 @@ public:
 	// template<Intput, Output> virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* @pre @code isInitialized() @endcode */
 	// template<Input, Output> virtual const Output process(Input input);
-#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): can't have templates virtual */ /* NOLINTBEGIN(misc-unused-parameters): TODO */ \
+#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): can't have templates virtual */ \
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, bool>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeBool;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, char>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeChar;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, int>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeInt;}\
@@ -886,7 +891,6 @@ public:
 	templateWorkaround(cnsModeVectorFloat, std::vector<float>)
 	templateWorkaround(cnsModeVectorDouble, std::vector<double>)
 	templateWorkaround(cnsModeString, std::string)
-	/* NOLINTEND(misc-unused-parameters) */
 private:
 	bool initialized = false;
 	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;
@@ -1004,18 +1008,14 @@ typedef class ApxrCns : Cns {
 `less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.hxx)
 ```
 typedef enum VirusAnalysisHook : unsigned char {
-/* Broken diagnostic, suppress: NOLINTBEGIN(hicpp-signed-bitwise) */
 	virusAnalysisHookDefault = static_cast<unsigned char>(0),      /* "real-time" virus scans not initialized */
 	virusAnalysisHookQuery   = static_cast<unsigned char>(0),      /* return present hooks (as enum) */
 	virusAnalysisHookClear   = static_cast<unsigned char>(1) << 0, /* unhook (remove present hooks), then parse rest of bits */
 	virusAnalysisHookExec    = static_cast<unsigned char>(1) << 1, /* hook {execl(), execlp(), execle(), execv(), execvp(), execvpe()} */
 	virusAnalysisHookNewFile = static_cast<unsigned char>(1) << 2, /* hook (for modeNew in {"w+", "a", "a+"}) fwrite((void *)ptr, (size_t)size, (size_t)nmemb, {fopen((const char *)pathname, modeNew), fdopen((int)fd, modeNew), freopen((const char *)pathname, modeNew, (FILE *)stream)}) */
-/* unsuppress: NOLINTEND(hicpp-signed-bitwise) */
 } VirusAnalysisHook;
-/* `clang-tidy` suppress: NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange, fuchsia-overloaded-operator) */
 static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return static_cast<VirusAnalysisHook>(static_cast<unsigned>(x) | static_cast<unsigned>(s));}
 static const VirusAnalysisHook operator&(VirusAnalysisHook x,  VirusAnalysisHook s) {return static_cast<VirusAnalysisHook>(static_cast<unsigned>(x) & static_cast<unsigned>(s));}
-/* `clang-tidy` on: NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange, fuchsia-overloaded-operator) */
 extern VirusAnalysisHook globalVirusAnalysisHook /*= virusAnalysisHookDefault*/; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 
 typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `bool(true)` unless you `switch` all individual enums. The actual constant values do not matter for this. NOLINT(cert-int09-c, readability-enum-initial-value) */
@@ -1199,7 +1199,6 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
-/* `clang-tidy` suppress: NOLINTBEGIN(readability-implicit-bool-conversion) */
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
@@ -1266,7 +1265,6 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 	}
 	return virusAnalysisGetHook();
 }
-/* `clang-tidy` on: NOLINTEND(readability-implicit-bool-conversion) */
 
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
 	const auto fileHash = sha2(file.bytecode);

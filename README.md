@@ -39,7 +39,7 @@ Usage: [`./build.sh`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/build.s
   - To match `g++`/`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS = true, -DSUSUWU_SH_FILE = true, -DSUSUWU_SH_LINE = true, -DSUSUWU_SH_FUNC = false, -DSUSUWU_SKIP_COLORS = false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
   - TODO:
     - `-DSUSUWU_PREFER_CSTR` to replace `std::string` with `char *` (more compatible with non-C++ projects); default is `false`.
-    - `-DSUSUWU_PREFER_C` sets SUSUWU_PREFER_CSTR ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `false`.
+    - `-DSUSUWU_PREFER_C` sets `SUSUWU_PREFER_CSTR`+ `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `false`.
 
 # Contributor conventions/rules
 Linter: `clang-tidy cxx/*.cxx` /* uses [`.clang-tidy`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/.clang-tidy) options */ 
