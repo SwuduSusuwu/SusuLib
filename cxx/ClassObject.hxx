@@ -128,7 +128,7 @@ public:
 	virtual Object *cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
-		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory,llvm-qualified-auto,readability-qualified-auto) */
+		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
 		memcpy(clone, static_cast<const void *>(this), getObjectSize());
 		return static_cast<Object *>(clone);
 	}

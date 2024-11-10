@@ -10,6 +10,7 @@
 #include <string> /* std::string */
 namespace Susuwu {
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classObjectTests, "classObjectTests()"); }
+namespace { /* [misc-use-anonymous-namespace] */
 static const bool classIsValid(const Class *clas) {
 	bool result = true;
 	if(!clas->isInstance(*clas)) {
@@ -139,6 +140,7 @@ class SubClass : public Class { SUSUWU_CLASS_DEFAULTS(SubClass) };
 class SubClassWithMemberObject : public Class { public: SUSUWU_CLASS_DEFAULTS(SubClassWithMemberObject) bool memberObject = true; };
 class SubObject : public Object { SUSUWU_VIRTUAL_DEFAULTS(SubObject) };
 class SubObjectWithMemberObject : public Object { public: SUSUWU_VIRTUAL_DEFAULTS(SubObjectWithMemberObject) bool memberObject = true; };
+}; /* namespace */
 const bool classObjectTests() {
 	bool result = true;
 	const Class *newClass = new Class(),

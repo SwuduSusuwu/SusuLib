@@ -4,13 +4,14 @@
 /* This is just unit tests. `Macros.hxx` has all which has actual use. */
 #include "Macros.hxx" /* SUSUWU_ASSUME SUSUWU_CONSTEXPR SUSUWU_DEFAULT SUSUWU_DELETE SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_STATIC_ASSERT SUSUWU_UNREACHABLE */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit */
+namespace Susuwu {
+namespace { /* [misc-use-anonymous-namespace] */
 #ifdef SUSUWU_CXX11
 #	include <type_traits> /* is_empty */
 SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    /* `int`    */) {return false;}
 SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(SUSUWU_NULLPTR) /* `void *` */) {return true;}
 SUSUWU_STATIC_ASSERT(true  == MacrosCxx11NullptrTest(SUSUWU_NULLPTR)); /* Tests that `nullptr` is `void *` */
 #endif /* def SUSUWU_CXX11 */
-namespace Susuwu { /* NOLINTBEGIN(misc-use-anonymous-namespace): can't use functions if anonymouse */
 class MacrosCxx11InheritanceTest {
 public:
 	MacrosCxx11InheritanceTest() SUSUWU_DELETE /* Notice: deleted constructor is redundant for pure virtual class */
@@ -42,13 +43,13 @@ static void macrosNoUniqueAddressTest() {
 	SUSUWU_STATIC_ASSERT(sizeof(bool) < sizeof(SubClassWithMemberSubobjectNoAddress));
 #endif /* def SUSUWU_CXX20 else */
 }
-
 SUSUWU_NORETURN static void macrosNoReturn();
 SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} /* NOLINT(concurrency-mt-unsafe): is unreachable code */
 SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT;
 SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) SUSUWU_NOEXCEPT {
 	return true;
-} /* NOLINTEND(misc-use-anonymous-namespace): `clang-tidy` back on */
+}
+}; /* namespace */
 SUSUWU_STATIC_ASSERT(true); /* test at file-scope, which `assert()` does not support */
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 	SUSUWU_STATIC_ASSERT(true); /* test at function-scope, which some custom static asserts can't do */

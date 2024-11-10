@@ -7,13 +7,15 @@
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
 namespace Susuwu {
-static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) { /* NOLINT(misc-use-anonymous-namespace): have to call */
+namespace { /* [misc-use-anonymouse-namespace] */
+static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
 		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::string("classResultListDumpToTest(resultList, os, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
 	}
 }
+}; /* namespace */
 const bool classResultListTests() {
 	ResultList resultList;
 	resultList.hashes.insert(ResultListHash({'\x32'})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */

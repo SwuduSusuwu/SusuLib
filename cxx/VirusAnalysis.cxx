@@ -132,7 +132,9 @@ const bool virusAnalysisHookTests() {
 	}
 	return true;
 }
-const bool virusAnalysisImpl(const PortableExecutable &file) {
+
+namespace { /* [misc-use-anonymouse-namespace] */
+static const bool virusAnalysisImpl(const PortableExecutable &file) {
 	switch(virusAnalysis(file)) {
 	case virusAnalysisPass:
 		return true; /* launch this */
@@ -141,7 +143,8 @@ const bool virusAnalysisImpl(const PortableExecutable &file) {
 	default:
 		return false; /* abort */
 	}
-};
+}
+}; /* namespace */
 const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ignore depth-of-1 recursion: NOLINT(misc-no-recursion) */
 	const VirusAnalysisHook originalHookStatus = globalVirusAnalysisHook;
 	if(virusAnalysisHookQuery == hookStatus || originalHookStatus == hookStatus) {

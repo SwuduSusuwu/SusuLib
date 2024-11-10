@@ -2,17 +2,20 @@
 Checks:          '*,
 -*-else-after-return,-*-use-emplace,
 -altera-id-dependent-backward-branch,-altera-struct-pack-align,-altera-unroll-loops,
+-boost-use-ranges,
 -llvm-header-guard,
 -cert-err58-cpp,
 -cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-avoid-non-const-global-variables,
 -cppcoreguidelines-special-member-functions,-hicpp-special-member-functions,
 -fuchsia-default-arguments-declarations,-fuchsia-default-arguments-calls,-fuchsia-statically-constructed-objects,
+-hicpp-signed-bitwise,
 -llvmlibc-callee-namespace,-llvmlibc-implementation-in-namespace,-llvmlibc-restrict-system-libc-headers,-llvmlibc-inline-function-decl,
--misc-use-anonymous-namespace,
+-misc-non-private-member-variables-in-classes,
 -modernize-type-traits,-modernize-use-nodiscard,-modernize-use-trailing-return-type,-modernize-use-using,
 -performance-avoid-endl,
 -portability-std-allocator-const,
--readability-identifier-length,-readability-container-data-pointer,-readability-const-return-type,-readability-isolate-declaration'
+-llvm-qualified-auto,-readability-qualified-auto,
+-readability-const-return-type,-readability-container-data-pointer,-readability-identifier-length,-readability-isolate-declaration,-readability-simplify-boolean-expr,-readability-static-definition-in-anonymous-namespace'
 WarningsAsErrors: ''
 HeaderFileExtensions:
   - hxx

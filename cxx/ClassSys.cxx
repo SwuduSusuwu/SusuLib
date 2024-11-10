@@ -193,6 +193,7 @@ const bool classSysSetConsoleInput(bool input) {
 	return classSysGetConsoleInput();
 }
 
+namespace { /* [misc-use-anonymous-namespace] */
 static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
@@ -207,6 +208,7 @@ static void classSysHexTests(const std::string &value) {
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
+}; /* namespace */
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
 	classSysHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);

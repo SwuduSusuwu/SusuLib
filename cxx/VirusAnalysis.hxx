@@ -14,13 +14,11 @@
 /* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
 namespace Susuwu {
 typedef enum VirusAnalysisHook : unsigned char {
-/* Broken diagnostic, suppress: NOLINTBEGIN(hicpp-signed-bitwise) */
-	virusAnalysisHookDefault = static_cast<unsigned char>(0),      /* "real-time" virus scans not initialized */
-	virusAnalysisHookQuery   = static_cast<unsigned char>(0),      /* return present hooks (as enum) */
-	virusAnalysisHookClear   = static_cast<unsigned char>(1) << 0, /* unhook (remove present hooks), then parse rest of bits */
-	virusAnalysisHookExec    = static_cast<unsigned char>(1) << 1, /* hook {execl(), execlp(), execle(), execv(), execvp(), execvpe()} */
-	virusAnalysisHookNewFile = static_cast<unsigned char>(1) << 2, /* hook (for modeNew in {"w+", "a", "a+"}) fwrite((void *)ptr, (size_t)size, (size_t)nmemb, {fopen((const char *)pathname, modeNew), fdopen((int)fd, modeNew), freopen((const char *)pathname, modeNew, (FILE *)stream)}) */
-/* unsuppress: NOLINTEND(hicpp-signed-bitwise) */
+	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
+	virusAnalysisHookQuery   = 0,      /* return present hooks (as enum) */
+	virusAnalysisHookClear   = 1 << 0, /* unhook (remove present hooks), then parse rest of bits */
+	virusAnalysisHookExec    = 1 << 1, /* hook {execl(), execlp(), execle(), execv(), execvp(), execvpe()} */
+	virusAnalysisHookNewFile = 1 << 2, /* hook (for modeNew in {"w+", "a", "a+"}) fwrite((void *)ptr, (size_t)size, (size_t)nmemb, {fopen((const char *)pathname, modeNew), fdopen((int)fd, modeNew), freopen((const char *)pathname, modeNew, (FILE *)stream)}) */
 } VirusAnalysisHook;
 /* `clang-tidy` suppress: NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange, fuchsia-overloaded-operator) */
 static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return static_cast<VirusAnalysisHook>(static_cast<unsigned>(x) | static_cast<unsigned>(s));}

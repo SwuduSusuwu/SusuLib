@@ -862,6 +862,7 @@ static void classSysHexTests(const std::string &value) {
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
+};
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
 	classSysHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
@@ -1128,7 +1129,7 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 ```
 `less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.cxx)
 ```
-static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) { /* NOLINT(misc-use-anonymous-namespace): have to call */
+static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
@@ -1340,11 +1341,11 @@ typedef class ApxrCns : Cns {
 ```
 /* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
 typedef enum VirusAnalysisHook : unsigned char {
-	virusAnalysisHookDefault = static_cast<unsigned char>(0),      /* "real-time" virus scans not initialized */
-	virusAnalysisHookQuery   = static_cast<unsigned char>(0),      /* return present hooks (as enum) */
-	virusAnalysisHookClear   = static_cast<unsigned char>(1) << 0, /* unhook (remove present hooks), then parse rest of bits */
-	virusAnalysisHookExec    = static_cast<unsigned char>(1) << 1, /* hook {execl(), execlp(), execle(), execv(), execvp(), execvpe()} */
-	virusAnalysisHookNewFile = static_cast<unsigned char>(1) << 2, /* hook (for modeNew in {"w+", "a", "a+"}) fwrite((void *)ptr, (size_t)size, (size_t)nmemb, {fopen((const char *)pathname, modeNew), fdopen((int)fd, modeNew), freopen((const char *)pathname, modeNew, (FILE *)stream)}) */
+	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
+	virusAnalysisHookQuery   = 0,      /* return present hooks (as enum) */
+	virusAnalysisHookClear   = 1 << 0, /* unhook (remove present hooks), then parse rest of bits */
+	virusAnalysisHookExec    = 1 << 1, /* hook {execl(), execlp(), execle(), execv(), execvp(), execvpe()} */
+	virusAnalysisHookNewFile = 1 << 2, /* hook (for modeNew in {"w+", "a", "a+"}) fwrite((void *)ptr, (size_t)size, (size_t)nmemb, {fopen((const char *)pathname, modeNew), fdopen((int)fd, modeNew), freopen((const char *)pathname, modeNew, (FILE *)stream)}) */
 } VirusAnalysisHook;
 static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return static_cast<VirusAnalysisHook>(static_cast<unsigned>(x) | static_cast<unsigned>(s));}
 static const VirusAnalysisHook operator&(VirusAnalysisHook x,  VirusAnalysisHook s) {return static_cast<VirusAnalysisHook>(static_cast<unsigned>(x) & static_cast<unsigned>(s));}
@@ -1561,7 +1562,8 @@ const bool virusAnalysisHookTests() {
 	}
 	return true;
 }
-const bool virusAnalysisImpl(const PortableExecutable &file) {
+
+static const bool virusAnalysisImpl(const PortableExecutable &file) {
 	switch(virusAnalysis(file)) {
 	case virusAnalysisPass:
 		return true; /* launch this */
@@ -1570,7 +1572,7 @@ const bool virusAnalysisImpl(const PortableExecutable &file) {
 	default:
 		return false; /* abort */
 	}
-};
+}
 const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ignore depth-of-1 recursion: NOLINT(misc-no-recursion) */
 	const VirusAnalysisHook originalHookStatus = globalVirusAnalysisHook;
 	if(virusAnalysisHookQuery == hookStatus || originalHookStatus == hookStatus) {
