@@ -11,9 +11,9 @@
  * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
+/* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
-/* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 more simple with macros, plus some of the `constexpr` versions require `__cplusplus >= 202002` */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
 #else /* !(defined __cplusplus */
 #	include <assert.h> /* assert */
@@ -25,16 +25,104 @@
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
-namespace Susuwu { /* namespaces do not affect macros. Is just standard practice to wrap all of a project's contents with namespaces. */
+
+#ifndef __has_feature
+#	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
+#endif /* ndef __has_feature */
+
+#if (defined(__cplusplus) && 201102 < __cplusplus)
+#	define SUSUWU_CXX11
+# define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
+#else
+# define SUSUWU_STATIC_ASSERT(condition) assert(condition)
+#endif /* (defined __cplusplus && 201102 <= __cplusplus) else */
+#if (defined(__cplusplus) && 201402 <= __cplusplus)
+#	define SUSUWU_CXX14
+#endif /* if (defined(__cplusplus) && 201402 < __cplusplus) */
+#if (defined(__cplusplus) && 201702 < __cplusplus)
+#	define SUSUWU_CXX17
+#endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
+#if (defined(__cplusplus) && 202002 <= __cplusplus)
+#	define SUSUWU_CXX20
+#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subojects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
+#else /* (defined(__cplusplus) && 202002 <= __cplusplus) else */
+#	define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
+#endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
+
+#ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
+/* `SUSUWU_EXPECTS(X)` is close to `@pre @code X @endcode` or `SUSUWU_ASSUME(X)` but is for headers; https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2521r2.html */
+/* Promises `(true == (X))`, for static analysis, or for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
+#	define SUSUWU_EXPECTS(X) [[expects: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_EXPECTS(!x.full());` */
+#	define SUSUWU_ENSURES(X) [[ensures: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_ENSURES(0 != x.size());` */
+#else /* else !def USE_CONTRACTS */
+#	define SUSUWU_EXPECTS(X) /* `@pre @code X @endcode` */
+#	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
+#endif /* else !def USE_CONTRACTS */
+
+#if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
+#	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
+		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
+#else /* C++11 else */
+#	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
+#endif /* else no `noexcept` */
+#if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;*/
+#else /* C++11 else */
+#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
+#endif /* else no `[[noreturn]]` */
+
+/* `#pragma S` in macro functions is `_Pragma(S)`, but without this wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`. Use as `SUSUWU_PRAGMA(message("Message"))` */
+#define SUSUWU_PRAGMA(S) _Pragma(#S)
+
+/* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
+#if !defined(NDEBUG_)
+/* [https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release] [https://stackoverflow.com/questions/2290509/debug-vs-ndebug] */
+/* Debug: Promises unreachable, for static analysis */
+#	define SUSUWU_UNREACHABLE assert(false && "UNREACHABLE") /* TODO: NOLINT(cert-dcl03-c,hicpp-static-assert,misc-static-assert): `static_assert` does not allow false, not even in unreachable code paths */
+#else
+#	include <version> /* __cpp_lib_unreachable */ /* [https://en.cppreference.com/w/cpp/feature_test] */
+#	if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable
+/* Release: Promises executable can not reach this spot, for compiler which optimizes this. Warning: `SUSUWU_UNREACHABLE && UB (undefined behaviour)` */
+#		include <utility> /* std::unreachable() */
+#		define SUSUWU_UNREACHABLE std::unreachable()
+#	elif (defined __GNUC__) && ((4 <= __GNUC__ && 4 < __GNUC_MINOR__) || 4 < __GNUC__) /* `~ $ g++` */
+#		define SUSUWU_UNREACHABLE __builtin_unreachable()
+#	else /* else (!def NDEBUG) && (!supports unreachable) */
+#		define SUSUWU_UNREACHABLE /* No-op */
+#	endif /* __cpp_lib_unreachable elif IS_GCC ...*/
+#endif  /* #elif (!defined NDEBUG) ... #else */
+
+namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
+const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+
+/* `SUSUWU_ASSUME(X)` is close to `@pre @code X @endcode` or `[[expects: x]]` */
+/* TODO: choose best of [various possible SUSUWU_ASSUME macros](https://stackoverflow.com/questions/44054078/how-to-guide-gcc-optimizations-based-on-assertions-without-runtime-cost) */
+#ifndef NDEBUG
+/* Debug: Promises `(true == (X))`, for static analysis */
+#	define SUSUWU_ASSUME(X) SUSUWU_STATIC_ASSERT(X)
+#elif (!defined USE_SUSUWU_ASSUME) || USE_SUSUWU_ASSUME /* Default: if(!NDEBUG) USE_SUSUWU_ASSUME=true; pass `-DUSE_SUSUWU_ASSUME=false` to disable this */
+/* Release: Promises `(true == (X))`, for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
+#	ifdef IS_MSVC
+#		define SUSUWU_ASSUME(X) __assume(X)
+#	elif __clang__ /* `~ $ clang++` */
+#		define SUSUWU_ASSUME(X) __builtin_assume(X)
+#	else /* (!def IS_MSVC) && (!def __clang__) */
+#		define SUSUWU_ASSUME(X) ((X) ? static_cast<void>(0) : SUSUWU_UNREACHABLE)
+#	endif /* !def IS_MSVC */
+#else /* !def USE_SUSUWU_ASSUME */
+#	define SUSUWU_ASSUME(X)
+#endif /* !def USE_SUSUWU_ASSUME */
+
 #define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
 #define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
 #define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
+
 #if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
 #	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
 #endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
-
-/* `#pragma S` in macro functions is `_Pragma(S)`, but without this wrap gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`. Use as `SUSUWU_PRAGMA(message("Message"))` */
-#define SUSUWU_PRAGMA(S) _Pragma(#S)
+#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
+#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
+#endif
 
 #if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
 # define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
@@ -78,10 +166,10 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #	define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U) /* don't printout */
 #endif
 #ifdef SUSUWU_SH_RUNTIME_COLORS
-#	pragma message("[Notice: SUSUWU_SH_RUNTIME_COLORS is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
+#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
 #endif /* #elif !defined(_POSIX_VERSION) TODO */
 #ifdef SUSUWU_SH_RUNTIME_OSC
-#	pragma message("[Notice: SUSUWU_SH_RUNTIME_OSC is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
+#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_OSC` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
 #endif /* #elif !defined(_POSIX_VERSION) TODO */
 #if !defined(_POSIX_VERSION)
 #	define SUSUWU_SH_COLORS_UNSUPPORTED /* assume "dumb terminals" (such as __WIN32__ or __MINGW32__ often has) if built without runtime tests for color attributes, on non-POSIX systems */
@@ -105,9 +193,9 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #	define SUSUWU_SH_BEL "\07" /* Bell sound */
 #	define SUSUWU_SH_ESC "\033" /* Escape */
 #	define SUSUWU_SH_OSC SUSUWU_SH_ESC "]" /* Operating System Command */
-#	define SUSUWU_SH_ST SUSUWU_SH_ESC "\\" /* String Terminator of commands */ /* `BEL` reduces this to 1 byte but just functions as `ST` on `xterm` */
+#	define SUSUWU_SH_ST SUSUWU_SH_ESC "\\" /* String Terminator of commands */ /* `BEL` reduces this to 1 byte, but just functions as `ST` on `xterm`. */
 #	define SUSUWU_SH_CSI SUSUWU_SH_ESC "[" /* Control Sequence Introducer */
-#if SUSUWU_SH_SKIP_COLORS /* `-DSUSUWU_SH_SKIP_COLORS=true` to turn colors off */
+#if SUSUWU_SH_SKIP_COLORS /* `-DSUSUWU_SH_SKIP_COLORS=true` to turn colors off. */
 #	define SUSUWU_SH_DEFAULT ""
 #	define SUSUWU_SH_BLACK ""
 #	define SUSUWU_SH_DARK_GRAY ""
@@ -173,18 +261,18 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #define SUSUWU_INFO(x) SUSUWU_PRINT(INFO, x)
 #define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
 
-/* Use this to just print debug/notices to `--debug` builds (+ do conditional execution) */
+/* Use this to just print debug/notices to `--debug` builds (+ do conditional execution). */
 #if SUSUWU_SH_VERBOSE
 #	define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
 #	define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
 #	define SUSUWU_EXECUTEVERBOSE(x) x /* about side-effects; do not assume that `--debug` was used. `--release -DSUSUWU_SH_VERBOSE=true` will execute this. */
 #else /* else SUSUWU_SH_VERBOSE */
-#	define SUSUWU_NOTICE(x) (true)/* skip */
-#	define SUSUWU_DEBUG(x) (true)/* skip */
+#	define SUSUWU_NOTICE(x) (true)/* skip. */
+#	define SUSUWU_DEBUG(x) (true)/* skip. */
 #	define SUSUWU_EXECUTEVERBOSE(x) (true)/*skip*/ /* about side-effects; do not assume that just `--release` was used. `--debug -DSUSUWU_SH_VERBOSE=false` will skip. */
 #endif /* else SUSUWU_SH_VERBOSE */
 
-/* Use this to reduce print (NOTICE/DEBUG is conditional) + (unconditional) execute into single statement */
+/* Use this to reduce print (NOTICE/DEBUG is conditional) + (unconditional) execute into single statement. */
 #define SUSUWU_ERROR_EXECUTE(x) ((SUSUWU_ERROR(#x)), (x))
 #define SUSUWU_WARNING_EXECUTE(x) ((SUSUWU_WARNING(#x)), (x))
 #define SUSUWU_INFO_EXECUTE(x) ((SUSUWU_INFO(#x)), (x))
@@ -192,109 +280,10 @@ namespace Susuwu { /* namespaces do not affect macros. Is just standard practice
 #define SUSUWU_NOTICE_EXECUTE(x) ((SUSUWU_NOTICE(#x)), (x))
 #define SUSUWU_DEBUG_EXECUTE(x) ((SUSUWU_DEBUG(#x)), (x))
 
-/* Use this to reduce (conditional) print + (conditional) execute into single statement */
+/* Use this to reduce (conditional) print + (conditional) execute into single statement. */
 #define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
-
-#ifndef __has_feature
-#	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
-#endif /* ndef __has_feature */
-#if (!defined _POSIX_VERSION) && (_POSIX_C_SOURCE)
-#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix */
-#endif /* (!defined _POSIX_VERSION) && (_POSIX_C_SOURCE) */
-#if (defined(__cplusplus) && 201102 < __cplusplus)
-#	define SUSUWU_CXX11
-# define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
-#	else
-# define SUSUWU_STATIC_ASSERT(condition) assert(condition)
-#endif /* (defined __cplusplus && 201102 <= __cplusplus) else */
-#if (defined(__cplusplus) && 201402 <= __cplusplus)
-#	define SUSUWU_CXX14
-#endif /* if (defined(__cplusplus) && 201402 < __cplusplus) */
-#if (defined(__cplusplus) && 201702 < __cplusplus)
-#	define SUSUWU_CXX17
-#endif /* if (defined(__cplusplus) && 201702 < __cplusplus) */
-#if (defined(__cplusplus) && 202002 <= __cplusplus)
-#	define SUSUWU_CXX20
-#	define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subojects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in the test. */
-void macrosNoUniqueAddressTest() {
-	typedef class Zero {} Zero;
-	class SubClassWithBaseSubobject : public Zero {bool boo;};
-	class SubClassWithMemberSubobject {bool boo; public: Zero zero;};
-	class SubClassWithMemberSubobjectNoAddress {bool boo; public: SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};
-	SUSUWU_STATIC_ASSERT(std::is_empty<Zero>::value);
-	SUSUWU_STATIC_ASSERT(sizeof(bool) == sizeof(SubClassWithBaseSubobject));
-	SUSUWU_STATIC_ASSERT(sizeof(bool) < sizeof(SubClassWithMemberSubobject));
-	SUSUWU_STATIC_ASSERT(sizeof(bool) == sizeof(SubClassWithMemberSubobjectNoAddress));
-}
-#else /* (defined(__cplusplus) && 202002 <= __cplusplus) else */
-#	define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
-#endif /* if (defined(__cplusplus) && 202002 <= __cplusplus) */
-
-#if (!defined __WIN32__) && (defined _WIN32 /* || defined __CYGWIN__ should use "#ifdef _POSIX_VERSION" path */ || __MSC_VER)
-#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
-#endif
-
-/* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
-#if !defined(NDEBUG_)
-/* [https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release] [https://stackoverflow.com/questions/2290509/debug-vs-ndebug] */
-/* Debug: Promises unreachable, for static analysis */
-#	define SUSUWU_UNREACHABLE assert(false && "UNREACHABLE") /* TODO: `static_assert` does not allow false, not even in unreachable code paths */
-#else
 }; /* namespace Susuwu */
-#	include <version> /* __cpp_lib_unreachable */ /* [https://en.cppreference.com/w/cpp/feature_test] */
-#	if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable
-/* Release: Promises executable can not reach this spot, for compiler which optimizes this. Warning: `SUSUWU_UNREACHABLE && UB (undefined behaviour)` */
-#		include <utility> /* std::unreachable() */
-#		define SUSUWU_UNREACHABLE std::unreachable()
-#	elif (defined __GNUC__) && ((4 <= __GNUC__ && 4 < __GNUC_MINOR__) || 4 < __GNUC__) /* `~ $ g++` */
-#		define SUSUWU_UNREACHABLE __builtin_unreachable()
-#	else /* else (!def NDEBUG) && (!supports unreachable) */
-#		define SUSUWU_UNREACHABLE /* No-op */
-#	endif /* __cpp_lib_unreachable elif IS_GCC ...*/
-namespace Susuwu {
-#endif  /* #elif (!defined NDEBUG) ... #else */
-
-#ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
-/* `SUSUWU_EXPECTS(X)` is close to `@pre @code X @endcode` or `SUSUWU_ASSUME(X)` but is for headers; https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2521r2.html */
-/* Promises `(true == (X))`, for static analysis, or for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
-#	define SUSUWU_EXPECTS(X) [[expects: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_EXPECTS(!x.full());` */
-#	define SUSUWU_ENSURES(X) [[ensures: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_ENSURES(0 != x.size());` */
-#else /* else !def USE_CONTRACTS */
-#	define SUSUWU_EXPECTS(X) /* `@pre @code X @endcode` */
-#	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
-#endif /* else !def USE_CONTRACTS */
-
-/* `SUSUWU_ASSUME(X)` is close to `@pre @code X @endcode` or `[[expects: x]]` */
-/* TODO: choose best of [various possible SUSUWU_ASSUME macros](https://stackoverflow.com/questions/44054078/how-to-guide-gcc-optimizations-based-on-assertions-without-runtime-cost) */
-#ifndef NDEBUG
-/* Debug: Promises `(true == (X))`, for static analysis */
-#	define SUSUWU_ASSUME(X) SUSUWU_STATIC_ASSERT(X)
-#elif (!defined USE_SUSUWU_ASSUME) || USE_SUSUWU_ASSUME /* Default: if(!NDEBUG) USE_SUSUWU_ASSUME=true; pass `-DUSE_SUSUWU_ASSUME=false` to disable this */
-/* Release: Promises `(true == (X))`, for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
-#	ifdef IS_MSVC
-#		define SUSUWU_ASSUME(X) __assume(X)
-#	elif __clang__ /* `~ $ clang++` */
-#		define SUSUWU_ASSUME(X) __builtin_assume(X)
-#	else /* (!def IS_MSVC) && (!def __clang__) */
-#		define SUSUWU_ASSUME(X) ((X) ? static_cast<void>(0) : SUSUWU_UNREACHABLE)
-#	endif /* !def IS_MSVC */
-#else /* !def USE_SUSUWU_ASSUME */
-#	define SUSUWU_ASSUME(X)
-#endif /* !def USE_SUSUWU_ASSUME */
 /* `clang-tidy` on: NOLINTEND(cppcoreguidelines-macro-usage) */
-
-#if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
-#	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
-		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
-#else /* C++11 else */
-#	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
-#endif /* else no `noexcept` */
-#if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;*/
-#else /* C++11 else */
-#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
-#endif /* else no `[[noreturn]]` */
-}; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_Macros_hxx */
 

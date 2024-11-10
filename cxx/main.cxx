@@ -4,25 +4,19 @@
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_ASSUME SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_UNREACHABLE */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT */
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
-#include <cstdlib> /* exit */
 #include <iostream> /* std::cout std::flush std::endl */
 namespace Susuwu {
-void noExcept() SUSUWU_NOEXCEPT(true);
-SUSUWU_NORETURN void noReturn();
-void noExcept() SUSUWU_NOEXCEPT {std::cout << std::flush;}
-void noReturn() {exit(0);}
-const int testHarnesses() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) {
+const int testHarnesses() {
 	const bool consoleHasInput = classSysGetConsoleInput();
 	if(consoleHasInput) {
 		classSysSetConsoleInput(false);
 	}
 	assert(!classSysGetConsoleInput());
-	std::cout << "cxx/Macros.hxx: " << std::flush;
-	SUSUWU_ASSUME(true);
-	noExcept();
-	std::cout << "pass" << std::endl;
+	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
+	const int macrosTestsErrno =  macrosTestsNoexcept();
+	std::cout << (0 == macrosTestsErrno ? "pass" : ("error#" + std::to_string(macrosTestsErrno))) << std::endl;
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
 	classSysTestsNoexcept();
 	std::cout << "classSha2TestsNoexcept(): " << std::flush;
@@ -42,8 +36,7 @@ const int testHarnesses() SUSUWU_EXPECTS(true) SUSUWU_ENSURES(true) {
 	} else {
 		std::cout << "error" << std::endl;
 	}
-	noReturn();
-	SUSUWU_UNREACHABLE;
+	return 0;
 }
 }; /* namespace Susuwu */
 int main(int argc, const char **args) {

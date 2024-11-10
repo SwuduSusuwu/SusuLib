@@ -55,6 +55,7 @@ set -x
 $CXX -x c -c ${sSRC}/../c/rfc6234/sha1.c
 $CXX -x c -c ${sSRC}/../c/rfc6234/sha224-256.c
 $CXX -x c -c ${sSRC}/../c/rfc6234/sha384-512.c
+$CXX -c ${sSRC}/Macros.cxx
 $CXX -c ${sSRC}/ClassSha2.cxx
 $CXX -c ${sSRC}/ClassResultList.cxx
 $CXX -c ${sSRC}/ClassSys.cxx
@@ -62,7 +63,7 @@ $CXX -c ${sSRC}/ClassCns.cxx
 $CXX -c ${sSRC}/VirusAnalysis.cxx
 $CXX -c ${sSRC}/AssistantCns.cxx
 $CXX -c ${sSRC}/main.cxx
-$CXX ${LD_FLAGS} sha1.o sha224-256.o sha384-512.o ClassSha2.o ClassResultList.o ClassSys.o ClassCns.o VirusAnalysis.o AssistantCns.o main.o
+$CXX ${LD_FLAGS} sha1.o sha224-256.o sha384-512.o Macros.o ClassSha2.o ClassResultList.o ClassSys.o ClassCns.o VirusAnalysis.o AssistantCns.o main.o
 STATUS=$?
 set +x
 if [ 0 -eq $STATUS  ]; then
