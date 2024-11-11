@@ -3,6 +3,7 @@
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
+#include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT */
@@ -48,6 +49,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	} else {
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassSha2Bit;
+	}
+	std::cout << "classResultListTestsNoexcept(): " << std::flush;
+	if(true == classResultListTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassResultListBit;
 	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
 	if(virusAnalysisTestsNoexcept()) {

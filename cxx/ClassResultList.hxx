@@ -6,10 +6,11 @@
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode FileHash */
 #include "ClassSha2.hxx" /* sha2 */
 #include "ClassSys.hxx" /* classSysHexOs */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_PREFER_CSTR */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include <cstddef> /* size_t */
 #if SUSUWU_PREFER_CSTR
-#include <cstring> /* strlen memmem */
+#	include <cstring> /* strlen memmem */
 #endif /* SUSUWU_PREFER_CSTR */
 #include <tuple> /* std::tuple std::get */
 #include <unordered_set> /* std::unordered_set */
@@ -30,6 +31,9 @@ typedef struct ResultList : Object { /* Lists of {metadata, executables (or page
 	Bytecodes bytecodes; /* Whole executables (for `VirusAnalysis`) or webpages (for `AssistantCns`); huge disk usage, just load this for signature synthesis (or CNS backpropagation). */
 /* `clang-tidy` on: NOLINTEND(misc-non-private-member-variables-in-classes) */
 } ResultList;
+
+const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classResultListTests, "classResultListTests()");}
 
 template<class List>
 const size_t listMaxSize(const List &list) {
@@ -56,11 +60,12 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 		}
 		if(index) {
 			os << index_;
+			whitespace ? (os << " = ") : (os << '=');
 		}
 		if(pascalValues) {
-				os << value.size() << value;
+			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
 		} else {
-			os << (index ? "=>0x" : "0x");
+			os << "0x";
 			classSysHexOs(os, value);
 		}
 		++index_;
@@ -70,7 +75,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 	} else {
 		os << "};";
 	}
-}
+} /* view `ClassResultList.cxx`:`classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
 template<class List, class Os>
 void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
 	os << "list.hashes" << (whitespace ? " = " : "=");
@@ -159,7 +164,6 @@ typedef struct ResultListSignatureMatch {
 	BytecodeOffset fileOffset;
 	ResultListSignature signature;
 } ResultListSignatureMatch;
-#include "Macros.hxx" /* SUSUWU_DEBUG */
 template<class List>
 /* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) {std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]";}` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {

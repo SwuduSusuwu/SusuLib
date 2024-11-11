@@ -666,6 +666,9 @@ typedef struct ResultList : Object { /* Lists of {metadata, executables (or page
 	Bytecodes bytecodes; /* Whole executables (for `VirusAnalysis`) or webpages (for `AssistantCns`); huge disk usage, just load this for signature synthesis (or CNS backpropagation). */
 } ResultList;
 
+const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classResultListTests, "classResultListTests()");}
+
 template<class List>
 const size_t listMaxSize(const List &list) {
 #if SUSUWU_PREFER_CSTR
@@ -691,11 +694,12 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 		}
 		if(index) {
 			os << index_;
+			whitespace ? (os << " = ") : (os << '=');
 		}
 		if(pascalValues) {
-				os << value.size() << value;
+			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
 		} else {
-			os << (index ? "=>0x" : "0x");
+			os << "0x";
 			classSysHexOs(os, value);
 		}
 		++index_;
@@ -705,7 +709,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 	} else {
 		os << "};";
 	}
-}
+} /* view `ClassResultList.cxx`:`classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
 template<class List, class Os>
 void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
 	os << "list.hashes" << (whitespace ? " = " : "=");
@@ -794,7 +798,6 @@ typedef struct ResultListSignatureMatch {
 	BytecodeOffset fileOffset;
 	ResultListSignature signature;
 } ResultListSignatureMatch;
-#include "Macros.hxx" /* SUSUWU_DEBUG */
 template<class List>
 /* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) {std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]";}` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {
@@ -829,6 +832,26 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 		x = it;
 	}
 	return list;
+}
+```
+`less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.cxx)
+```
+void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
+	std::stringstream os;
+	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
+	if(expectedValue != os.str()) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::string("classResultListDumpToTest(resultList, os, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
+	}
+}
+const bool classResultListTests() {
+	ResultList resultList;
+	resultList.hashes.insert(ResultListHash({0x32})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
+	resultList.signatures = {"1", "2"};
+	resultList.bytecodes = {"01", "02"};
+	classResultListDumpToTest(resultList, false, false, false, "list.hashes={0x32};list.signatures={0x31,0x32};list.bytecodes={0x3031,0x3032};");
+	classResultListDumpToTest(resultList, true, true, false, "list.hashes = {\n\t0 = 0x32\n};\nlist.signatures = {\n\t0 = 0x31,\n\t1 = 0x32\n};\nlist.bytecodes = {\n\t0 = 0x3031,\n\t1 = 0x3032\n};\n");
+	classResultListDumpToTest(resultList, false, false, true, "list.hashes={1:2};list.signatures={1:1,1:2};list.bytecodes={2:01,2:02};");
+	return true;
 }
 ```
 `less` [cxx/ClassCns.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassCns.hxx)
@@ -1515,14 +1538,15 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , such that other languages can execute unit tests */
 #endif /* def __cplusplus */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
-static const int susuwuUnitTestsMacrosBit        = 1 << 0; /*  1: `Macros.hxx`:`macrosTestsNoexcept()` */
-static const int susuwuUnitTestsClassSysBit      = 1 << 1; /*  2: `ClassSys.hxx`:`classSysTestsNoexcept()` */
-static const int susuwuUnitTestsClassSha2Bit     = 1 << 2; /*  4: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
-static const int susuwuUnitTestsVirusAnalysisBit = 1 << 3; /*  8: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
-static const int susuwuUnitTestsAssistantCnsBit  = 1 << 4; /* 16: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
-static const int susuwuUnitTestsConsoleBit       = 1 << 5; /* 32: `classSys.hxx`:`classSysSetConsoleInput()` */
-
-const SusuwuUnitTestsBitmask susuwuTestHarnesses();
+/* bits in order which tests execute (not ordered included, but order used) */
+static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*  1: `Macros.hxx`:`macrosTestsNoexcept()` */
+static const int susuwuUnitTestsConsoleBit         = 1 << 1; /*  2: `classSys.hxx`:`classSysSetConsoleInput()` */
+static const int susuwuUnitTestsClassSysBit        = 1 << 2; /*  4: `ClassSys.hxx`:`classSysTestsNoexcept()` */
+static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
+static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassSys.hxx`:`classSysTestsNoexcept()` */
+static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
+static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
+const SusuwuUnitTestsBitmask susuwuUnitTests();
 SusuwuUnitTestsBitmask main(int argc, const char **args);
 #ifdef __cplusplus
 } /* extern "C" { */
@@ -1532,7 +1556,11 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
 ```
 namespace Susuwu {
-static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept()) SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value) {
+static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
+#ifdef SUSUWU_CXX17 /* `type_traits` is C++11 but `is_nothrow_invocable` is C++17 */
+	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
+#endif /* def SUSUWU_CXX17 */
+	{
 	int susuwuUnitTestsErrno = 0;
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
@@ -1562,6 +1590,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	} else {
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassSha2Bit;
+	}
+	std::cout << "classResultListTestsNoexcept(): " << std::flush;
+	if(true == classResultListTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassResultListBit;
 	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
 	if(virusAnalysisTestsNoexcept()) {
