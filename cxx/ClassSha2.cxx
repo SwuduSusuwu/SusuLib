@@ -10,7 +10,7 @@
 #include <string> /* std::to_string */
 extern "C" {
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
-#include "../c/rfc6234/sha.h" /* SHA256HashSize, SHA256Context, SHA256Reset, SHA256Input, SHA256Result, SHA1*, SHA512*  */
+#include "../c/rfc6234/sha.h" /* SHA256HashSize, SHA256Context, SHA256Reset, SHA256Input, SHA256Result, SHA1*, SHA512* */
 }
 namespace Susuwu {
 Sha2 sha2 = sha256;
@@ -18,29 +18,27 @@ Sha2 sha2 = sha256;
 	FileHash result;
 	SHA1Context context;
 	result.resize(SHA1HashSize);
-	SHA1Reset(&context); /* If undefined, link sha1.o */
-	SHA1Input(&context, reinterpret_cast<const unsigned char *>(bytecode.c_str()), bytecode.size());
-	SHA1Result(&context, const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(result.c_str())));
+	SHA1Reset(&context); /* If `undefined symbol: SHA1Reset`, affix `sha1.o` to `${LD_FLAGS}` */
+	SHA1Input(&context, reinterpret_cast<const unsigned char *>(&bytecode[0]), bytecode.size());
+	SHA1Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-
 /* const */ FileHash /* 256 bits, not null-terminated */ sha256(const FileBytecode &bytecode) {
 	FileHash result;
 	SHA256Context context;
 	result.resize(SHA256HashSize);
-	SHA256Reset(&context); /* If undefined, link sha224-256.o */
-	SHA256Input(&context, reinterpret_cast<const unsigned char *>(bytecode.c_str()), bytecode.size());
-	SHA256Result(&context, const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(result.c_str())));
+	SHA256Reset(&context); /* If `undefined symbol: SHA256Reset`, affix `sha224-256.o` to `${LD_FLAGS}` */
+	SHA256Input(&context, reinterpret_cast<const unsigned char *>(&bytecode[0]), bytecode.size());
+	SHA256Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-
 /* const */ FileHash /* 512 bits, not null-terminated */ sha512(const FileBytecode &bytecode) {
 	FileHash result;
 	SHA512Context context;
 	result.resize(SHA512HashSize);
-	SHA512Reset(&context); /* If undefined, link sha384-512.o */
-	SHA512Input(&context, reinterpret_cast<const unsigned char *>(bytecode.c_str()), bytecode.size());
-	SHA512Result(&context, const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(result.c_str())));
+	SHA512Reset(&context); /* If `undefined symbol: SHA512Reset`, affix `sha384-512.o` to `${LD_FLAGS}` */
+	SHA512Input(&context, reinterpret_cast<const unsigned char *>(&bytecode[0]), bytecode.size());
+	SHA512Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
 
