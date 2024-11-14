@@ -1,4 +1,23 @@
 #!/bin/sh
+SUSUWU_DIR_SUFFIX_SLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "$OBJDIR") */
+	DIR=$1
+	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
+		DIR="${DIR}/" #/* if original doesn't have, append '/' */
+	fi
+	echo "${DIR}" #/* return with slash */
+}
+SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "$OBJDIR") */
+	DIR=$1
+	case "${DIR}" in
+		./*) #/* original has "./" */
+			;;
+		*) #/* default (if original doesn't match "./") */
+			DIR="./${DIR}" #/* if original doesn't have, affix "./" */
+			;;
+	esac
+	echo "${DIR}" #/* return with "./" */
+}
+
 #/* Based on cxx/Macros.hxx */
 SUSUWU_SH_DEFAULT="\033[0m"
 SUSUWU_SH_BLACK="\033[0;30m"
@@ -24,8 +43,8 @@ SUSUWU_SH_SUCCESS="[${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_NOTICE="[${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_DEBUG="[${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}]"
-SUSUWU_PRINT() {
+SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "$0 launch" */
 	local LEVEL="${1}"; local x="${2}"
-	echo "${LEVEL}${x}${SUSUWU_SH_CLOSE_}" >&2 #fd=2 is `std::cerr`/`stderr`
+	echo "${LEVEL}${x}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 }
 

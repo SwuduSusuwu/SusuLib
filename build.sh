@@ -1,12 +1,12 @@
 #!/bin/sh
-. ./Macros.sh
+. ./Macros.sh #/* SUSUWU_DIR_SUFFIX_SLASH, SUSUWU_DIR_AFFIX_DOTSLASH, SUSUWU_PRINT, SUSUWU_SH_* */
 SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Dual licenses: choose \"Creative Commons\" or \"Apache 2\" (allows all uses)."
 
 if command -v ctags > /dev/null; then
 	ctags -R
 fi
 
-CXXFLAGS_ANALYSIS="-Wall -Wno-unused -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers" #TODO: -`-Wno-*, +`-Wpedantic`, +`-Werror``
+CXXFLAGS_ANALYSIS="-Wall -Wno-unused -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers" #/*TODO: -`-Wno-*`, +`-Wpedantic`, +`-Werror` */
 CXXFLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
 CXXFLAGS_DEBUG="-g -Og" #/* in MSVC is `/Zi /Od`: symbols for `gdb`/`lldb` use, optimizations compatible with `-g`/`-fsan*` */
 CXXFLAGS_DEBUG="${CXXFLAGS_DEBUG} -fno-omit-frame-pointer" #/* thus optimization won't remove stacktraces: https://stackoverflow.com/questions/48234575/g-will-fno-omit-frame-pointer-be-effective-if-specified-before-o2-or-o3 https://clang.llvm.org/docs/MemorySanitizer.html */
@@ -34,7 +34,7 @@ elif command -v clang++ > /dev/null; then
 elif command -v g++ > /dev/null; then
 	CXX="g++"
 	CXXFLAGS_DEBUG="${CXXFLAGS_DEBUG} ${CXXFLAGS_FSAN}"
-elif command -v "${CXX}" > /dev/null; then
+elif command -v "${CXX}" > /dev/null; then #/* TODO: if our flags are compatible with all `${CXX}`, move this to top */
 	SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`clang++ not found\`, \`g++ not found\`. \`\${CXX}\` (\"${CXX}\") found, will use this."
 else
 	SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`clang++ not found\`, \`g++ not found\`. \`\${CXX}\` (\"${CXX}\") not found. Do \`apt install clang\` or \`apt install gcc\`."
@@ -60,36 +60,56 @@ CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_ANALYSIS}"
 CCFLAGS="${CCFLAGS} ${CXXFLAGS}"
 C_SOURCE_PATH="./c/"
 CXX_SOURCE_PATH="./cxx/"
+
+if [ -z ${CROSS_COMP} ]; then
+	OUTPUT="a.out"
+else
+	OUTPUT="a.exe"
+fi
+if [ -z ${OBJDIR} ]; then
+	OBJDIR="./obj/"
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "To redirect \`${CXX} -c ... -o \${OBJDIR}\${OBJ}.o\` (which has \`OBJDIR=\"${OBJDIR}\"\`), execute \`export OBJDIR=\"./obj/\"\` (where \"./obj/\" is a directory which you choose)."
+else
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${CXX} -c ... -o \${OBJDIR}\` inherits local \`OBJDIR=\"${OBJDIR}\"\` until you execute \`unset OBJDIR\`."
+fi
+if [ -z ${BINDIR} ]; then
+	BINDIR="./bin/"
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "To redirect \`${LD} ... -o \${BINDIR}${OUTPUT}\` (which has \`BINDIR=\"${BINDIR}\"\`), execute \`export BINDIR=\"./bin/\"\` (where \"./bin/\" is a directory which you choose)."
+else
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${LD} ... -o \${BINDIR}${OUTPUT}\` inherits local \`BINDIR=\"${BINDIR}\"\` until you execute \`unset BINDIR\`."
+fi
+mkdir -p "${OBJDIR}" "${BINDIR}"
+
+C_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
+CXX_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
+OBJDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${OBJDIR}") #/* if inherit OBJDIR, perhaps it is without last '/' */
+BINDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${BINDIR}") #/* if inherit BINDIR, perhaps it is without last '/' */
 set -x
-${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha1.c"
-${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha224-256.c"
-${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha384-512.c"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}Macros.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassSha2.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassResultList.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassSys.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassCns.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}VirusAnalysis.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}AssistantCns.cxx"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}main.cxx"
+${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha1.c" -o "${OBJDIR}sha1.o"
+${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha224-256.c" -o "${OBJDIR}sha224-256.o"
+${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha384-512.c" -o "${OBJDIR}sha384-512.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}Macros.cxx" -o "${OBJDIR}Macros.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassSha2.cxx" -o "${OBJDIR}ClassSha2.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassResultList.cxx" -o "${OBJDIR}ClassResultList.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassSys.cxx" -o "${OBJDIR}ClassSys.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassCns.cxx" -o "${OBJDIR}ClassCns.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}VirusAnalysis.cxx" -o "${OBJDIR}VirusAnalysis.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}AssistantCns.cxx" -o "${OBJDIR}AssistantCns.o"
+${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}main.cxx" -o "${OBJDIR}main.o"
 #/* Order is 2 fold: language of code, plus which source the most `#include` (most include `Macros.hxx`). */
-${LD} ${LDFLAGS} "sha1.o" "sha224-256.o" "sha384-512.o" "Macros.o" "ClassSha2.o" "ClassResultList.o" "ClassSys.o" "ClassCns.o" "VirusAnalysis.o" "AssistantCns.o" "main.o"
+${LD} ${LDFLAGS} "${OBJDIR}sha1.o" "${OBJDIR}sha224-256.o" "${OBJDIR}sha384-512.o" "${OBJDIR}Macros.o" "${OBJDIR}ClassSha2.o" "${OBJDIR}ClassResultList.o" "${OBJDIR}ClassSys.o" "${OBJDIR}ClassCns.o" "${OBJDIR}VirusAnalysis.o" "${OBJDIR}AssistantCns.o" "${OBJDIR}main.o" -o "${BINDIR}${OUTPUT}"
 STATUS=$?
 set +x
 
 if [ 0 -eq ${STATUS} ]; then
-	if [ -z ${CROSS_COMP} ]; then
-		FILE_OUT="a.out"
-	else
-		FILE_OUT="a.exe"
-	fi
-	SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${FILE_OUT}\` (`stat -c%s ${FILE_OUT}` bytes)."
-	./${FILE_OUT}
+	SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+	BINDIR=$(SUSUWU_DIR_AFFIX_DOTSLASH "${BINDIR}")
+	${BINDIR}${OUTPUT}
 	STATUS=$?
 	if [ 0 -eq ${STATUS} ]; then
-		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "\`./${FILE_OUT}\` returned status SusuwuUnitTestsBitmask(${STATUS})."
+		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "\`${BINDIR}${OUTPUT}\` returned status SusuwuUnitTestsBitmask(${STATUS})."
 	else
-		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`./${FILE_OUT}\` returned status SusuwuUnitTestsBitmask(${STATUS})."
+		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${BINDIR}${OUTPUT}\` returned status SusuwuUnitTestsBitmask(${STATUS})."
 	fi
 fi
 return ${STATUS}
