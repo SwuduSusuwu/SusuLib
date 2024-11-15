@@ -22,10 +22,12 @@ Targets: Windows/Linux/Android/OSX/iOS; minimum [_C++11_](https://gcc.gnu.org/pr
 Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/a.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) has constants to use to interpret `a.out`'s return values.
 - Console flags:
-  - `./build.sh` : Defaults to `./build.sh --debug`.
+  - `./build.sh` : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
+  - `./build.sh --clean` : removes intermediate object files + exits; to reduce disc use.
+  - `./build.sh --rebuild` : removes intermediate object files + continues; to rebuild with new flags (or if `./build.sh` doesn't rebuild code which includes updated headers).
   - `./build.sh --debug` : includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with `-Og`.
   - `./build.sh --release` : excludes `--debug` (`-DNDEBUG`), strips frame-pointers/symbols, optimizes with `-O2`.
-  - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_
+  - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_.
 - Special flags (`vim build.sh` to use); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `!defined(__cplusplus)`.
@@ -47,28 +49,28 @@ Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/tru
 # Contributor conventions/rules
 Linter: `clang-tidy cxx/*.cxx` /* uses [`.clang-tidy`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/.clang-tidy) options */ 
 ## Git
-Do atomic commits: Commits should allow to use `git rebase -i` to reorder, unless commit messages include such as "Is followup to \<commit hash\>" (which shows temporal order).
+Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such as through `git rebase -i`) with a previous commit, or cannot `./build.sh` if a previous commit got `git revert`, your commit message must include such as "Is followup to \<commit hash\>" (which shows temporal order).
 
 `git commit` message format/syntax:
-- if commit does `git add NewFile`: message has `+\`NewFile\``
-- if `git rm Exists`: `-`Exists``
-- if `touch Exists && git add Exists`: `@\`Exists\`` or `?\`Exists\``
-  - Simple wildcards/regex for altered functions: `\`%s/oldFunction/newFunction/\``
+- if commit does `git add NewFile`: message has `+\`NewFile\``.
+- if `git rm Exists`: `-`Exists``.
+- if `touch Exists && git add Exists`: `@\`Exists\`` or `?\`Exists\``.
+  - Simple wildcards/regex for altered functions: `\`%s/oldFunction/newFunction/\``.
 - if `echo "int newFunction() {...}" >> Exists && git add Exists`: `@\`Exists\`:+\`NewFunction()\``.
-- if `git mv OldPath/ NewPath/`: `\`OldPath/.* -> NewPath/.*\``
+- if `git mv OldPath/ NewPath/`: `\`OldPath/.* -> NewPath/.*\``.
 
 [Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to format code/paths.]
 ## Source
 Most of what [_Mozilla Org_'s (_Firefox_'s) style](https://firefox-source-docs.mozilla.org/code-quality/coding-style/coding_style_cpp.html) suggests is sound (you should follow this unless you have specific reasons not to).
 Code rules (lots overlap with _Mozilla Org_'s):
 
-- Files: `#import "PascalCase.hxx"`, as this is most common.
+- Files: `#include "PascalCase.hxx"`, as this is most common. `./build.sh` requires: that all local includes prefix as `Class*.hxx` (so it knows to execute `--rebuild` if you upgrade a common include.) TODO: incremental builds which don't require this.
 
 - Structs, enums, classe: `typedef struct PascalCase {} PascalCase;`, `typedef enum PascalCase {} PascalCase;`, `typedef class PascalCase {} PascalCase;`, as this is most common.
 
 - Macros: `#define NAMESPACE_CONSTANT_CASE(snake_case_param) assert(snake_case_param);`, as this is most common.
 
-- Indent: tabs ('^I', reduced memory use, allows local configs to set width, allows arrow keys to move fast); as much tabs as braces ('{', '}'). [All which conflicts with _Mozilla Org_'s format is tab use]
+- Indent: tabs ('^I', reduced memory use, allows local configs to set width, allows arrow keys to move fast); as much tabs as braces ('{', '}'). [All which conflicts with _Mozilla Org_'s format is tab use.]
 
 - Braces, functions; most common form:
 ```
@@ -106,7 +108,7 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
 bool functionDeclaration(std::string input, std::deque<vector> output);
 ```
   - It is arguable whether or not you should document such possible system errors; almost all Standard Template Library functions can throw derivatives of `std::logic_error`.
-  - Regex `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/` once have _Contracts_/_C++26_
+  - Regex `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/` once have _Contracts_/_C++26_.
   - cxx/Macros.cxx has `ASSUME(X)`, which is close to `[[expects: x]]`, but `ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
   - Documentation of interfaces belongs to `*.hxx`; `*.cxx` is to do implementations. Do not duplicate interface comments.
   - Advantages of `[[expects]]`; allows to move information of interfaces out of `*.cxx`, to `*.hxx`.

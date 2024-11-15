@@ -15,7 +15,7 @@ CXXFLAGS_FSAN="-fsanitize=address -fno-sanitize-recover=all -fsanitize=float-div
 #CXXFLAGS_FSAN="${CXXFLAGS_FSAN} -fsanitize=undefined" #/* causes 'cannot locate symbol "__ubsan_handle_function_type_mismatch_abort"' */
 
 CROSS_COMP=""
-if [ "--mingw" = "${1}" ] || [ "--mingw" = "${2}" ]; then
+if [ "--mingw" = "${1}" -o  "--mingw" = "${2}" ]; then
 	CROSS_COMP=" --mingw"
 	LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
 	if command -v x86_64-w64-mingw32-clang++ > /dev/null; then
@@ -41,7 +41,7 @@ else
 	exit 1
 fi
 
-if [ "--release" = "${1}" ] || [ "--release" = "${2}" ]; then
+if [ "--release" = "${1}" -o  "--release" = "${2}" ]; then
 	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --release\` does not support profilers/debuggers (use \`${0}${CROSS_COMP} --debug\` for this)."
 	CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_RELEASE}"
 else
@@ -79,30 +79,62 @@ else
 	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${LD} ... -o \${BINDIR}${OUTPUT}\` inherits local \`BINDIR=\"${BINDIR}\"\` until you execute \`unset BINDIR\`."
 fi
 mkdir -p "${OBJDIR}" "${BINDIR}"
+if [ "--rebuild" = "${1}" -o  "--rebuild" = "${2}" ]; then
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Was called with \`${0}${CROSS_COMP} --rebuild\`, will remove intermediate objects+ continue."
+	rm ${OBJDIR}*.o
+fi
+if [ "--clean" = "${1}" -o  "--clean" = "${2}" ]; then
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Was called with \`${0}${CROSS_COMP} --clean\`, will remove intermediate objects + exit. Use \`${0}${CROSS_COMP} --rebuild\` to clean + continue."
+	rm ${OBJDIR}*.o
+	exit 0
+fi
 
 C_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
 CXX_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
 OBJDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${OBJDIR}") #/* if inherit OBJDIR, perhaps it is without last '/' */
 BINDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${BINDIR}") #/* if inherit BINDIR, perhaps it is without last '/' */
+if [ -e ${BINDIR}${OUTPUT} ]; then
+	BUILDNEW=false
+else
+	BUILDNEW=true
+fi
+for SOURCE in ${CXX_SOURCE_PATH}Class*.hxx ${CXX_SOURCE_PATH}Macros.hxx; do
+	OBJECT="${OBJDIR}$(basename ${SOURCE} .hxx).o" #/* `basename`'s second param removes suffix */
+	SRCCXX="${CXX_SOURCE_PATH}$(basename ${SOURCE} .hxx).cxx" #/* `basename`'s second param removes suffix */
+	if [ ${OBJECT} -ot ${SOURCE} -a -e ${SOURCE} ]; then #/* `&& [ -e ${SOURCE} ]` is: skip unless `${SOURCE}` exists. */
+		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${SOURCE}\` is newer than \`${OBJECT}\`, will rebuild all objects."
+		rm ${OBJDIR}*.o
+		break
+	elif [ ! -e ${SRCCXX} ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
+		touch ${OBJECT};            #/* ... then produce `*.o` (for future tests.) */
+	fi
+done
+OBJECTLIST=""
 set -x
-${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha1.c" -o "${OBJDIR}sha1.o"
-${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha224-256.c" -o "${OBJDIR}sha224-256.o"
-${CC} ${CCFLAGS} -c "${C_SOURCE_PATH}rfc6234/sha384-512.c" -o "${OBJDIR}sha384-512.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}Macros.cxx" -o "${OBJDIR}Macros.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassSha2.cxx" -o "${OBJDIR}ClassSha2.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassResultList.cxx" -o "${OBJDIR}ClassResultList.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassSys.cxx" -o "${OBJDIR}ClassSys.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}ClassCns.cxx" -o "${OBJDIR}ClassCns.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}VirusAnalysis.cxx" -o "${OBJDIR}VirusAnalysis.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}AssistantCns.cxx" -o "${OBJDIR}AssistantCns.o"
-${CXX} ${CXXFLAGS} -c "${CXX_SOURCE_PATH}main.cxx" -o "${OBJDIR}main.o"
-#/* Order is 2 fold: language of code, plus which source the most `#include` (most include `Macros.hxx`). */
-${LD} ${LDFLAGS} "${OBJDIR}sha1.o" "${OBJDIR}sha224-256.o" "${OBJDIR}sha384-512.o" "${OBJDIR}Macros.o" "${OBJDIR}ClassSha2.o" "${OBJDIR}ClassResultList.o" "${OBJDIR}ClassSys.o" "${OBJDIR}ClassCns.o" "${OBJDIR}VirusAnalysis.o" "${OBJDIR}AssistantCns.o" "${OBJDIR}main.o" -o "${BINDIR}${OUTPUT}"
+#for SOURCE in ${C_SOURCE_PATH}*/*.c; do #/* The extra "*/" is since this just has vendored code (`rfc6234/`) */
+for SOURCE in "${C_SOURCE_PATH}rfc6234/sha1.c" "${C_SOURCE_PATH}rfc6234/sha224-256.c" "${C_SOURCE_PATH}rfc6234/sha384-512.c"; do
+	OBJECT="${OBJDIR}$(basename ${SOURCE} .c).o" #/* `basename`'s second param removes suffix */
+	if [ ${OBJECT} -ot ${SOURCE} -o ! -e ${OBJECT} ] >/dev/null; then
+		${CC} ${CCFLAGS} -c "${SOURCE}" -o "${OBJECT}"
+		BUILDNEW=true
+	fi
+	OBJECTLIST="${OBJECTLIST} ${OBJECT}"
+done
+for SOURCE in ${CXX_SOURCE_PATH}*.cxx; do
+	OBJECT="${OBJDIR}$(basename ${SOURCE} .cxx).o" #/* `basename`'s second param removes suffix */
+	if [ ${OBJECT} -ot ${SOURCE} -o ! -e ${OBJECT} ] > /dev/null 2>&1; then
+		${CXX} ${CXXFLAGS} -c "${SOURCE}" -o "${OBJECT}"
+		BUILDNEW=true
+	fi
+	OBJECTLIST="${OBJECTLIST} ${OBJECT}"
+done
+${BUILDNEW} && ${LD} ${LDFLAGS}${OBJECTLIST} -o "${BINDIR}${OUTPUT}"
 STATUS=$?
 set +x
 
-if [ 0 -eq ${STATUS} ]; then
-	SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+if [ 0 -eq ${STATUS} -o false = ${BUILDNEW} ]; then
+	${BUILDNEW} && SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+	${BUILDNEW} || SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
 	BINDIR=$(SUSUWU_DIR_AFFIX_DOTSLASH "${BINDIR}")
 	${BINDIR}${OUTPUT}
 	STATUS=$?
