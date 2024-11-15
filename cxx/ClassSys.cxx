@@ -1,23 +1,23 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_PRINT WARNING */
+#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include <cassert> /* assert */
 #include <cerrno> /* errno */
 #include <cstdlib> /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 #include <stdexcept> /* std::runtime_error */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
 #include <unistd.h> /* execve execv fork geteuid getuid setuid */
 #else
-# ifdef __WIN32__
-# include <shlobj.h> /* IsUserAnAdmin */
-# endif /* def __WIN32__ */
+#	ifdef SUSUWU_WIN32
+#	include <shlobj.h> /* IsUserAnAdmin */
+#	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
-#endif /* def _POSIX_VERSION */
+#endif /* def SUSUWU_POSIX */
 #include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */
 #include <vector> /* std::vector */
@@ -36,7 +36,7 @@ const bool classSysInit(int argc, const char **args) {
 }
 
 const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) SUSUWU_NOEXCEPT {
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	const pid_t pid = fork();
 	if(0 != pid) {
 		if(-1 == pid) {
@@ -65,14 +65,14 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 		execve(argv[0], &argv[0], &envp[0]); /* NORETURN */
 	}
 	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
-#else /* ndef _POSIX_VERSION */
-# undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
-	SUSUWU_ERROR("execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}");
+#else /* ndef SUSUWU_POSIX */
+#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
+	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
 	return -1;
-#endif /* ndef _POSIX_VERSION */
+#endif /* ndef SUSUWU_POSIX */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	if(-1 == pid) {
@@ -86,65 +86,65 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
-#else /* ndef _POSIX_VERSION */
-	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
-# define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
-#endif /* ndef _POSIX_VERSION */
+#else /* ndef SUSUWU_POSIX */
+	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
+#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
+#endif /* ndef SUSUWU_POSIX */
 }
 
 const bool classSysHasRoot() {
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	return (0 == geteuid());
-#elif defined __WIN32__
+#elif defined SUSUWU_WIN32
 	return IsUserAnAdmin();
 #else
-	SUSUWU_PRINT(WARNING, "classSysHasRoot(bool) {#if !(defined _POSIX_VERSION || defined __WIN32__) /* TODO */}");
+	SUSUWU_WARNING("classSysHasRoot(bool) {#if !(defined SUSUWU_POSIX || defined SUSUWU_WIN32) /* TODO */}");
 	return false;
-#endif /* def _POSIX_VERSION or def __WIN32__ */
+#endif /* def SUSUWU_POSIX or def SUSUWU_WIN32 */
 }
 const bool classSysSetRoot(bool root) {
 	if(classSysHasRoot() == root) {
 		return root;
 	}
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	if(root) {
 		if(-1 == seteuid(0)) {
-			SUSUWU_PRINT(WARNING, "classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
+			SUSUWU_WARNING("classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
 		}
 #if 0
-# ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
-# else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
+#	ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
+#	else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
 		/* TODO: polkit? Until this is finished, you must use chmod (to give setuid to executable), or execute new processes (with `sudo`/`su`) if you wish to use firewall/antivirus (which require root) */
-# endif /* __APPLE__ else */
+#	endif /* __APPLE__ else */
 #endif /* 0 */
 	} else {
-# if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
+#	if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
 		uid_t sudoUid = audit_getloginuid();
-# else /* !def linux */
+#	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
 			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = nullptr;
 			if(nullptr == sudoUidStr) {
-				SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(nullptr == getenv(\"SUDO_UID\")) /* stuck as root */}");
+				SUSUWU_WARNING("classSysSetRoot(false) {(nullptr == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
 			} else {
 				sudoUid = static_cast<uid_t>(strtol(sudoUidStr, &sudoUidStrIt, 10));
 				if(sudoUidStr == sudoUidStrIt || -1 == setuid(sudoUid)) { /* prevent reescalation to root */
-					SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(-1 == setuid(sudoUid)) /* can't prevent reescalation to root */}");
+					SUSUWU_WARNING("classSysSetRoot(false) {(-1 == setuid(sudoUid)) /* can't prevent reescalation to root */}");
 				}
 			}
 		}
-# endif /* !def LINUX */
+#	endif /* !def LINUX */
 		if(0 == sudoUid) {
-			SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(0 == sudoUid) /* stuck as root */}");
+			SUSUWU_WARNING("classSysSetRoot(false) {(0 == sudoUid) /* stuck as root */}");
 		} else if(-1 == seteuid(sudoUid)) {
-			SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(-1 == seteuid(sudoUid)) /* stuck as root */}");
+			SUSUWU_WARNING("classSysSetRoot(false) {(-1 == seteuid(sudoUid)) /* stuck as root */}");
 		}
 	}
-/* #elif defined __WIN32__ */ //TODO: https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time says you must spawn new processes to do this
+/* #elif defined SUSUWU_WIN32 */ //TODO: https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time says you must spawn new processes to do this
 #else
-	SUSUWU_PRINT(WARNING, "classSysSetRoot(bool) {#ifndef _POSIX_VERSION /* TODO */}");
-#endif /* _POSIX_VERSION */
+	SUSUWU_WARNING("classSysSetRoot(bool) {#ifndef SUSUWU_POSIX /* TODO */}");
+#endif /* SUSUWU_POSIX */
 	return classSysHasRoot();
 }
 

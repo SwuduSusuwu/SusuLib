@@ -4,7 +4,7 @@
 #include "ClassCns.hxx" /* Cns CnsMode */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
-#include "ClassSha2.hxx" /* sha2 */
+#include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysArgc classSysArgs classSysHasRoot classSysHexStr classSysSetRoot execvex */
 #include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERRSTR SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
 #include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
@@ -166,7 +166,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 /* `clang-tidy` on: NOLINTEND(readability-implicit-bool-conversion) */
 
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
-	const auto fileHash = sha2(file.bytecode);
+	const auto fileHash = classSha2(file.bytecode);
 	for(const auto &analysis : virusAnalyses) {
 		switch(analysis(file, fileHash)) {
 			case virusAnalysisPass:

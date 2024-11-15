@@ -1,11 +1,11 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_AssistantCns_cxx
 #define INCLUDES_cxx_AssistantCns_cxx
-#include "AssistantCns.hxx" /* assistantParseQuestion assistantParseResponses assistantParseUrls */
+#include "AssistantCns.hxx" /* assistantCnsProcessQuestion assistantCnsProcessResponses assistantCnsProcessUrls */
 #include "ClassCns.hxx" /* Cns CnsMode execvex */
 #include "ClassPortableExecutable.hxx" /* FileBytecode FilePath */
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
-#include "ClassSha2.hxx" /* sha2 */
+#include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
 #include "Macros.hxx" /* SUSUWU_NOTICE_EXECUTEVERBOSE */
 #include <cassert> /* assert */
@@ -49,7 +49,7 @@ const bool assistantCnsTests() {
 	assert(3 == responsesOrNull.hashes.size());
 	SUSUWU_NOTICE_EXECUTEVERBOSE(resultListDumpTo(questionsOrNull, std::cout, true, true, false));
 	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(responsesOrNull, std::cout, false, false, false), std::cout << std::endl));
-	questionsResponsesFromHosts(questionsOrNull, responsesOrNull);
+	assistantCnsDownloadHosts(questionsOrNull, responsesOrNull);
 	produceAssistantCns(questionsOrNull, responsesOrNull, assistantCns);
 	return true;
 }
@@ -69,22 +69,22 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	cns.setupSynapses(inputsToOutputs);
 }
 
-void questionsResponsesFromHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
 	for(const auto &host : hosts) {
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
 		questionsOrNull.signatures.push_back(host);
-		questionsResponsesFromXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
+		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
 }
-void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &localXhtml) {
-	auto noRobots = assistantParseUrls("robots.txt");
-	auto question = assistantParseQuestion(localXhtml);
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &localXhtml) {
+	auto noRobots = assistantCnsProcessUrls("robots.txt");
+	auto question = assistantCnsProcessQuestion(localXhtml);
 	if(!question.empty()) {
-		auto questionSha2 = sha2(question);
+		auto questionSha2 = classSha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
 			decltype(question) response = "";
-			auto responses = assistantParseResponses(localXhtml);
+			auto responses = assistantCnsProcessResponses(localXhtml);
 			if(!responses.empty()) {
 				questionsOrNull.hashes.insert(questionSha2);
 				questionsOrNull.bytecodes.push_back(question);
@@ -95,7 +95,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 					}
 					response += responseIt;
 				}
-				auto responseSha2 = sha2(response);
+				auto responseSha2 = classSha2(response);
 				if(listHasValue(responsesOrNull.hashes, responseSha2)) { /* TODO */ } else {
 					responsesOrNull.hashes.insert(responseSha2);
 					responsesOrNull.bytecodes.push_back(response);
@@ -103,12 +103,12 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 			}
 		}
 	}
-	auto urls = assistantParseUrls(localXhtml);
+	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
 			execvex("wget '" + url + "' -O" + localXhtml);
 			questionsOrNull.signatures.push_back(url);
-			questionsResponsesFromXhtml(questionsOrNull, responsesOrNull, localXhtml);
+			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
 	}
 }
@@ -116,7 +116,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #endif /* BOOST_VERSION */
-const std::vector<FilePath> assistantParseUrls(const FilePath &localXhtml) {
+const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) {
 	const std::vector<FilePath> urls;
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt;
@@ -130,8 +130,8 @@ const std::vector<FilePath> assistantParseUrls(const FilePath &localXhtml) {
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
-const FileBytecode assistantParseQuestion(const FilePath &localXhtml) {return "";} /* TODO */
-const std::vector<FileBytecode> assistantParseResponses(const FilePath &localXhtml) {return {};} /* TODO */
+const FileBytecode assistantCnsProcessQuestion(const FilePath &localXhtml) {return "";} /* TODO */
+const std::vector<FileBytecode> assistantCnsProcessResponses(const FilePath &localXhtml) {return {};} /* TODO */
 
 const std::string assistantCnsProcess(const Cns &cns, const FileBytecode &bytecode) {
 	return cns.processToString(bytecode);

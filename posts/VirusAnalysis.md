@@ -1,7 +1,7 @@
 **Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure us**
 _[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners) allows all uses._
 
-Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but _caches_ reduce this to **less than 1ms** (just cost to lookup `ResultList::hashes`, which is `std::unordered_set<decltype(sha2(const FileBytecode &))>`; a hashmap of hashes).
+Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but _caches_ reduce this to **less than 1ms** (just cost to lookup `ResultList::hashes`, which is `std::unordered_set<decltype(classSha2(const FileBytecode &))>`; a hashmap of hashes).
 
 `Licenses: allows all uses ("Creative Commons"/"Apache 2")`
 [Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources]
@@ -46,9 +46,6 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	else /* (202002 <= __cplusplus) else */
 #		define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
 #	endif /* if (202002 <= __cplusplus) */
-#	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
-#	else /* C++11 else */
-#	endif /* else no `[[noreturn]]` */
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
@@ -62,16 +59,22 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
 #define SUSUWU_PRAGMA(S) _Pragma(#S) /* `#pragma S` in macro functions is `_Pragma(S)` (but without this indirection/wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`.) Usage: `SUSUWU_PRAGMA(message("Message"))` */
 
-#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
-#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
-#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
-#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
-#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
-#endif
-
-#ifndef __has_feature
-#	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
-#endif /* ndef __has_feature */
+#if defined(_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) /* Purpose: Often, `_POSIX_VERSION` is not set on POSIX targets */
+#	define SUSUWU_POSIX _POSIX_VERSION /* Usage: `#ifdef SUSUWU_WIN32\n#include <unistd.h>\n#endif` */
+#endif /* defined*_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) */
+#if defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) /* Purpose: https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
+#	define SUSUWU_WIN32 /* Usage: `#ifdef SUSUWU_WIN32\n#include <windows.h>\n#endif` */
+#endif /* defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) */
+#if defined(__clang__) || defined(__has_feature) /* Purpose: `gcc` "error: missing binary operator before token \"(\"" fix */
+#	define SUSUWU_HAS_FEATURE(X) __has_feature(x) /* Usage: `#if SUSUWU_HAS_FEATURE(cxx_noexcept)\nnoexcept\n#endif` */
+#else /* defined(__clang__) || defined(__has_feature) else */
+#	define SUSUWU_HAS_FEATURE(X) false
+#endif /* defined(__clang__) || defined(__has_feature) else */
+#if defined(__has_cpp_attribute)
+#	define SUSUWU_HAS_ATTRIBUTE(X) __has_cpp_attribute(x) /* Usage: `#if SUSUWU_HAS_ATTRIBUTE(noreturn)\nnoreturn\n#endif` */
+#else /* defined(__has_cpp_attribute) else */
+#	define SUSUWU_HAS_ATTRIBUTE(X) false
+#endif /* defined(__has_cpp_attribute) else */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */
@@ -91,7 +94,7 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
 #endif /* else !def USE_CONTRACTS */
 
-#if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
+#if defined(SUSUWU_CXX11) || (defined(__clang__) && SUSUWU_HAS_FEATURE(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
 #else /* C++11 else */
@@ -190,7 +193,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif
 #ifdef SUSUWU_SH_RUNTIME_COLORS
 #	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
-#endif /* #elif !defined(_POSIX_VERSION) TODO */
+#endif /* #elif !defined(SUSUWU_POSIX) TODO */
 #define SUSUWU_SH_ESC "\033" /* Escape */
 #define SUSUWU_SH_CSI SUSUWU_SH_ESC "[" /* Control Sequence Introducer */
 #define SUSUWU_SH_DEFAULT	SUSUWU_SH_CSI "0m"
@@ -350,9 +353,9 @@ static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return 
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
 
-/* #if _POSIX_VERSION, `return (0 == geteuid());` #elif __WIN32__ `return IsUserAnAdmin();` #endif `return false;` */
+/* #if SUSUWU_POSIX, `return (0 == geteuid());` #elif SUSUWU_WIN32 `return IsUserAnAdmin();` #endif `return false;` */
 const bool classSysHasRoot();
-/* #if _POSIX_VERSION, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
+/* #if SUSUWU_POSIX, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
  * Usage: classSysSetRoot(true); functionsWhichRequireRoot; classSysSetRoot(false); */
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
 
@@ -418,7 +421,7 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 	try {
 		return func(args...);
 	} catch (const std::exception &ex) {
-		SUSUWU_PRINT(ERROR, funcName + " {throw std::exception(\"" + ex.what() + "\");}");
+		SUSUWU_ERROR(funcName + " {throw std::exception(\"" + ex.what() + "\");}");
 		return decltype(func(args...))(); /* `func(args...)`'s default return value; if `int func(args...)`, `return 0;`. If `bool func(args...)`, `return false;` */
 	}
 }
@@ -443,7 +446,7 @@ const bool classSysInit(int argc, const char **args) {
 }
 
 const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) SUSUWU_NOEXCEPT {
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	const pid_t pid = fork();
 	if(0 != pid) {
 		if(-1 == pid) {
@@ -460,7 +463,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	argv.push_back(nullptr);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
-		execv(argv[0], &argv[0]); /* NORETURN */
+		execv(argv[0], &argv[0]); /* SUSUWU_NORETURN */
 	} else {
 		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()};
 		std::vector<char *> envp;
@@ -469,17 +472,17 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
 		envp.push_back(nullptr);
-		execve(argv[0], &argv[0], &envp[0]); /* NORETURN */
+		execve(argv[0], &argv[0], &envp[0]); /* SUSUWU_NORETURN */
 	}
-	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
-#else /* ndef _POSIX_VERSION */
-# undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
-	SUSUWU_ERROR("execvesFork: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}");
+	exit(EXIT_FAILURE); /* execv*() is `SUSUWU_NORETURN`. NOLINT(concurrency-mt-unsafe) */
+#else /* ndef SUSUWU_POSIX */
+#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
+	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
     return -1;
-#endif /* ndef _POSIX_VERSION */
+#endif /* ndef SUSUWU_POSIX */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	if(-1 == pid) {
@@ -492,65 +495,65 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	}
 	return wstatus;
-#else /* ndef _POSIX_VERSION */
-	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef _POSIX_VERSION /* TODO: convert to win32 */}"));
-# define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
-#endif /* ndef _POSIX_VERSION */
+#else /* ndef SUSUWU_POSIX */
+	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
+#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
+#endif /* ndef SUSUWU_POSIX */
 }
 
 const bool classSysHasRoot() {
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	return (0 == geteuid());
-#elif defined __WIN32__
+#elif defined SUSUWU_WIN32
 	return IsUserAnAdmin();
 #else
-	SUSUWU_PRINT(WARNING, "classSysHasRoot(bool) {#if !(defined _POSIX_VERSION || defined __WIN32__) /* TODO */}");
+	SUSUWU_WARNING("classSysHasRoot(bool) {#if !(defined SUSUWU_POSIX || defined SUSUWU_WIN32) /* TODO */}");
 	return false;
-#endif /* def _POSIX_VERSION or def __WIN32__ */
+#endif /* def SUSUWU_POSIX or def SUSUWU_WIN32 */
 }
 const bool classSysSetRoot(bool root) {
 	if(classSysHasRoot() == root) {
 		return root;
 	}
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 	if(root) {
 		if(-1 == seteuid(0)) {
-			SUSUWU_PRINT(WARNING, "classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
+			SUSUWU_WARNING("classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
 		}
 #if 0
-# ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
-# else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
+#	ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
+#	else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
 		/* TODO: polkit? Until this is finished, you must use chmod (to give setuid to executable), or execute new processes (with `sudo`/`su`) if you wish to use firewall/antivirus (which require root) */
-# endif /* __APPLE__ else */
+#	endif /* __APPLE__ else */
 #endif /* 0 */
 	} else {
-# if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
+#	if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
 		uid_t sudoUid = audit_getloginuid();
-# else /* !def linux */
+#	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
 			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = nullptr;
 			if(nullptr == sudoUidStr) {
-				SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(nullptr == getenv(\"SUDO_UID\")) /* stuck as root */}");
+				SUSUWU_WARNING("classSysSetRoot(false) {(nullptr == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
 			} else {
 				sudoUid = static_cast<uid_t>(strtol(sudoUidStr, &sudoUidStrIt, 10));
 				if(sudoUidStr == sudoUidStrIt || -1 == setuid(sudoUid)) { /* prevent reescalation to root */
-					SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(-1 == setuid(sudoUid)) /* can't prevent reescalation to root */}");
+					SUSUWU_WARNING("classSysSetRoot(false) {(-1 == setuid(sudoUid)) /* can't prevent reescalation to root */}");
 				}
 			}
 		}
-# endif /* !def LINUX */
+#	endif /* !def LINUX */
 		if(0 == sudoUid) {
-			SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(0 == sudoUid) /* stuck as root */}");
+			SUSUWU_WARNING("classSysSetRoot(false) {(0 == sudoUid) /* stuck as root */}");
 		} else if(-1 == seteuid(sudoUid)) {
-			SUSUWU_PRINT(WARNING, "classSysSetRoot(false) {(-1 == seteuid(sudoUid)) /* stuck as root */}");
+			SUSUWU_WARNING("classSysSetRoot(false) {(-1 == seteuid(sudoUid)) /* stuck as root */}");
 		}
 	}
-/* #elif defined __WIN32__ */ //TODO: https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time says you must spawn new processes to do this
+/* #elif defined SUSUWU_WIN32 */ //TODO: https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time says you must spawn new processes to do this
 #else
-	SUSUWU_PRINT(WARNING, "classSysSetRoot(bool) {#ifndef _POSIX_VERSION /* TODO */}");
-#endif /* _POSIX_VERSION */
+	SUSUWU_WARNING("classSysSetRoot(bool) {#ifndef SUSUWU_POSIX /* TODO */}");
+#endif /* SUSUWU_POSIX */
 	return classSysHasRoot();
 }
 
@@ -584,37 +587,37 @@ const bool classSysTests() {
 ```
 `less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.hxx)
 ```
-/* const */ FileHash /* 128 bits, not null-terminated */ sha1(const FileBytecode &bytecode);
-/* const */ FileHash /* 256 bits, not null-terminated */ sha256(const FileBytecode &bytecode);
-/* const */ FileHash /* 512 bits, not null-terminated */ sha512(const FileBytecode &bytecode);
-typedef FileHash (*Sha2)(const FileBytecode &bytecode);
-extern Sha2 sha2/* = sha256 */; /* To compress, apps can execute `sha2 = sha1;`. To double hash sizes, execute `sha2 = sha512;`. (Notice: this does not recompute hashes which exist) */
+/* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode);
+/* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode);
+/* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode);
+typedef FileHash (*ClassSha2)(const FileBytecode &bytecode);
+extern ClassSha2 classSha2/* = classSha256 */; /* To compress, apps can execute `classSha2 = classSha1;`. To double hash sizes, execute `classSha2 = classSha512;`. (Notice: this does not recompute hashes which exist) */
 const bool classSha2Tests();
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 ```
 `less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.cxx)
 ```
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
-Sha2 sha2 = sha256;
-/* const */ FileHash /* 128 bits, not null-terminated */ sha1(const FileBytecode &bytecode) {
+ClassSha2 classSha2 = classSha256;
+/* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode) {
 	FileHash result;
 	SHA1Context context;
 	result.resize(SHA1HashSize);
-	SHA1Reset(&context); /* If `undefined symbol: SHA1Reset`, affix `sha1.o` to `${LD_FLAGS}` */
+	SHA1Reset(&context); /* If `undefined symbol: SHA1Reset`, affix `classSha1.o` to `${LD_FLAGS}` */
 	SHA1Input(&context, reinterpret_cast<const unsigned char *>(&bytecode[0]), bytecode.size());
 	SHA1Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-/* const */ FileHash /* 256 bits, not null-terminated */ sha256(const FileBytecode &bytecode) {
+/* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode) {
 	FileHash result;
 	SHA256Context context;
 	result.resize(SHA256HashSize);
-	SHA256Reset(&context); /* If `undefined symbol: SHA256Reset`, affix `sha224-256.o` to `${LD_FLAGS}` */
+	SHA256Reset(&context); /* If `undefined symbol: SHA256Reset`, affix `classSha224-256.o` to `${LD_FLAGS}` */
 	SHA256Input(&context, reinterpret_cast<const unsigned char *>(&bytecode[0]), bytecode.size());
 	SHA256Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-/* const */ FileHash /* 512 bits, not null-terminated */ sha512(const FileBytecode &bytecode) {
+/* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode) {
 	FileHash result;
 	SHA512Context context;
 	result.resize(SHA512HashSize);
@@ -628,24 +631,24 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const char nulls[65536 /* 65536 == 2^16 == 64kb */] = {0};
 	std::string nullStr(nulls, &nulls[65536]);
 	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
-	const FileHash hash = sha2(nullStr);
+	const FileHash hash = classSha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
 	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {
-		SUSUWU_PRINT(WARNING, "0 ms (0 μs) to compute `sha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = inf mbps");
+		SUSUWU_WARNING("0 ms (0 μs) to compute `classSha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = inf mbps");
 	} else {
-		SUSUWU_INFO(std::to_string((ts2 - ts) / 1000) + " ms (" + std::to_string(ts2 - ts) + " μs) to compute `sha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = " + std::to_string(float(65536) * CHAR_BIT /* to bits */ / (ts2 - ts) /* to bpμs */ * 1000000 /* to bps */ / (1 << 20) /* to mbps */) + "mbps");
+		SUSUWU_INFO(std::to_string((ts2 - ts) / 1000) + " ms (" + std::to_string(ts2 - ts) + " μs) to compute `classSha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = " + std::to_string(float(65536) * CHAR_BIT /* to bits */ / (ts2 - ts) /* to bpμs */ * 1000000 /* to bps */ / (1 << 20) /* to mbps */) + "mbps");
 	}
-	SUSUWU_NOTICE("This `sha2()` is from `./build.sh --debug`: `./build.sh --release` has 2x this throughput");
+	SUSUWU_NOTICE("This `classSha2()` is from `./build.sh --debug`: `./build.sh --release` has 2x this throughput");
 	if(0 == hash.size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`0 == sha2(std::string()).size();"));
-	} else if(hashStrTrue.size() != hashStrCompute.size() && sha256 == sha2) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`sha2 = sha256;`, but `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`"));
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`0 == classSha2(std::string()).size();"));
+	} else if(hashStrTrue.size() != hashStrCompute.size() && classSha256 == classSha2) {
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`"));
 	} else if(hashStrTrue.size() != hashStrCompute.size()) {
-		SUSUWU_INFO("`(sha256 != sha2)`, `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`");
+		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`");
 	} else if(hashStrTrue != hashStrCompute) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "sha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
+		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
 	}
 	return true;
 }
@@ -726,7 +729,7 @@ template<class List, class List2>
  *	@post @code !hashes.empty() @endcode */
 void listToHashes(const List &list /* ResultList::bytecodes or ResultList::hex*/, List2 &hashes /* ResultList::hashess */) {
 	for(const auto &value : list) {
-		hashes.insert(sha2(value));
+		hashes.insert(classSha2(value));
 	}
 }
 /* Usage: if `ResultList` was not produced with `.hashes` */
@@ -970,7 +973,7 @@ typedef class ApxrCns : Cns {
 #include <vector> /* Sources: `pkg install python` */
 typedef class HsomCns : Cns { /* TODO. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
 	//template<Input, Output> void setupSynapses(const std::vector<std::tuple<Input, Output>>) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
-	void setupSynapses(const std::vector<std::tuple<float, float>>) {
+	void setupSynapses(const std::vector<std::tuple<float, float>>) override {
  	setenv("PYTHONPATH",".",1);
  	Py_Initialize();
 //  PyRun_SimpleString("import sys; sys.path.append('.')"); PyRun_SimpleString("import hsom; from hsom import SelfOrganizingNetwork;");
@@ -1135,7 +1138,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT;
 
 typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const ResultListHash &fileHash);
 extern std::vector<VirusAnalysisFun> virusAnalyses;
-const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = sha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) {analysis(file, hash);} */
+const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = classSha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) {analysis(file, hash);} */
 const VirusAnalysisResult virusAnalysisRemoteAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* TODO: compatible hosts to upload to */
 const VirusAnalysisResult virusAnalysisManualReviewCacheless(const PortableExecutable &file, const ResultListHash &fileHash); /* Ask user to "Block", "Submit to remote hosts for analysis", or "Allow". */
 static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file, const ResultListHash &fileHash) {
@@ -1146,7 +1149,7 @@ static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecuta
 		return manualReviewCaches[fileHash] = virusAnalysisManualReviewCacheless(file, fileHash);
 	}
 }
-static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file) { return virusAnalysisManualReview(file, sha2(file.bytecode)); }
+static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file) { return virusAnalysisManualReview(file, classSha2(file.bytecode)); }
 
 /* Setup virus fix CMS, uses more resources than `produceAnalysisCns()` */
 /* `abortOrNull` should map to `passOrNull` (`ResultList` is composed of `std::tuple`s, because just `produceVirusFixCns()` requires this),
@@ -1308,7 +1311,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 }
 
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
-	const auto fileHash = sha2(file.bytecode);
+	const auto fileHash = classSha2(file.bytecode);
 	for(const auto &analysis : virusAnalyses) {
 		switch(analysis(file, fileHash)) {
 			case virusAnalysisPass:
@@ -1638,14 +1641,14 @@ For comparison; `produceVirusFixCns` is close to assistants (such as "ChatGPT 4.
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
 
-/* if (with example inputs) these functions (`questionsResponsesFromHosts()` `produceAssistantCns()`) pass, `return true;`
+/* if (with example inputs) these functions (`assistantCnsDownloadHosts()` `produceAssistantCns()`) pass, `return true;`
  * @throw std::bad_alloc
  * @throw std::logic_error
  * @pre @code assistantCns.hasImplementation() @endcode */
 const bool assistantCnsTests();
 static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
 
-/* Universal Resources Locators of hosts which `questionsResponsesFromHosts()` uses
+/* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )
  * Github is a special case; has compressed downloads of repositories ( https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github )
  */
@@ -1655,9 +1658,9 @@ extern std::vector<FilePath> assistantCnsDefaultHosts;
  * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new  synthesis).
  * If no responses, `0 == responsesOrNull.bytecodes[x].size()` (ignore).
  * `questionsOrNull.signatures[x] = Universal Resource Locator`
- * @code sha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
-void questionsResponsesFromHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts = assistantCnsDefaultHosts);
-void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &filepath = "index.xhtml");
+ * @code classSha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts = assistantCnsDefaultHosts);
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &filepath = "index.xhtml");
 const std::vector<FilePath> ParseUrls(const FilePath &filepath = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
 const FileBytecode ParseQuestion(const FilePath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
 const std::vector<FileBytecode> ParseResponses(const FilePath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
@@ -1711,7 +1714,7 @@ const bool assistantCnsTests() {
 	assert(3 == responsesOrNull.hashes.size());
 	SUSUWU_NOTICE_EXECUTEVERBOSE(resultListDumpTo(questionsOrNull, std::cout, true, true, false));
 	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(responsesOrNull, std::cout, false, false, false), std::cout << std::endl));
-	questionsResponsesFromHosts(questionsOrNull, responsesOrNull);
+	assistantCnsDownloadHosts(questionsOrNull, responsesOrNull);
 	produceAssistantCns(questionsOrNull, responsesOrNull, assistantCns);
 	return true;
 }
@@ -1731,22 +1734,22 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	cns.setupSynapses(inputsToOutputs);
 }
 
-void questionsResponsesFromHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
 	for(const auto &host : hosts) {
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
 		questionsOrNull.signatures.push_back(host);
-		questionsResponsesFromXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
+		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
 }
-void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &localXhtml) {
-	auto noRobots = assistantParseUrls("robots.txt");
-	auto question = assistantParseQuestion(localXhtml);
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &localXhtml) {
+	auto noRobots = assistantCnsProcessUrls("robots.txt");
+	auto question = assistantCnsProcessQuestion(localXhtml);
 	if(!question.empty()) {
-		auto questionSha2 = sha2(question);
+		auto questionSha2 = classSha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
 			decltype(question) response = "";
-			auto responses = assistantParseResponses(localXhtml);
+			auto responses = assistantCnsProcessResponses(localXhtml);
 			if(!responses.empty()) {
 				questionsOrNull.hashes.insert(questionSha2);
 				questionsOrNull.bytecodes.push_back(question);
@@ -1757,7 +1760,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 					}
 					response += responseIt;
 				}
-				auto responseSha2 = sha2(response);
+				auto responseSha2 = classSha2(response);
 				if(listHasValue(responsesOrNull.hashes, responseSha2)) { /* TODO */ } else {
 					responsesOrNull.hashes.insert(responseSha2);
 					responsesOrNull.bytecodes.push_back(response);
@@ -1765,12 +1768,12 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 			}
 		}
 	}
-	auto urls = assistantParseUrls(localXhtml);
+	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
 			execvex("wget '" + url + "' -O" + localXhtml);
 			questionsOrNull.signatures.push_back(url);
-			questionsResponsesFromXhtml(questionsOrNull, responsesOrNull, localXhtml);
+			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
 	}
 }
@@ -1778,7 +1781,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #endif /* BOOST_VERSION */
-const std::vector<FilePath> assistantParseUrls(const FilePath &localXhtml) {
+const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) {
 	const std::vector<FilePath> urls;
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt;
@@ -1788,12 +1791,12 @@ const std::vector<FilePath> assistantParseUrls(const FilePath &localXhtml) {
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
 #else /* else !BOOST_VERSION */
-# pragma message("TODO: process XHTML without Boost")
+#	pragma message("TODO: process XHTML without Boost")
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
-const FileBytecode assistantParseQuestion(const FilePath &localXhtml) {return "";} /* TODO */
-const std::vector<FileBytecode> assistantParseResponses(const FilePath &localXhtml) {return {};} /* TODO */
+const FileBytecode assistantCnsProcessQuestion(const FilePath &localXhtml) {return "";} /* TODO */
+const std::vector<FileBytecode> assistantCnsProcessResponses(const FilePath &localXhtml) {return {};} /* TODO */
 
 const std::string assistantCnsProcess(const Cns &cns, const FileBytecode &bytecode) {
 	return cns.processToString(bytecode);

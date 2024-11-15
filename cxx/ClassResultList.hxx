@@ -4,7 +4,7 @@
 #define INCLUDES_cxx_ClassResultList_hxx
 //#include "ClassObject.hxx" /* Object */ /* TODO: fix "Initialization of non-aggregate type" */
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode FileHash */
-#include "ClassSha2.hxx" /* sha2 */
+#include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHexOs */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_PREFER_CSTR */
 #include <algorithm> /* std::search std::find std::set_intersection */
@@ -92,7 +92,7 @@ template<class List, class List2>
  *	@post @code !hashes.empty() @endcode */
 void listToHashes(const List &list /* ResultList::bytecodes or ResultList::hex*/, List2 &hashes /* ResultList::hashess */) {
 	for(const auto &value : list) {
-		hashes.insert(sha2(value));
+		hashes.insert(classSha2(value));
 	}
 }
 /* Usage: if `ResultList` was not produced with `.hashes` */

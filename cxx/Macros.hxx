@@ -39,9 +39,6 @@
 #	else /* (202002 <= __cplusplus) else */
 #		define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
 #	endif /* if (202002 <= __cplusplus) */
-#	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) /* TODO: [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
-#	else /* C++11 else */
-#	endif /* else no `[[noreturn]]` */
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
@@ -55,15 +52,22 @@
 #define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
 #define SUSUWU_PRAGMA(S) _Pragma(#S) /* `#pragma S` in macro functions is `_Pragma(S)` (but without this indirection/wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`.) Usage: `SUSUWU_PRAGMA(message("Message"))` */
 
-#if (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE)
-#	define _POSIX_VERSION _POSIX_C_SOURCE /* "Error: ... ndef _POSIX_VERSION" fix. Now, you can just do `#ifdef _POSIX_VERSION` for POSIX code paths */
-#endif /* (!defined _POSIX_VERSION) && (defined _POSIX_C_SOURCE) */
-#if (!defined __WIN32__) && (defined _WIN32 || __MSC_VER /* || defined __CYGWIN__ (should use `#ifdef _POSIX_VERSION` path) */)
-#	define __WIN32__ /* https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
-#endif
-#ifndef __has_feature
-#	define __has_feature(X) false /* `gcc` "error: missing binary operator before token \"(\"" fix */
-#endif /* ndef __has_feature */
+#if defined(_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) /* Purpose: Often, `_POSIX_VERSION` is not set on POSIX targets */
+#	define SUSUWU_POSIX _POSIX_VERSION /* Usage: `#ifdef SUSUWU_WIN32\n#include <unistd.h>\n#endif` */
+#endif /* defined*_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) */
+#if defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) /* Purpose: https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
+#	define SUSUWU_WIN32 /* Usage: `#ifdef SUSUWU_WIN32\n#include <windows.h>\n#endif` */
+#endif /* defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) */
+#if defined(__clang__) || defined(__has_feature) /* Purpose: `gcc` "error: missing binary operator before token \"(\"" fix */
+#	define SUSUWU_HAS_FEATURE(X) __has_feature(x) /* Usage: `#if SUSUWU_HAS_FEATURE(cxx_noexcept)\nnoexcept\n#endif` */
+#else /* defined(__clang__) || defined(__has_feature) else */
+#	define SUSUWU_HAS_FEATURE(X) false
+#endif /* defined(__clang__) || defined(__has_feature) else */
+#if defined(__has_cpp_attribute)
+#	define SUSUWU_HAS_ATTRIBUTE(X) __has_cpp_attribute(x) /* Usage: `#if SUSUWU_HAS_ATTRIBUTE(noreturn)\nnoreturn\n#endif` */
+#else /* defined(__has_cpp_attribute) else */
+#	define SUSUWU_HAS_ATTRIBUTE(X) false
+#endif /* defined(__has_cpp_attribute) else */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */
@@ -83,12 +87,12 @@
 #	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
 #endif /* else !def USE_CONTRACTS */
 
-#if defined(SUSUWU_CXX11) || (defined(__clang__) && __has_feature(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
+#if defined(SUSUWU_CXX11) || (defined(__clang__) && SUSUWU_HAS_FEATURE(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
-#else /* C++11 else */
+#else /* SUSUWU_CXX11 else */
 #	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
-#endif /* else no `noexcept` */
+#endif /* SUSUWU_CXX11 else */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
@@ -182,16 +186,16 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif
 #ifdef SUSUWU_SH_RUNTIME_COLORS
 #	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
-#endif /* #elif !defined(_POSIX_VERSION) TODO */
+#endif /* #elif !defined(SUSUWU_POSIX) TODO */
 #ifdef SUSUWU_SH_RUNTIME_OSC
 #	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_OSC` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
-#endif /* #elif !defined(_POSIX_VERSION) TODO */
-#if !defined(_POSIX_VERSION)
-#	define SUSUWU_SH_COLORS_UNSUPPORTED /* assume "dumb terminals" (such as __WIN32__ or __MINGW32__ often has) if built without runtime tests for color attributes, on non-POSIX systems */
-#	define SUSUWU_SH_OSC_UNSUPPORTED /* assume "dumb terminals" (such as __WIN32__ or __MINGW32__ often has) if built without runtime tests for Operating System Commands, on non-POSIX systems */
+#endif /* #elif !defined(SUSUWU_POSIX) TODO */
+#if !defined(SUSUWU_POSIX)
+#	define SUSUWU_SH_COLORS_UNSUPPORTED /* assume "dumb terminals" (such as SUSUWU_WIN32 often has) if built without runtime tests for color attributes, on non-POSIX systems */
+#	define SUSUWU_SH_OSC_UNSUPPORTED /* assume "dumb terminals" (such as SUSUWU_WIN32 often has) if built without runtime tests for Operating System Commands, on non-POSIX systems */
 #endif
 #if defined(SUSUWU_SH_OSC_UNSUPPORTED) && !defined(SUSUWU_SH_SKIP_OSC)
-#	define SUSUWU_SH_SKIP_OSC true /* you can use `-DSUSUWU_SH_SKIP_OSC=false` to force unsupported Operating System Command use (such as if build is __WIN32__ but you assume Win10+ `xterm` support) */
+#	define SUSUWU_SH_SKIP_OSC true /* you can use `-DSUSUWU_SH_SKIP_OSC=false` to force unsupported Operating System Command use (such as if build is SUSUWU_WIN32 but you assume Win10+ `xterm` support) */
 #endif /* SUSUWU_SH_OSC_UNSUPPORTED && !defined SUSUWU_SH_SKIP_OSC */
 #ifdef SUSUWU_SH_SKIP_OSC /* `-DSUSUWU_SH_SKIP_OSC=true` to turn Operating System Commands off */
 #	define SUSUWU_SH_TO_CLIPBOARD_PREFIX ""
@@ -203,7 +207,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_SH_TO_CLIPBOARD(base64_str) fprintf(stdout, SUSUWU_SH_TO_CLIPBOARD_PREFIX "%s" SUSUWU_SH_TO_CLIPBOARD_SUFFIX, IF_SUSUWU_CPLUSPLUS(std::string(base64_str).c_str(), base64_str)); /* TODO: `std::cout` version of this */
 #endif /* def SUSUWU_SH_SKIP_OSC else */
 #if defined(SUSUWU_SH_COLORS_UNSUPPORTED) && !defined(SUSUWU_SH_SKIP_COLORS)
-#	define SUSUWU_SH_SKIP_COLORS true /* you can use `-DSUSUWU_SH_SKIP_COLORS=false` to force unsupported color use (such as if build is for __WIN32__ but you assume Win10+ `xterm` support) */
+#	define SUSUWU_SH_SKIP_COLORS true /* you can use `-DSUSUWU_SH_SKIP_COLORS=false` to force unsupported color use (such as if build is for SUSUWU_WIN32 but you assume Win10+ `xterm` support) */
 #endif /* SUSUWU_SH_COLORS_UNSUPPORTED && !defined SUSUWU_SH_SKIP_COLORS */
 #	define SUSUWU_SH_BEL "\07" /* Bell sound */
 #	define SUSUWU_SH_ESC "\033" /* Escape */

@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
-#include "Macros.hxx" /* ERROR SUSUWU_NOEXCEPT SUSUWU_PRINT */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX */
 #include <cassert> /* assert */
 #include <chrono> /* std::chrono */
 #include <exception> /* std::exception */
@@ -11,7 +11,7 @@
 #include <iostream> /* std::cerr std::cin std::endl */
 #include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */
-#ifdef _POSIX_VERSION
+#ifdef SUSUWU_POSIX
 #include <sys/types.h> /* pid_t */
 #else
 typedef int pid_t;
@@ -43,9 +43,9 @@ static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return 
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
 
-/* #if _POSIX_VERSION, `return (0 == geteuid());` #elif __WIN32__ `return IsUserAnAdmin();` #endif `return false;` */
+/* #if SUSUWU_POSIX, `return (0 == geteuid());` #elif SUSUWU_WIN32 `return IsUserAnAdmin();` #endif `return false;` */
 const bool classSysHasRoot();
-/* #if _POSIX_VERSION, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
+/* #if SUSUWU_POSIX, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
  * Usage: classSysSetRoot(true); functionsWhichRequireRoot; classSysSetRoot(false); */
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
 
@@ -111,7 +111,7 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 	try {
 		return func(args...);
 	} catch (const std::exception &ex) {
-		SUSUWU_PRINT(ERROR, funcName + " {throw std::exception(\"" + ex.what() + "\");}");
+		SUSUWU_ERROR(funcName + " {throw std::exception(\"" + ex.what() + "\");}");
 		return decltype(func(args...))(); /* `func(args...)`'s default return value; if `int func(args...)`, `return 0;`. If `bool func(args...)`, `return false;` */
 	}
 }

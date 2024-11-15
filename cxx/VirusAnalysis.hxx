@@ -5,7 +5,7 @@
 #include "ClassCns.hxx" /* Cns CnsMode */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable FilePath FileBytecode */
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
-#include "ClassSha2.hxx" /* sha2 */
+#include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT */
 #include <map> /* std::map */
@@ -104,7 +104,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT;
 
 typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const ResultListHash &fileHash);
 extern std::vector<VirusAnalysisFun> virusAnalyses;
-const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = sha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) {analysis(file, hash);} */
+const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = classSha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) {analysis(file, hash);} */
 const VirusAnalysisResult virusAnalysisRemoteAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* TODO: compatible hosts to upload to */
 const VirusAnalysisResult virusAnalysisManualReviewCacheless(const PortableExecutable &file, const ResultListHash &fileHash); /* Ask user to "Block", "Submit to remote hosts for analysis", or "Allow". */
 static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file, const ResultListHash &fileHash) {
@@ -115,7 +115,7 @@ static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecuta
 		return manualReviewCaches[fileHash] = virusAnalysisManualReviewCacheless(file, fileHash);
 	}
 }
-static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file) { return virusAnalysisManualReview(file, sha2(file.bytecode)); }
+static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file) { return virusAnalysisManualReview(file, classSha2(file.bytecode)); }
 
 /* Setup virus fix CMS, uses more resources than `produceAnalysisCns()` */
 /* `abortOrNull` should map to `passOrNull` (`ResultList` is composed of `std::tuple`s, because just `produceVirusFixCns()` requires this),
