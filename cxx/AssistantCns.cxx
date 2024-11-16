@@ -15,6 +15,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::cin std::cout */
+#include <type_traits> /* std::remove_const */
 #include <ostream> /* std::ostream */
 #if defined(SUSUWU_USE_PUGIXML) /* !def BOOST_VERSION */
 #	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
@@ -107,8 +108,10 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	if(!question.empty()) {
 		auto questionSha2 = classSha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
-			decltype(question) response = "";
 			auto responses = assistantCnsProcessResponses(localXhtml);
+			std::remove_const<decltype(responses.front())>::type response = ""; /* TODO: ``non-const lvalue reference to type 'std::string' cannot bind to a value of unrelated type 'const char[1]'`` solution */
+//			std::remove_const_t<decltype(responses.at(0))> response = ""; /* invalid solution */
+//			std::remove_cv<decltype(responses[0])>::type response = ""; /* invalid solution */
 			if(!responses.empty()) { /* cppcheck-suppress knownConditionTrueFalse */
 				questionsOrNull.hashes.insert(questionSha2);
 				questionsOrNull.bytecodes.push_back(question);
