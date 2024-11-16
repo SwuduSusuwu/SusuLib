@@ -12,6 +12,7 @@
 #if SUSUWU_PREFER_CSTR
 #	include <cstring> /* strlen memmem */
 #endif /* SUSUWU_PREFER_CSTR */
+#include <string> /* std::string */
 #include <tuple> /* std::tuple std::get */
 #include <unordered_set> /* std::unordered_set */
 #include <vector> /* std::vector */
@@ -42,7 +43,7 @@ const size_t listMaxSize(const List &list) {
 	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) {max = temp;}}
 	return max; /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
 #else /* else !SUSUWU_PREFER_CSTR */
-	auto it = std::max_element(list.cbegin(), list.cend(), [](const auto &s, const auto &x) { return s.size() < x.size(); });
+	auto it = std::max_element(list.cbegin(), list.cend(), [](const typename List::const_iterator::value_type &s, const typename List::const_iterator::value_type &x) { return s.size() < x.size(); });
 	return it->size();
 #endif /* SUSUWU_PREFER_CSTR else */
 }
@@ -113,7 +114,8 @@ const bool listsIntersect(const List &list, const List &list2) {
 
 template<class List>
 /* return `list`'s `const_iterator` to first instance of `value`, or `list.cend()` (if not found) */
-auto listFindValue(const List &list, const typename List::value_type &value) {
+auto listFindValue(const List &list, const typename List::value_type &value) -> decltype(std::find(list.cbegin(), list.cend(), value)) {
+//const class List::const_iterator listFindValue(const List &list, const typename List::value_type &value) {
 	return std::find(list.cbegin(), list.cend(), value);
 }
 template<class List>
@@ -122,11 +124,9 @@ const bool listHasValue(const List &list, const typename List::value_type &value
 }
 
 template<class List>
-const typename List::value_type::const_iterator listDefaultIterator = typename List::value_type::const_iterator(); /* Equates to "Not found" */
-template<class List>
 /* return `list`'s `const_iterator` to first instance of `std::string(itBegin, itEndSubstr)`, or default iterator (if not found)
  * @pre @code itBegin < itEnd @endcode */
-decltype(listDefaultIterator<List>) listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
+const typename List::value_type::const_iterator listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
 #pragma unroll
 	for(const auto &value : list) {
 		auto result = std::search(value.cbegin(), value.cend(), itBegin, itEnd, [](char chValue, char chIt) { return chValue == chIt; });
@@ -134,12 +134,12 @@ decltype(listDefaultIterator<List>) listFindSubstr(const List &list, typename Li
 			return result;
 		}
 	}
-	return listDefaultIterator<List>;
+	return typename List::value_type::const_iterator(); /* Equates to "Not found" */
 }
 template<class List>
 /* @pre @code itBegin < itEnd @endcode */
 const bool listHasSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
-	return listDefaultIterator<List> != listFindSubstr(list, itBegin, itEnd);
+	return typename List::value_type::const_iterator() != listFindSubstr(list, itBegin, itEnd);
 }
 template<class List>
 /* Returns shortest substr from `value`, which is not found in `list`

@@ -16,7 +16,7 @@
 #else
 typedef int pid_t;
 #endif
-#include <type_traits> /* std::remove_const_t */
+#include <type_traits> /* std::remove_const */
 #include <vector> /* std::vector */
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 namespace Susuwu {
@@ -28,10 +28,10 @@ extern const char **classSysArgs;
  * @post @code (0 < classSysArgc && nullptr != classSysArgs && nullptr != classSysArgs[0] */
 const bool classSysInit(int argc, const char **args);
 
-inline const auto classSysUSecondClock() {
+typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysUSeconds;
+inline const ClassSysUSeconds classSysUSecondClock() {
 	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
-typedef decltype(classSysUSecondClock()) ClassSysUSeconds;
 
 /* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork(); if(-1 != pid) {pid || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0]));} return pid;`
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
@@ -90,8 +90,8 @@ inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthe
 	return os;
 }
 template<class List>
-inline const auto classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
-	std::remove_const_t<typename List::value_type> str = (parenthesis ? "{" : "");
+inline const typename List::value_type classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
+	typename List::value_type str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
 			str += ", ";
@@ -107,7 +107,7 @@ inline const auto classSysColoredParamStr(const List &argvS, const bool parenthe
 }
 
 template<typename Func, typename... Args>
-auto templateCatchAll(Func func, const std::string &funcName, Args... args) {
+auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> const decltype(func(args...)) {
 	try {
 		return func(args...);
 	} catch (const std::exception &ex) {

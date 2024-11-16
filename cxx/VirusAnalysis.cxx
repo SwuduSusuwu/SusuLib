@@ -38,7 +38,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 	cnsAnalysisCaches.clear();
 	sandboxAnalysisCaches.clear();
 }
-std::vector<typeof(VirusAnalysisFun)> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
+std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {

@@ -83,7 +83,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 	if(!question.empty()) {
 		auto questionSha2 = sha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
-			typeof question response = "";
+			decltype(question) response = "";
 			auto responses = assistantParseResponses(localXhtml);
 			if(!responses.empty()) {
 				questionsOrNull.hashes.insert(questionSha2);
@@ -98,7 +98,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 				auto responseSha2 = sha2(response);
 				if(listHasValue(responsesOrNull.hashes, responseSha2)) { /* TODO */ } else {
 					responsesOrNull.hashes.insert(responseSha2);
-					responsesOrNull.bytecodes.push_back(response); 
+					responsesOrNull.bytecodes.push_back(response);
 				}
 			}
 		}

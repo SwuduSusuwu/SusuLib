@@ -326,6 +326,7 @@ public:
 ```
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.hxx)
 ```
+/* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 extern int classSysArgc;
 extern const char **classSysArgs;
 /* Called from main(), stores {argc, args} into {classSysArgc, classSysArgs}
@@ -334,10 +335,10 @@ extern const char **classSysArgs;
  * @post @code (0 < classSysArgc && nullptr != classSysArgs && nullptr != classSysArgs[0] */
 const bool classSysInit(int argc, const char **args);
 
-inline const auto classSysUSecondClock() {
+typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysUSeconds;
+inline const ClassSysUSeconds classSysUSecondClock() {
 	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
-typedef decltype(classSysUSecondClock()) ClassSysUSeconds;
 
 /* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork(); if(-1 != pid) {pid || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0]));} return pid;`
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
@@ -396,8 +397,8 @@ inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthe
 	return os;
 }
 template<class List>
-inline const auto classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
-	std::remove_const_t<typename List::value_type> str = (parenthesis ? "{" : "");
+inline const typename List::value_type classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
+	typename List::value_type str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
 			str += ", ";
@@ -413,7 +414,7 @@ inline const auto classSysColoredParamStr(const List &argvS, const bool parenthe
 }
 
 template<typename Func, typename... Args>
-auto templateCatchAll(Func func, const std::string &funcName, Args... args) {
+auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> const decltype(func(args...)) {
 	try {
 		return func(args...);
 	} catch (const std::exception &ex) {
@@ -676,7 +677,7 @@ const size_t listMaxSize(const List &list) {
 	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) {max = temp;}}
 	return max; /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
 #else /* else !SUSUWU_PREFER_CSTR */
-	auto it = std::max_element(list.cbegin(), list.cend(), [](const auto &s, const auto &x) { return s.size() < x.size(); });
+	auto it = std::max_element(list.cbegin(), list.cend(), [](const typename List::const_iterator::value_type &s, const typename List::const_iterator::value_type &x) { return s.size() < x.size(); });
 	return it->size();
 #endif /* SUSUWU_PREFER_CSTR else */
 }
@@ -747,7 +748,8 @@ const bool listsIntersect(const List &list, const List &list2) {
 
 template<class List>
 /* return `list`'s `const_iterator` to first instance of `value`, or `list.cend()` (if not found) */
-auto listFindValue(const List &list, const typename List::value_type &value) {
+auto listFindValue(const List &list, const typename List::value_type &value) -> decltype(std::find(list.cbegin(), list.cend(), value)) {
+//const class List::const_iterator listFindValue(const List &list, const typename List::value_type &value) {
 	return std::find(list.cbegin(), list.cend(), value);
 }
 template<class List>
@@ -756,11 +758,9 @@ const bool listHasValue(const List &list, const typename List::value_type &value
 }
 
 template<class List>
-const typename List::value_type::const_iterator listDefaultIterator = typename List::value_type::const_iterator(); /* Equates to "Not found" */
-template<class List>
 /* return `list`'s `const_iterator` to first instance of `std::string(itBegin, itEndSubstr)`, or default iterator (if not found)
  * @pre @code itBegin < itEnd @endcode */
-decltype(listDefaultIterator<List>) listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
+const typename List::value_type::const_iterator listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
 #pragma unroll
 	for(const auto &value : list) {
 		auto result = std::search(value.cbegin(), value.cend(), itBegin, itEnd, [](char chValue, char chIt) { return chValue == chIt; });
@@ -768,12 +768,12 @@ decltype(listDefaultIterator<List>) listFindSubstr(const List &list, typename Li
 			return result;
 		}
 	}
-	return listDefaultIterator<List>;
+	return typename List::value_type::const_iterator(); /* Equates to "Not found" */
 }
 template<class List>
 /* @pre @code itBegin < itEnd @endcode */
 const bool listHasSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
-	return listDefaultIterator<List> != listFindSubstr(list, itBegin, itEnd);
+	return typename List::value_type::const_iterator() != listFindSubstr(list, itBegin, itEnd);
 }
 template<class List>
 /* Returns shortest substr from `value`, which is not found in `list`
@@ -836,7 +836,7 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 ```
 `less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.cxx)
 ```
-void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
+static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) { /* NOLINT(misc-use-anonymous-namespace): have to call */
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
@@ -845,7 +845,7 @@ void classResultListDumpToTest(const ResultList &resultList, bool index, bool wh
 }
 const bool classResultListTests() {
 	ResultList resultList;
-	resultList.hashes.insert(ResultListHash({0x32})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
+	resultList.hashes.insert(ResultListHash({'\x32'})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
 	resultList.signatures = {"1", "2"};
 	resultList.bytecodes = {"01", "02"};
 	classResultListDumpToTest(resultList, false, false, false, "list.hashes={0x32};list.signatures={0x31,0x32};list.bytecodes={0x3031,0x3032};");
@@ -1047,6 +1047,7 @@ typedef class ApxrCns : Cns {
 ```
 `less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.hxx)
 ```
+/* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = static_cast<unsigned char>(0),      /* "real-time" virus scans not initialized */
 	virusAnalysisHookQuery   = static_cast<unsigned char>(0),      /* return present hooks (as enum) */
@@ -1133,7 +1134,7 @@ extern std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatu
 void virusAnalysisResetCaches() SUSUWU_NOEXCEPT;
 
 typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const ResultListHash &fileHash);
-extern std::vector<typeof(VirusAnalysisFun)> virusAnalyses;
+extern std::vector<VirusAnalysisFun> virusAnalyses;
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = sha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) {analysis(file, hash);} */
 const VirusAnalysisResult virusAnalysisRemoteAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* TODO: compatible hosts to upload to */
 const VirusAnalysisResult virusAnalysisManualReviewCacheless(const PortableExecutable &file, const ResultListHash &fileHash); /* Ask user to "Block", "Submit to remote hosts for analysis", or "Allow". */
@@ -1181,7 +1182,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 	cnsAnalysisCaches.clear();
 	sandboxAnalysisCaches.clear();
 }
-std::vector<typeof(VirusAnalysisFun)> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
+std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
@@ -1633,6 +1634,7 @@ To run most of this fast (lag less,) use `CXXFLAGS` which auto-vectorizes/auto-p
 For comparison; `produceVirusFixCns` is close to assistants (such as "ChatGPT 4.0" or "Claude-3 Opus";) have such demo as `produceAssistantCns`;
 `less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.hxx)
 ```
+/* (Work-in-progress) assistant bots with artificial CNS. */
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
 
@@ -1743,7 +1745,7 @@ void questionsResponsesFromXhtml(ResultList &questionsOrNull, ResultList &respon
 	if(!question.empty()) {
 		auto questionSha2 = sha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
-			typeof question response = "";
+			decltype(question) response = "";
 			auto responses = assistantParseResponses(localXhtml);
 			if(!responses.empty()) {
 				questionsOrNull.hashes.insert(questionSha2);
@@ -1786,7 +1788,7 @@ const std::vector<FilePath> assistantParseUrls(const FilePath &localXhtml) {
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
 #else /* else !BOOST_VERSION */
-#	pragma message("TODO: process XHTML without Boost")
+# pragma message("TODO: process XHTML without Boost")
 #endif /* else !BOOST_VERSION */
 	return urls;
 }

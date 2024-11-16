@@ -2,12 +2,12 @@
 #ifndef INCLUDES_cxx_ClassResultList_cxx
 #define INCLUDES_cxx_ClassResultList_cxx
 #include "ClassResultList.hxx" /* resultList resultListDumpTo ResultListHash */
-#include "ClassSys.hxx" /* templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_SH_GREEN SUSUWU_NOEXCEPT SUSUWU_SH_RED SUSUWU_SH_WHITE */
 #include <sstream> /* std::stringstream */
+#include <string> /* std::string */
 #include <stdexcept> /* std::runtime_error */
 namespace Susuwu {
-static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
+static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) { /* NOLINT(misc-use-anonymous-namespace): have to call */
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
@@ -16,7 +16,7 @@ static void classResultListDumpToTest(const ResultList &resultList, bool index, 
 }
 const bool classResultListTests() {
 	ResultList resultList;
-	resultList.hashes.insert(ResultListHash({0x32})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
+	resultList.hashes.insert(ResultListHash({'\x32'})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
 	resultList.signatures = {"1", "2"};
 	resultList.bytecodes = {"01", "02"};
 	classResultListDumpToTest(resultList, false, false, false, "list.hashes={0x32};list.signatures={0x31,0x32};list.bytecodes={0x3031,0x3032};");
