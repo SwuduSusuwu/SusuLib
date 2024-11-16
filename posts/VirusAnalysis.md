@@ -4398,8 +4398,8 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	if(!question.empty()) {
 		auto questionSha2 = classSha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
-			decltype(question) response = "";
 			auto responses = assistantCnsProcessResponses(localXhtml);
+			std::remove_const<std::remove_reference<decltype(responses.front())>::type>::type response = ""; /* notice: if future versions require array-to-pointer conversion, then replace `std::remove_const<std::remove_reference<>>` with `std::decay<>` */
 			if(!responses.empty()) { /* cppcheck-suppress knownConditionTrueFalse */
 				questionsOrNull.hashes.insert(questionSha2);
 				questionsOrNull.bytecodes.push_back(question);
