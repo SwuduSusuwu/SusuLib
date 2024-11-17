@@ -1,7 +1,7 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
-#include "Macros.hxx" /* SUSUWU_CXX20 */ /* NOLINT(misc-include-cleaner): if undefined, `clang-tidy` warns "unused" */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_DEFAULT */ /* NOLINT(misc-include-cleaner): if undefined, `clang-tidy` warns "unused" */
 #include <cassert> /* assert */
 #include <cctype> /* size_t */
 #include <cstring> /* memcmp */
@@ -17,10 +17,10 @@ typedef enum ObjectCloneAs : unsigned char {
 } ObjectCloneAs;
 typedef class Class { /* suppress `clang-tidy`'s suggestion of constructor (cannot have virtual constructor): NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions) */
 public:
-	virtual ~Class() = default; /* allow subclasses to release resources */
+	virtual ~Class() = SUSUWU_DEFAULT; /* allow subclasses to release resources */
 /* `clang-tidy` off: NOLINTBEGIN(fuchsia-overloaded-operator, cppcoreguidelines-explicit-virtual-functions, hicpp-use-override,modernize-use-override) */
 #ifdef SUSUWU_CXX20 /* TODO? `clang++` support this with C++17, but emits `-Wc++20-extensions`*/
-	virtual /* const requires C++26 */ bool operator==(const Class &) const = default;
+	virtual /* const requires C++26 */ bool operator==(const Class &) const = SUSUWU_DEFAULT;
 #else /* !C++20 */
 	virtual /* const requires C++26 */ bool operator==(const Class &obj) const { return (sizeof(*this) == sizeof(obj) && 0 == memcmp(reinterpret_cast<const void *>(this), reinterpret_cast<const void *>(&obj), sizeof(*this))); } /* warning: first operand of this 'memcmp' call is a pointer to dynamic class 'Object'; vtable pointer will be compared [-Wdynamic-class-memaccess] */
 #endif /* !(C++20 */

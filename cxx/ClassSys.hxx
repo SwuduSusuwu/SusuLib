@@ -24,8 +24,8 @@ extern int classSysArgc;
 extern const char **classSysArgs;
 /* Called from main(), stores {argc, args} into {classSysArgc, classSysArgs}
  * Much simpler to use path from args[0] (versus https://stackoverflow.com/questions/1528298/get-path-of-executable/34109000#34109000)
- * @pre @code (0 < argc && nullptr != args && nullptr != args[0]
- * @post @code (0 < classSysArgc && nullptr != classSysArgs && nullptr != classSysArgs[0] */
+ * @pre @code (0 < argc && SUSUWU_NULLPTR != args && SUSUWU_NULLPTR != args[0]
+ * @post @code (0 < classSysArgc && SUSUWU_NULLPTR != classSysArgs && SUSUWU_NULLPTR != classSysArgs[0] */
 const bool classSysInit(int argc, const char **args);
 
 typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysUSeconds;

@@ -21,12 +21,16 @@
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	if 199901 <= __cplusplus
+#		define SUSUWU_CXX98
+#	endif /* (199901 <= __cplusplus) */
 #	if 201102 < __cplusplus
 #		define SUSUWU_CXX11
-#	endif /* (201102 <= __cplusplus) */
+#	endif /* (201102 < __cplusplus) */
 #	if 201402 <= __cplusplus
 #		define SUSUWU_CXX14
 #	endif /* if (201402 < __cplusplus) */
@@ -42,6 +46,9 @@
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	if (199901 <= __STDC_VERSION__)
+#		define SUSUWU_C99
+#	endif /* (199901 <= __STDC_VERSION__) */
 #	if (201112 <= __STDC_VERSION__)
 #		define SUSUWU_C11
 #	endif /* (201112 <= __STDC_VERSION__) */
@@ -70,7 +77,7 @@
 #endif /* defined(__has_cpp_attribute) else */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? #	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
 #else
 #	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
@@ -87,11 +94,29 @@
 #	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
 #endif /* else !def USE_CONTRACTS */
 
-#if defined(SUSUWU_CXX11) || (defined(__clang__) && SUSUWU_HAS_FEATURE(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
+#define SUSUWU_STATIC static /* Wrap for possible future instrumentation/diagnostics */
+#define SUSUWU_EXTERN extern /* Wrap for possible future instrumentation/diagnostics */
+#if defined(SUSUWU_C99) || defined(SUSUWU_CXX98)
+#	define SUSUWU_INLINE inline
+#else /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
+#	define SUSUWU_INLINE static
+#	pragma message("[Warning: `#define SUSUWU_INLINE static` due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX98)`.]")
+#endif /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
+#if defined(SUSUWU_CXX11) /* TODO? (pre-CXX11 support) || SUSUWU_HAS_FEATURE(cxx_noexcept) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) */ /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
+#	define SUSUWU_DEFAULT default /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_DELETE delete /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_FINAL final /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
 #else /* SUSUWU_CXX11 else */
-#	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
+#	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
+#	define SUSUWU_DEFAULT /* No-op */
+#	define SUSUWU_DELETE /* No-op */
+#	define SUSUWU_FINAL final /* No-op */
+#	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
+#	define SUSUWU_OVERRIDE override /* No-op */
 #endif /* SUSUWU_CXX11 else */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
@@ -163,6 +188,10 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif
 #if defined(SUSUWU_SH_FUNC) && SUSUWU_SH_FUNC /* overridable with `-DSUSUWU_SH_FUNC true/false` */
 #	define SUSUWU_SH_USE_FUNC /* affix `__func__ ":"` to `stderr`/`cerr` printout */
+#endif
+#if defined(SUSUWU_SH_USE_FUNC) && !defined(SUSUWU_C99) && !defined(SUSUWU_CXX11) /* no `__func__` support */
+#	pragma message("[Warning: `-DSUSUWU_SH_FUNC = true` was undone (no `__func__`, due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX11)`.]")
+#	undef SUSUWU_SH_USE_FUNC /* affix `__func__ ":"` to `stderr`/`cerr` printout */
 #endif
 #ifdef SUSUWU_SH_USE_FILE
 #	define IF_SUSUWU_SH_FILE(U /* wrap clauses which print __FILE__ to `cerr`/`cout` */) U /* printout */

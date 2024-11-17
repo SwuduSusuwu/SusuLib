@@ -12,12 +12,17 @@ Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-you
 # Purposes
 [`./posts/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/posts/) stages posts (school classes) for https://SwuduSusuwu.SubStack.com/ about artificial neural tissue, antivirus, assistants, plus autonomous tools.
 
-[`./c/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/c/) _C_ implementations of posts (TODO, has [issue](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task), + vendored code (for now just _RFC6234_, for `sha2`).
+[`./c/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/c/) _C_ implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task), + vendored code (for now just _RFC6234_, for `sha2`).
 
 [`./cxx/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/) _C++_ implementations of posts (for now is just neural system pure virtual template ([`./cxx/ClassCns.hxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassCns.hxx)) + antivirus([`./cxx/VirusAnalysis.cxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.cxx)) + assistant([`./cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.cxx)), with lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
 
 # How to use this
-Targets: Windows/Linux/Android/OSX/iOS; minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class {bool defaultMemberInit = true};`, `decltype`, `for(value: list) {}`, `nullptr`, `__func__`).
+Minimum requirements (build targets which this supports):
+- Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
+- Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class {bool defaultMemberInit = true};`, `decltype`, `for(value: list) {}`).
+  - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with `cxx/Macros.hxx` macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_asset`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
+  - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#Contributor-conventionsrules).
+  - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#Contributor-conventionsrules).
 
 Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/a.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) has constants to use to interpret `a.out`'s return values.

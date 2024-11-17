@@ -6,7 +6,7 @@
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode FileHash */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHexOs */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_PREFER_CSTR */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include <cstddef> /* size_t */
 #if SUSUWU_PREFER_CSTR
@@ -22,7 +22,7 @@ typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecod
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
 typedef struct ResultList : Object { /* Lists of {metadata, executables (or pages)} */
-	const std::string getName() const override {return "Susuwu::struct ResultList";}
+	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::struct ResultList";}
 /* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */

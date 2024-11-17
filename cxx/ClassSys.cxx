@@ -1,7 +1,7 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
+#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include <cassert> /* assert */
 #include <cerrno> /* errno */
@@ -23,13 +23,13 @@ typedef int pid_t;
 #include <vector> /* std::vector */
 namespace Susuwu {
 int classSysArgc = 0;
-const char **classSysArgs = {nullptr};
+const char **classSysArgs = {SUSUWU_NULLPTR};
 const bool classSysInit(int argc, const char **args) {
 	classSysArgc = argc;
 	if(0 < argc) {
 		classSysArgs = args;
-		assert(nullptr != args);
-		assert(nullptr != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+		assert(SUSUWU_NULLPTR != args);
+		assert(SUSUWU_NULLPTR != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		return true;
 	}
 	return false;
@@ -51,7 +51,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	for(const auto &x: argvSmutable /* auto x = argvSmutable.cbegin(); argvSmutable.cend() != x; ++x */) {
 		argv.push_back(const_cast<char *>(x.c_str()));
 	}
-	argv.push_back(nullptr);
+	argv.push_back(SUSUWU_NULLPTR);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
 		execv(argv[0], &argv[0]); /* NORETURN */
 	} else {
@@ -61,7 +61,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 		for(const auto &x: envpSmutable) {
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
-		envp.push_back(nullptr);
+		envp.push_back(SUSUWU_NULLPTR);
 		execve(argv[0], &argv[0], &envp[0]); /* NORETURN */
 	}
 	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
@@ -123,9 +123,9 @@ const bool classSysSetRoot(bool root) {
 #	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
-			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = nullptr;
-			if(nullptr == sudoUidStr) {
-				SUSUWU_WARNING("classSysSetRoot(false) {(nullptr == getenv(\"SUDO_UID\")) /* stuck as root */}");
+			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = SUSUWU_NULLPTR;
+			if(SUSUWU_NULLPTR == sudoUidStr) {
+				SUSUWU_WARNING("classSysSetRoot(false) {(SUSUWU_NULLPTR == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
 			} else {
 				sudoUid = static_cast<uid_t>(strtol(sudoUidStr, &sudoUidStrIt, 10));

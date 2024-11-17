@@ -28,12 +28,16 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	if 199901 <= __cplusplus
+#		define SUSUWU_CXX98
+#	endif /* (199901 <= __cplusplus) */
 #	if 201102 < __cplusplus
 #		define SUSUWU_CXX11
-#	endif /* (201102 <= __cplusplus) */
+#	endif /* (201102 < __cplusplus) */
 #	if 201402 <= __cplusplus
 #		define SUSUWU_CXX14
 #	endif /* if (201402 < __cplusplus) */
@@ -49,6 +53,9 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	if (199901 <= __STDC_VERSION__)
+#		define SUSUWU_C99
+#	endif /* (199901 <= __STDC_VERSION__) */
 #	if (201112 <= __STDC_VERSION__)
 #		define SUSUWU_C11
 #	endif /* (201112 <= __STDC_VERSION__) */
@@ -94,12 +101,30 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
 #endif /* else !def USE_CONTRACTS */
 
-#if defined(SUSUWU_CXX11) || (defined(__clang__) && SUSUWU_HAS_FEATURE(cxx_noexcept)) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
+#define SUSUWU_STATIC static /* Wrap for possible future instrumentation/diagnostics */
+#define SUSUWU_EXTERN extern /* Wrap for possible future instrumentation/diagnostics */
+#if defined(SUSUWU_C99) || defined(SUSUWU_CXX98)
+#	define SUSUWU_INLINE inline
+#else /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
+#	define SUSUWU_INLINE static
+#	pragma message("[Warning: `#define SUSUWU_INLINE static` due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX98)`.]")
+#endif /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
+#if defined(SUSUWU_CXX11) /* TODO? (pre-CXX11 support) || SUSUWU_HAS_FEATURE(cxx_noexcept) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) */ /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
+#	define SUSUWU_DEFAULT default /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_DELETE delete /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_FINAL final /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
-#else /* C++11 else */
-#	define SUSUWU_NOEXCEPT /* old `g++`/`clang++` "error: expected function body after function declarator" fix */
-#endif /* else no `noexcept` */
+#else /* SUSUWU_CXX11 else */
+#	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
+#	define SUSUWU_DEFAULT /* No-op */
+#	define SUSUWU_DELETE /* No-op */
+#	define SUSUWU_FINAL final /* No-op */
+#	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
+#	define SUSUWU_OVERRIDE override /* No-op */
+#endif /* SUSUWU_CXX11 else */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
@@ -170,6 +195,10 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif
 #if defined(SUSUWU_SH_FUNC) && SUSUWU_SH_FUNC /* overridable with `-DSUSUWU_SH_FUNC true/false` */
 #	define SUSUWU_SH_USE_FUNC /* affix `__func__ ":"` to `stderr`/`cerr` printout */
+#endif
+#if defined(SUSUWU_SH_USE_FUNC) && !defined(SUSUWU_C99) && !defined(SUSUWU_CXX11) /* no `__func__` support */
+#	pragma message("[Warning: `-DSUSUWU_SH_FUNC = true` was undone (no `__func__`, due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX11)`.]")
+#	undef SUSUWU_SH_USE_FUNC /* affix `__func__ ":"` to `stderr`/`cerr` printout */
 #endif
 #ifdef SUSUWU_SH_USE_FILE
 #	define IF_SUSUWU_SH_FILE(U /* wrap clauses which print __FILE__ to `cerr`/`cout` */) U /* printout */
@@ -268,6 +297,25 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 `less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.cxx)
 ```
 /* This is just unit tests. `Macros.hxx` has all which has actual use. */
+#ifdef SUSUWU_CXX11
+SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    /* `int`    */) {return false;}
+SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(SUSUWU_NULLPTR) /* `void *` */) {return true;}
+SUSUWU_STATIC_ASSERT(true  == MacrosCxx11NullptrTest(SUSUWU_NULLPTR)); /* Tests that `nullptr` is `void *` */
+#endif /* def SUSUWU_CXX11 */
+class MacrosCxx11InheritanceTest {
+public:
+	virtual ~MacrosCxx11InheritanceTest() = SUSUWU_DEFAULT; /* Notice: destructor has implementation; reimplementation is optional. */
+	MacrosCxx11InheritanceTest() = SUSUWU_DELETE; /* Notice: deleted constructor is redundant for pure virtual class */
+	virtual const bool PureVirtual() const = 0; /* Notice: this is pure virtual; subclasses must implement this. */
+};
+class MacrosCxx11InheritanceTestSubclass : MacrosCxx11InheritanceTest {
+public: /* Notice: inherits default constructor */
+	const bool PureVirtual() const SUSUWU_OVERRIDE {return true;}; /* Notice: `final` is not allowed since this has a subclass. `override` is optional. */
+};
+class MacrosCxx11InheritanceTestSubclass2 SUSUWU_FINAL /* Since destructor is final, cannot inherit from class. `clang++` thus warns, unless the whole class is `final`. */: MacrosCxx11InheritanceTestSubclass {
+public: /* Notice: inherits `PureVirtual()`, which you can now set `final` */
+	~MacrosCxx11InheritanceTestSubclass2() SUSUWU_OVERRIDE SUSUWU_FINAL {}; /* Notice: `override`/`final` is optional. */
+};
 static void macrosNoUniqueAddressTest() {
 	typedef class Zero {} Zero;
 	class SubClassWithBaseSubobject : public Zero {bool boo;};
@@ -313,7 +361,7 @@ typedef FilePath FileHash; /* TODO: `std::unordered_set<std::basic_string<unsign
 typedef class PortableExecutable : Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
 public:
-	const std::string getName() const override {return "Susuwu::class PortableExecutable";}
+	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class PortableExecutable";}
 	explicit PortableExecutable(FilePath path_ = "") : path(std::move(path_)) {}
 	PortableExecutable(FilePath path_, FileBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
 /*TODO: overload on typedefs which map to the same types:	PortableExecutable(const FilePath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
@@ -323,7 +371,7 @@ public:
 } PortableExecutable;
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
-	const std::string getName() const override {return "Susuwu::class PortableExecutableBytecode";}
+	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class PortableExecutableBytecode";}
 	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_))  {std::ifstream input(path); if(input.good()) {bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());}}
 } PortableExecutableBytecode;
 ```
@@ -334,8 +382,8 @@ extern int classSysArgc;
 extern const char **classSysArgs;
 /* Called from main(), stores {argc, args} into {classSysArgc, classSysArgs}
  * Much simpler to use path from args[0] (versus https://stackoverflow.com/questions/1528298/get-path-of-executable/34109000#34109000)
- * @pre @code (0 < argc && nullptr != args && nullptr != args[0]
- * @post @code (0 < classSysArgc && nullptr != classSysArgs && nullptr != classSysArgs[0] */
+ * @pre @code (0 < argc && SUSUWU_NULLPTR != args && SUSUWU_NULLPTR != args[0]
+ * @post @code (0 < classSysArgc && SUSUWU_NULLPTR != classSysArgs && SUSUWU_NULLPTR != classSysArgs[0] */
 const bool classSysInit(int argc, const char **args);
 
 typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysUSeconds;
@@ -433,13 +481,13 @@ static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchA
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
 ```
 int classSysArgc = 0;
-const char **classSysArgs = {nullptr};
+const char **classSysArgs = {SUSUWU_NULLPTR};
 const bool classSysInit(int argc, const char **args) {
 	classSysArgc = argc;
 	if(0 < argc) {
 		classSysArgs = args;
-		assert(nullptr != args);
-		assert(nullptr != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+		assert(SUSUWU_NULLPTR != args);
+		assert(SUSUWU_NULLPTR != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		return true;
 	}
 	return false;
@@ -461,7 +509,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	for(const auto &x: argvSmutable /* auto x = argvSmutable.cbegin(); argvSmutable.cend() != x; ++x */) {
 		argv.push_back(const_cast<char *>(x.c_str()));
 	}
-	argv.push_back(nullptr);
+	argv.push_back(SUSUWU_NULLPTR);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
 		execv(argv[0], &argv[0]); /* SUSUWU_NORETURN */
 	} else {
@@ -471,7 +519,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 		for(const auto &x: envpSmutable) {
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
-		envp.push_back(nullptr);
+		envp.push_back(SUSUWU_NULLPTR);
 		execve(argv[0], &argv[0], &envp[0]); /* SUSUWU_NORETURN */
 	}
 	exit(EXIT_FAILURE); /* execv*() is `SUSUWU_NORETURN`. NOLINT(concurrency-mt-unsafe) */
@@ -532,9 +580,9 @@ const bool classSysSetRoot(bool root) {
 #	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
-			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = nullptr;
-			if(nullptr == sudoUidStr) {
-				SUSUWU_WARNING("classSysSetRoot(false) {(nullptr == getenv(\"SUDO_UID\")) /* stuck as root */}");
+			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = SUSUWU_NULLPTR;
+			if(SUSUWU_NULLPTR == sudoUidStr) {
+				SUSUWU_WARNING("classSysSetRoot(false) {(SUSUWU_NULLPTR == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
 			} else {
 				sudoUid = static_cast<uid_t>(strtol(sudoUidStr, &sudoUidStrIt, 10));
@@ -661,7 +709,7 @@ typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecod
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
 typedef struct ResultList : Object { /* Lists of {metadata, executables (or pages)} */
-	const std::string getName() const override {return "Susuwu::struct ResultList";}
+	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::struct ResultList";}
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;
@@ -872,15 +920,15 @@ typedef enum CnsMode : char {
 
 typedef class Cns : Object {
 public:
-	const std::string getName() const override {return "Susuwu::class Cns";}
-	~Cns() override = default;
-	Cns() = default; /* Default constructor */
-	Cns(const Cns &) = default; /* Copy constructor */
-	Cns& operator=(const Cns &) = default; /* Copy assignment */
-	Cns(Cns&&) SUSUWU_NOEXCEPT = default; /* Move constructor */
-	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT = default; /* Move assignment */
-	const bool hasImplementation() const override {return typeid(Cns) != typeid(this);}
-	const bool isInitialized() const override {return initialized;}
+	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class Cns";}
+	~Cns() SUSUWU_OVERRIDE = SUSUWU_DEFAULT;
+	Cns() = SUSUWU_DEFAULT; /* Default constructor */
+	Cns(const Cns &) = SUSUWU_DEFAULT; /* Copy constructor */
+	Cns& operator=(const Cns &) = SUSUWU_DEFAULT; /* Copy assignment */
+	Cns(Cns&&) SUSUWU_NOEXCEPT = SUSUWU_DEFAULT; /* Move constructor */
+	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT = SUSUWU_DEFAULT; /* Move assignment */
+	const bool hasImplementation() const SUSUWU_OVERRIDE {return typeid(Cns) != typeid(this);}
+	const bool isInitialized() const SUSUWU_OVERRIDE {return initialized;}
 	virtual void setInitialized(const bool is) {initialized = is;}
 	virtual void setInputMode(CnsMode x) {inputMode = x;}
 	virtual void setOutputMode(CnsMode x) {outputMode = x;}
@@ -973,7 +1021,7 @@ typedef class ApxrCns : Cns {
 #include <vector> /* Sources: `pkg install python` */
 typedef class HsomCns : Cns { /* TODO. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
 	//template<Input, Output> void setupSynapses(const std::vector<std::tuple<Input, Output>>) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
-	void setupSynapses(const std::vector<std::tuple<float, float>>) override {
+	void setupSynapses(const std::vector<std::tuple<float, float>>) SUSUWU_OVERRIDE {
  	setenv("PYTHONPATH",".",1);
  	Py_Initialize();
 //  PyRun_SimpleString("import sys; sys.path.append('.')"); PyRun_SimpleString("import hsom; from hsom import SelfOrganizingNetwork;");
@@ -1910,4 +1958,100 @@ This post was about general methods to produce virus analysis tools, does not re
     Could have small local sandboxes (that just run for a few seconds) and small CNS (just billions of neurons with hundreds of layers, versus the trillions of neurons with thousands of layers of cortices that antivirus hosts would use for this).
 
     Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes, or just add artificial CNS to antivirus hosts for extra analysis.
+
+/* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
+#ifndef INCLUDES_cxx_Macros_hxx
+#define INCLUDES_cxx_Macros_hxx
+/* Miscellaneous macros */
+/* To printout default preprocessor definitions:
+ * for X={clang, clang++, gcc, g++, hipcc, icc}: `$X -dM -E -x c++ /dev/null`
+ * replace `/dev/null` with a file (such as `cxx/Macros.hxx`) to printout actual preprocessor definitions
+ * for MSVC: `git clone --depth 1 https://github.com/MicrosoftDocs/cpp-docs.git && vim cpp-docs/blob/main/docs/preprocessor/predefined-macros.md` or browse to https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
+ * for others: `git clone https://github.com/cpredef/predef.git && vim predef/Compilers.md`
+ */ /* To pass new preprocessor definitions (example is `#define USE_CONTRACTS true`):
+ * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
+ * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
+ */
+/* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
+#if defined(SUSUWU_PREFER_C) || !defined(__cplusplus)
+#	define SUSUWU_SH_PREFER_STDIO
+#	define SUSUWU_SH_PREFER_CSTR
+#endif /*defined((SUSUWU_PREFER_C) || !defined(__cplusplus) */
+#ifdef SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
+#	include <stdio.h> /* fprintf stderr stdout */
+#else
+#	include <iostream> /* std::cerr std::cout std::endl */
+#endif
+
+#ifdef __cplusplus
+#	include <cassert> /* assert static_assert */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	if 199901 <= __cplusplus
+#		define SUSUWU_CXX98
+#	endif /* (199901 <= __cplusplus) */
+#	if 201102 < __cplusplus
+#		define SUSUWU_CXX11
+#	endif /* (201102 < __cplusplus) */
+#	if 201402 <= __cplusplus
+#		define SUSUWU_CXX14
+#	endif /* if (201402 < __cplusplus) */
+#	if 201702 < __cplusplus
+#		define SUSUWU_CXX17
+#	endif /* if (201702 < __cplusplus) */
+#	if 202002 <= __cplusplus
+#		define SUSUWU_CXX20
+#		define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subobjects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
+#	else /* (202002 <= __cplusplus) else */
+#		define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
+#	endif /* if (202002 <= __cplusplus) */
+#else /* def __cplusplus */
+#	include <assert.h> /* assert static_assert */
+#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	if (199901 <= __STDC_VERSION__)
+#		define SUSUWU_C99
+#	endif /* (199901 <= __STDC_VERSION__) */
+#	if (201112 <= __STDC_VERSION__)
+#		define SUSUWU_C11
+#	endif /* (201112 <= __STDC_VERSION__) */
+#endif /* !(defined __cplusplus */
+
+#define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
+#define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
+#define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
+#define SUSUWU_PRAGMA(S) _Pragma(#S) /* `#pragma S` in macro functions is `_Pragma(S)` (but without this indirection/wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`.) Usage: `SUSUWU_PRAGMA(message("Message"))` */
+
+#if defined(_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) /* Purpose: Often, `_POSIX_VERSION` is not set on POSIX targets */
+#	define SUSUWU_POSIX _POSIX_VERSION /* Usage: `#ifdef SUSUWU_WIN32\n#include <unistd.h>\n#endif` */
+#endif /* defined*_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) */
+#if defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) /* Purpose: https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
+#	define SUSUWU_WIN32 /* Usage: `#ifdef SUSUWU_WIN32\n#include <windows.h>\n#endif` */
+#endif /* defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) */
+#if defined(__clang__) || defined(__has_feature) /* Purpose: `gcc` "error: missing binary operator before token \"(\"" fix */
+#	define SUSUWU_HAS_FEATURE(X) __has_feature(x) /* Usage: `#if SUSUWU_HAS_FEATURE(cxx_noexcept)\nnoexcept\n#endif` */
+#else /* defined(__clang__) || defined(__has_feature) else */
+#	define SUSUWU_HAS_FEATURE(X) false
+#endif /* defined(__clang__) || defined(__has_feature) else */
+#if defined(__has_cpp_attribute)
+#	define SUSUWU_HAS_ATTRIBUTE(X) __has_cpp_attribute(x) /* Usage: `#if SUSUWU_HAS_ATTRIBUTE(noreturn)\nnoreturn\n#endif` */
+#else /* defined(__has_cpp_attribute) else */
+#	define SUSUWU_HAS_ATTRIBUTE(X) false
+#endif /* defined(__has_cpp_attribute) else */
+
+#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? #	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
+#	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
+#else
+#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
+#	define SUSUWU_CONSTEXPR /* No-op */
+#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
+
+#ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
+/* `SUSUWU_EXPECTS(X)` is close to `@pre @code X @endcode` or `SUSUWU_ASSUME(X)` but is for headers; https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2521r2.html */
+/* Promises `(true == (X))`, for static analysis, or for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
+#	define SUSUWU_EXPECTS(X) [[expects: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_EXPECTS(!x.full());` */
+#	define SUSUWU_ENSURES(X) [[ensures: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_ENSURES(0 != x.size());` */
+#else /* else !def USE_CONTRACTS */
+#	define SUSUWU_EXPECTS(X) /* `@pre @code X @endcode` */
+#	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
+#endif /* else !def USE_CONTRACTS */
 

@@ -2,6 +2,7 @@
 #ifndef INCLUDES_cxx_ClassCns_cxx
 #define INCLUDES_cxx_ClassCns_cxx
 #include "ClassCns.hxx" /* CnsMode std::string std::tuple */
+#include "Macros.hxx" /* SUSUWU_OVERRIDE */
 #include <cassert> /* assert */
 #include <cctype> /* size_t */
 #include <cstdlib> /* exit EXIT_FAILURE */
@@ -15,7 +16,7 @@ namespace Susuwu {
 #include <vector> /* std::vector */
 typedef class HsomCns : Cns { /* TODO. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
 	//template<Input, Output> void setupSynapses(const std::vector<std::tuple<Input, Output>>) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
-	void setupSynapses(const std::vector<std::tuple<float, float>>) {
+	void setupSynapses(const std::vector<std::tuple<float, float>>) SUSUWU_OVERRIDE {
  	setenv("PYTHONPATH",".",1);
  	Py_Initialize();
 //  PyRun_SimpleString("import sys; sys.path.append('.')"); PyRun_SimpleString("import hsom; from hsom import SelfOrganizingNetwork;"); 
