@@ -88,7 +88,6 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
 	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
-#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
 #endif /* ndef SUSUWU_POSIX */
 }
 
@@ -162,6 +161,9 @@ static void classSysHexTests(const std::string &value) {
 	classSysHexOs(os, value);
 	if(2 != os.str().size()) {
 		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+#ifndef SUSUWU_POSIX
+#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
+#endif /* ndef SUSUWU_POSIX */
 	}
 }
 const bool classSysTests() {

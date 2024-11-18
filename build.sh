@@ -8,6 +8,7 @@ fi
 
 CXXFLAGS_ANALYSIS="-Wall -Wno-unused -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers" #/*TODO: -`-Wno-*`, +`-Wpedantic`, +`-Werror` */
 CXXFLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
+CXXFLAGS_DEBUG="-std=c++11 -g -Og" #/* in MSVC is `/Zi /Od`: symbols for `gdb`/`lldb` use, optimizations compatible with `-g`/`-fsan*` */
 CXXFLAGS_DEBUG="-g -Og" #/* in MSVC is `/Zi /Od`: symbols for `gdb`/`lldb` use, optimizations compatible with `-g`/`-fsan*` */
 CXXFLAGS_DEBUG="${CXXFLAGS_DEBUG} -fno-omit-frame-pointer" #/* thus optimization won't remove stacktraces: https://stackoverflow.com/questions/48234575/g-will-fno-omit-frame-pointer-be-effective-if-specified-before-o2-or-o3 https://clang.llvm.org/docs/MemorySanitizer.html */
 #CXXFLAGS_DEBUG="${CXXFLAGS_DEBUG} -fno-optimize-sibling-calls" #/* Don't inline functions. Does extra stacktraces. */
@@ -80,7 +81,7 @@ else
 fi
 mkdir -p "${OBJDIR}" "${BINDIR}"
 if [ "--rebuild" = "${1}" -o  "--rebuild" = "${2}" ]; then
-	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Was called with \`${0}${CROSS_COMP} --rebuild\`, will remove intermediate objects+ continue."
+	SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Was called with \`${0}${CROSS_COMP} --rebuild\`, will remove intermediate objects + continue."
 	rm ${OBJDIR}*.o
 fi
 if [ "--clean" = "${1}" -o  "--clean" = "${2}" ]; then

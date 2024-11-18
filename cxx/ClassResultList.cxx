@@ -4,8 +4,8 @@
 #include "ClassResultList.hxx" /* resultList resultListDumpTo ResultListHash */
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_SH_GREEN SUSUWU_NOEXCEPT SUSUWU_SH_RED SUSUWU_SH_WHITE */
 #include <sstream> /* std::stringstream */
-#include <string> /* std::string */
 #include <stdexcept> /* std::runtime_error */
+#include <string> /* std::string */
 namespace Susuwu {
 static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) { /* NOLINT(misc-use-anonymous-namespace): have to call */
 	std::stringstream os;
