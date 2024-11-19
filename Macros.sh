@@ -6,7 +6,7 @@ SUSUWU_DIR_SUFFIX_SLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "$OBJDI
 	fi
 	echo "${DIR}" #/* return with slash */
 }
-SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "$OBJDIR") */
+SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "$BINDIR") */
 	DIR=$1
 	case "${DIR}" in
 		./*) #/* original has "./" */
@@ -48,13 +48,13 @@ SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "$0 launch" */
 	echo "${LEVEL}${x}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 }
 
-SUSUWU_REBUILD_CTAGS() {
+SUSUWU_BUILD_CTAGS() {
 	if command -v ctags > /dev/null; then
 		ctags -R
 	fi
 }
 
-SUSUWU_SETUP_CXX_PROCESS_MINGW() { #/* TODO: input args */
+SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $?` */
 	CROSS_COMP=""
 	if [ "--mingw" = "${1}" -o  "--mingw" = "${2}" ]; then
 		CROSS_COMP=" --mingw"
@@ -69,6 +69,11 @@ SUSUWU_SETUP_CXX_PROCESS_MINGW() { #/* TODO: input args */
 			SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`x86_64-w64-mingw32-clang++ not found\`, \`x86_64-w64-mingw32-g++ not found\`. Do \`apt install llvm-mingw-w64\` or \`apt install mingw-w64\`."
 			exit 1
 		fi
+	fi
+}
+SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_OUTPUT "" SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+	if [ ! -z ${CROSS_COMP} ]; then #/* if `--mingw`,         */
+		return;                       #/* don't override `CXX`. */
 	elif command -v clang++ > /dev/null; then
 		CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
 		CXXFLAGS_DEBUG="${CXXFLAGS_DEBUG} ${CXXFLAGS_FSAN}" #/* [`-fsan*` supports `g++`/`clang++`](https://developers.redhat.com/blog/2021/05/05/memory-error-checking-in-c-and-c-comparing-sanitizers-and-valgrind#tldr) */
@@ -83,7 +88,7 @@ SUSUWU_SETUP_CXX_PROCESS_MINGW() { #/* TODO: input args */
 	fi
 }
 
-SUSUWU_PROCESS_RELEASE_DEBUG() { #/* TODO: input args */
+SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $? */
 	if [ "--release" = "${1}" -o  "--release" = "${2}" ]; then
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --release\` does not support profilers/debuggers (use \`${0}${CROSS_COMP} --debug\` for this)."
 		CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_RELEASE}"
@@ -96,42 +101,49 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* TODO: input args */
 		ASAN_OPTIONS=abort_on_error=1:fast_unwind_on_malloc=0:detect_leaks=0 UBSAN_OPTIONS=print_stacktrace=1 #/* "For LLDB/GDB and to prevent very short stack traces and usually false leaks detection" */
 	fi
 }
-SUSUWU_SETUP_BUILD_FLAGS() {
+SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_OUTPUT "" SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
 	LD="${CXX}"
 	CC="${CXX} -x c"
 	LDFLAGS="${LDFLAGS} ${CXXFLAGS}"
 	CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_ANALYSIS}"
 	CCFLAGS="${CCFLAGS} ${CXXFLAGS}"
+	C_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
+	CXX_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
 }
 
-SUSUWU_SETUP_OUTPUT_DIRS() { #/* Usage: `SUSUWU_SETUP_OUTPUT_DIRS()` */
+SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 	if [ -z ${CROSS_COMP} ]; then
-		OUTPUT="a.out"
+		OUTPUT="${1}.out"
 	else
-		OUTPUT="a.exe"
+		OUTPUT="${1}.exe"
 	fi
+}
+SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 	if [ -z ${OBJDIR} ]; then
-		OBJDIR="./obj/"
+		OBJDIR="${1}"
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "To redirect \`${CXX} -c ... -o \${OBJDIR}\${OBJ}.o\` (which has \`OBJDIR=\"${OBJDIR}\"\`), execute \`OBJDIR=\"./obj/\"\` (where \"./obj/\" is a directory which you choose)."
 	else
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${CXX} -c ... -o \${OBJDIR}\` inherits local \`OBJDIR=\"${OBJDIR}\"\` until you execute \`unset OBJDIR\`."
 	fi
+	OBJDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${OBJDIR}") #/* if inherit OBJDIR, perhaps it is without last '/' */
+	mkdir -p "${OBJDIR}"
+}
+SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 	if [ -z ${BINDIR} ]; then
-		BINDIR="./bin/"
+		BINDIR="${1}"
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "To redirect \`${LD} ... -o \${BINDIR}${OUTPUT}\` (which has \`BINDIR=\"${BINDIR}\"\`), execute \`BINDIR=\"./bin/\"\` (where \"./bin/\" is a directory which you choose)."
 	else
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${LD} ... -o \${BINDIR}${OUTPUT}\` inherits local \`BINDIR=\"${BINDIR}\"\` until you execute \`unset BINDIR\`."
 	fi
-	C_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
-	CXX_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
-	OBJDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${OBJDIR}") #/* if inherit OBJDIR, perhaps it is without last '/' */
 	BINDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${BINDIR}") #/* if inherit BINDIR, perhaps it is without last '/' */
-	mkdir -p "${OBJDIR}" "${BINDIR}"
+	mkdir -p "${BINDIR}"
 }
-SUSUWU_CLEAN_OUTPUT() {
+SUSUWU_CLEAN_OUTPUT() { #/* The `-f` flag is omitted in case `OBJDIR` or `BINDIR` is set to "../*/". */
 	rm ${OBJDIR}*.o
+	rm ${BINDIR}*.exe
+	rm ${BINDIR}*.out
 }
-SUSUWU_PROCESS_CLEAN_REBUILD() {
+SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $?` */
 	if [ "--clean" = "${1}" -o  "--clean" = "${2}" ]; then
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Was called with \`${0}${CROSS_COMP} --clean\`, will remove intermediate objects + exit. Use \`${0}${CROSS_COMP} --rebuild\` to clean + continue."
 		SUSUWU_CLEAN_OUTPUT
@@ -143,23 +155,25 @@ SUSUWU_PROCESS_CLEAN_REBUILD() {
 	fi
 }
 
-SUSUWU_BUILD_SOURCES() {
-	if [ -e ${BINDIR}${OUTPUT} ]; then
-		BUILDNEW=false
-	else
-		BUILDNEW=true
-	fi
-	for SOURCE in ${CXX_SOURCE_PATH}Class*.hxx ${CXX_SOURCE_PATH}Macros.hxx; do
+SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
+	for SOURCE in $@; do
 		OBJECT="${OBJDIR}$(basename ${SOURCE} .hxx).o" #/* `basename`'s second param removes suffix */
 		SRCCXX="${CXX_SOURCE_PATH}$(basename ${SOURCE} .hxx).cxx" #/* `basename`'s second param removes suffix */
 		if [ ${OBJECT} -ot ${SOURCE} -a -e ${SOURCE} ]; then #/* `&& [ -e ${SOURCE} ]` is: skip unless `${SOURCE}` exists. */
-			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${SOURCE}\` (which is a common `#include`) is newer than \`${OBJECT}\`, will rebuild all objects."
+			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${SOURCE}\` (which is a common \`#include\`) is newer than \`${OBJECT}\`, will rebuild all objects."
 			SUSUWU_CLEAN_OUTPUT
 			break
 		elif [ ! -e ${SRCCXX} ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
 			touch ${OBJECT};            #/* ... then produce `*.o` (for future tests.) */
 		fi
 	done
+}
+SUSUWU_BUILD_SOURCES() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_OUTPUT "" SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+	if [ -e ${BINDIR}${OUTPUT} ]; then
+		BUILDNEW=false
+	else
+		BUILDNEW=true
+	fi
 	OBJECTLIST=""
 	set -x
 	#for SOURCE in ${C_SOURCE_PATH}*/*.c; do #/* The extra "*/" is since this just has vendored code (`rfc6234/`) */
@@ -182,15 +196,19 @@ SUSUWU_BUILD_SOURCES() {
 	${BUILDNEW} && ${LD} ${LDFLAGS}${OBJECTLIST} -o "${BINDIR}${OUTPUT}"
 	STATUS=$?
 	set +x
-	if [ 0 -eq ${STATUS} -o false = ${BUILDNEW} ]; then
- 		${BUILDNEW} && SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
-		${BUILDNEW} || SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+	if [ false = ${BUILDNEW} ]; then
+		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+		return 0
+	elif [ 0 -eq ${STATUS} ]; then
+		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+	else
+		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${LD}\` returned status code ${STATUS}."
 	fi
 	return ${STATUS}
 }
 
 SUSUWU_TEST_OUTPUT() {
-	if [ 0 -eq ${STATUS} -o false = ${BUILDNEW} ]; then
+	if [ 0 -eq ${STATUS} ] || [ false = ${BUILDNEW} ]; then
 		${BINDIR}${OUTPUT}
 		STATUS=$?
 		if [ 0 -eq ${STATUS} ]; then

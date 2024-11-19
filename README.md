@@ -33,7 +33,7 @@ Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/tru
   - `./build.sh --debug` : includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with `-Og`.
   - `./build.sh --release` : excludes `--debug` (`-DNDEBUG`), strips frame-pointers/symbols, optimizes with `-O2`.
   - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_.
-- Special flags (`vim build.sh` to use); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
+- Special flags (use `vim build.sh` to put into `CXXFLAGS_SPECIAL`); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `!defined(__cplusplus)`.
     - `-DSUSUWU_SH_VERBOSE` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `!defined(NDEBUG)`.
