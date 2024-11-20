@@ -1,13 +1,13 @@
 #!/bin/sh
 SUSUWU_DIR_SUFFIX_SLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "$OBJDIR") */
-	DIR=$1
+	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
 		DIR="${DIR}/" #/* if original doesn't have, append '/' */
 	fi
 	echo "${DIR}" #/* return with slash */
 }
 SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "$BINDIR") */
-	DIR=$1
+	DIR=${1}
 	case "${DIR}" in
 		./*) #/* original has "./" */
 			;;
@@ -43,25 +43,20 @@ SUSUWU_SH_SUCCESS="[${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_NOTICE="[${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_DEBUG="[${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}]"
-SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "$0 launch" */
-	local LEVEL="${1}"; local x="${2}"
-	echo "${LEVEL}${x}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
+SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "message" */
+	local LEVEL="${1}";
+	local MESSAGE="${2}"
+	echo "${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 }
 
-SUSUWU_BUILD_CTAGS() {
-	if command -v ctags > /dev/null; then
-		ctags -R
-	fi
-}
-
-SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $?` */
+SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
-	if [ "--mingw" = "${1}" -o  "--mingw" = "${2}" ]; then
+	if [ "--mingw" = "${1}" -o "--mingw" = "${2}" ]; then
 		CROSS_COMP=" --mingw"
 	fi
 }
-SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
-	if [ " --mingw" == ${CROSS_COMP} ]; then
+SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+	if [ " --mingw" = "${CROSS_COMP}" ]; then
 		LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
 		if command -v x86_64-w64-mingw32-clang++ > /dev/null; then
 			CXX="x86_64-w64-mingw32-clang++"
@@ -73,7 +68,6 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [
 			SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`x86_64-w64-mingw32-clang++ not found\`, \`x86_64-w64-mingw32-g++ not found\`. Do \`apt install llvm-mingw-w64\` or \`apt install mingw-w64\`."
 			exit 1
 		fi
-		return;                       #/* don't override `CXX`. */
 	elif command -v clang++ > /dev/null; then
 		CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
 		USE_FSAN=true #/* [`-fsan*` supports `g++`/`clang++`](https://developers.redhat.com/blog/2021/05/05/memory-error-checking-in-c-and-c-comparing-sanitizers-and-valgrind#tldr) */
@@ -105,8 +99,8 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [
 	return 0
 }
 
-SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $?` */
-	if [ "--release" = "${1}" -o  "--release" = "${2}" ]; then
+SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [This processes params passed to `${0}`.] */
+	if [ "--release" = "${1}" -o "--release" = "${2}" ]; then
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --release\` does not support profilers/debuggers (use \`${0}${CROSS_COMP} --debug\` for this)."
 		CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_RELEASE}"
 	else
@@ -122,7 +116,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $?` */
 		fi
 	fi
 }
-SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
 	LDFLAGS="${LDFLAGS}"
 	CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_ANALYSIS}"
 	CCFLAGS="${CCFLAGS} ${CXXFLAGS}"
@@ -180,19 +174,19 @@ SUSUWU_CLEAN_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
 SUSUWU_REBUILD_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to rebuild" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus continue. [Use \`${0}${CROSS_COMP} --clean\` to remove plus exit.]"
 }
-SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $?` */
-	if [ "--clean" = "${1}" -o  "--clean" = "${2}" ]; then
+SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [This processes params passed to `${0}`.] */
+	if [ "--clean" = "${1}" -o "--clean" = "${2}" ]; then
 		SUSUWU_CLEAN_OUTPUT "Was called with \`${0}${CROSS_COMP} --clean\`"
 	fi
-	if [ "--rebuild" = "${1}" -o  "--rebuild" = "${2}" ]; then
+	if [ "--rebuild" = "${1}" -o "--rebuild" = "${2}" ]; then
 		SUSUWU_REBUILD_OUTPUT "Was called with \`${0}${CROSS_COMP} --rebuild\`"
 	fi
 }
 
 SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
-	for SOURCE in $@; do
-		OBJECT="${OBJDIR}$(basename ${SOURCE} .hxx).o" #/* `basename`'s second param removes suffix */
-		SRCCXX="$(dirname ${SOURCE})/$(basename ${SOURCE} .hxx).cxx" #/* `basename`'s second param removes suffix */
+	local SOURCE; for SOURCE in $@; do
+		local OBJECT="${OBJDIR}$(basename ${SOURCE} .hxx).o" #/* `basename`'s second param removes suffix */
+		local SRCCXX="$(dirname ${SOURCE})/$(basename ${SOURCE} .hxx).cxx" #/* `basename`'s second param removes suffix */
 		if [ ${OBJECT} -ot ${SOURCE} -a -e ${SOURCE} ]; then #/* `&& [ -e ${SOURCE} ]` is: skip unless `${SOURCE}` exists. */
 			SUSUWU_REBUILD_OUTPUT "\`${SOURCE}\` (which is a common \`#include\`) is newer than \`${OBJECT}\`"
 			break
@@ -201,13 +195,41 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h
 		fi
 	done
 }
+SUSUWU_BUILD_CTAGS() { #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
+	local STATUS=1
+	if command -v ctags > /dev/null; then
+		if [ -z ${1} ] || [ -z ${2} ]; then
+			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`SUSUWU_BUILD_CTAGS()\` was called with less than 2 params; will default to \`SUSUWU_BUILD_CTAGS \"-R --languages=C++\" \"\${C_SOURCE_PATH}\" \"\${C_SOURCE_PATH}\"\` (paths: \"${C_SOURCE_PATH}\" \"${CXX_SOURCE_PATH}\")."
+			if [ -n "${C_SOURCE_PATH}" ]; then
+				ctags -R "${C_SOURCE_PATH}"
+				STATUS=0
+			fi
+			if [ -n "${CXX_SOURCE_PATH}" ]; then
+				ctags -R --languages=C++ --c++-kinds=+p --fields=+l --extras=+q ${CXX_SOURCE_PATH}
+				#ctags -R ${CXX_SOURCE_PATH}
+				STATUS=0
+			fi
+		else
+			local FLAGS=${1}
+			local SOURCE_PATH
+			shift 1 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
+			local SOURCE_PATH; for SOURCE_PATH in $@; do
+				ctags "${FLAGS}" ${SOURCE_PATH}
+				STATUS=0
+			done
+		fi
+	else
+		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`ctags not found\`; do \`apt install ctags\` to use \`SUSUWU_BUILD_CTAGS\`."
+	fi
+	return ${STATUS};
+}
 SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES [${CC} || ${CXX}] [${CCFLAGS} || ${CXXFLAGS}] ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
-	OLD_ARG_1=${1}
-	OLD_ARG_2=${2}
+	local OLD_ARG_1=${1}
+	local OLD_ARG_2=${2}
 	shift 2 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
 	set -x
-	for SOURCE in $@; do
-		OBJECT="${OBJDIR}$(basename "${SOURCE}" "${OLD_ARG_2}").o" #/* `basename`'s second param removes suffix */
+	local SOURCE; for SOURCE in $@; do
+		local OBJECT="${OBJDIR}$(basename "${SOURCE}" "${OLD_ARG_2}").o" #/* `basename`'s second param removes suffix */
 		if [ ${OBJECT} -ot ${SOURCE} -o ! -s ${OBJECT} ] > /dev/null 2>&1; then
 			${OLD_ARG_1} -c "${SOURCE}" -o "${OBJECT}"
 			BUILDNEW=true
@@ -215,7 +237,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES [${CC} || ${CXX}] [${C
 		OBJECTLIST="${OBJECTLIST} ${OBJECT}"
 	done
 }
-SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
+SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
 	${BUILDNEW} && ${LD} ${LDFLAGS}${OBJECTLIST} -o "${BINDIR}${OUTPUT}"
 	STATUS=$?
 	set +x
@@ -239,7 +261,7 @@ SUSUWU_TEST_OUTPUT() {
 				wine ${BINDIR}${OUTPUT}
 			else
 				SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`wine not found\`. do \`apt install wine\`."
-				return 0
+				return 1
 			fi
 		fi
 		STATUS=$?
@@ -271,9 +293,9 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL" [/usr/
 		fi
 		return 0
 	fi
-	for USRBIN in "/usr/bin" "/usr/local/bin" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "$(realpath -q ~/.local/bin)"; do
+	for USRBIN in "$(realpath -q ~/.local/bin)" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "/usr/bin" "/usr/local/bin"; do
 		if [ -d "${USRBIN}" ]; then
-			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${1}\` was not passed \`USRBIN\`. Autodetected as \`${USRBIN}\`."
+			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${1}\` was not passed \`USRBIN\`. Search has set \`USRBIN=\"${USRBIN}\"\`."
 			return 0
 		fi
 	done

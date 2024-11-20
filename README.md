@@ -4,9 +4,10 @@ Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-you
 - [Purposes](#Purposes)
 - [How to use this](#How-to-use-this)
 - [Contributor conventions/rules](#Contributor-conventionsrules)
-  - [Git](#Git)
-  - [Source](#Source)
-  - [Good first issues](https://github.com/SwuduSusuwu/SubStack/contribute)
+  - [`git`](#Git)
+  - [`sh` source](#Sh-source)
+  - [_C_/_C++_ source](#Cc-source)
+  - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SubStack/contribute)
   - [Secure](https://github.com/SwuduSusuwu/SubStack/blob/trunk/SECURITY.md)
 
 # Purposes
@@ -65,7 +66,11 @@ Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such
 - if `git mv OldPath/ NewPath/`: `\`OldPath/.* -> NewPath/.*\``.
 
 [Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to format code/paths.]
-## Source
+## `sh` source
+Is as for _C++_, except that you act as if all functions/variables are macros (which use `CONSTANT_CASE`).
+Specific to `sh` (but doesn't conflict with _C++_): variable access shall include "{}" (thus not `$1`, but `${1}`).
+For temp variables, you affix `local` (thus not `for VALUE in LIST; do` but `local VALUE; for VALUE in LIST; do`).
+## _C_/_C++_ source
 Most of what [_Mozilla Org_'s (_Firefox_'s) style](https://firefox-source-docs.mozilla.org/code-quality/coding-style/coding_style_cpp.html) suggests is sound (you should follow this unless you have specific reasons not to).
 Code rules (lots overlap with _Mozilla Org_'s):
 

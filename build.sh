@@ -2,8 +2,6 @@
 . ./Macros.sh #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() SUSUWU_INSTALL() SUSUWU_PRINT() SUSUWU_PROCESS_CLEAN_REBUILD() SUSUWU_PROCESS_MINGW() SUSUWU_PROCESS_RELEASE_DEBUG() SUSUWU_SETUP_BUILD_FLAGS() SUSUWU_SETUP_CXX() SUSUWU_SETUP_BINDIR() SUSUWU_SETUP_OBJDIR() SUSUWU_SETUP_OUTPUT() SUSUWU_SH_* SUSUWU_TEST_OUTPUT() SUSUWU_UNINSTALL() */
 SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Dual licenses: choose \"Creative Commons\" or \"Apache 2\" (allows all uses)."
 
-SUSUWU_BUILD_CTAGS #/* Usage: `apt-get install ctags` */
-
 CXXFLAGS_SPECIAL="" #/* You can put special flags from `build.sh` into this to use. */
 CXXFLAGS_ANALYSIS="-Wall -Wno-unused -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers" #/*TODO: -`-Wno-*`, +`-Wpedantic`, +`-Werror` */
 CXXFLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
@@ -17,7 +15,7 @@ C_SOURCE_PATH="./c/"
 CXX_SOURCE_PATH="./cxx/"
 
 
-SUSUWU_PROCESS_MINGW $@ #/* Usage: `./build.sh --mingw` */
+SUSUWU_PROCESS_MINGW $@ #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
 SUSUWU_PROCESS_RELEASE_DEBUG $@ #/* Usage: `./build.sh --debug` or `./build.sh --release` */
 
@@ -28,6 +26,7 @@ SUSUWU_PROCESS_CLEAN_REBUILD $@ #/* Usage: `./build.sh --clean` or `./build.sh -
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 SUSUWU_PROCESS_INCLUDES ${CXX_SOURCE_PATH}Class*.hxx ${CXX_SOURCE_PATH}Macros.hxx
+SUSUWU_BUILD_CTAGS #/* Usage: `apt-get install ctags vim && vim -t tagToSearchFor` */
 SUSUWU_BUILD_OBJECTS "${CC} ${CCFLAGS}" ".c" "${C_SOURCE_PATH}rfc6234/sha1.c" "${C_SOURCE_PATH}rfc6234/sha224-256.c" "${C_SOURCE_PATH}rfc6234/sha384-512.c"
 SUSUWU_BUILD_OBJECTS "${CXX} ${CXXFLAGS}" ".cxx" "${CXX_SOURCE_PATH}*.cxx"
 SUSUWU_BUILD_EXECUTABLE
