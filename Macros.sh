@@ -1,4 +1,7 @@
 #!/bin/sh
+#/* TODO: [produce `for OPTION in @$; do` loops for all `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/22) */
+#/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
+#/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 SUSUWU_DIR_SUFFIX_SLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}") */
 	local DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
@@ -56,9 +59,28 @@ SUSUWU_SH_SUCCESS="[${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_NOTICE="[${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_DEBUG="[${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}]"
+SUSUWU_S=false
+SUSUWU_VERBOSE=false
+SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
+	if [ "-s" = "${1}" -o "-s" = "${2}" ]; then
+		SUSUWU_S=true
+	fi
+}
+SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
+	if [ "--verbose" = "${1}" -o "--verbose" = "${2}" ]; then
+		SUSUWU_VERBOSE=true
+		set -x
+	fi
+}
 SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "message" */
 	local LEVEL="${1}";
 	local MESSAGE="${2}"
+	if [ true = ${SUSUWU_S} ] && [ "${SUSUWU_SH_NOTICE}" = "${LEVEL}" ]; then
+		return 0
+	fi
+	if [ "${SUSUWU_SH_DEBUG}" = "${LEVEL}" ] && [ ! true = ${SUSUWU_VERBOSE} ] ; then
+		return 0
+	fi
 	echo "${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 }
 
@@ -240,7 +262,9 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES [${CC} || ${CXX}] [${C
 	local OLD_ARG_1=${1}
 	local OLD_ARG_2=${2}
 	shift 2 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
-	set -x
+	if [ ! true = ${SUSUWU_S} ]; then
+		set -x
+	fi
 	local SOURCE; for SOURCE in $@; do
 		local OBJECT="${OBJDIR}$(basename "${SOURCE}" "${OLD_ARG_2}").o" #/* `basename`'s second param removes suffix */
 		if [ "${OBJECT}" -ot "${SOURCE}" -o ! -s "${OBJECT}" ] > /dev/null 2>&1; then
@@ -253,7 +277,9 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES [${CC} || ${CXX}] [${C
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
 	${BUILDNEW} && ${LD} ${LDFLAGS}${OBJECTLIST} -o "${BINDIR}${OUTPUT}"
 	STATUS=$?
-	set +x
+	if [ ! true = ${SUSUWU_S} ] && [ ! true = ${SUSUWU_VERBOSE} ]; then
+		set +x
+	fi
 	if [ false = ${BUILDNEW} ]; then
 		STATUS=0
 		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
