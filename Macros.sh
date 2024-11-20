@@ -58,6 +58,10 @@ SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $?` */
 	CROSS_COMP=""
 	if [ "--mingw" = "${1}" -o  "--mingw" = "${2}" ]; then
 		CROSS_COMP=" --mingw"
+	fi
+}
+SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+	if [ " --mingw" == ${CROSS_COMP} ]; then
 		LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
 		if command -v x86_64-w64-mingw32-clang++ > /dev/null; then
 			CXX="x86_64-w64-mingw32-clang++"
@@ -69,10 +73,6 @@ SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $?` */
 			SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`x86_64-w64-mingw32-clang++ not found\`, \`x86_64-w64-mingw32-g++ not found\`. Do \`apt install llvm-mingw-w64\` or \`apt install mingw-w64\`."
 			exit 1
 		fi
-	fi
-}
-SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
-	if [ ! -z ${CROSS_COMP} ]; then #/* if `--mingw`,         */
 		return;                       #/* don't override `CXX`. */
 	elif command -v clang++ > /dev/null; then
 		CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
@@ -82,11 +82,27 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [
 		USE_FSAN=true
 	elif command -v "${CXX}" > /dev/null; then #/* TODO: if our flags are compatible with all `${CXX}`, move this to top */
 		SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`clang++ not found\`, \`g++ not found\`. \`\${CXX}\` (\"${CXX}\") found, will use this."
+		if command -v "${CC}" > /dev/null; then
+			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${CC}\` (\"${CC}\") found, will use this."
+		else
+			CC="${CXX} -x c"
+			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${CC}\` not found, will use \"\${CXX} -x -c\" (\"${CC}\")."
+		fi
+		if command -v "${LD}" > /dev/null; then
+			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${LD}\` (\"${LD}\") found, will use this."
+		else
+			LD="${CXX}"
+			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${LD}\` not found, will use \"\${CXX}\" (\"${LD}\")."
+		fi
 		USE_FSAN=false #/* `TODO: test unknown compilers for `-fsan*` support */
+		return 0
 	else
 		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`clang++ not found\`, \`g++ not found\`. \`\${CXX}\` (\"${CXX}\") not found. Do \`apt install clang\` or \`apt install gcc\`."
 		exit 1
 	fi
+	LD="${CXX}"
+	CC="${CXX} -x c"
+	return 0
 }
 
 SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $?` */
@@ -107,8 +123,6 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $?` */
 	fi
 }
 SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGE $?] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $?] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $?] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
-	LD="${CXX}"
-	CC="${CXX} -x c"
 	LDFLAGS="${LDFLAGS}"
 	CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_ANALYSIS}"
 	CCFLAGS="${CCFLAGS} ${CXXFLAGS}"
@@ -248,9 +262,29 @@ SUSUWU_FORMAT() { #/* Is analogous to `make format`. */
 SUSUWU_DOCS() { #/* Is analogous to `make docs`. */
 	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which will use tools such as \`Sphinx\` or \`Doxygen\`)"
 }
-SUSUWU_INSTALL() { #/* Is analogous to `make install`. */
-	SUSUWU_TODO_LIST "SUSUWU_INSTALL()" "(which will use scripts such as \`cp ${BINDIR}${OUTPUT} /usr/bin/\`)"
+SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL" [/usr/bin | /usr/local/bin]`. Is just for internal use. */
+	if [ -n "${2}" ]; then #/* function `${1}` was passed USRBIN as its first param (our second param) */
+		USRBIN="${2}"
+		if [ ! -d "${USRBIN}" ]; then
+			SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${USRBIN}\` is not a directory (\`${1}\` requires dir input)."
+			return 1
+		fi
+		return 0
+	fi
+	for USRBIN in "/usr/bin" "/usr/local/bin" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "$(realpath -q ~/.local/bin)"; do
+		if [ -d "${USRBIN}" ]; then
+			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${1}\` was not passed \`USRBIN\`. Autodetected as \`${USRBIN}\`."
+			return 0
+		fi
+	done
+	SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${1}\` was not passed \`USRBIN\`. Failed to autodetect path (which \`${1}\` uses.)"
+	return 1 #/* Notice: `exit 1` would cause GitHub rubbers (with unknown install paths) to fail unit tests. */
 }
-SUSUWU_UNINSTALL() { #/* Is analogous to `make uninstall`. */
-	SUSUWU_TODO_LIST "SUSUWU_UNINSTALL()" "(which will use scripts such as \`rm /usr/bin/${OUTPUT}\`)"
+SUSUWU_INSTALL() { #/* Usage: `SUSUWU_INSTALL [USRBIN]`. Is analogous to `make install`. */
+	SUSUWU_PROCESS_USRBIN "SUSUWU_INSTALL()" "${1}" &&
+	cp --interactive ${BINDIR}${OUTPUT} "${USRBIN}/${OUTPUT}"
+} #/* returns result of `cp`; thus `SUSUWU_INSTALL && SUSUWU_UNINSTALL` won't remove files unless the interactive `SUSUWU_INSTALL` has total success */
+SUSUWU_UNINSTALL() { #/* Usage: `SUSUWU_UNINSTALL [USRBIN]`. Is analogous to `make uninstall`. */
+	SUSUWU_PROCESS_USRBIN "SUSUWU_UNINSTALL()" "${1}" &&
+	rm "${USRBIN}/${OUTPUT}"
 }
