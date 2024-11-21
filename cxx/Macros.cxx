@@ -13,8 +13,9 @@ SUSUWU_STATIC_ASSERT(true  == MacrosCxx11NullptrTest(SUSUWU_NULLPTR)); /* Tests 
 namespace Susuwu { /* NOLINTBEGIN(misc-use-anonymous-namespace): can't use functions if anonymouse */
 class MacrosCxx11InheritanceTest {
 public:
-	virtual ~MacrosCxx11InheritanceTest() SUSUWU_DEFAULT /* Notice: destructor has implementation; reimplementation is optional. */
 	MacrosCxx11InheritanceTest() SUSUWU_DELETE /* Notice: deleted constructor is redundant for pure virtual class */
+	MacrosCxx11InheritanceTest(const MacrosCxx11InheritanceTest &) SUSUWU_DEFAULT /* Default clone constructor */
+	virtual ~MacrosCxx11InheritanceTest() SUSUWU_DEFAULT /* Notice: destructor has implementation; reimplementation is optional. */
 	virtual const bool PureVirtual() const = 0; /* Notice: this is pure virtual; subclasses must implement this. */
 };
 class MacrosCxx11InheritanceTestSubclass : MacrosCxx11InheritanceTest {
@@ -23,13 +24,13 @@ public: /* Notice: inherits default constructor */
 };
 class MacrosCxx11InheritanceTestSubclass2 SUSUWU_FINAL /* Since destructor is final, cannot inherit from class. `clang++` thus warns, unless the whole class is `final`. */: MacrosCxx11InheritanceTestSubclass {
 public: /* Notice: inherits `PureVirtual()`, which you can now set `final` */
-	~MacrosCxx11InheritanceTestSubclass2() SUSUWU_OVERRIDE SUSUWU_FINAL {}; /* Notice: `override`/`final` is optional. */
+	~MacrosCxx11InheritanceTestSubclass2() SUSUWU_FINAL SUSUWU_DEFAULT /* Notice: `override`/`final` is optional. */
 };
 static void macrosNoUniqueAddressTest() {
 	typedef class Zero {} Zero;
-	class SubClassWithBaseSubobject : public Zero {bool boo;};
-	class SubClassWithMemberSubobject {bool boo; public: Zero zero;};
-	class SubClassWithMemberSubobjectNoAddress {bool boo; public: SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};
+	class SubClassWithBaseSubobject : public Zero {public: bool boo = true;};
+	class SubClassWithMemberSubobject {public: bool boo = true; Zero zero;};
+	class SubClassWithMemberSubobjectNoAddress {public: bool boo = true; SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};
 #ifdef SUSUWU_CXX11 /* this is true without C++11, but `std::is_empty` doesn't exist in C++98. */
 	SUSUWU_STATIC_ASSERT(std::is_empty<Zero>::value);
 #endif /* def SUSUWU_CXX11 */
