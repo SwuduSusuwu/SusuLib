@@ -1270,7 +1270,11 @@ const bool virusAnalysisTests() {
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
 	if(0 < classSysArgc) {
+#ifdef __linux__
+		const PortableExecutableBytecode executable("/proc/self/exe"); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
+#else /* def __linux__ else */
 		const PortableExecutableBytecode executable(classSysArgs[0]); /* Pointer is from `main()`, suppress: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+#endif /* def __linux__ else */
 		if(virusAnalysisAbort == virusAnalysis(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
