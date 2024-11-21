@@ -15,17 +15,17 @@ C_SOURCE_PATH="./c/"
 CXX_SOURCE_PATH="./cxx/"
 
 
-SUSUWU_PROCESS_MINGW $@ #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
+SUSUWU_PROCESS_MINGW "$@" #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
-SUSUWU_PROCESS_RELEASE_DEBUG $@ #/* Usage: `./build.sh --debug` or `./build.sh --release` */
+SUSUWU_PROCESS_RELEASE_DEBUG "$@" #/* Usage: `./build.sh --debug` or `./build.sh --release` */
 
 SUSUWU_SETUP_OBJDIR "./obj/"
 SUSUWU_SETUP_BINDIR "./bin/"
 SUSUWU_SETUP_OUTPUT "a"
-SUSUWU_PROCESS_CLEAN_REBUILD $@ #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
+SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
-SUSUWU_PROCESS_INCLUDES ${CXX_SOURCE_PATH}Class*.hxx ${CXX_SOURCE_PATH}Macros.hxx
+SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
 SUSUWU_BUILD_CTAGS #/* Usage: `apt-get install ctags vim && vim -t tagToSearchFor` */
 SUSUWU_BUILD_OBJECTS "${CC} ${CCFLAGS}" ".c" "${C_SOURCE_PATH}rfc6234/sha1.c" "${C_SOURCE_PATH}rfc6234/sha224-256.c" "${C_SOURCE_PATH}rfc6234/sha384-512.c"
 SUSUWU_BUILD_OBJECTS "${CXX} ${CXXFLAGS}" ".cxx" "${CXX_SOURCE_PATH}*.cxx"

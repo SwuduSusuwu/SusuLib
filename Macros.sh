@@ -1,13 +1,13 @@
 #!/bin/sh
-SUSUWU_DIR_SUFFIX_SLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "$OBJDIR") */
-	DIR=${1}
+SUSUWU_DIR_SUFFIX_SLASH() { #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}") */
+	local DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
 		DIR="${DIR}/" #/* if original doesn't have, append '/' */
 	fi
 	echo "${DIR}" #/* return with slash */
 }
-SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "$BINDIR") */
-	DIR=${1}
+SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "${BINDIR}") */
+	local DIR=${1}
 	case "${DIR}" in
 		./*) #/* original has "./" */
 			;;
@@ -16,6 +16,19 @@ SUSUWU_DIR_AFFIX_DOTSLASH() { #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "$BIN
 			;;
 	esac
 	echo "${DIR}" #/* return with "./" */
+}
+SUSUWU_ESCAPE_SPACES() { #/* Usage: `OBJECTLIST="${OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${OBJECT}"). */
+#	echo $(echo "$@" | sed 's/ /\\\ /') #/* Error: `sed not found`, although is installed. */
+#	echo "\"${@}\""; #/* Error: if `OBJECT="obj/main.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: '"obj/main.o"'`. */
+	local ESCAPED_PATH=""
+	local PATH; for PATH in $@; do
+		if [ -z "${ESCAPED_PATH}" ]; then
+			ESCAPED_PATH="${PATH}"
+		else
+			ESCAPED_PATH="${ESCAPED_PATH}\\ ${PATH}" #/* Error: if `OBJECT="obj/long path.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: 'obj/long\'\nclang++: error: no such file or directory: 'path.o'`. TODO: fix this. */
+		fi #/* Is not a regression (`Macros.sh` never supported spaces; our patbs don't have spaces.) */
+	done
+	echo "${ESCAPED_PATH}"
 }
 
 #/* Based on cxx/Macros.hxx */
@@ -150,7 +163,7 @@ SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`[ -z \"\${BINDIR%/}\" ] || [ \"-z \${OBJDIR%/}\" ]\`: \`${0}\` must call \`SUSUWU_SETUP_OBJDIR()\` + \`SUSUWU_SETUP_BINDIR()\` before \`SUSUWU_SETUP_OUTPUT()\`."
 		exit 1 #/* `if("/" == BINDIR || "" == BINDIR)`, can't use `${BINDIR}${OUTPUT}` */
 	fi
-	if [ -z ${CROSS_COMP} ]; then
+	if [ -z "${CROSS_COMP}" ]; then
 		OUTPUT="${1}.out"
 	else
 		OUTPUT="${1}.exe"
@@ -162,10 +175,10 @@ SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 	fi
 }
 SUSUWU_CLEAN_OUTPUT_IMPL() { #/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript" */
-	SUSUWU_PRINT "${SUSUWU_SH_INFO}" "${1}; will remove intermediate objects (\`rm ${OBJDIR}*.o\`), plus remove generated executables (\`rm ${BINDIR}*.{exe,out}\`)${2}"
-	rm ${OBJDIR}*.o 2>/dev/null #/* The `-f` flag is omitted in case `OBJDIR` or `BINDIR` is set to "../*/". */
-	rm ${BINDIR}*.exe 2>/dev/null
-	rm ${BINDIR}*.out 2>/dev/null
+	SUSUWU_PRINT "${SUSUWU_SH_INFO}" "${1}; will remove intermediate objects (\`rm \"${OBJDIR}*.o\"\`), plus remove generated executables (\`rm \"${BINDIR}*.{exe,out}\"\`)${2}"
+	rm "${OBJDIR}*.o" 2>/dev/null #/* The `-f` flag is omitted in case `OBJDIR` or `BINDIR` is set to "../*/". */
+	rm "${BINDIR}*.exe" 2>/dev/null
+	rm "${BINDIR}*.out" 2>/dev/null
 }
 SUSUWU_CLEAN_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus exit. [Use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
@@ -190,7 +203,7 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h
 		if [ ${OBJECT} -ot ${SOURCE} -a -e ${SOURCE} ]; then #/* `&& [ -e ${SOURCE} ]` is: skip unless `${SOURCE}` exists. */
 			SUSUWU_REBUILD_OUTPUT "\`${SOURCE}\` (which is a common \`#include\`) is newer than \`${OBJECT}\`"
 			break
-		elif [ ! -e ${SRCCXX} ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
+		elif [ ! -e "${SRCCXX}" ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
 			touch ${OBJECT};            #/* ... then produce `*.o` (for future tests.) */
 		fi
 	done
@@ -198,7 +211,7 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h
 SUSUWU_BUILD_CTAGS() { #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
 	local STATUS=1
 	if command -v ctags > /dev/null; then
-		if [ -z ${1} ] || [ -z ${2} ]; then
+		if [ -z "${1}" ] || [ -z "${2}" ]; then
 			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`SUSUWU_BUILD_CTAGS()\` was called with less than 2 params; will default to \`SUSUWU_BUILD_CTAGS \"-R --languages=C++\" \"\${C_SOURCE_PATH}\" \"\${C_SOURCE_PATH}\"\` (paths: \"${C_SOURCE_PATH}\" \"${CXX_SOURCE_PATH}\")."
 			if [ -n "${C_SOURCE_PATH}" ]; then
 				ctags -R "${C_SOURCE_PATH}"
@@ -214,7 +227,7 @@ SUSUWU_BUILD_CTAGS() { #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 			local SOURCE_PATH
 			shift 1 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
 			local SOURCE_PATH; for SOURCE_PATH in $@; do
-				ctags "${FLAGS}" ${SOURCE_PATH}
+				ctags "${FLAGS}" "${SOURCE_PATH}"
 				STATUS=0
 			done
 		fi
@@ -230,11 +243,11 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES [${CC} || ${CXX}] [${C
 	set -x
 	local SOURCE; for SOURCE in $@; do
 		local OBJECT="${OBJDIR}$(basename "${SOURCE}" "${OLD_ARG_2}").o" #/* `basename`'s second param removes suffix */
-		if [ ${OBJECT} -ot ${SOURCE} -o ! -s ${OBJECT} ] > /dev/null 2>&1; then
+		if [ "${OBJECT}" -ot "${SOURCE}" -o ! -s "${OBJECT}" ] > /dev/null 2>&1; then
 			${OLD_ARG_1} -c "${SOURCE}" -o "${OBJECT}"
 			BUILDNEW=true
 		fi
-		OBJECTLIST="${OBJECTLIST} ${OBJECT}"
+		OBJECTLIST="${OBJECTLIST} $(SUSUWU_ESCAPE_SPACES ${OBJECT})"
 	done
 }
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
@@ -242,8 +255,8 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	STATUS=$?
 	set +x
 	if [ false = ${BUILDNEW} ]; then
+		STATUS=0
 		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
-		return 0
 	elif [ 0 -eq ${STATUS} ]; then
 		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
 	else
@@ -254,7 +267,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 
 SUSUWU_TEST_OUTPUT() {
 	if [ 0 -eq ${STATUS} ] || [ false = ${BUILDNEW} ]; then
-		if [ -z ${CROSS_COMP} ]; then #/* `if("" == CROSS_COMP)` */
+		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
 			${BINDIR}${OUTPUT}
 		else #/* if `--mingw` */
 			if command -v wine > /dev/null; then

@@ -69,9 +69,11 @@ Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such
 ## `sh` source
 Is as for _C++_, except that you act as if all functions/variables are macros (which use `CONSTANT_CASE`).
 
-Specific to `sh` (but doesn't conflict with _C++_): variable access shall include "{}" (thus not `$1`, but `${1}`).
-
-For temp variables, you affix `local` (thus not `for VALUE in LIST; do` but `local VALUE; for VALUE in LIST; do`).
+Specific to `sh` (but doesn't conflict with _C++_):
+- Variable access: uses "${...}" (thus not `if [ true = $BOOL ]`, but `if [ true = ${BOOL} ]`), in case text is tacked onto the variable ("1(true==$BOOL2)path==$PATH" is an error, but "1)true==${BOOL}2)path==${PATH}" is cool).
+- Str variable access: uses `"${...}"` (thus not `if [ "-q" = ${PARAM}`, but `if [ "-q" = "${PARAM}" ]`), in case `${PARAM}` has spaces, also to avoid diagnostics (such as ["Double quote array expansions to avoid re-splitting elements."](https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1724).
+- For temp variables, you affix `local` (thus not `for VALUE in ${LIST}; do`, but `local VALUE; for VALUE in ${LIST}; do`).
+  - [Notice; to split (on spaces) is the purpose of the `for` loop.]
 ## _C_/_C++_ source
 Most of what [_Mozilla Org_'s (_Firefox_'s) style](https://firefox-source-docs.mozilla.org/code-quality/coding-style/coding_style_cpp.html) suggests is sound (you should follow this unless you have specific reasons not to).
 
