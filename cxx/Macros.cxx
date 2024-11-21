@@ -13,8 +13,8 @@ SUSUWU_STATIC_ASSERT(true  == MacrosCxx11NullptrTest(SUSUWU_NULLPTR)); /* Tests 
 namespace Susuwu { /* NOLINTBEGIN(misc-use-anonymous-namespace): can't use functions if anonymouse */
 class MacrosCxx11InheritanceTest {
 public:
-	virtual ~MacrosCxx11InheritanceTest() = SUSUWU_DEFAULT; /* Notice: destructor has implementation; reimplementation is optional. */
-	MacrosCxx11InheritanceTest() = SUSUWU_DELETE; /* Notice: deleted constructor is redundant for pure virtual class */
+	virtual ~MacrosCxx11InheritanceTest() SUSUWU_DEFAULT /* Notice: destructor has implementation; reimplementation is optional. */
+	MacrosCxx11InheritanceTest() SUSUWU_DELETE /* Notice: deleted constructor is redundant for pure virtual class */
 	virtual const bool PureVirtual() const = 0; /* Notice: this is pure virtual; subclasses must implement this. */
 };
 class MacrosCxx11InheritanceTestSubclass : MacrosCxx11InheritanceTest {

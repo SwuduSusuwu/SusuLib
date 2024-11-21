@@ -304,8 +304,8 @@ SUSUWU_STATIC_ASSERT(true  == MacrosCxx11NullptrTest(SUSUWU_NULLPTR)); /* Tests 
 #endif /* def SUSUWU_CXX11 */
 class MacrosCxx11InheritanceTest {
 public:
-	virtual ~MacrosCxx11InheritanceTest() = SUSUWU_DEFAULT; /* Notice: destructor has implementation; reimplementation is optional. */
-	MacrosCxx11InheritanceTest() = SUSUWU_DELETE; /* Notice: deleted constructor is redundant for pure virtual class */
+	virtual ~MacrosCxx11InheritanceTest() SUSUWU_DEFAULT /* Notice: destructor has implementation; reimplementation is optional. */
+	MacrosCxx11InheritanceTest() SUSUWU_DELETE /* Notice: deleted constructor is redundant for pure virtual class */
 	virtual const bool PureVirtual() const = 0; /* Notice: this is pure virtual; subclasses must implement this. */
 };
 class MacrosCxx11InheritanceTestSubclass : MacrosCxx11InheritanceTest {
@@ -923,12 +923,12 @@ typedef enum CnsMode : char {
 typedef class Cns : Object {
 public:
 	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class Cns";}
-	~Cns() SUSUWU_OVERRIDE = SUSUWU_DEFAULT;
-	Cns() = SUSUWU_DEFAULT; /* Default constructor */
-	Cns(const Cns &) = SUSUWU_DEFAULT; /* Copy constructor */
-	Cns& operator=(const Cns &) = SUSUWU_DEFAULT; /* Copy assignment */
-	Cns(Cns&&) SUSUWU_NOEXCEPT = SUSUWU_DEFAULT; /* Move constructor */
-	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT = SUSUWU_DEFAULT; /* Move assignment */
+	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
+	Cns() SUSUWU_DEFAULT /* Default constructor */
+	Cns(const Cns &) SUSUWU_DEFAULT /* Copy constructor */
+	Cns& operator=(const Cns &) SUSUWU_DEFAULT /* Copy assignment */
+	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
+	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
 	const bool hasImplementation() const SUSUWU_OVERRIDE {return typeid(Cns) != typeid(this);}
 	const bool isInitialized() const SUSUWU_OVERRIDE {return initialized;}
 	virtual void setInitialized(const bool is) {initialized = is;}

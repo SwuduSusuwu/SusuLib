@@ -104,16 +104,16 @@
 #endif /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
 #if defined(SUSUWU_CXX11) /* TODO? (pre-CXX11 support) || SUSUWU_HAS_FEATURE(cxx_noexcept) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) */ /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
-#	define SUSUWU_DEFAULT default /* Usage: `Macros.cxx` has tests for this */
-#	define SUSUWU_DELETE delete /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_DEFAULT = default; /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_DELETE = delete; /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_FINAL final /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
 #else /* SUSUWU_CXX11 else */
 #	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
-#	define SUSUWU_DEFAULT /* No-op */
-#	define SUSUWU_DELETE /* No-op */
+#	define SUSUWU_DEFAULT {} /* allows default constructors/destructors. TODO: default operators? */
+#	define SUSUWU_DELETE ; /* causes linker error if DELETEd function is called. */
 #	define SUSUWU_FINAL final /* No-op */
 #	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
 #	define SUSUWU_OVERRIDE override /* No-op */
