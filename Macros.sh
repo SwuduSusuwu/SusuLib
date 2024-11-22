@@ -27,7 +27,7 @@ SUSUWU_ESCAPE_SPACES() { #/* Usage: `OBJECTLIST="${OBJECTLIST} $(SUSUWU_ESCAPE_S
 	local PATH; for PATH in $@; do
 		if [ -z "${ESCAPED_PATH}" ]; then
 			ESCAPED_PATH="${PATH}"
-		else
+		elif [ -n "${PATH}" ]; then
 			ESCAPED_PATH="${ESCAPED_PATH}\\ ${PATH}" #/* Error: if `OBJECT="obj/long path.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: 'obj/long\'\nclang++: error: no such file or directory: 'path.o'`. TODO: fix this. */
 		fi #/* Is not a regression (`Macros.sh` never supported spaces; our patbs don't have spaces.) */
 	done
@@ -197,10 +197,10 @@ SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 	fi
 }
 SUSUWU_CLEAN_OUTPUT_IMPL() { #/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript" */
-	SUSUWU_PRINT "${SUSUWU_SH_INFO}" "${1}; will remove intermediate objects (\`rm \"${OBJDIR}*.o\"\`), plus remove generated executables (\`rm \"${BINDIR}*.{exe,out}\"\`)${2}"
-	rm "${OBJDIR}*.o" 2>/dev/null #/* The `-f` flag is omitted in case `OBJDIR` or `BINDIR` is set to "../*/". */
-	rm "${BINDIR}*.exe" 2>/dev/null
-	rm "${BINDIR}*.out" 2>/dev/null
+	SUSUWU_PRINT "${SUSUWU_SH_INFO}" "${1}; will remove intermediate objects (\`rm \"${OBJDIR}\"*.o\`), plus remove generated executables (\`rm \"${BINDIR}\"*.{exe,out}\`)${2}"
+	rm "${OBJDIR}"*.o 2>/dev/null #/* The `-f` flag is omitted in case `OBJDIR` or `BINDIR` is set to "../*/". */
+	rm "${BINDIR}"*.exe 2>/dev/null
+	rm "${BINDIR}"*.out 2>/dev/null
 }
 SUSUWU_CLEAN_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus exit. [Use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
