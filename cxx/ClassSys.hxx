@@ -2,8 +2,10 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX */
+#include "ClassPortableExecutable.hxx" /* FilePath */
+#include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS, SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX */
 #include <cassert> /* assert */
+#include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include <chrono> /* std::chrono */
 #include <exception> /* std::exception */
 #include <iomanip> /* std::dec std::hex */
@@ -48,6 +50,10 @@ const bool classSysHasRoot();
 /* #if SUSUWU_POSIX, `root ? (seteuid(0) : (seteuid(getuid() || getenv("SUDO_UID")), setuid(geteuid)); return classSysHasRoot();` #endif
  * Usage: classSysSetRoot(true); functionsWhichRequireRoot; classSysSetRoot(false); */
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
+
+/* Filesystems */
+const FilePath classSysGetOwnPath();
+const FILE *classSysFopenOwnPath();
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */

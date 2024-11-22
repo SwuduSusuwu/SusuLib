@@ -5,7 +5,7 @@
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysArgc classSysArgs classSysHasRoot classSysHexStr classSysSetRoot execvex */
+#include "ClassSys.hxx" /* classSysHasRoot classSysHexStr classSysSetRoot execvex */
 #include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERRSTR SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
 #include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
 #include <algorithm> /* std::sort */
@@ -71,12 +71,9 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	if(0 < classSysArgc) {
-#ifdef __linux__
-		const PortableExecutableBytecode executable("/proc/self/exe"); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
-#else /* def __linux__ else */
-		const PortableExecutableBytecode executable(classSysArgs[0]); /* Pointer is from `main()`, suppress: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-#endif /* def __linux__ else */
+	const FilePath gotOwnPath = classSysGetOwnPath();
+	if("" != gotOwnPath) {
+		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysis(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}

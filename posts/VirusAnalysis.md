@@ -408,6 +408,10 @@ const bool classSysHasRoot();
  * Usage: classSysSetRoot(true); functionsWhichRequireRoot; classSysSetRoot(false); */
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
 
+/* Filesystems */
+const FilePath classSysGetOwnPath();
+const FILE *classSysFopenOwnPath();
+
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
 
@@ -478,6 +482,7 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 /* @throw std::runtime_error */
 const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
+
 ```
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
 ```
@@ -512,7 +517,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	argv.push_back(SUSUWU_NULLPTR);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
-		execv(argv[0], &argv[0]); /* SUSUWU_NORETURN */
+		execv(argv[0], &argv[0]); /* has `noreturn` */
 	} else {
 		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()};
 		std::vector<char *> envp;
@@ -521,13 +526,13 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
 		envp.push_back(SUSUWU_NULLPTR);
-		execve(argv[0], &argv[0], &envp[0]); /* SUSUWU_NORETURN */
+		execve(argv[0], &argv[0], &envp[0]); /* has `noreturn` */
 	}
-	exit(EXIT_FAILURE); /* execv*() is `SUSUWU_NORETURN`. NOLINT(concurrency-mt-unsafe) */
+	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
-	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
+#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
 	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
-    return -1;
+	return -1;
 #endif /* ndef SUSUWU_POSIX */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
@@ -605,6 +610,28 @@ const bool classSysSetRoot(bool root) {
 	return classSysHasRoot();
 }
 
+const FILE *classSysFopenOwnPath() {
+	return fopen(classSysGetOwnPath().c_str(), "r");
+}
+const FilePath classSysGetOwnPath() {
+#ifdef __linux__
+	return "/proc/self/exe";
+#elif defined SUSUWU_WIN32
+	char ownPathStr[MAX_PATH];
+	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
+	if(hModule) {
+		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
+	} else {
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
+		return FilePath(); /* return EXIT_FAILURE; */
+	}
+	return FilePath(ownPathStr);
+#else /* def SUSUWU_WIN32 else */
+	assert(NULL != classSysArgs);
+	assert(NULL != classSysArgs[0]);
+	return classSysArgs[0];
+#endif /* def SUSUWU_WIN32 else */
+}
 const bool classSysSetConsoleInput(bool input) {
 	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
 	return classSysGetConsoleInput();
@@ -1269,12 +1296,9 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	if(0 < classSysArgc) {
-#ifdef __linux__
-		const PortableExecutableBytecode executable("/proc/self/exe"); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
-#else /* def __linux__ else */
-		const PortableExecutableBytecode executable(classSysArgs[0]); /* Pointer is from `main()`, suppress: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-#endif /* def __linux__ else */
+	const FilePath gotOwnPath = classSysGetOwnPath();
+	if("" != gotOwnPath) {
+		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysis(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
@@ -1966,98 +1990,10 @@ This post was about general methods to produce virus analysis tools, does not re
 
     Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes, or just add artificial CNS to antivirus hosts for extra analysis.
 
-/* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
-#ifndef INCLUDES_cxx_Macros_hxx
-#define INCLUDES_cxx_Macros_hxx
-/* Miscellaneous macros */
-/* To printout default preprocessor definitions:
- * for X={clang, clang++, gcc, g++, hipcc, icc}: `$X -dM -E -x c++ /dev/null`
- * replace `/dev/null` with a file (such as `cxx/Macros.hxx`) to printout actual preprocessor definitions
  * for MSVC: `git clone --depth 1 https://github.com/MicrosoftDocs/cpp-docs.git && vim cpp-docs/blob/main/docs/preprocessor/predefined-macros.md` or browse to https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
  * for others: `git clone https://github.com/cpredef/predef.git && vim predef/Compilers.md`
  */ /* To pass new preprocessor definitions (example is `#define USE_CONTRACTS true`):
  * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
-#if defined(SUSUWU_PREFER_C) || !defined(__cplusplus)
-#	define SUSUWU_SH_PREFER_STDIO
-#	define SUSUWU_SH_PREFER_CSTR
-#endif /*defined((SUSUWU_PREFER_C) || !defined(__cplusplus) */
-#ifdef SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
-#	include <stdio.h> /* fprintf stderr stdout */
-#else
-#	include <iostream> /* std::cerr std::cout std::endl */
-#endif
-
-#ifdef __cplusplus
-#	include <cassert> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
-#	if 199901 <= __cplusplus
-#		define SUSUWU_CXX98
-#	endif /* (199901 <= __cplusplus) */
-#	if 201102 < __cplusplus
-#		define SUSUWU_CXX11
-#	endif /* (201102 < __cplusplus) */
-#	if 201402 <= __cplusplus
-#		define SUSUWU_CXX14
-#	endif /* if (201402 < __cplusplus) */
-#	if 201702 < __cplusplus
-#		define SUSUWU_CXX17
-#	endif /* if (201702 < __cplusplus) */
-#	if 202002 <= __cplusplus
-#		define SUSUWU_CXX20
-#		define SUSUWU_NO_UNIQUE_ADDRESS [[no_unique_address]] /* use this attribute on member subobjects if `std::is_empty<MemberClass>::value == true`, if you want those to not pad (most compilers pad such that `1 == sizeof(zero)` in `macrosNoUniqueAddressTest`. */
-#	else /* (202002 <= __cplusplus) else */
-#		define SUSUWU_NO_UNIQUE_ADDRESS /* No-op */
-#	endif /* if (202002 <= __cplusplus) */
-#else /* def __cplusplus */
-#	include <assert.h> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
-#	if (199901 <= __STDC_VERSION__)
-#		define SUSUWU_C99
-#	endif /* (199901 <= __STDC_VERSION__) */
-#	if (201112 <= __STDC_VERSION__)
-#		define SUSUWU_C11
-#	endif /* (201112 <= __STDC_VERSION__) */
-#endif /* !(defined __cplusplus */
-
-#define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
-#define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
-#define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */
-#define SUSUWU_PRAGMA(S) _Pragma(#S) /* `#pragma S` in macro functions is `_Pragma(S)` (but without this indirection/wrap, gives `error: _Pragma takes a parenthesized string literal`/`expected string literal in pragma message`.) Usage: `SUSUWU_PRAGMA(message("Message"))` */
-
-#if defined(_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) /* Purpose: Often, `_POSIX_VERSION` is not set on POSIX targets */
-#	define SUSUWU_POSIX _POSIX_VERSION /* Usage: `#ifdef SUSUWU_WIN32\n#include <unistd.h>\n#endif` */
-#endif /* defined*_POSIX_VERSION) || defined(_POSIX_C_SOURCE) || defined(__CYGWIN__) */
-#if defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) /* Purpose: https://stackoverflow.com/questions/430424/are-there-any-macros-to-determine-if-my-code-is-being-compiled-to-windows/430435#430435 says that __WIN32__ is not always defined on Windows targets */
-#	define SUSUWU_WIN32 /* Usage: `#ifdef SUSUWU_WIN32\n#include <windows.h>\n#endif` */
-#endif /* defined(__WIN32__) || defined(_WIN32) || defined(__MSC_VER) || defined(__MINGW32__) */
-#if defined(__clang__) || defined(__has_feature) /* Purpose: `gcc` "error: missing binary operator before token \"(\"" fix */
-#	define SUSUWU_HAS_FEATURE(X) __has_feature(x) /* Usage: `#if SUSUWU_HAS_FEATURE(cxx_noexcept)\nnoexcept\n#endif` */
-#else /* defined(__clang__) || defined(__has_feature) else */
-#	define SUSUWU_HAS_FEATURE(X) false
-#endif /* defined(__clang__) || defined(__has_feature) else */
-#if defined(__has_cpp_attribute)
-#	define SUSUWU_HAS_ATTRIBUTE(X) __has_cpp_attribute(x) /* Usage: `#if SUSUWU_HAS_ATTRIBUTE(noreturn)\nnoreturn\n#endif` */
-#else /* defined(__has_cpp_attribute) else */
-#	define SUSUWU_HAS_ATTRIBUTE(X) false
-#endif /* defined(__has_cpp_attribute) else */
-
-#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? #	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
-#	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
-#else
-#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
-#	define SUSUWU_CONSTEXPR /* No-op */
-#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
-
-#ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
-/* `SUSUWU_EXPECTS(X)` is close to `@pre @code X @endcode` or `SUSUWU_ASSUME(X)` but is for headers; https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2521r2.html */
-/* Promises `(true == (X))`, for static analysis, or for compiler which optimizes this. Warning: `if(!(X)) {UB (undefined behaviour)}` */
-#	define SUSUWU_EXPECTS(X) [[expects: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_EXPECTS(!x.full());` */
-#	define SUSUWU_ENSURES(X) [[ensures: X]] /* Usage: `void pushf(std::deque<float> &x, float f) SUSUWU_ENSURES(0 != x.size());` */
-#else /* else !def USE_CONTRACTS */
-#	define SUSUWU_EXPECTS(X) /* `@pre @code X @endcode` */
-#	define SUSUWU_ENSURES(X) /* `@post @code X @encode` */
-#endif /* else !def USE_CONTRACTS */
 

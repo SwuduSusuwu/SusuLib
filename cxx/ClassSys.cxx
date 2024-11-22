@@ -3,8 +3,10 @@
 #define INCLUDES_cxx_ClassSys_cxx
 #include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
+#include "ClassPortableExecutable.hxx" /* FilePath */
 #include <cassert> /* assert */
 #include <cerrno> /* errno */
+#include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include <cstdlib> /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef SUSUWU_POSIX
@@ -14,6 +16,7 @@
 #include <unistd.h> /* execve execv fork geteuid getuid setuid */
 #else
 #	ifdef SUSUWU_WIN32
+#	include <windows.h> /* GetModuleFileName GetModuleHandle HMODULE */
 #	include <shlobj.h> /* IsUserAnAdmin */
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
@@ -53,7 +56,7 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	argv.push_back(SUSUWU_NULLPTR);
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
-		execv(argv[0], &argv[0]); /* NORETURN */
+		execv(argv[0], &argv[0]); /* has `noreturn` */
 	} else {
 		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()};
 		std::vector<char *> envp;
@@ -62,9 +65,9 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
 		envp.push_back(SUSUWU_NULLPTR);
-		execve(argv[0], &argv[0], &envp[0]); /* NORETURN */
+		execve(argv[0], &argv[0], &envp[0]); /* has `noreturn` */
 	}
-	exit(EXIT_FAILURE); /* execv*() is `NORETURN`. NOLINT(concurrency-mt-unsafe) */
+	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
 #	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
 	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
@@ -147,6 +150,28 @@ const bool classSysSetRoot(bool root) {
 	return classSysHasRoot();
 }
 
+const FILE *classSysFopenOwnPath() {
+	return fopen(classSysGetOwnPath().c_str(), "r");
+}
+const FilePath classSysGetOwnPath() {
+#ifdef __linux__
+	return "/proc/self/exe";
+#elif defined SUSUWU_WIN32
+	char ownPathStr[MAX_PATH];
+	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
+	if(hModule) {
+		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
+	} else {
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
+		return FilePath(); /* return EXIT_FAILURE; */
+	}
+	return FilePath(ownPathStr);
+#else /* def SUSUWU_WIN32 else */
+	assert(SUSUWU_NULLPTR != classSysArgs);
+	assert(SUSUWU_NULLPTR != classSysArgs[0]);
+	return classSysArgs[0];
+#endif /* def SUSUWU_WIN32 else */
+}
 const bool classSysSetConsoleInput(bool input) {
 	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
 	return classSysGetConsoleInput();
