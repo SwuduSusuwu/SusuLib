@@ -409,8 +409,10 @@ const bool classSysHasRoot();
 const bool classSysSetRoot(bool root); /* root ? (seteuid(0) : (seteuid(getuid() || atoi(getenv("SUDO_UID"))), setuid(geteuid)); return classSysHasRoot(); */
 
 /* Filesystems */
-const FilePath classSysGetOwnPath();
-const FILE *classSysFopenOwnPath();
+/* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
+ * Error values: `return FilePath();` */
+const FilePath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<FilePath>::value) */;
+const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetFilePath()>::value) */;
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
@@ -482,7 +484,6 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 /* @throw std::runtime_error */
 const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
-
 ```
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
 ```
@@ -615,20 +616,28 @@ const FILE *classSysFopenOwnPath() {
 }
 const FilePath classSysGetOwnPath() {
 #ifdef __linux__
-	return "/proc/self/exe";
+	char path[PATH_MAX];
+	ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+	if (len == -1) {
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) {/* this shouldn't happen */} }");
+		return FilePath(); /* return EXIT_FAILURE; */
+	}
+	path[len] = '\0';
+//	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
+	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	char ownPathStr[MAX_PATH];
 	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	if(hModule) {
 		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
+		return FilePath(ownPathStr);
 	} else {
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
 		return FilePath(); /* return EXIT_FAILURE; */
 	}
-	return FilePath(ownPathStr);
 #else /* def SUSUWU_WIN32 else */
-	assert(NULL != classSysArgs);
-	assert(NULL != classSysArgs[0]);
+	assert(SUSUWU_NULLPTR != classSysArgs);
+	assert(SUSUWU_NULLPTR != classSysArgs[0]);
 	return classSysArgs[0];
 #endif /* def SUSUWU_WIN32 else */
 }
@@ -1267,7 +1276,7 @@ std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, 
 
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
-		abortOrNull.hashes = {}, abortOrNull.signatures = {}, abortOrNull.bytecodes = {  /* Produce from an antivirus vendor's (such as VirusTotal.com's) infection databases */
+		abortOrNull.hashes = {}, abortOrNull.signatures = {}, abortOrNull.bytecodes = { /* Produce from an antivirus vendor's (such as VirusTotal.com's) infection databases */
 			"infection",
 			"infectedSW",
 			"corruptedSW",
@@ -1275,7 +1284,7 @@ const bool virusAnalysisTests() {
 		};
 	}
 	ResultList passOrNull; {
-		passOrNull.hashes = {}, passOrNull.signatures = {}, passOrNull.bytecodes = {  /* Produce from an antivirus vendor's (such as VirusTotal.com's) fresh-files databases */
+		passOrNull.hashes = {}, passOrNull.signatures = {}, passOrNull.bytecodes = { /* Produce from an antivirus vendor's (such as VirusTotal.com's) fresh-files databases */
 			"",
 			"SW",
 			"SW",
@@ -1297,7 +1306,7 @@ const bool virusAnalysisTests() {
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
 	const FilePath gotOwnPath = classSysGetOwnPath();
-	if("" != gotOwnPath) {
+	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysis(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
@@ -1448,7 +1457,7 @@ const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const Res
 			SUSUWU_NOTICE("hashAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to hash 0x" + classSysHexStr(fileHash) + " (found in `abortList.hashes`). You should treat this as a virus detection if this was not a test. */");
 			return hashAnalysisCaches[fileHash] = virusAnalysisAbort;
 		} else {
-			return hashAnalysisCaches[fileHash] =  virusAnalysisContinue; /* continue to next tests */
+			return hashAnalysisCaches[fileHash] = virusAnalysisContinue; /* continue to next tests */
 		}
 	}
 }
@@ -1487,7 +1496,7 @@ const std::vector<std::string> importedFunctionsList(const PortableExecutable &f
  *
  * "x86" instruction list for Intel/AMD ( https://wikipedia.org/wiki/x86 ),
  * "aarch64" instruction list for most smartphones/tablets ( https://wikipedia.org/wiki/aarch64 ),
- * shows how to analyse what OS functions the SW goes to without libraries (through `int`/`syscall`, old;  most new SW uses `jmp`/`call`.)
+ * shows how to analyse what OS functions the SW goes to without libraries (through `int`/`syscall`, old; most new SW uses `jmp`/`call`.)
  * Plus, instructions lists show how to analyse what args the apps/SW pass to functions/syscalls (simple for constant args such as "push 0x2; call functions;",
  * but if registers/addresses as args such as "push eax; push [address]; call [address2];" must guess what is *"eax"/"[address]"/"[address2]", or use sandboxes.
  *
@@ -1989,11 +1998,4 @@ This post was about general methods to produce virus analysis tools, does not re
     Could have small local sandboxes (that just run for a few seconds) and small CNS (just billions of neurons with hundreds of layers, versus the trillions of neurons with thousands of layers of cortices that antivirus hosts would use for this).
 
     Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes, or just add artificial CNS to antivirus hosts for extra analysis.
-
- * for MSVC: `git clone --depth 1 https://github.com/MicrosoftDocs/cpp-docs.git && vim cpp-docs/blob/main/docs/preprocessor/predefined-macros.md` or browse to https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
- * for others: `git clone https://github.com/cpredef/predef.git && vim predef/Compilers.md`
- */ /* To pass new preprocessor definitions (example is `#define USE_CONTRACTS true`):
- * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
- * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
- */
 

@@ -7,13 +7,14 @@
 #include <cassert> /* assert */
 #include <cerrno> /* errno */
 #include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
+#include IF_SUSUWU_CPLUSPLUS(<climits>, <limits.h>) /* PATH_MAX */
 #include <cstdlib> /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef SUSUWU_POSIX
 #include <stdexcept> /* std::runtime_error */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
-#include <unistd.h> /* execve execv fork geteuid getuid setuid */
+#include <unistd.h> /* execve execv fork geteuid getuid readlink setuid */
 #else
 #	ifdef SUSUWU_WIN32
 #	include <windows.h> /* GetModuleFileName GetModuleHandle HMODULE */
@@ -155,17 +156,25 @@ const FILE *classSysFopenOwnPath() {
 }
 const FilePath classSysGetOwnPath() {
 #ifdef __linux__
-	return "/proc/self/exe";
+	char path[PATH_MAX];
+	ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+	if (len == -1) {
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) {/* this shouldn't happen */} }");
+		return FilePath(); /* return EXIT_FAILURE; */
+	}
+	path[len] = '\0';
+//	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
+	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	char ownPathStr[MAX_PATH];
 	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	if(hModule) {
 		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
+		return FilePath(ownPathStr);
 	} else {
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
 		return FilePath(); /* return EXIT_FAILURE; */
 	}
-	return FilePath(ownPathStr);
 #else /* def SUSUWU_WIN32 else */
 	assert(SUSUWU_NULLPTR != classSysArgs);
 	assert(SUSUWU_NULLPTR != classSysArgs[0]);

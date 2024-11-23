@@ -42,7 +42,7 @@ std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, 
 
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
-		abortOrNull.hashes = {}, abortOrNull.signatures = {}, abortOrNull.bytecodes = {  /* Produce from an antivirus vendor's (such as VirusTotal.com's) infection databases */
+		abortOrNull.hashes = {}, abortOrNull.signatures = {}, abortOrNull.bytecodes = { /* Produce from an antivirus vendor's (such as VirusTotal.com's) infection databases */
 			"infection",
 			"infectedSW",
 			"corruptedSW",
@@ -50,7 +50,7 @@ const bool virusAnalysisTests() {
 		};
 	}
 	ResultList passOrNull; {
-		passOrNull.hashes = {}, passOrNull.signatures = {}, passOrNull.bytecodes = {  /* Produce from an antivirus vendor's (such as VirusTotal.com's) fresh-files databases */
+		passOrNull.hashes = {}, passOrNull.signatures = {}, passOrNull.bytecodes = { /* Produce from an antivirus vendor's (such as VirusTotal.com's) fresh-files databases */
 			"",
 			"SW",
 			"SW",
@@ -72,7 +72,7 @@ const bool virusAnalysisTests() {
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
 	const FilePath gotOwnPath = classSysGetOwnPath();
-	if("" != gotOwnPath) {
+	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysis(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
@@ -225,7 +225,7 @@ const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const Res
 			SUSUWU_NOTICE("hashAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to hash 0x" + classSysHexStr(fileHash) + " (found in `abortList.hashes`). You should treat this as a virus detection if this was not a test. */");
 			return hashAnalysisCaches[fileHash] = virusAnalysisAbort;
 		} else {
-			return hashAnalysisCaches[fileHash] =  virusAnalysisContinue; /* continue to next tests */
+			return hashAnalysisCaches[fileHash] = virusAnalysisContinue; /* continue to next tests */
 		}
 	}
 }
@@ -264,7 +264,7 @@ const std::vector<std::string> importedFunctionsList(const PortableExecutable &f
  *
  * "x86" instruction list for Intel/AMD ( https://wikipedia.org/wiki/x86 ),
  * "aarch64" instruction list for most smartphones/tablets ( https://wikipedia.org/wiki/aarch64 ),
- * shows how to analyse what OS functions the SW goes to without libraries (through `int`/`syscall`, old;  most new SW uses `jmp`/`call`.)
+ * shows how to analyse what OS functions the SW goes to without libraries (through `int`/`syscall`, old; most new SW uses `jmp`/`call`.)
  * Plus, instructions lists show how to analyse what args the apps/SW pass to functions/syscalls (simple for constant args such as "push 0x2; call functions;",
  * but if registers/addresses as args such as "push eax; push [address]; call [address2];" must guess what is *"eax"/"[address]"/"[address2]", or use sandboxes.
  *
