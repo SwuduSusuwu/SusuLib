@@ -143,7 +143,7 @@ const bool listHasSubstr(const List &list, typename List::value_type::const_iter
 }
 template<class List>
 /* Returns shortest substr from `value`, which is not found in `list`
- * Usage: `resultList.signatures.push_back({listProduceSignature(resultList.bytecodes, bytecode));` */
+ * Usage: `auto tuple = listProduceSignature(resultList.bytecodes, bytecode); resultList.signatures.push_back({std::get<0>(tuple), std::get<1>(tuple)});` */
 const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_iterator> listProduceSignature(const List &list, const typename List::value_type &value) {
 	ptrdiff_t smallest = value.size();
 	auto itBegin = value.cbegin(), itEnd = value.cend();

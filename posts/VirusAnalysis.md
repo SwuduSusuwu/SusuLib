@@ -867,7 +867,7 @@ const bool listHasSubstr(const List &list, typename List::value_type::const_iter
 }
 template<class List>
 /* Returns shortest substr from `value`, which is not found in `list`
- * Usage: `resultList.signatures.push_back({listProduceSignature(resultList.bytecodes, bytecode));` */
+ * Usage: `auto tuple = listProduceSignature(resultList.bytecodes, bytecode); resultList.signatures.push_back({std::get<0>(tuple), std::get<1>(tuple)});` */
 const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_iterator> listProduceSignature(const List &list, const typename List::value_type &value) {
 	ptrdiff_t smallest = value.size();
 	auto itBegin = value.cbegin(), itEnd = value.cend();
@@ -1479,9 +1479,10 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 void produceAbortListSignatures(const ResultList &passList, ResultList &abortList) {
 	abortList.signatures.reserve(abortList.bytecodes.size());
 	for(const auto &file : abortList.bytecodes) {
-		auto tuple = listProduceSignature(passList.bytecodes, file);
-		if(std::get<0>(tuple) < std::get<1>(tuple)) { /* require `(0 < ResultListSignature.size())` to prevent crashes */
-			abortList.signatures.push_back(ResultListSignature(std::get<0>(tuple), std::get<1>(tuple)));
+		const auto tuple = listProduceSignature(passList.bytecodes, file);
+		const auto itBegin = std::get<0>(tuple),  itEnd = std::get<1>(tuple);
+		if(itBegin < itEnd) { /* require `(0 < ResultListSignature.size())` to prevent crashes */
+			abortList.signatures.push_back(ResultListSignature(itBegin, itEnd));
 		}
 	} /* The most simple signature is a substring, but some analyses use regexes. */
 }
@@ -1635,7 +1636,7 @@ static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*  1: `Macros.hxx`
 static const int susuwuUnitTestsConsoleBit         = 1 << 1; /*  2: `classSys.hxx`:`classSysSetConsoleInput()` */
 static const int susuwuUnitTestsClassSysBit        = 1 << 2; /*  4: `ClassSys.hxx`:`classSysTestsNoexcept()` */
 static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
-static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassSys.hxx`:`classSysTestsNoexcept()` */
+static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
@@ -1808,12 +1809,16 @@ const bool assistantCnsTests() {
 }
 void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, Cns &cns) {
 	std::vector<std::tuple<ResultListBytecode, ResultListBytecode>> inputsToOutputs;
+	const size_t maxConvolutionsOfMessages = 6666; /* is not conversation's max message count, but max steps to compute output. TODO: compute this value */
+	const size_t maxResponseSize = listMaxSize(responsesOrNull.bytecodes);
+	const size_t maxQuestionSize = listMaxSize(questionsOrNull.bytecodes);
+	const size_t maxWidthOfMessages = (maxResponseSize > maxQuestionSize) ? maxResponseSize : maxQuestionSize;
 	cns.setInputMode(cnsModeString);
 	cns.setOutputMode(cnsModeString);
-	cns.setInputNeurons(listMaxSize(questionsOrNull.bytecodes));
-	cns.setOutputNeurons(listMaxSize(responsesOrNull.bytecodes));
-	cns.setLayersOfNeurons(6666);
-	cns.setNeuronsPerLayer(26666);
+	cns.setInputNeurons(maxQuestionSize);
+	cns.setOutputNeurons(maxResponseSize);
+	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
+	cns.setNeuronsPerLayer(maxWidthOfMessages /* TODO: reduce this */);
 	assert(questionsOrNull.bytecodes.size() == questionsOrNull.bytecodes.size());
 	inputsToOutputs.reserve(questionsOrNull.bytecodes.size());
 	for(size_t x = 0; questionsOrNull.bytecodes.size() > x; ++x) {

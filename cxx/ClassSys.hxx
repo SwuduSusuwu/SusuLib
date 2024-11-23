@@ -5,8 +5,8 @@
 #include "ClassPortableExecutable.hxx" /* FilePath */
 #include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS, SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX */
 #include <cassert> /* assert */
-#include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include <chrono> /* std::chrono */
+#include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include <exception> /* std::exception */
 #include <iomanip> /* std::dec std::hex */
 #include <ios> /* std::streamsize */

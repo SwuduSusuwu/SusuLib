@@ -247,9 +247,10 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 void produceAbortListSignatures(const ResultList &passList, ResultList &abortList) {
 	abortList.signatures.reserve(abortList.bytecodes.size());
 	for(const auto &file : abortList.bytecodes) {
-		auto tuple = listProduceSignature(passList.bytecodes, file);
-		if(std::get<0>(tuple) < std::get<1>(tuple)) { /* require `(0 < ResultListSignature.size())` to prevent crashes */
-			abortList.signatures.push_back(ResultListSignature(std::get<0>(tuple), std::get<1>(tuple)));
+		const auto tuple = listProduceSignature(passList.bytecodes, file);
+		const auto itBegin = std::get<0>(tuple),  itEnd = std::get<1>(tuple);
+		if(itBegin < itEnd) { /* require `(0 < ResultListSignature.size())` to prevent crashes */
+			abortList.signatures.push_back(ResultListSignature(itBegin, itEnd));
 		}
 	} /* The most simple signature is a substring, but some analyses use regexes. */
 }

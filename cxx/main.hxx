@@ -11,7 +11,7 @@ static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*  1: `Macros.hxx`
 static const int susuwuUnitTestsConsoleBit         = 1 << 1; /*  2: `classSys.hxx`:`classSysSetConsoleInput()` */
 static const int susuwuUnitTestsClassSysBit        = 1 << 2; /*  4: `ClassSys.hxx`:`classSysTestsNoexcept()` */
 static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
-static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassSys.hxx`:`classSysTestsNoexcept()` */
+static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
 /* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise) */

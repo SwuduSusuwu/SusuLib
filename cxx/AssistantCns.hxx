@@ -3,9 +3,9 @@
 #ifndef INCLUDES_cxx_AssistantCns_hxx
 #define INCLUDES_cxx_AssistantCns_hxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassSys.hxx" /* templateCatchAll */
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode */
 #include "ClassResultList.hxx" /* ResultList */
+#include "ClassSys.hxx" /* templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT */
 #include <iostream> /* std::cout */
 #include <ostream> /* std::ostream */

@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_AssistantCns_cxx
 #define INCLUDES_cxx_AssistantCns_cxx
 #include "AssistantCns.hxx" /* assistantCnsProcessQuestion assistantCnsProcessResponses assistantCnsProcessUrls */
-#include "ClassCns.hxx" /* Cns CnsMode execvex */
+#include "ClassCns.hxx" /* Cns CnsMode */
 #include "ClassPortableExecutable.hxx" /* FileBytecode FilePath */
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
@@ -55,12 +55,16 @@ const bool assistantCnsTests() {
 }
 void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, Cns &cns) {
 	std::vector<std::tuple<ResultListBytecode, ResultListBytecode>> inputsToOutputs;
+	const size_t maxConvolutionsOfMessages = 6666; /* is not conversation's max message count, but max steps to compute output. TODO: compute this value */
+	const size_t maxResponseSize = listMaxSize(responsesOrNull.bytecodes);
+	const size_t maxQuestionSize = listMaxSize(questionsOrNull.bytecodes);
+	const size_t maxWidthOfMessages = (maxResponseSize > maxQuestionSize) ? maxResponseSize : maxQuestionSize;
 	cns.setInputMode(cnsModeString);
 	cns.setOutputMode(cnsModeString);
-	cns.setInputNeurons(listMaxSize(questionsOrNull.bytecodes));
-	cns.setOutputNeurons(listMaxSize(responsesOrNull.bytecodes));
-	cns.setLayersOfNeurons(6666);
-	cns.setNeuronsPerLayer(26666);
+	cns.setInputNeurons(maxQuestionSize);
+	cns.setOutputNeurons(maxResponseSize);
+	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
+	cns.setNeuronsPerLayer(maxWidthOfMessages /* TODO: reduce this */);
 	assert(questionsOrNull.bytecodes.size() == questionsOrNull.bytecodes.size());
 	inputsToOutputs.reserve(questionsOrNull.bytecodes.size());
 	for(size_t x = 0; questionsOrNull.bytecodes.size() > x; ++x) {
@@ -106,7 +110,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
-			execvex("wget '" + url + "' -O" + localXhtml);
+			execvex("wget '" + url + "' -O" += localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
