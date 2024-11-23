@@ -37,10 +37,10 @@ const bool assistantCnsTests() {
 	}
 	ResultList responsesOrNull; {
 		responsesOrNull.hashes = {}, responsesOrNull.signatures = {}, responsesOrNull.bytecodes = { /* UTF-8 */
-			ResultListBytecode("65536") + assistantCnsResponseDelimiter + "65,536", /* `+` is `concat()` for C++ */
+			(ResultListBytecode("65536") += assistantCnsResponseDelimiter) += "65,536", /* `+` is `concat()` for C++ */
 			ResultListBytecode(""),
 			ResultListBytecode(""),
-			ResultListBytecode("How do you do?") + assistantCnsResponseDelimiter + "Fanuc produces autonomous robots"
+			(ResultListBytecode("How do you do?") += assistantCnsResponseDelimiter) += "Fanuc produces autonomous robots"
 		};
 	}
 	resultListProduceHashes(questionsOrNull);
@@ -79,8 +79,8 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
 	for(const auto &host : hosts) {
-		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
-		execvex("wget '" + host + "' -Oindex.xhtml");
+		execvex((std::string("wget '") += host) += "/robots.txt' -Orobots.txt");
+		execvex((std::string("wget '") += host) += "' -Oindex.xhtml");
 		questionsOrNull.signatures.push_back(host);
 		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
@@ -114,7 +114,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
-			execvex("wget '" + url + "' -O" += localXhtml);
+			execvex(((std::string("wget '") += url) += "' -O") += localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
@@ -160,12 +160,12 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */)
 		}
 		input = ""; /* reset past messages */
 #else /* !def IGNORE_PAST_MESSAGES */
-				response += "Response #" + std::to_string(responseNumber++) + ": " + it + '\n';
+				response += ((std::string("Response #") += std::to_string(responseNumber++)) += ": ") += it + '\n';
 			}
 		} else {
 			response = responses.at(0);
 		}
-		input += "\n<response>" + response + "</response>\n";
+		input += (std::string("\n<response>") += response) += "</response>\n";
 		os << response;
 #endif /* !def IGNORE_PAST_MESSAGES */
 	}
