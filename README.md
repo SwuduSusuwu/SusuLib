@@ -1,4 +1,4 @@
-Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-your-work/use-remix/) or _[Apache 2](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE)_ (allows all uses).
+Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-your-work/use-remix/) or _[Apache 2](./LICENSE)_ (allows all uses).
 
 # Table of Contents
 - [Purposes](#Purposes)
@@ -8,31 +8,31 @@ Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-you
 - [How to contribute](#How-to-contribute)
   - [Beta test/experimental builds](#Beta-testexperimental-builds)
   - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SubStack/contribute)
-  - [Sensitive issues](https://github.com/SwuduSusuwu/SubStack/blob/trunk/SECURITY.md#Sensitive-issues)
+  - [Sensitive issues](./SECURITY.md#Sensitive-issues)
   - [Contributor conventions/rules](#Contributor-conventionsrules)
     - [`git`](#Git)
     - [`sh` source](#Sh-source)
     - [_C_/_C++_ source](#Cc-source)
 
 # Purposes
-[`./posts/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/posts/) stages posts (school classes) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about artificial neural tissue, antivirus, assistants, plus autonomous tools.
+[`./posts/`](./posts/) stages posts (school classes) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about artificial neural tissue, antivirus, assistants, plus autonomous tools.
 
-[`./c/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/c/) _C_ implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task), + vendored code (for now just _RFC6234_, for `sha2`).
+[`./c/`](./c/) _C_ implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task), + vendored code (for now just _RFC6234_, for `sha2`).
 
-[`./cxx/`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/) _C++_ implementations of posts (for now is just neural system pure virtual template ([`./cxx/ClassCns.hxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassCns.hxx)) + antivirus([`./cxx/VirusAnalysis.cxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.cxx)) + assistant([`./cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.cxx)), with lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
+[`./cxx/`](./cxx/) _C++_ implementations of posts (for now is just neural system pure virtual template ([`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx)) + antivirus([`./cxx/VirusAnalysis.cxx`](./cxx/VirusAnalysis.cxx)) + assistant([`./cxx/AssistantCns.cxx`](./cxx/AssistantCns.cxx)), with lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
 
 # How to use this
 Minimum requirements (build targets which this supports):
 - Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
-  - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with `cxx/Macros.hxx` macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_asset`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
+  - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_asset`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
   - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#Contributor-conventionsrules).
   - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#Contributor-conventionsrules).
 ## Download
 Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
 ## Options/setup
-Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/a.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
-- [`./cxx/main.hxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) has constants to use to interpret `a.out`'s return values.
+Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/a.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
+- [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `a.out`'s return values.
 - Console flags:
   - `./build.sh` : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
   - `./build.sh --clean` : removes intermediate object files + exits; to reduce disc use.
@@ -66,7 +66,7 @@ View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for i
 - `git switch experimental && ./build.sh`
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
-    - Note: [sensitive issue(s)](https://github.com/SwuduSusuwu/SubStack/blob/trunk/SECURITY.md#Sensitive-issues) have a separate protocol.
+    - Note: [sensitive issue(s)](./SECURITY.md#Sensitive-issues) have a separate protocol.
 # Contributor conventions/rules
 So that code is consistant, pull requests have language-specific syntax rules:
 ## Git
@@ -103,7 +103,7 @@ Specific to `sh` (but doesn't conflict with _C++_):
 - For temp variables, you affix `local` (thus not `for VALUE in ${LIST}; do`, but `local VALUE; for VALUE in ${LIST}; do`).
   - [Notice; to split (on spaces) is the purpose of the `for` loop.]
 ## _C_/_C++_ source
-Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/.clang-tidy) options).
+Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](./.clang-tidy) options).
 
 Most of what [_Mozilla Org_'s (_Firefox_'s) style](https://firefox-source-docs.mozilla.org/code-quality/coding-style/coding_style_cpp.html) suggests is sound (you should follow this unless you have specific reasons not to).
 
@@ -145,9 +145,9 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
 - [\_DEBUG is specific to MSVC, thus use NDEBUG](https://stackoverflow.com/questions/2290509/debug-vs-ndebug), [Pass `-D NDEBUG` to disable asssets + enable optimizations](https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release)
 - Do not perform tasks within `assert()`, due to: the standard says "[`#if NDEBUG\n#define assert(x) (0)\n#endif`]".
 - All userland errors should go to `throw std::exception()` _or derivatives of std::exception_, `std::cerr`, `extern int errno;`, or `return errno;`. Comments about possible errors should go above function declarations (Doxygen convention).
-  - `throw` / `std:cerr` should use the new common syntax for this: `"[WARN_LEVEL: OPTIONAL_FUNCTION_NAME {code which triggered the error/warning/diagnostic/notice} /* OPTIONAL COMMENTS */]"`, 
-  - [`./cxx/Macros.hxx`](https://github.com/SwuduSusuwu/SubStack/tree/trunk/cxx/Macros.hxx): {SUSUWU_STR(x), SUSUWU_CERR(x), SUSUWU_STDOUT(x)} have the new syntax for this.
-- [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702): 
+  - `throw` / `std:cerr` should use the new common syntax for this: `"[WARN_LEVEL: OPTIONAL_FUNCTION_NAME {code which triggered the error/warning/diagnostic/notice} /* OPTIONAL COMMENTS */]"`,
+  - [`./cxx/Macros.hxx`](./cxx/Macros.hxx): {SUSUWU_STR(x), SUSUWU_CERR(x), SUSUWU_STDOUT(x)} have the new syntax for this.
+- [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702):
 ```
 /* @throw std::bad_alloc If function uses {malloc, realloc, new[], std::*::{push_back, push_front, insert}}
  * @throw std::logic_error Optional. Would include most functions which use std::*
@@ -159,7 +159,7 @@ bool functionDeclaration(std::string input, std::deque<vector> output);
 - 
   - It is arguable whether or not you should document such possible system errors; almost all Standard Template Library functions can throw derivatives of `std::logic_error`.
   - Regex `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/` once have _Contracts_/_C++26_.
-  - cxx/Macros.cxx has `ASSUME(X)`, which is close to `[[expects: x]]`, but `ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
+  - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `ASSUME(X)`, which is close to `[[expects: x]]`, but `ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
   - Documentation of interfaces belongs to `*.hxx`; `*.cxx` is to do implementations. Do not duplicate interface comments.
   - Advantages of `[[expects]]`; allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
 
