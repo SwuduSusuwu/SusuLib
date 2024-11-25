@@ -1,7 +1,7 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassObject_cxx
 #define INCLUDES_cxx_ClassObject_cxx
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_OVERRIDE */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_PURE_VIRTUAL_DEFAULTS SUSUWU_VIRTUAL_DEFAULTS */
 #include "ClassObject.hxx" /* Class Object SUSUWU_CLASS_DEFAULTS SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS SUSUWU_VIRTUAL_DEFAULTS */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include <memory> /* std::unique_ptr std::make_unique */
@@ -135,28 +135,10 @@ static const bool objectTestsMismatch(const Object *object1, const Object *objec
 	}
 	return result;
 }
-class SubClass : public Class {
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubClass"; }
-	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubClass *>(&obj);; }
-};
-class SubClassWithMemberObject : public Class {
-	public:
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubClassWithMemberObject"; }
-	const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(*this);; }
-	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubClassWithMemberObject *>(&obj);; }
-	bool memberObject = true;
-};
-class SubObject : public Object {
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubObject"; }
-	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubObject *>(&obj);; }
-};
-class SubObjectWithMemberObject : public Object {
-	public:
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubObjectWithMemberObject"; }
-	const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(*this);; }
-	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubObjectWithMemberObject *>(&obj);; }
-	bool memberObject = true;
-};
+class SubClass : public Class { SUSUWU_CLASS_DEFAULTS(SubClass) };
+class SubClassWithMemberObject : public Class { public: SUSUWU_CLASS_DEFAULTS(SubClassWithMemberObject) bool memberObject = true; };
+class SubObject : public Object { SUSUWU_VIRTUAL_DEFAULTS(SubObject) };
+class SubObjectWithMemberObject : public Object { public: SUSUWU_VIRTUAL_DEFAULTS(SubObjectWithMemberObject) bool memberObject = true; };
 const bool classObjectTests() {
 	bool result = true;
 	const Class *newClass = new Class(),

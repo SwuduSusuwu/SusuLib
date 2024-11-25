@@ -385,6 +385,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
+namespace Susuwu {
 const bool classObjectTests();
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
 
@@ -394,7 +395,9 @@ public:
 	virtual const size_t getDynamicSize() const { return 0; /* sum({`S` for `malloc(S)`, `sizeof(S)` for `new S`}) */ }
 	virtual const size_t getObjectSize() const { return sizeof(*this); /* sum(sizeof({vptr, data members})) */ }
 	virtual const bool hasExtraVirtuals() const { /* if(has `virtual`s other than `Object`'s) { return true; }*/ return false; }
-	virtual const bool isPureVirtual() const { return false; } /* in case the compiler does not recognize such classes as "pure virtual", put `return true;` for classes which do not implement all virtuals (or which have broken implementations of virtuals) */
+#define SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL(SUBCLASS) const bool isPureVirtual() const SUSUWU_OVERRIDE { return false; }
+#define SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL_PURE_VIRTUAL(SUBCLASS) const bool isPureVirtual() const SUSUWU_OVERRIDE { return typeid(SUBCLASS) == typeid(this); }
+	virtual const bool isPureVirtual() const { return false; } /* in case the compiler does not recognize such classes as "pure virtual", use `SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL_PURE_VIRTUAL(SubClass)` for `SubClass` which does not implement all virtuals (or which has broken implementations of virtuals) */
 	virtual const bool isInitialized() const { return true; } /* override this if the constructor does not produce objects ready to use */
 	virtual const bool isPlainOldData() const { return !(usesDynamicAllocations() || usesFilesystem() || usesNetwork() || usesThreads()); } /* whether or not to allow shallow clones */
 	virtual const bool usesDynamicAllocations() const { /* if(uses functions suchas {`malloc`, `new`}) { return true; } */ return false; }
@@ -412,25 +415,55 @@ public:
 #ifndef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS /* override with `-DSUSUWU_VIRTUAL_VPTR_COMPARISON=false` to use `hasLayoutOf()` && data members comparison */
 # define SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS true /* Default: `Class::operator==` does `typeid` && data members comparison */
 #endif /* ndef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+
+#define SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR { return typeid(*this) == typeid(obj) && 0 == memcmp(reinterpret_cast<const void *>(this), reinterpret_cast<const void *>(&obj), this->getObjectSize()); } /* cast silences "warning: first operand of this 'memcmp' call is a pointer to dynamic class 'Object'; vtable pointer will be compared [-Wdynamic-class-memaccess]" */
+#define SUSUWU_VIRTUAL_OPERATOREQUALTO_WITHOUT_VPTR { return (this->hasLayoutOf(obj) && 0 == memcmp(reinterpret_cast<const char *>(this) + SUSUWU_VPTR_OFFSET, reinterpret_cast<const char *>(&obj) + SUSUWU_VPTR_OFFSET, this->getObjectSize() - SUSUWU_VPTR_SZ)); } /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+
+#ifdef SUSUWU_CXX20
+#	define SUSUWU_VIRTUAL_OPERATOREQUALTO_DEFAULT SUSUWU_DEFAULT
+#else /* !C++20 */
+#	define SUSUWU_VIRTUAL_OPERATOREQUALTO_DEFAULT SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR
+#endif /* !C++20 */
+#define SUSUWU_SUBCLASS_OPERATOREQUALTO(SUBCLASS) bool operator==(const SUBCLASS &obj) const SUSUWU_VIRTUAL_OPERATOREQUALTO_DEFAULT /* Usage: `SUSUWU_SUBCLASS_OPERATOREQUALTO(SubClass);`, for all `SubClass : public Class` or `SubClass : public Object` which do not have their own `operator==(const SubClass &)` */
+
+#define SUSUWU_VIRTUAL_ virtual /* Is used to mark base class functions `virtual`. */
+#define SUSUWU_CLASS_OVERRIDE /* For base class functions is no-op. */
+#if SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS
+#	define SUSUWU_CLASS_OPERATOREQUALTO(SUBCLASS) SUSUWU_VIRTUAL_ bool operator==(const Class &obj) const SUSUWU_CLASS_OVERRIDE SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR
+#else /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+#	define SUSUWU_CLASS_OPERATOREQUALTO(SUBCLASS) SUSUWU_VIRTUAL_ bool operator==(const Class &obj) const SUSUWU_CLASS_OVERRIDE SUSUWU_VIRTUAL_OPERATOREQUALTO_WITHOUT_VPTR
+#endif /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+#define SUSUWU_CLASS_GETNAME(SUBCLASS) SUSUWU_VIRTUAL_ const std::string /* returns as value so subclasses can return dynamic values */ getName() const SUSUWU_CLASS_OVERRIDE { return #SUBCLASS; }
+#define SUSUWU_CLASS_GETOBJECTSIZE(SUBCLASS) SUSUWU_VIRTUAL_ const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(SUBCLASS); } /* Run-time type information */
+#define SUSUWU_CLASS_ISINSTANCE(SUBCLASS) SUSUWU_VIRTUAL_ const bool isInstance(const Class &obj) const SUSUWU_CLASS_OVERRIDE { return dynamic_cast<const SUBCLASS *>(&obj); } /* port of Java's */
+#define SUSUWU_CLASS_DEFAULTS(SUBCLASS) /* Usage: `class SubClass : public Class { SUSUWU_CLASS_DEFAULTS(SubClass) };` */ \
+	SUSUWU_CLASS_GETNAME(SUBCLASS) \
+	SUSUWU_CLASS_GETOBJECTSIZE(SUBCLASS)\
+	SUSUWU_CLASS_OPERATOREQUALTO(SUBCLASS) /* If you don't want it to override `operator==(const Class &)` for you; do `#define SUSUWU_CLASS_OPERATOREQUALTO(noop) ;` */\
+	SUSUWU_CLASS_ISINSTANCE(SUBCLASS)
 typedef class Class : public Instrumentation { /* Port of `java.lang.Class`. */ /* NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions): suppress `clang-tidy`'s suggestions of constructors. */
 public:
 	~Class() SUSUWU_OVERRIDE SUSUWU_DEFAULT /* allows subclasses to release resources */
-	virtual const std::string getName() const { return "Susuwu::Class"; } /* returns as value so subclasses can return dynamic values */
+	SUSUWU_CLASS_DEFAULTS(Susuwu::Class)
 	virtual const Class *getSuperclass() const { return SUSUWU_NULLPTR; /* no base for root class */ }
 	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass(); return SUSUWU_NULLPTR != superclass ? *superclass : *this; /* for promises not to `return nullptr`, use references */ }
 	SUSUWU_INLINE const bool hasLayoutOf(const Class &obj) const { return this->isRelatedTo(obj) && this->getObjectSize() == obj.getObjectSize(); }
 	SUSUWU_INLINE const bool isAssignableFrom(const Class &obj) const { return this->isInstance(obj); } /* TODO: template to test types without obj */
-	virtual const bool isInstance(const Class &obj) const { return SUSUWU_NULLPTR != dynamic_cast<const Class *>(&obj); } /* port of Java's */ /* NOLINT(readability-redundant-casting) */
 	SUSUWU_INLINE const bool isRelatedTo(const Class &obj) const { return (this->isInstance(obj) || obj.isInstance(*this)); }
-#ifdef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS
-	virtual /* const requires C++26 */ bool operator==(const Class &obj) const { return (sizeof(*this) == sizeof(obj) && 0 == memcmp(reinterpret_cast<const void *>(this), reinterpret_cast<const void *>(&obj), sizeof(*this))); } /* warning: first operand of this 'memcmp' call is a pointer to dynamic class 'Object'; vtable pointer will be compared [-Wdynamic-class-memaccess] */
-#else /* !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
-	virtual /* const requires C++26 */ bool operator==(const Class &obj) const { return this->hasLayoutOf(obj && 0 == memcmp(&reinterpret_cast<const char *>(this)[SUSUWU_VPTR_OFFSET], &reinterpret_cast<const char *>(&obj)[SUSUWU_VPTR_OFFSET], sizeof(*this) - SUSUWU_VPTR_SZ)); }
-#endif /* !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
 	virtual bool operator!=(const Class &obj) const SUSUWU_FINAL { return !this->operator==(obj); } /* do not override this, but `operator==(const Class &)` */
 } Class;
 SUSUWU_INLINE const bool instanceof(const Class &obj, const Class &thiso) { return thiso.isInstance(obj); } /* Just as Java's `instanceof`, has operands reversed compared to `isInstance`. */
+#undef SUSUWU_CLASS_OVERRIDE                  /*     Was no-op for base functions, ... */
+#define SUSUWU_CLASS_OVERRIDE SUSUWU_OVERRIDE /* ... but is `override` for subclasses. */
 
+#define SUSUWU_OBJECT_OVERRIDE /* For base class functions is no-op. */
+#define SUSUWU_VIRTUAL_DEFAULTS(SUBCLASS) /* Usage: `class SubClass : public Object { SUSUWU_VIRTUAL_DEFAULTS(SubClass) };` */ \
+	SUSUWU_CLASS_DEFAULTS(SUBCLASS) /* If you don't want it to override `operator==(const Class &)` for you; do `#define SUSUWU_CLASS_OPERATOREQUALTO(Q) ;` */\
+	SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL(SUBCLASS)
+
+#define SUSUWU_PURE_VIRTUAL_DEFAULTS(SUBCLASS) /* Usage: `class PureVirtualSubClass : public Object { SUSUWU_PURE_VIRTUAL_DEFAULTS(PureVirtualSubClass) };` */ \
+	SUSUWU_CLASS_DEFAULTS(SUBCLASS) \
+	SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL_PURE_VIRTUAL(SUBCLASS)
 typedef enum ObjectCloneAs : unsigned char { /* Is extra (not part of Java); accomodates the numerous types of C++ clones. */
 	objectCloneAsNone           = 0, /* `!isCloneabble()` */
 	objectCloneAsDeep           = 1, /* Recursive `new` */
@@ -440,6 +473,7 @@ typedef enum ObjectCloneAs : unsigned char { /* Is extra (not part of Java); acc
 } ObjectCloneAs;
 typedef class Object : public Class { /* Port of `java.lang.Object`. */
 public:
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::Object) /* use `SUSUWU_PURE_VIRTUAL_DEFAULTS(SubClass)` if `SubClass` is pure virtual */
 	virtual const bool isCloneable() const { return objectCloneAsNone != cloneableAs(); }
 	virtual const ObjectCloneAs cloneableAs() const { /* returns preferred/default clone mode */
 		return isPlainOldData() ? objectCloneAsShallow : objectCloneAsNone; /* crude heuristic, override for complex classes */
@@ -473,14 +507,16 @@ public:
 		this->~Object();
 	}
 	const Class &getClass() const { return *this; }
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::Object"; }
-	virtual const long /* `int` gives `error: cast from pointer to smaller type 'int' loses information` */ hashCode() const { return reinterpret_cast<long>(this); }
-	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const Object *>(&obj); } /* port of Java's */
+	virtual const long /* `int` gives `error: cast from pointer to smaller type 'int' loses information` */ hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
 	virtual void notify() {}
 	virtual void notifyAll() {}
 	virtual void wait() {}
 } Object;
+#undef SUSUWU_VIRTUAL_  /* Was used to mark base functions `virtual` ... */
+#define SUSUWU_VIRTUAL_ /*            ... , but is no-op for subclasses. */
+#undef SUSUWU_OBJECT_OVERRIDE                  /*     Was no-op for base functions, ... */
+#define SUSUWU_OBJECT_OVERRIDE SUSUWU_OVERRIDE /* ... but is `override` for subclasses. */
 
 /* Is some slowdown to use inheritance+polymorphism with all classes;
  * https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754 shows howto use `final` (requires C++11) to fix this. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
