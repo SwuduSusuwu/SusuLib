@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassPortableExecutable_hxx
 #define INCLUDES_cxx_ClassPortableExecutable_hxx
-#include "ClassObject.hxx" /* Object */
+#include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS */
 #include "Macros.hxx" /* SUSUWU_OVERRIDE */
 #include <fstream> /* std::ifstream */
 #include <iterator> /* std::istreambuf_iterator */
@@ -17,7 +17,7 @@ typedef FilePath FileHash; /* TODO: `std::unordered_set<std::basic_string<unsign
 typedef class PortableExecutable : public Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
 public:
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::PortableExecutable"; }
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutable) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	explicit PortableExecutable(FilePath path_ = "") : path(std::move(path_)) {}
 	PortableExecutable(FilePath path_, FileBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
 /*TODO: overload on typedefs which map to the same types:	PortableExecutable(const FilePath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
@@ -29,7 +29,7 @@ public:
 } PortableExecutable;
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::PortableExecutableBytecode"; }
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutableBytecode) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 }; /* namespace Susuwu */

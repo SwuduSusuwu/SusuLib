@@ -534,7 +534,7 @@ typedef FilePath FileHash; /* TODO: `std::unordered_set<std::basic_string<unsign
 typedef class PortableExecutable : public Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
 public:
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::PortableExecutable"; }
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutable) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	explicit PortableExecutable(FilePath path_ = "") : path(std::move(path_)) {}
 	PortableExecutable(FilePath path_, FileBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
 /*TODO: overload on typedefs which map to the same types:	PortableExecutable(const FilePath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
@@ -544,7 +544,7 @@ public:
 } PortableExecutable;
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::PortableExecutableBytecode"; }
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutableBytecode) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 ```
@@ -945,7 +945,7 @@ typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecod
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
 typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::ResultList"; }
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;
@@ -1162,8 +1162,7 @@ public:
 	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
 	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
 	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::Cns"; }
-	const bool isPureVirtual() const SUSUWU_OVERRIDE { return typeid(Cns) == typeid(this); }
+	SUSUWU_PURE_VIRTUAL_DEFAULTS(Susuwu::Cns) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; }
 	virtual void setInitialized(const bool is) { initialized = is; }
 	virtual void setInputMode(CnsMode x) { inputMode = x; }

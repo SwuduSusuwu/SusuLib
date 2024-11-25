@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
-#include "ClassObject.hxx" /* Object */
+#include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "Macros.hxx" /* SUSUWU_CXX17 SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
 #include <cassert> /* assert */
 #include <cstddef> /* size_t */
@@ -30,8 +30,7 @@ public:
 	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
 	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
 	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::Cns"; }
-	const bool isPureVirtual() const SUSUWU_OVERRIDE { return typeid(Cns) == typeid(this); }
+	SUSUWU_PURE_VIRTUAL_DEFAULTS(Susuwu::Cns) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; }
 	virtual void setInitialized(const bool is) { initialized = is; }
 	virtual void setInputMode(CnsMode x) { inputMode = x; }

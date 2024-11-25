@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx
-#include "ClassObject.hxx" /* Object */
+#include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode FileHash */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHexOs */
@@ -22,7 +22,7 @@ typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecod
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
 typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
-	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::ResultList"; }
+	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 /* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
