@@ -1,0 +1,182 @@
+/* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
+#ifndef INCLUDES_cxx_ClassObject_cxx
+#define INCLUDES_cxx_ClassObject_cxx
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_OVERRIDE */
+#include "ClassObject.hxx" /* Class Object SUSUWU_CLASS_DEFAULTS SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS SUSUWU_VIRTUAL_DEFAULTS */
+#include "ClassSys.hxx" /* templateCatchAll */
+//#include <memory> /* std::unique_ptr std::make_unique */
+#include <cstddef> /* size_t */
+//#include <stdexcept> /* std::runtime_error */
+#include <string> /* std::string */
+namespace Susuwu {
+const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classObjectTests, "classObjectTests()"); }
+static const bool classIsValid(const Class *clas) {
+	bool result = true;
+	if(!clas->isInstance(*clas)) {
+		SUSUWU_ERROR("classIsValid() { if(!clas->isInstance(*clas)) { /* `" + clas->getName() + "::isInstance` false negative. */ } }");
+		result = false;
+	}
+	if(clas->isPureVirtual()) {
+		SUSUWU_ERROR("classIsValid() { if(clas->isPureVirtual()) { /* `" + clas->getName() + "::isPureVirtual` false positive. */ } }");
+		result = false;
+	}
+	if(!clas->isInitialized()) {
+		SUSUWU_ERROR("classIsValid() { if(!clas->isInitialized()) { /* `" + clas->getName() + "::isInitialized` false negative. */ } }");
+		result = false;
+	}
+	return result;
+}
+static const bool classTestsCommutative(const Class *class1, const Class *class2) { /* TODO: call this "Symmetric"? */
+	bool result = classIsValid(class1) && classIsValid(class2);
+	if(class1->operator!=(*class2) != class2->operator!=(*class1)) {
+		SUSUWU_ERROR("classTestsCommutative() { if(class1->operator!=(*class2) != class2->operator!=(*class1)) { /* `" + class1->getName() + "::operator!=` not commutative to `" + class2->getName() + "::operator!=`. */ } }");
+		result = false;
+	}
+	if(class1->operator==(*class2) != class2->operator==(*class1)) {
+		SUSUWU_ERROR("classTestsCommutative() { if(class1->operator==(*class2) != class2->operator==(*class1)) { /* `" + class1->getName() + "::operator==` not commutative to `" + class2->getName() + "::operator==`. */ } }");
+		result = false;
+	}
+	if(class1->operator==(*class2) == class1->operator!=(*class2)) {
+		SUSUWU_ERROR("classTestsCommutative() { if(class1->operator==(*class2/*" + class2->getName() + "*/ == class1->operator!=(*class2)) { /* `" + class1->getName() + "::operator==` not anticommuttative to `" + class1->getName() + "::operator!=`. */ } }");
+		result = false;
+	}
+	if(class1->isRelatedTo(*class2) != class2->isRelatedTo(*class1)) {
+		SUSUWU_ERROR("classTestsCommutative() { if(class1->isRelatedTo(*class2) != class2->isRelatedTo(*class1)) { /* `" + class1->getName() + "::isRelatedTo` not commutative to `" + class2->getName() + "::isRelatedTo`. */ } }");
+		result = false;
+	}
+	if(instanceof(*class2, *class1) != class1->isInstance(*class2)) {
+		SUSUWU_ERROR("classTestsCommutative() { if(instanceof(*class2, *class1) != class1->isInstance(*class2))) { /* `instanceof` has logic error. */ } }");
+		result = false;
+	}
+	if(class1->isRelatedTo(*class2) != (class1->isInstance(*class2) || class2->isInstance(*class1))) {
+		SUSUWU_ERROR("classTestsCommutative() { if(class1->isRelatedTo(*class2) != (class1->isInstance(*class2) || class2->isInstance(*class1))) { /* `" + class1->getName() + "::isRelatedTo` has logic error. */ } }");
+		result = false;
+	}
+	return result;
+}
+static const bool classTestsMatch(const Class *class1, const Class *class2) {
+	bool result = classTestsCommutative(class1, class2);
+	if(class1->operator!=(*class2)) {
+		SUSUWU_ERROR("classTestsMatch() { if(class1->operator!=(*class2 /*" + class2->getName() + "*/)) { /* `" + class1->getName() + "::operator!=` false negative. */ } }");
+		result = false;
+	}
+	if(!class1->isRelatedTo(*class2)) {
+		SUSUWU_ERROR("classTestsMatch() { if(!class1->isRelatedTo(*class2)) { /* `" + class1->getName() + "::isRelatedTo` false negative. */ } }");
+		result = false;
+	}
+	if(class1->getObjectSize() != class2->getObjectSize()) {
+		SUSUWU_ERROR("classTestsMatch() { if(class1->getObjectSize() != class2->getObjectSize())) { /* `" + class1->getName() + "::getObjectSize()` not commutative to `" + class2->getName() + "::getObjectSize()`. */ } }");
+		result = false;
+	}
+	return result;
+}
+static const bool classTestsMismatch(const Class *class1, const Class *class2) {
+	bool result = classTestsCommutative(class1, class2);
+	if(class1->operator==(*class2)) {
+		SUSUWU_ERROR("classTestsMismatch() { if(class1->operator==(*class2 /*" + class2->getName() + "*/)) { /* `" + class1->getName() + "::operator==` false positive. */ } }");
+		result = false;
+	}
+#if !SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match" for `operator==`. */
+	if(class1->getName() == class2->getName()) {
+		SUSUWU_ERROR(std::string("classTestsMismatch() { if(class1->getName() == class2->getName()) { /* `") + typeid(class1).name() + "::getName() == \"" + class1->getName() + "\"`, but also `" + typeid(class2).name() + "::getName() == \"" + class2->getName() + "\"` */ } }");
+		result = false;
+	}
+	if(class1->isInstance(*class2) && class2->isInstance(*class1)) {
+		SUSUWU_ERROR("classTestsMismatch() { if(class1->isInstance(*class2) && class2->isInstance(*class1)) { /* `" + class1->getName() + "::isInstance` false positive, or `" + class2->getName() + "::isInstance` false positive. */ } }");
+		result = false;
+	}
+#endif /* SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES */
+	return result;
+}
+class SubClass : public Class {
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubClass"; }
+	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubClass *>(&obj);; }
+};
+class SubClassWithMemberObject : public Class {
+	public:
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubClassWithMemberObject"; }
+	const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(*this);; }
+	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubClassWithMemberObject *>(&obj);; }
+	bool memberObject = true;
+};
+class SubObject : public Object {
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubObject"; }
+	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubObject *>(&obj);; }
+};
+class SubObjectWithMemberObject : public Object {
+	public:
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubObjectWithMemberObject"; }
+	const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(*this);; }
+	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubObjectWithMemberObject *>(&obj);; }
+	bool memberObject = true;
+};
+const bool classObjectTests() {
+	bool result = true;
+	const Class *newClass = new Class(),
+	*newObject = new Object(),
+	*newSubClass = new SubClass(),
+	*newSubObject = new SubObject(),
+	*newSubClassWithMemberObject = new SubClassWithMemberObject(),
+	*newSubObjectWithMemberObject = new SubObjectWithMemberObject();
+	const Class class2 = Class();
+	const Object object2 = Object();
+
+	result &=	classTestsMatch(newClass, newClass) /* reflexive */;
+	result &=	classTestsMatch(newSubClass, newSubClass) /* reflexive */;
+	result &=	classTestsMatch(newSubClassWithMemberObject, newSubClassWithMemberObject) /* reflexive */;
+	result &=	classTestsMatch(newObject, newObject) /* reflexive */;
+	result &=	classTestsMatch(newSubObject, newSubObject) /* reflexive */;
+	result &=	classTestsMatch(newSubObjectWithMemberObject, newSubObjectWithMemberObject) /* reflexive */;
+	result &=	classTestsMismatch(newClass, newSubObjectWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newClass, newSubClassWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newSubClass, newSubObjectWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newSubClass, newSubClassWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newObject, newSubClassWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newObject, newSubObjectWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newSubObject, newSubClassWithMemberObject) /* `getObjectSize()` mismatch */;
+	result &=	classTestsMismatch(newSubObject, newSubObjectWithMemberObject) /* `getObjectSize()` mismatch */;
+#if SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match" for `operator==`. */
+	SUSUWU_PRAGMA(message("TODO: `SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES`. [Ask if you want this](https://github.com/SwuduSusuwu/SubStack/issues/10 if you want this.)"))
+	result &=	classTestsMismatch(newClass, &class2);
+	result &=	classTestsMismatch(newObject, &object2);
+#else /* SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES else */
+	result &=	classTestsMatch(newClass, &class2) /* reflexive */;
+	result &=	classTestsMatch(newObject, &object2) /* reflexive */;
+#endif /* SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES else */
+#if SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS /* If you interpret `Java`'s standard as "`typeid` must match". */
+	result &=	classTestsMismatch(newClass, newSubClass);
+	result &=	classTestsMismatch(newClass, newObject);
+	result &=	classTestsMismatch(newClass, newSubObject);
+	result &=	classTestsMismatch(newClass, &object2);
+	result &=	classTestsMismatch(newObject, newSubObject);
+	result &=	classTestsMismatch(newObject, &class2);
+#else /* SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS else */
+	SUSUWU_PRAGMA(message("Warning: `-DSUSUWU_VIRTUAL_OPERATORS_USE_VPTRS=false` is experimental"))
+	result &=	classTestsMatch(newClass, newSubClass) /* transitive */;
+	result &=	classTestsMatch(newClass, newObject) /* transitive */;
+	result &=	classTestsMatch(newClass, newSubObject) /* transitive */;
+	result &=	classTestsMatch(newClass, &object2) /* transitive */;
+	result &=	classTestsMatch(newObject, &class2) /* transitive */;
+	result &=	classTestsMatch(newObject, newSubObject) /* transitive */;
+#endif /* SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS else */
+	if(newClass->getName() != class2.getName()) {
+		SUSUWU_ERROR("classObjectTests() { if(newClass->getName() != class2.getName()) { /* `Class::getName()` virtual error */ } }");
+		result = false;
+	}
+	if(newObject->getName() != object2.getName()) {
+		SUSUWU_ERROR("classObjectTests() { if(newObject->getName() != object2.getName()) { /* `Object::getName()` virtual error */ } }");
+		result = false;
+	}
+
+	delete newSubObjectWithMemberObject;
+	delete newSubClassWithMemberObject;
+	delete newSubObject;
+	delete newSubClass;
+	delete newObject;
+	delete newClass;
+	return result;
+}
+
+}; /* namespace Susuwu */
+#endif /* ndef INCLUDES_cxx_ClassObject_cxx */
+

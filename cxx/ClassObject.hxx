@@ -14,6 +14,9 @@
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
 namespace Susuwu {
+const bool classObjectTests();
+const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
+
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
 	virtual ~Instrumentation() SUSUWU_DEFAULT /* allows subclasses to release resources */

@@ -385,7 +385,9 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
-namespace Susuwu {
+const bool classObjectTests();
+const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
+
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
 	virtual ~Instrumentation() SUSUWU_DEFAULT /* allows subclasses to release resources */
@@ -484,6 +486,8 @@ public:
  * https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754 shows howto use `final` (requires C++11) to fix this. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
 }; /* namespace Susuwu */
 ```
+`less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
+
 `less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```
 typedef std::string FilePath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
@@ -1794,13 +1798,14 @@ extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , s
 /* `clang-tidy` on: NOLINTBEGIN(hicpp-signed-bitwise) */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
 /* bits in order which tests execute (not ordered included, but order used) */
-static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*  1: `Macros.hxx`:`macrosTestsNoexcept()` */
-static const int susuwuUnitTestsConsoleBit         = 1 << 1; /*  2: `classSys.hxx`:`classSysSetConsoleInput()` */
-static const int susuwuUnitTestsClassSysBit        = 1 << 2; /*  4: `ClassSys.hxx`:`classSysTestsNoexcept()` */
-static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
-static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
-static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
-static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
+static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*   1: `Macros.hxx`:`macrosTestsNoexcept()` */
+static const int susuwuUnitTestsClassObjectBit     = 1 << 1; /*   2: `ClassObjects.hxx`:`classObjectsTestsNoexcept()` */
+static const int susuwuUnitTestsConsoleBit         = 1 << 2; /*   4: `ClassSys.hxx`:`classSysSetConsoleInput()` */
+static const int susuwuUnitTestsClassSysBit        = 1 << 3; /*   8: `ClassSys.hxx`:`classSysTestsNoexcept()` */
+static const int susuwuUnitTestsClassSha2Bit       = 1 << 4; /*  16: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
+static const int susuwuUnitTestsClassResultListBit = 1 << 5; /*  32: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
+static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 6; /*  64: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
+static const int susuwuUnitTestsAssistantCnsBit    = 1 << 7; /* 128: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 SusuwuUnitTestsBitmask main(int argc, const char **args);
@@ -1812,7 +1817,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
 ```
 namespace Susuwu {
-static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
+static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classObjectTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
 #ifdef SUSUWU_CXX17
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
@@ -1835,6 +1840,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	} else {
 		std::cout << "error#" << std::to_string(macrosTestsErrno) << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsMacrosBit;
+	}
+	std::cout << "classObjectTestsNoexcept(): " << std::flush;
+	if(true == classObjectTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassObjectBit;
 	}
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
 	if(true != classSysTestsNoexcept()) {
