@@ -84,6 +84,17 @@ SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCE
 	echo "${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 }
 
+SUSUWU_SCAN_GIT() { #/* Usage: `SUSUWU_SCAN_GIT` */
+	if command -v git > /dev/null && git rev-parse --is-inside-work-tree; then #test -d ".git/"; then
+		local GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+		if [ "experimental" = "${GIT_BRANCH}" -o "HEAD" = "${GIT_BRANCH}" ]; then
+			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${GIT_BRANCH}\" (which is unstable & sets \`-DSUSUWU_EXPERIMENTAL\`); for production use, execute \`git switch trunk\`."
+			FLAGS_USER="${FLAGS_USER} -DSUSUWU_EXPERIMENTAL"
+		else
+			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${GIT_BRANCH}\"."
+		fi
+	fi
+}
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
 	if [ "--mingw" = "${1}" -o "--mingw" = "${2}" ]; then
@@ -156,8 +167,8 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 }
 SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
 	LDFLAGS="${LDFLAGS}"
-	CXXFLAGS="${CXXFLAGS} ${FLAGS_SPECIAL} ${FLAGS_ANALYSIS}"
-	CFLAGS="${CFLAGS} ${FLAGS_SPECIAL} ${FLAGS_ANALYSIS}"
+	CXXFLAGS="${CXXFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
+	CFLAGS="${CFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
 	C_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
 	CXX_SOURCE_PATH=$(SUSUWU_DIR_SUFFIX_SLASH "${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
 	OBJECTLIST=""

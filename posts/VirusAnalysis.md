@@ -29,6 +29,12 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
 
+#ifdef SUSUWU_EXPERIMENTAL
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch trunk && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
+#else /* def SUSUWU_EXPERIMENTAL else */
+#	define SUSUWU_EXPERIMENTAL_ISSUES ""
+#endif /* def SUSUWU_EXPERIMENTAL else */
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
@@ -266,7 +272,11 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #else
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
 #endif
-#define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
+#ifdef SUSUWU_EXPERIMENTAL
+#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
+#else /* SUSUWU_EXPERIMENTAL else */
+#	define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
+#endif /* SUSUWU_EXPERIMENTAL else */
 #define SUSUWU_WARNING(x) SUSUWU_PRINT(WARNING, x)
 #define SUSUWU_INFO(x) SUSUWU_PRINT(INFO, x)
 #define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
@@ -1351,7 +1361,6 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
-/* `clang-tidy` suppress: NOLINTBEGIN(readability-implicit-bool-conversion) */
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
@@ -1422,7 +1431,6 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 	}
 	return virusAnalysisGetHook();
 }
-/* `clang-tidy` on: NOLINTEND(readability-implicit-bool-conversion) */
 
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
 	const auto fileHash = classSha2(file.bytecode);
@@ -1656,6 +1664,7 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 #ifdef __cplusplus
 extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , such that other languages can execute unit tests */
 #endif /* def __cplusplus */
+/* `clang-tidy` on: NOLINTBEGIN(hicpp-signed-bitwise) */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
 /* bits in order which tests execute (not ordered included, but order used) */
 static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*  1: `Macros.hxx`:`macrosTestsNoexcept()` */
@@ -1665,12 +1674,14 @@ static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.h
 static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
+/* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 SusuwuUnitTestsBitmask main(int argc, const char **args);
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif /* def __cplusplus */
 #endif /* ndef INCLUDES_cxx_main_hxx */
+
 ```
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
 ```
@@ -1744,6 +1755,9 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 	if(true != Susuwu::classSysInit(argc, args)) {
 		return susuwuUnitTestsClassSysBit;
 	}
+#ifdef SUSUWU_EXPERIMENTAL
+	SUSUWU_WARNING('`' + std::string(Susuwu::classSysGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
+#endif
 	return Susuwu::unitTestsCxx();
 }
 ```

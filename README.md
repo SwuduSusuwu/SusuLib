@@ -34,7 +34,7 @@ Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/tru
   - `./build.sh --debug` : includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with `-Og`.
   - `./build.sh --release` : excludes `--debug` (`-DNDEBUG`), strips frame-pointers/symbols, optimizes with `-O2`.
   - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_.
-- Special flags (use `vim build.sh` to put into `CXXFLAGS_SPECIAL`); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
+- Environment flags (use `vim build.sh` to put into `FLAGS_USER`); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `!defined(__cplusplus)`.
     - `-DSUSUWU_SH_VERBOSE` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `!defined(NDEBUG)`.
@@ -44,13 +44,15 @@ Usage: [`./build.sh [OPTIONS]`](https://github.com/SwuduSusuwu/SubStack/blob/tru
     - `-DSUSUWU_SH_FUNC = true` sets output format to `[__func__: WARN_LEVEL: message]`; default is `false`.
     - `-DSUSUWU_SH_SKIP_COLORS = true` to omit _VT100_ (_ANSI_) colors; default is `defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
     - `-DSUSUWU_SH_SKIP_COLORS = false` to force (even if unsupported) _VT100_ (_ANSI_) color use.
-    - Flags which https://github.com/SwuduSusuwu/SubStack/issues/17 will introduce (TODO):
+    - TODO (for now, no effect; once [issue #17](https://github.com/SwuduSusuwu/SubStack/issues/17) is closed, you can use):
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`/`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS = true, -DSUSUWU_SH_FILE = true, -DSUSUWU_SH_LINE = true, -DSUSUWU_SH_FUNC = false, -DSUSUWU_SKIP_COLORS = false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
-  - TODO:
+  - Unstable/`experimental` flags:
+    - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
+  - TODO (for now won't build, or has no effect):
     - `-DSUSUWU_PREFER_CSTR` to replace `std::string` with `char *` (more compatible with non-C++ projects); default is `false`.
-    - `-DSUSUWU_PREFER_C` sets `SUSUWU_PREFER_CSTR`+ `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `false`.
+    - `-DSUSUWU_PREFER_C` sets `SUSUWU_PREFER_CSTR` + `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `false`.
 
 # Contributor conventions/rules
 Linter: `clang-tidy cxx/*.cxx` /* uses [`.clang-tidy`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/.clang-tidy) options */ 

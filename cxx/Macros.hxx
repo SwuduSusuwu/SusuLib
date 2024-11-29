@@ -22,6 +22,12 @@
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
 
+#ifdef SUSUWU_EXPERIMENTAL
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch trunk && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
+#else /* def SUSUWU_EXPERIMENTAL else */
+#	define SUSUWU_EXPERIMENTAL_ISSUES ""
+#endif /* def SUSUWU_EXPERIMENTAL else */
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
@@ -304,7 +310,11 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #else
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
 #endif
-#define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
+#ifdef SUSUWU_EXPERIMENTAL
+#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
+#else /* SUSUWU_EXPERIMENTAL else */
+#	define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
+#endif /* SUSUWU_EXPERIMENTAL else */
 #define SUSUWU_WARNING(x) SUSUWU_PRINT(WARNING, x)
 #define SUSUWU_INFO(x) SUSUWU_PRINT(INFO, x)
 #define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)

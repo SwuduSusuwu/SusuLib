@@ -5,8 +5,8 @@
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_NOEXCEPT */
+#include "ClassSys.hxx" /* classSysGetOwnPath classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_WARNING */
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #include <iostream> /* std::cout std::flush std::endl */
 #include <string> /* std::to_string */
@@ -84,6 +84,9 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 	if(true != Susuwu::classSysInit(argc, args)) {
 		return susuwuUnitTestsClassSysBit;
 	}
+#ifdef SUSUWU_EXPERIMENTAL
+	SUSUWU_WARNING('`' + std::string(Susuwu::classSysGetOwnPath()) + "`" SUSUWU_EXPERIMENTAL_ISSUES);
+#endif
 	return Susuwu::unitTestsCxx();
 }
 /* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
