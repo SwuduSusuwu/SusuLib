@@ -88,6 +88,53 @@ static const bool classTestsMismatch(const Class *class1, const Class *class2) {
 #endif /* SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES */
 	return result;
 }
+static const bool objectIsValid(const Object *obj) {
+	bool result = classIsValid(obj);
+	class Object *objectClone = obj->clone();
+	result &=	classTestsMatch(objectClone, obj) /* reflexive */;
+	delete objectClone;
+	return result;
+}
+static const bool objectTestsCommutative(const Object *object1, const Object *object2) {
+	bool result = objectIsValid(object1) && objectIsValid(object2); //classTestsCommutative(object1, object2); /* redundant, due to `result = classTestsM*`. */
+	if(object1->equals(*object2) != object2->equals(*object1)) {
+		SUSUWU_ERROR("objectTestsCommutative() { if(object1->equals(*object2) != object2->equals(*object1)) { /* `" + object1->getName() + "::equals()` is not commutative to `" + object2->getName() + "::equals()`. */ } }");
+		result = false;
+	}
+	if((object1->hashCode() == object2->hashCode()) != (object1->toString() == object2->toString())) {
+		SUSUWU_ERROR("objectTestsCommutative() { if((object1->hashCode() == object2->hashCode()) != (object1->toString() == object2->toString())) { /* Impossible with default `hashCode()` (which is address comparison) */ } }");
+		result = false;
+	}
+	return result;
+}
+static const bool objectTestsMatch(const Object *object1, const Object *object2) {
+	bool result = objectTestsCommutative(object1, object2);
+	result &= classTestsMatch(object1, object2);
+	if(!object1->equals(*object2)) {
+		SUSUWU_ERROR("objectTestsMatch() { if(!object1->equals(*object2 /*" + object2->getName() + "*/)) { /* `" + object1->getName() + "::equals` false negative. */ } }");
+		result = false;
+	}
+	return result;
+}
+static const bool objectTestsMismatch(const Object *object1, const Object *object2) {
+	bool result = objectTestsCommutative(object1, object2);
+#if !SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* Interprets `Java`'s standard as "Addresses must match" for `equals`. */
+	result &= classTestsMismatch(object1, object2);
+#endif /* SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES else */
+	if(object1->equals(*object2)) {
+		SUSUWU_ERROR("objectTestsMismatch() { if(object1->equals(*object2 /*" + object2->getName() + "*/)) { /* `" + object1->getName() + "::equals` false positive. */ } }");
+		result = false;
+	}
+	if(object1->hashCode() == object2->hashCode()) {
+		SUSUWU_ERROR("objectTestsMismatch() { if(object1->hashCode() == object2->hashCode()) { /* `" + object1->getName() + "::hashCode()` not unique. */ } }");
+		result = false;
+	}
+	if(object1->toString() == object2->toString()) {
+		SUSUWU_ERROR("objectTestsMismatch() { if(object1->toString() == object2->toString()) { /* `" + object1->getName() + "::toString()` not unique. */ } }");
+		result = false;
+	}
+	return result;
+}
 class SubClass : public Class {
 	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::SubClass"; }
 	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const SubClass *>(&obj);; }
@@ -113,10 +160,10 @@ class SubObjectWithMemberObject : public Object {
 const bool classObjectTests() {
 	bool result = true;
 	const Class *newClass = new Class(),
-	*newObject = new Object(),
 	*newSubClass = new SubClass(),
+	*newSubClassWithMemberObject = new SubClassWithMemberObject();
+	const Object *newObject = new Object(),
 	*newSubObject = new SubObject(),
-	*newSubClassWithMemberObject = new SubClassWithMemberObject(),
 	*newSubObjectWithMemberObject = new SubObjectWithMemberObject();
 	const Class class2 = Class();
 	const Object object2 = Object();
@@ -159,6 +206,14 @@ const bool classObjectTests() {
 	result &=	classTestsMatch(newObject, &class2) /* transitive */;
 	result &=	classTestsMatch(newObject, newSubObject) /* transitive */;
 #endif /* SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS else */
+#if SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* Interprets `Java`'s standard as "Addresses must match" for `equals`. */
+	result &=	objectTestsMismatch(newObject, &object2);
+#else /* SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES else */
+	SUSUWU_PRAGMA(message("Notice: used `-DSUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES=false`."))
+	result &=	objectTestsMatch(newObject, &object2) /* reflexive */;
+#endif /* SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES else */
+	result &=	objectTestsMatch(newObject, newObject);
+	result &=	objectTestsMismatch(newObject, newSubObjectWithMemberObject);
 	if(newClass->getName() != class2.getName()) {
 		SUSUWU_ERROR("classObjectTests() { if(newClass->getName() != class2.getName()) { /* `Class::getName()` virtual error */ } }");
 		result = false;
