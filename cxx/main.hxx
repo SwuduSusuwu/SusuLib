@@ -14,7 +14,7 @@ static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.h
 static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
-/* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise) */
+/* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 SusuwuUnitTestsBitmask main(int argc, const char **args);
 #ifdef __cplusplus

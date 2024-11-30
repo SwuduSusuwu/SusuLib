@@ -85,7 +85,7 @@ SUSUWU_PRINT() { #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCE
 }
 
 SUSUWU_SCAN_GIT() { #/* Usage: `SUSUWU_SCAN_GIT` */
-	if command -v git > /dev/null && git rev-parse --is-inside-work-tree; then #test -d ".git/"; then
+	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
 		local GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 		if [ "experimental" = "${GIT_BRANCH}" -o "HEAD" = "${GIT_BRANCH}" ]; then
 			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${GIT_BRANCH}\" (which is unstable & sets \`-DSUSUWU_EXPERIMENTAL\`); for production use, execute \`git switch trunk\`."
@@ -104,31 +104,31 @@ SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes pa
 SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
 	if [ " --mingw" = "${CROSS_COMP}" ]; then
 		LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
-		if command -v x86_64-w64-mingw32-clang++ > /dev/null; then
+		if command -v x86_64-w64-mingw32-clang++ >/dev/null; then
 			CXX="x86_64-w64-mingw32-clang++"
 			USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SubStack/issues/16) */
-		elif command -v x86_64-w64-mingw32-g++ > /dev/null; then
+		elif command -v x86_64-w64-mingw32-g++ >/dev/null; then
 			CXX="x86_64-w64-mingw32-g++"
 			USE_FSAN=false #/* `TODO: `-fsan*` for `x86_64-w64-mingw32-g++`](https://www.mingw-w64.org/contribute/#thorough-status-report-for-sanitizers-asan-tsan-usan) */
 		else
 			SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`x86_64-w64-mingw32-clang++ not found\`, \`x86_64-w64-mingw32-g++ not found\`. Do \`apt install llvm-mingw-w64\` or \`apt install mingw-w64\`."
 			exit 1
 		fi
-	elif command -v clang++ > /dev/null; then
+	elif command -v clang++ >/dev/null; then
 		CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
 		USE_FSAN=true #/* [`-fsan*` supports `g++`/`clang++`](https://developers.redhat.com/blog/2021/05/05/memory-error-checking-in-c-and-c-comparing-sanitizers-and-valgrind#tldr) */
-	elif command -v g++ > /dev/null; then
+	elif command -v g++ >/dev/null; then
 		CXX="g++"
 		USE_FSAN=true
-	elif command -v "${CXX}" > /dev/null; then #/* TODO: if our flags are compatible with all `${CXX}`, move this to top */
+	elif command -v "${CXX}" >/dev/null; then #/* TODO: if our flags are compatible with all `${CXX}`, move this to top */
 		SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`clang++ not found\`, \`g++ not found\`. \`\${CXX}\` (\"${CXX}\") found, will use this."
-		if command -v "${CC}" > /dev/null; then
+		if command -v "${CC}" >/dev/null; then
 			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${CC}\` (\"${CC}\") found, will use this."
 		else
 			CC="${CXX} -x c"
 			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${CC}\` not found, will use \"\${CXX} -x -c\" (\"${CC}\")."
 		fi
-		if command -v "${LD}" > /dev/null; then
+		if command -v "${LD}" >/dev/null; then
 			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`\${LD}\` (\"${LD}\") found, will use this."
 		else
 			LD="${CXX}"
@@ -246,7 +246,7 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h
 }
 SUSUWU_BUILD_CTAGS() { #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
 	local STATUS=1
-	if command -v ctags > /dev/null; then
+	if command -v ctags >/dev/null; then
 		if [ -z "${1}" ] || [ -z "${2}" ]; then
 			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`SUSUWU_BUILD_CTAGS()\` was called with less than 2 params; will default to \`SUSUWU_BUILD_CTAGS \"-R --languages=C++\" \"\${C_SOURCE_PATH}\" \"\${C_SOURCE_PATH}\"\` (paths: \"${C_SOURCE_PATH}\" \"${CXX_SOURCE_PATH}\")."
 			if [ -n "${C_SOURCE_PATH}" ]; then
@@ -281,7 +281,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES [${CC} || ${CXX}] [${C
 	fi
 	local SOURCE; for SOURCE in $@; do
 		local OBJECT="${OBJDIR}$(basename "${SOURCE}" "${OLD_ARG_2}").o" #/* `basename`'s second param removes suffix */
-		if [ "${OBJECT}" -ot "${SOURCE}" -o ! -s "${OBJECT}" ] > /dev/null 2>&1; then
+		if [ "${OBJECT}" -ot "${SOURCE}" -o ! -s "${OBJECT}" ] >/dev/null 2>&1; then
 			${OLD_ARG_1} -c "${SOURCE}" -o "${OBJECT}"
 			BUILDNEW=true
 		fi
@@ -310,7 +310,7 @@ SUSUWU_TEST_OUTPUT() {
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
 			${BINDIR}${OUTPUT}
 		else #/* if `--mingw` */
-			if command -v wine > /dev/null; then
+			if command -v wine >/dev/null; then
 				wine ${BINDIR}${OUTPUT}
 			else
 				SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`wine not found\`. do \`apt install wine\`."

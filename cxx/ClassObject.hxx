@@ -32,7 +32,7 @@ public:
 	virtual const std::string getName() const { return "Susuwu::class Object"; }
 /* `clang-tidy` on: NOLINTEND(fuchsia-overloaded-operator, cppcoreguidelines-explicit-virtual-functions, hicpp-use-override,modernize-use-override) */
 	virtual const bool hasImplementation() const { return typeid(Object) != typeid(this); }
-	virtual const bool isInitialized() const {return true;} /* override this if the constructor is not enough to produce usable subclass */
+	virtual const bool isInitialized() const { return true; } /* override this if the constructor is not enough to produce usable subclass */
 	virtual const bool isCloneable() const { return objectCloneAsNone != cloneableAs(); }
 	virtual const bool equals(const Object &obj) const { return obj == *this; /* if you would override equals, just override operator==, as most C++ code uses operator== */ }
 //	virtual const bool equals(const Object &obj) const { return operator==(obj); /* if you would override equals, just override operator==, as most C++ code uses operator== */ }
@@ -57,16 +57,16 @@ public:
 	virtual void finalize() {
 		this->~Object();
 	}
-	const Class &getClass() const {return *this;}
+	const Class &getClass() const { return *this; }
 	virtual const Object *getBaseClassPtr() const { return nullptr; /* no base for root class */ }
 	virtual const Object &getBaseClassRef() const { return *this; /* for promises not to "return nullptr", use references */ }
 	virtual const size_t getStaticSize() const { return sizeof(*this); /* sizeof vtable + member variables */ }
 	virtual const size_t getDynamicSize() const { return 0; /* sizeof allocations from functions such as `malloc` / `new` */ }
-	virtual const bool usesDynamicAllocations() const { /* if(uses functions suchas `malloc` / `new`) {return true;} */ return false; }
-	virtual const bool usesFilesystem() const { /* if(uses functions suchas `fopen` / `new`) {return true;} */ return false; }
-	virtual const bool usesNetwork() const { /* if(uses functions suchas `socket`) {return true;} */ return false; }
-	virtual const bool usesThreads() const { /* if(uses functions suchas `pthread`) {return true;} */ return false; }
-	virtual const bool hasExtraVirtuals/*OtherThanObject*/() const { /* if(has `virtual`s other than `Object`'s) {return true;}*/ return false; }
+	virtual const bool usesDynamicAllocations() const { /* if(uses functions suchas `malloc` / `new`) { return true; } */ return false; }
+	virtual const bool usesFilesystem() const { /* if(uses functions suchas `fopen` / `new`) { return true; } */ return false; }
+	virtual const bool usesNetwork() const { /* if(uses functions suchas `socket`) { return true; } */ return false; }
+	virtual const bool usesThreads() const { /* if(uses functions suchas `pthread`) { return true; } */ return false; }
+	virtual const bool hasExtraVirtuals/*OtherThanObject*/() const { /* if(has `virtual`s other than `Object`'s) { return true; }*/ return false; }
 } Object;
 /* Is some slowdown to use inheritance+polymorphism with all classes;
  * https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754 shows howto use `final` to fix this */

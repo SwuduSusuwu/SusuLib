@@ -85,7 +85,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 		return susuwuUnitTestsClassSysBit;
 	}
 #ifdef SUSUWU_EXPERIMENTAL
-	SUSUWU_WARNING('`' + std::string(Susuwu::classSysGetOwnPath()) + "`" SUSUWU_EXPERIMENTAL_ISSUES);
+	SUSUWU_WARNING('`' + std::string(Susuwu::classSysGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
 #endif
 	return Susuwu::unitTestsCxx();
 }

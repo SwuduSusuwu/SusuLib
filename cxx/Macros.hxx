@@ -180,23 +180,23 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
 #endif
 
-#if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
+#if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS=true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
 #else
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) FALSE
 #endif
 
-#if (!defined(SUSUWU_SH_FILE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_FILE /* overridable with `-DSUSUWU_SH_FILE true/false` */
+#if (!defined(SUSUWU_SH_FILE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_FILE /* overridable with `-DSUSUWU_SH_FILE=[true/false]` */
 #	define SUSUWU_SH_USE_FILE /* affix `__FILE__ ":"` to `stderr`/`cerr` printout */
 #endif
-#if (!defined(SUSUWU_SH_LINE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_LINE /* overridable with `-DSUSUWU_SH_LINE true/false` */
+#if (!defined(SUSUWU_SH_LINE) && SUSUWU_SH_VERBOSE) || SUSUWU_SH_LINE /* overridable with `-DSUSUWU_SH_LINE=[true/false]` */
 #	define SUSUWU_SH_USE_LINE /* affix `__LINE__ ":"` to `stderr`/`cerr` printout */
 #endif
-#if defined(SUSUWU_SH_FUNC) && SUSUWU_SH_FUNC /* overridable with `-DSUSUWU_SH_FUNC true/false` */
+#if defined(SUSUWU_SH_FUNC) && SUSUWU_SH_FUNC /* overridable with `-DSUSUWU_SH_FUNC=[true|false]` */
 #	define SUSUWU_SH_USE_FUNC /* affix `__func__ ":"` to `stderr`/`cerr` printout */
 #endif
 #if defined(SUSUWU_SH_USE_FUNC) && !defined(SUSUWU_C99) && !defined(SUSUWU_CXX11) /* no `__func__` support */
-#	pragma message("[Warning: `-DSUSUWU_SH_FUNC = true` was undone (no `__func__`, due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX11)`.]")
+#	pragma message("[Warning: `-DSUSUWU_SH_FUNC=true` was undone (no `__func__`, due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX11)`.]")
 #	undef SUSUWU_SH_USE_FUNC /* affix `__func__ ":"` to `stderr`/`cerr` printout */
 #endif
 #ifdef SUSUWU_SH_USE_FILE
