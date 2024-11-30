@@ -49,8 +49,12 @@ static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templ
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
  * @pre @code (virusAnalysisHookDefault == virusAnalysisGetHook() || virusAnalysisHookExec == virusAnalysisGetHook() || virusAnalysisHookNewFile == virusAnalysisGetHook() || (virusAnalysisHookExec | virusAnalysisHookNewFile) == virusAnalysisGetHook()) @endcode
  * @post @code (virusAnalysisHookDefault == virusAnalysisGetHook() || virusAnalysisHookExec == virusAnalysisGetHook() || virusAnalysisHookNewFile == virusAnalysisGetHook() || (virusAnalysisHookExec | virusAnalysisHookNewFile) == virusAnalysisGetHook()) @endcode */
+#ifdef SUSUWU_EXPERIMENTAL
 const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus);
 static const VirusAnalysisHook virusAnalysisGetHook() {return virusAnalysisHook(virusAnalysisHookQuery);} /* Ignore depth-of-1 recursion: NOLINT(misc-no-recursion) */
+#else /* def SUSUWU_EXPERIMENTAL else */
+static const VirusAnalysisHook virusAnalysisGetHook() {return virusAnalysisHookDefault;}
+#endif /* def SUSUWU_EXPERIMENTAL else */
 
 const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* `if(abortList[file]) {return Abort;} if(passList[file] {return Pass;} return Continue;` */
 

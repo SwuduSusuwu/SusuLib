@@ -103,6 +103,9 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
+#ifndef SUSUWU_EXPERIMENTAL /* if `VirusAnalysis.hxx` won't include this */
+const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus);
+#endif /* ndef SUSUWU_EXPERIMENTAL */
 /* `clang-tidy` suppress: NOLINTBEGIN(readability-implicit-bool-conversion) */
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
