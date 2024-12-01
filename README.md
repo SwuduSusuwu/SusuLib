@@ -64,6 +64,9 @@ Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such
 - if `git rm Exists`: `-`Exists``.
 - if `touch Exists && git add Exists`: `@\`Exists\`` or `?\`Exists\``.
   - Simple wildcards/regex for altered functions: `\`%s/oldFunction/newFunction/\``.
+  - '*' is not used as update prefix, since '*' has much other use in _Regex_ (wildcards) & _C++_ (such as block comments, dereferences, or math).
+    - From the root commit through 159940fb8b60b176a38a13cdfbd9393596daa9b5 (Date:   Thu Jul 4 07:56:01 2024 -0700), '@' was the prefix for updates. From then until this commit, '?' was the prefix for updates.
+    - From this commit on (this is the successor to commit 0ae6233c02d9e04fca60027b1e32b885eb69bb8a (Date:   Sat Nov 30 17:50:40 2024 -0800)), '@' is (once more) the prefix for updates, due to: it is more common for projects to so use '@'.
 - if `echo "int newFunction() {...}" >> Exists && git add Exists`: `@\`Exists\`:+\`NewFunction()\``.
 - if `git mv OldPath/ NewPath/`: `\`OldPath/.* -> NewPath/.*\``.
 
