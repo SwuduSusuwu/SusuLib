@@ -40,7 +40,7 @@ extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared
 
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
  * @throw std::bad_alloc, std::runtime_error
- * @pre @code analysisCns.hasImplementation() && virusFixCns.hasImplementation() @endcode */
+ * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
 static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
@@ -81,7 +81,7 @@ const VirusAnalysisResult straceOutputsAnalysis(const FilePath &straceOutput); /
 /* Analysis CNS */
 /* Setup analysis CNS; is slow to produce (requires access to huge file databases);
 but once produced, uses few resources (allow clients to do fast analysis.)
- * @pre @code cns.hasImplementation() && pass.bytecodes.size() && abort.bytecodes.size() @endcode
+ * @pre @code !cns.isPureVirtual() && pass.bytecodes.size() && abort.bytecodes.size() @endcode
  * @post @code cns.isInitialized() @endcode */
 void produceAnalysisCns(const ResultList &pass, const ResultList &abort,
 	const ResultList &unreviewed = ResultList() /* WARNING! Possible danger to use unreviewed files */,
@@ -121,7 +121,7 @@ static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecuta
 /* `abortOrNull` should map to `passOrNull` (`ResultList` is composed of `std::tuple`s, because just `produceVirusFixCns()` requires this),
  * with `abortOrNull->bytecodes[x] = NULL` (or "\0") for new SW synthesis,
  * and `passOrNull->bytecodes[x] = NULL` (or "\0") if infected and CNS can not cleanse this.
- * @pre @code cns.hasImplementation() @endcode
+ * @pre @code !cns.isPureVirtual() @endcode
  * @post @code cns.isInitialized() @encode
  */
 void produceVirusFixCns(

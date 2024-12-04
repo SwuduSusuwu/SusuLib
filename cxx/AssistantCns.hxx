@@ -19,7 +19,7 @@ extern std::string assistantCnsResponseDelimiter;
 /* if (with example inputs) these functions (`assistantCnsDownloadHosts()` `produceAssistantCns()`) pass, `return true;`
  * @throw std::bad_alloc
  * @throw std::logic_error
- * @pre @code assistantCns.hasImplementation() @endcode */
+ * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
 static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
 

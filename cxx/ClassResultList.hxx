@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx
-//#include "ClassObject.hxx" /* Object */ /* TODO: fix "Initialization of non-aggregate type" */
+#include "ClassObject.hxx" /* Object */
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode FileHash */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHexOs */
@@ -21,8 +21,8 @@ typedef FileHash ResultListHash;
 typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
-typedef struct ResultList : Object { /* Lists of {metadata, executables (or pages)} */
-	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::struct ResultList";}
+typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::ResultList"; }
 /* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
@@ -34,13 +34,13 @@ typedef struct ResultList : Object { /* Lists of {metadata, executables (or page
 } ResultList;
 
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
-static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classResultListTests, "classResultListTests()");}
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
 
 template<class List>
 const size_t listMaxSize(const List &list) {
 #if SUSUWU_PREFER_CSTR
 	size_t max = 0;
-	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) {max = temp;}}
+	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) { max = temp; } }
 	return max; /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
 #else /* else !SUSUWU_PREFER_CSTR */
 	auto it = std::max_element(list.cbegin(), list.cend(), [](const typename List::const_iterator::value_type &s, const typename List::const_iterator::value_type &x) { return s.size() < x.size(); });
@@ -165,7 +165,7 @@ typedef struct ResultListSignatureMatch {
 	ResultListSignature signature;
 } ResultListSignatureMatch;
 template<class List>
-/* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) {std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]";}` */
+/* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) { std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]"; }` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {
 	for(const auto &signature : list) {
 #if SUSUWU_PREFER_CSTR
@@ -181,7 +181,7 @@ ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typena
 	return {-1, ""};
 }
 template<class List>
-/* Usage: `if(listHasSignatureOfValue(resultList.signatures, value)) {std::cout << "value has signature from ResultList.signatures";}` */
+/* Usage: `if(listHasSignatureOfValue(resultList.signatures, value)) { std::cout << "value has signature from ResultList.signatures"; }` */
 const bool listHasSignatureOfValue(const List &list, const typename List::value_type &value) {
 	return -1 != listFindSignatureOfValue(list, value).fileOffset;
 }

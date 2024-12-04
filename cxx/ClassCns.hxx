@@ -22,26 +22,26 @@ typedef enum CnsMode : char {
 #endif /* def SUSUWU_CXX17 else */
 } CnsMode;
 
-typedef class Cns : Object {
+typedef class Cns : public Object {
 public:
-	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class Cns";}
-	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
 	Cns() SUSUWU_DEFAULT /* Default constructor */
 	Cns(const Cns &) SUSUWU_DEFAULT /* Copy constructor */
 	Cns& operator=(const Cns &) SUSUWU_DEFAULT /* Copy assignment */
 	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
 	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
-	const bool hasImplementation() const SUSUWU_OVERRIDE {return typeid(Cns) != typeid(this);}
-	const bool isInitialized() const SUSUWU_OVERRIDE {return initialized;}
-	virtual void setInitialized(const bool is) {initialized = is;}
-	virtual void setInputMode(CnsMode x) {inputMode = x;}
-	virtual void setOutputMode(CnsMode x) {outputMode = x;}
-	virtual void setInputNeurons(size_t x) {inputNeurons = x;}
-	virtual void setOutputNeurons(size_t x) {outputNeurons = x;}
-	virtual void setLayersOfNeurons(size_t x) {layersOfNeurons = x;} 
-	virtual void setNeuronsPerLayer(size_t x) {neuronsPerLayer = x;}
+	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::Cns"; }
+	const bool isPureVirtual() const SUSUWU_OVERRIDE { return typeid(Cns) == typeid(this); }
+	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; }
+	virtual void setInitialized(const bool is) { initialized = is; }
+	virtual void setInputMode(CnsMode x) { inputMode = x; }
+	virtual void setOutputMode(CnsMode x) { outputMode = x; }
+	virtual void setInputNeurons(size_t x) { inputNeurons = x; }
+	virtual void setOutputNeurons(size_t x) { outputNeurons = x; }
+	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; }
+	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; }
 	/* @throw bad_alloc
-	 * @pre @code hasImplementation() @endcode
+	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
 	// template<Intput, Output> virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* @pre @code isInitialized() @endcode */
@@ -94,8 +94,8 @@ private:
 } Cns;
 
 #ifdef USE_HSOM_CNS
-typedef class HsomCns : Cns {
-/* Work-in-progress (`ClassCns.cxx` for more information): `HSOM` is simple Python-based CNS from https://github.com/CarsonScott/HSOM 
+typedef class HsomCns : public Cns {
+/* Work-in-progress (`ClassCns.cxx` for more information): `HSOM` is simple Python-based CNS from https://github.com/CarsonScott/HSOM
  * Examples of howto setup `HSOM` as artificial CNS; https://github.com/CarsonScott/HSOM/tree/master/examples
  * [ https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ] suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?"
  */
@@ -103,7 +103,7 @@ typedef class HsomCns : Cns {
 #endif /* USE_HSOM_CNS */
 
 #ifdef USE_APXR_CNS
-typedef class ApxrCns : Cns {
+typedef class ApxrCns : public Cns {
 /* Work-in-progress (`ClassCns.cxx for more information): `apxr` is complex Erlang-based CNS from https://github.com/Rober-t/apxr_run/
  * Examples of howto setup `apxr` as artificial CNS; https://github.com/Rober-t/apxr_run/blob/master/src/examples/
  * "apxr_run" has various FLOSS neural network activation functions (absolute, average, standard deviation, sqrt, sin, tanh, log, sigmoid, cos), plus sensor functions (vector difference, quadratic, multiquadric, saturation [+D-zone], gaussian, cartesian/planar/polar distances): https://github.com/Rober-t/apxr_run/blob/master/src/lib/functions.erl

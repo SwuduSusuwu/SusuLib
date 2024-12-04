@@ -379,6 +379,111 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 	return 0;
 }
 ```
+`less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassObject.hxx)
+```
+/* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/class.html)),
+ * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
+* to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
+/* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
+namespace Susuwu {
+typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
+public:
+	virtual ~Instrumentation() SUSUWU_DEFAULT /* allows subclasses to release resources */
+	virtual const size_t getDynamicSize() const { return 0; /* sum({`S` for `malloc(S)`, `sizeof(S)` for `new S`}) */ }
+	virtual const size_t getObjectSize() const { return sizeof(*this); /* sum(sizeof({vptr, data members})) */ }
+	virtual const bool hasExtraVirtuals() const { /* if(has `virtual`s other than `Object`'s) { return true; }*/ return false; }
+	virtual const bool isPureVirtual() const { return false; } /* in case the compiler does not recognize such classes as "pure virtual", put `return true;` for classes which do not implement all virtuals (or which have broken implementations of virtuals) */
+	virtual const bool isInitialized() const { return true; } /* override this if the constructor does not produce objects ready to use */
+	virtual const bool isPlainOldData() const { return !(usesDynamicAllocations() || usesFilesystem() || usesNetwork() || usesThreads()); } /* whether or not to allow shallow clones */
+	virtual const bool usesDynamicAllocations() const { /* if(uses functions suchas {`malloc`, `new`}) { return true; } */ return false; }
+	virtual const bool usesFilesystem() const { /* if(uses functions suchas {`fopen`, `new`}) { return true; } */ return false; }
+	virtual const bool usesNetwork() const { /* if(uses functions suchas {`socket`}) { return true; } */ return false; }
+	virtual const bool usesThreads() const { /* if(uses functions suchas {`pthread`}) { return true; } */ return false; }
+} Instrumentation;
+
+#ifndef SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* override with `-DSUSUWU_VIRTUAL_EQUALS_USE_ADDRESES=false` */
+# define SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES true /* Default is: Interpret `Java`'s `Object::equals` standard as "Addresses must match". */
+#endif /* ndef SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES */
+#define SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES false /* TODO: inherit from `SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES`? */
+#define SUSUWU_VPTR_SZ sizeof(SUSUWU_NULLPTR) /* TODO: use documented constant for `vptr` byte count. */
+#define SUSUWU_VPTR_OFFSET SUSUWU_VPTR_SZ /* Notice: assumes that first data member is `vptr`. */
+#ifndef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS /* override with `-DSUSUWU_VIRTUAL_VPTR_COMPARISON=false` to use `hasLayoutOf()` && data members comparison */
+# define SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS true /* Default: `Class::operator==` does `typeid` && data members comparison */
+#endif /* ndef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+typedef class Class : public Instrumentation { /* Port of `java.lang.Class`. */ /* NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions): suppress `clang-tidy`'s suggestions of constructors. */
+public:
+	~Class() SUSUWU_OVERRIDE SUSUWU_DEFAULT /* allows subclasses to release resources */
+	virtual const std::string getName() const { return "Susuwu::Class"; } /* returns as value so subclasses can return dynamic values */
+	virtual const Class *getSuperclass() const { return SUSUWU_NULLPTR; /* no base for root class */ }
+	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass(); return SUSUWU_NULLPTR != superclass ? *superclass : *this; /* for promises not to `return nullptr`, use references */ }
+	SUSUWU_INLINE const bool hasLayoutOf(const Class &obj) const { return this->isRelatedTo(obj) && this->getObjectSize() == obj.getObjectSize(); }
+	SUSUWU_INLINE const bool isAssignableFrom(const Class &obj) const { return this->isInstance(obj); } /* TODO: template to test types without obj */
+	virtual const bool isInstance(const Class &obj) const { return SUSUWU_NULLPTR != dynamic_cast<const Class *>(&obj); } /* port of Java's */ /* NOLINT(readability-redundant-casting) */
+	SUSUWU_INLINE const bool isRelatedTo(const Class &obj) const { return (this->isInstance(obj) || obj.isInstance(*this)); }
+#ifdef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS
+	virtual /* const requires C++26 */ bool operator==(const Class &obj) const { return (sizeof(*this) == sizeof(obj) && 0 == memcmp(reinterpret_cast<const void *>(this), reinterpret_cast<const void *>(&obj), sizeof(*this))); } /* warning: first operand of this 'memcmp' call is a pointer to dynamic class 'Object'; vtable pointer will be compared [-Wdynamic-class-memaccess] */
+#else /* !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+	virtual /* const requires C++26 */ bool operator==(const Class &obj) const { return this->hasLayoutOf(obj && 0 == memcmp(&reinterpret_cast<const char *>(this)[SUSUWU_VPTR_OFFSET], &reinterpret_cast<const char *>(&obj)[SUSUWU_VPTR_OFFSET], sizeof(*this) - SUSUWU_VPTR_SZ)); }
+#endif /* !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+	virtual bool operator!=(const Class &obj) const SUSUWU_FINAL { return !this->operator==(obj); } /* do not override this, but `operator==(const Class &)` */
+} Class;
+SUSUWU_INLINE const bool instanceof(const Class &obj, const Class &thiso) { return thiso.isInstance(obj); } /* Just as Java's `instanceof`, has operands reversed compared to `isInstance`. */
+
+typedef enum ObjectCloneAs : unsigned char { /* Is extra (not part of Java); accomodates the numerous types of C++ clones. */
+	objectCloneAsNone           = 0, /* `!isCloneabble()` */
+	objectCloneAsDeep           = 1, /* Recursive `new` */
+	objectCloneAsShallow        = 2, /* `memcpy` */
+	objectCloneAsReferenceCount = 4, /* `std::shared_ptr` */ /* TODO: `objectCloneAsReferenceCount` with const `clone` */
+	objectCloneAsCoW            = 8  /* [Copy-on-Write](https://wikipedia.org/wiki/Copy-on-write)  */
+} ObjectCloneAs;
+typedef class Object : public Class { /* Port of `java.lang.Object`. */
+public:
+	virtual const bool isCloneable() const { return objectCloneAsNone != cloneableAs(); }
+	virtual const ObjectCloneAs cloneableAs() const { /* returns preferred/default clone mode */
+		return isPlainOldData() ? objectCloneAsShallow : objectCloneAsNone; /* crude heuristic, override for complex classes */
+	}
+	virtual const bool isCloneableAs(ObjectCloneAs cloneAs) const { return cloneableAs() == cloneAs; /* must override if multiple cloneable types */ }
+	virtual const Object stackClone() const {
+		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::stackClone()`: unsupported default use."); }
+		return Object(*this);
+	}
+	virtual Object *clone() const {
+//		return &(*(new Object) = stackClone());
+		return cloneAs(cloneableAs());
+	}
+	virtual const Object stackCloneAs(ObjectCloneAs cloneAs) const {
+		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::stackCloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
+		return Object(*this);
+	}
+	virtual Object *cloneAs(ObjectCloneAs cloneAs) const {
+//		return &(*(new Object) = stackCloneAs(cloneAs));
+		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
+		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory,llvm-qualified-auto,readability-qualified-auto) */
+		memcpy(clone, static_cast<const void *>(this), getObjectSize());
+		return reinterpret_cast<Object *>(clone);
+	}
+#if SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match". */
+	virtual const bool equals(const Object &obj) const { return this == &obj; } /* Java's contract requires you to override this version of `equals` */
+#else /* SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES else */
+	virtual const bool equals(const Object &obj) const { return this->getClass().operator==(obj); } /* if you want to override `equals`, just override `operator==(const Class *)`, which will do both */
+#endif /* SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES else */
+	virtual void finalize() {
+		this->~Object();
+	}
+	const Class &getClass() const { return *this; }
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::Object"; }
+	virtual const long /* `int` gives `error: cast from pointer to smaller type 'int' loses information` */ hashCode() const { return reinterpret_cast<long>(this); }
+	const bool isInstance(const Class &obj) const SUSUWU_OVERRIDE { return SUSUWU_NULLPTR != dynamic_cast<const Object *>(&obj); } /* port of Java's */
+	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
+	virtual void notify() {}
+	virtual void notifyAll() {}
+	virtual void wait() {}
+} Object;
+
+/* Is some slowdown to use inheritance+polymorphism with all classes;
+ * https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754 shows howto use `final` (requires C++11) to fix this. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
+}; /* namespace Susuwu */
+```
 `less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```
 typedef std::string FilePath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
@@ -386,10 +491,10 @@ typedef FilePath FileBytecode; /* Uses `std::string` for bytecode (versus `std::
  * "If you are going to use the data in a string like fashon then you should opt for std::string as using a std::vector may confuse subsequent maintainers. If on the other hand most of the data manipulation looks like plain maths or vector like then a std::vector is more appropriate." -- https://stackoverflow.com/a/1556294/24473928
 */
 typedef FilePath FileHash; /* TODO: `std::unordered_set<std::basic_string<unsigned char>>` */
-typedef class PortableExecutable : Object {
+typedef class PortableExecutable : public Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
 public:
-	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class PortableExecutable";}
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::PortableExecutable"; }
 	explicit PortableExecutable(FilePath path_ = "") : path(std::move(path_)) {}
 	PortableExecutable(FilePath path_, FileBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
 /*TODO: overload on typedefs which map to the same types:	PortableExecutable(const FilePath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
@@ -399,8 +504,8 @@ public:
 } PortableExecutable;
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
-	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class PortableExecutableBytecode";}
-	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_))  {std::ifstream input(path); if(input.good()) {bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());}}
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::PortableExecutableBytecode"; }
+	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 ```
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.hxx)
@@ -799,8 +904,8 @@ typedef FileHash ResultListHash;
 typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
-typedef struct ResultList : Object { /* Lists of {metadata, executables (or pages)} */
-	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::struct ResultList";}
+typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::ResultList"; }
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;
@@ -810,13 +915,13 @@ typedef struct ResultList : Object { /* Lists of {metadata, executables (or page
 } ResultList;
 
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
-static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classResultListTests, "classResultListTests()");}
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
 
 template<class List>
 const size_t listMaxSize(const List &list) {
 #if SUSUWU_PREFER_CSTR
 	size_t max = 0;
-	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) {max = temp;}}
+	for(auto it = &list[0]; list.cend() != it; ++it) { const size_t temp = strlen(*it); if(temp > max) { max = temp; } }
 	return max; /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
 #else /* else !SUSUWU_PREFER_CSTR */
 	auto it = std::max_element(list.cbegin(), list.cend(), [](const typename List::const_iterator::value_type &s, const typename List::const_iterator::value_type &x) { return s.size() < x.size(); });
@@ -941,7 +1046,7 @@ typedef struct ResultListSignatureMatch {
 	ResultListSignature signature;
 } ResultListSignatureMatch;
 template<class List>
-/* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) {std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]";}` */
+/* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) { std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]"; }` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {
 	for(const auto &signature : list) {
 #if SUSUWU_PREFER_CSTR
@@ -957,7 +1062,7 @@ ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typena
 	return {-1, ""};
 }
 template<class List>
-/* Usage: `if(listHasSignatureOfValue(resultList.signatures, value)) {std::cout << "value has signature from ResultList.signatures";}` */
+/* Usage: `if(listHasSignatureOfValue(resultList.signatures, value)) { std::cout << "value has signature from ResultList.signatures"; }` */
 const bool listHasSignatureOfValue(const List &list, const typename List::value_type &value) {
 	return -1 != listFindSignatureOfValue(list, value).fileOffset;
 }
@@ -1009,26 +1114,26 @@ typedef enum CnsMode : char {
 #endif /* def SUSUWU_CXX17 else */
 } CnsMode;
 
-typedef class Cns : Object {
+typedef class Cns : public Object {
 public:
-	const std::string getName() const SUSUWU_OVERRIDE {return "Susuwu::class Cns";}
-	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
 	Cns() SUSUWU_DEFAULT /* Default constructor */
 	Cns(const Cns &) SUSUWU_DEFAULT /* Copy constructor */
 	Cns& operator=(const Cns &) SUSUWU_DEFAULT /* Copy assignment */
 	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
 	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
-	const bool hasImplementation() const SUSUWU_OVERRIDE {return typeid(Cns) != typeid(this);}
-	const bool isInitialized() const SUSUWU_OVERRIDE {return initialized;}
-	virtual void setInitialized(const bool is) {initialized = is;}
-	virtual void setInputMode(CnsMode x) {inputMode = x;}
-	virtual void setOutputMode(CnsMode x) {outputMode = x;}
-	virtual void setInputNeurons(size_t x) {inputNeurons = x;}
-	virtual void setOutputNeurons(size_t x) {outputNeurons = x;}
-	virtual void setLayersOfNeurons(size_t x) {layersOfNeurons = x;}
-	virtual void setNeuronsPerLayer(size_t x) {neuronsPerLayer = x;}
+	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
+	const std::string getName() const SUSUWU_OVERRIDE { return "Susuwu::Cns"; }
+	const bool isPureVirtual() const SUSUWU_OVERRIDE { return typeid(Cns) == typeid(this); }
+	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; }
+	virtual void setInitialized(const bool is) { initialized = is; }
+	virtual void setInputMode(CnsMode x) { inputMode = x; }
+	virtual void setOutputMode(CnsMode x) { outputMode = x; }
+	virtual void setInputNeurons(size_t x) { inputNeurons = x; }
+	virtual void setOutputNeurons(size_t x) { outputNeurons = x; }
+	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; }
+	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; }
 	/* @throw bad_alloc
-	 * @pre @code hasImplementation() @endcode
+	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
 	// template<Intput, Output> virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* @pre @code isInitialized() @endcode */
@@ -1080,7 +1185,7 @@ private:
 } Cns;
 
 #ifdef USE_HSOM_CNS
-typedef class HsomCns : Cns {
+typedef class HsomCns : public Cns {
 /* Work-in-progress (`ClassCns.cxx` for more information): `HSOM` is simple Python-based CNS from https://github.com/CarsonScott/HSOM
  * Examples of howto setup `HSOM` as artificial CNS; https://github.com/CarsonScott/HSOM/tree/master/examples
  * [ https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ] suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?"
@@ -1089,7 +1194,7 @@ typedef class HsomCns : Cns {
 #endif /* USE_HSOM_CNS */
 
 #ifdef USE_APXR_CNS
-typedef class ApxrCns : Cns {
+typedef class ApxrCns : public Cns {
 /* Work-in-progress (`ClassCns.cxx for more information): `apxr` is complex Erlang-based CNS from https://github.com/Rober-t/apxr_run/
  * Examples of howto setup `apxr` as artificial CNS; https://github.com/Rober-t/apxr_run/blob/master/src/examples/
  * "apxr_run" has various FLOSS neural network activation functions (absolute, average, standard deviation, sqrt, sin, tanh, log, sigmoid, cos), plus sensor functions (vector difference, quadratic, multiquadric, saturation [+D-zone], gaussian, cartesian/planar/polar distances): https://github.com/Rober-t/apxr_run/blob/master/src/lib/functions.erl
@@ -1213,7 +1318,7 @@ extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared
 
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
  * @throw std::bad_alloc, std::runtime_error
- * @pre @code analysisCns.hasImplementation() && virusFixCns.hasImplementation() @endcode */
+ * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
 static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
@@ -1254,7 +1359,7 @@ const VirusAnalysisResult straceOutputsAnalysis(const FilePath &straceOutput); /
 /* Analysis CNS */
 /* Setup analysis CNS; is slow to produce (requires access to huge file databases);
 but once produced, uses few resources (allow clients to do fast analysis.)
- * @pre @code cns.hasImplementation() && pass.bytecodes.size() && abort.bytecodes.size() @endcode
+ * @pre @code !cns.isPureVirtual() && pass.bytecodes.size() && abort.bytecodes.size() @endcode
  * @post @code cns.isInitialized() @endcode */
 void produceAnalysisCns(const ResultList &pass, const ResultList &abort,
 	const ResultList &unreviewed = ResultList() /* WARNING! Possible danger to use unreviewed files */,
@@ -1294,7 +1399,7 @@ static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecuta
 /* `abortOrNull` should map to `passOrNull` (`ResultList` is composed of `std::tuple`s, because just `produceVirusFixCns()` requires this),
  * with `abortOrNull->bytecodes[x] = NULL` (or "\0") for new SW synthesis,
  * and `passOrNull->bytecodes[x] = NULL` (or "\0") if infected and CNS can not cleanse this.
- * @pre @code cns.hasImplementation() @endcode
+ * @pre @code !cns.isPureVirtual() @endcode
  * @post @code cns.isInitialized() @encode
  */
 void produceVirusFixCns(
@@ -1703,7 +1808,6 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 } /* extern "C" { */
 #endif /* def __cplusplus */
 #endif /* ndef INCLUDES_cxx_main_hxx */
-
 ```
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
 ```
@@ -1795,7 +1899,7 @@ extern std::string assistantCnsResponseDelimiter;
 /* if (with example inputs) these functions (`assistantCnsDownloadHosts()` `produceAssistantCns()`) pass, `return true;`
  * @throw std::bad_alloc
  * @throw std::logic_error
- * @pre @code assistantCns.hasImplementation() @endcode */
+ * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
 static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
 
