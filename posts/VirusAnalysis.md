@@ -646,13 +646,13 @@ const FILE *classSysFopenOwnPath() {
 }
 const FilePath classSysGetOwnPath() {
 #ifdef __linux__
-	char path[PATH_MAX];
-	ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
+	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
 	if (len == -1) {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) {/* this shouldn't happen */} }");
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
 		return FilePath(); /* return EXIT_FAILURE; */
 	}
-	path[len] = '\0';
+	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
 	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
@@ -666,9 +666,14 @@ const FilePath classSysGetOwnPath() {
 		return FilePath(); /* return EXIT_FAILURE; */
 	}
 #else /* def SUSUWU_WIN32 else */
-	assert(SUSUWU_NULLPTR != classSysArgs);
-	assert(SUSUWU_NULLPTR != classSysArgs[0]);
-	return classSysArgs[0];
+	if(SUSUWU_NULLPTR == classSysArgs) {
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs) {/* `classSysInit()` was not used? */} }");
+		return FilePath(); /* return EXIT_FAILURE; */
+	} else if(SUSUWU_NULLPTR == classSysArgs[0]) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs[0]) {/* `classSysInit()` was not used? */} }");
+		return FilePath(); /* return EXIT_FAILURE; */
+	}
+	return FilePath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 #endif /* def SUSUWU_WIN32 else */
 }
 const bool classSysSetConsoleInput(bool input) {
