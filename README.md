@@ -25,7 +25,7 @@ Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-you
 Minimum requirements (build targets which this supports):
 - Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
-  - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_asset`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
+  - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_assert`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
   - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#Contributor-conventionsrules).
   - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#Contributor-conventionsrules).
 ## Download
@@ -42,23 +42,23 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_.
 - Environment flags (use `vim build.sh` to put into `FLAGS_USER`); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
   - Custom `sh` (console) output:
-    - `-DSUSUWU_SH_PREFER_STDIO` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `!defined(__cplusplus)`.
-    - `-DSUSUWU_SH_VERBOSE` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `!defined(NDEBUG)`.
-    - `-DSUSUWU_SH_SKIP_BRACKETS=true` sets output format to `WARN_LEVEL: message`; default is `false`.
-    - `-DSUSUWU_SH_FILE=true` sets output format to `[__FILE__: WARN_LEVEL: message]`; default is `SUSUWU_SH_VERBOSE`.
-    - `-DSUSUWU_SH_LINE=true` sets output format to `[__LINE__: WARN_LEVEL: message]`; default is `SUSUWU_SH_VERBOSE`.
-    - `-DSUSUWU_SH_FUNC=true` sets output format to `[__func__: WARN_LEVEL: message]`; default is `false`.
-    - `-DSUSUWU_SH_SKIP_COLORS=true` to omit _VT100_ (_ANSI_) colors; default is `defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
+    - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
+    - `-DSUSUWU_SH_VERBOSE[=true|=false]` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `=!defined(NDEBUG)`.
+    - `-DSUSUWU_SH_SKIP_BRACKETS=true` sets output format to `WARN_LEVEL: message`; default is `=false`.
+    - `-DSUSUWU_SH_FILE=true` sets output format to `[__FILE__: WARN_LEVEL: message]`; default is `=SUSUWU_SH_VERBOSE`.
+    - `-DSUSUWU_SH_LINE=true` sets output format to `[__LINE__: WARN_LEVEL: message]`; default is `=SUSUWU_SH_VERBOSE`.
+    - `-DSUSUWU_SH_FUNC=true` sets output format to `[__func__: WARN_LEVEL: message]`; default is `=false`.
+    - `-DSUSUWU_SH_SKIP_COLORS=true` to omit _VT100_ (_ANSI_) colors; default is `=defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
     - `-DSUSUWU_SH_SKIP_COLORS=false` to force (even if unsupported) _VT100_ (_ANSI_) color use.
     - TODO (for now, no effect; once [issue #17](https://github.com/SwuduSusuwu/SubStack/issues/17) is closed, you can use):
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
-  - To match `g++`/`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false, -DSUSUWU_SKIP_COLORS=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
+  - To match `g++`/`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
   - Unstable/`experimental` flags:
     - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
   - TODO (for now won't build, or has no effect):
-    - `-DSUSUWU_PREFER_CSTR` to replace `std::string` with `char *` (more compatible with non-C++ projects); default is `false`.
-    - `-DSUSUWU_PREFER_C` sets `SUSUWU_PREFER_CSTR` + `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `false`.
+    - `-DSUSUWU_PREFER_CSTR=true` to replace `std::string` with `char *` (more compatible with non-C++ projects); default is `=SUSUWU_PREFER_C`.
+    - `-DSUSUWU_PREFER_C=true` sets `SUSUWU_PREFER_CSTR` + `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `=!defined(__plusplus)`).
 
 # How to contribute
 View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for ideas on code to contribute, plus so you do not report documented issues.)

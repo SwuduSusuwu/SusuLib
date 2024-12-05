@@ -12,11 +12,28 @@
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
 /* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
-#if defined(SUSUWU_PREFER_C) || !defined(__cplusplus)
-#	define SUSUWU_SH_PREFER_STDIO
-#	define SUSUWU_SH_PREFER_CSTR
-#endif /*defined((SUSUWU_PREFER_C) || !defined(__cplusplus) */
-#ifdef SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
+#ifndef SUSUWU_PREFER_C
+#	ifdef __cplusplus
+#		define SUSUWU_PREFER_C false
+#	else
+#		define SUSUWU_PREFER_C true
+#	endif /* else !def __cplusplus */
+#endif /* ndef SUSUWU_PREFER_C */
+#if !defined(SUSUWU_SH_PREFER_STDIO)
+#	if SUSUWU_PREFER_C
+#		define SUSUWU_SH_PREFER_STDIO true
+#	else
+#		define SUSUWU_SH_PREFER_STDIO false
+#	endif /* else !SUSUWU_PREFER_C */
+#endif /* !defined(SUSUWU_SH_PREFER_STDIO) */
+#if !defined(SUSUWU_SH_PREFER_CSTR) 
+#	if SUSUWU_PREFER_C
+#		define SUSUWU_SH_PREFER_CSTR true
+#	else
+#		define SUSUWU_SH_PREFER_CSTR false
+#	endif /* else !SUSUWU_PREFER_C */
+#endif /* !defined(SUSUWU_SH_PREFER_CSTR) */
+#if SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
 #	include <stdio.h> /* fprintf stderr stdout */
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
@@ -176,7 +193,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 
 #if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
 #	define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
-#else
+#elif !defined(SUSUWU_SH_VERBOSE)
 #	define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
 #endif
 
@@ -305,7 +322,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_CERR(WARN_LEVEL, x) std::cerr << SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(<< std::string(SUSUWU_SH_FILE)) IF_SUSUWU_SH_LINE(<< std::to_string(__LINE__) << ":") IF_SUSUWU_SH_FUNC(<< std::string(__func__) << ":") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(<< ' ') << SUSUWU_CERR_IMP(WARN_LEVEL, x) << SUSUWU_SH_POSTFIX << std::endl
 #define SUSUWU_STDERR(WARN_LEVEL, x) SUSUWU_STDERR_IMP(WARN_LEVEL, SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE("%i:") IF_SUSUWU_SH_FUNC("%s:") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(" "), SUSUWU_SH_POSTFIX "\n", x, IF_SUSUWU_SH_LINE(__LINE__ SUSUWU_COMMA) IF_SUSUWU_SH_FUNC(__func__ SUSUWU_COMMA))
 /* Use this to do C versus C++ agnostic code */
-#ifdef SUSUWU_SH_PREFER_STDIO
+#if SUSUWU_SH_PREFER_STDIO
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_STDERR(LEVEL, x)
 #else
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
