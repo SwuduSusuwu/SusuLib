@@ -19,11 +19,28 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
  * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
-#if defined(SUSUWU_PREFER_C) || !defined(__cplusplus)
-#	define SUSUWU_SH_PREFER_STDIO
-#	define SUSUWU_SH_PREFER_CSTR
-#endif /*defined((SUSUWU_PREFER_C) || !defined(__cplusplus) */
-#ifdef SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
+#ifndef SUSUWU_PREFER_C
+#	ifdef __cplusplus
+#		define SUSUWU_PREFER_C false
+#	else
+#		define SUSUWU_PREFER_C true
+#	endif /* else !def __cplusplus */
+#endif /* ndef SUSUWU_PREFER_C */
+#if !defined(SUSUWU_SH_PREFER_STDIO)
+#	if SUSUWU_PREFER_C
+#		define SUSUWU_SH_PREFER_STDIO true
+#	else
+#		define SUSUWU_SH_PREFER_STDIO false
+#	endif /* else !SUSUWU_PREFER_C */
+#endif /* !defined(SUSUWU_SH_PREFER_STDIO) */
+#if !defined(SUSUWU_SH_PREFER_CSTR)
+#	if SUSUWU_PREFER_C
+#		define SUSUWU_SH_PREFER_CSTR true
+#	else
+#		define SUSUWU_SH_PREFER_CSTR false
+#	endif /* else !SUSUWU_PREFER_C */
+#endif /* !defined(SUSUWU_SH_PREFER_CSTR) */
+#if SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
 #	include <stdio.h> /* fprintf stderr stdout */
 #else
 #	include <iostream> /* std::cerr std::cout std::endl */
@@ -90,7 +107,7 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #endif /* defined(__has_cpp_attribute) else */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? #	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
 #else
 #	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
@@ -117,19 +134,19 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #endif /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
 #if defined(SUSUWU_CXX11) /* TODO? (pre-CXX11 support) || SUSUWU_HAS_FEATURE(cxx_noexcept) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) */ /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
 #	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
-#	define SUSUWU_DEFAULT default /* Usage: `Macros.cxx` has tests for this */
-#	define SUSUWU_DELETE delete /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_DEFAULT = default; /* Usage: `Macros.cxx` has tests for this */
+#	define SUSUWU_DELETE = delete; /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_FINAL final /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
 #else /* SUSUWU_CXX11 else */
 #	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
-#	define SUSUWU_DEFAULT /* No-op */
-#	define SUSUWU_DELETE /* No-op */
-#	define SUSUWU_FINAL final /* No-op */
+#	define SUSUWU_DEFAULT {} /* allows default constructors/destructors. TODO: default operators? */
+#	define SUSUWU_DELETE ; /* causes linker error if DELETEd function is called. */
+#	define SUSUWU_FINAL /* No-op */
 #	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
-#	define SUSUWU_OVERRIDE override /* No-op */
+#	define SUSUWU_OVERRIDE /* No-op */
 #endif /* SUSUWU_CXX11 else */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
@@ -183,9 +200,9 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 
 #if !defined(NDEBUG) && !defined(SUSUWU_SH_VERBOSE)
 #	define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
-#else
+#elif !defined(SUSUWU_SH_VERBOSE)
 #	define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
-#endif
+#endif /* else defined(SUSUWU_SH_VERBOSE) */
 
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS=true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
@@ -267,11 +284,11 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_CERR(WARN_LEVEL, x) std::cerr << SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(<< std::string(SUSUWU_SH_FILE)) IF_SUSUWU_SH_LINE(<< std::to_string(__LINE__) << ":") IF_SUSUWU_SH_FUNC(<< std::string(__func__) << ":") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(<< ' ') << SUSUWU_CERR_IMP(WARN_LEVEL, x) << SUSUWU_SH_POSTFIX << std::endl
 #define SUSUWU_STDERR(WARN_LEVEL, x) SUSUWU_STDERR_IMP(WARN_LEVEL, SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE("%i:") IF_SUSUWU_SH_FUNC("%s:") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(" "), SUSUWU_SH_POSTFIX "\n", x, IF_SUSUWU_SH_LINE(__LINE__ SUSUWU_COMMA) IF_SUSUWU_SH_FUNC(__func__ SUSUWU_COMMA))
 /* Use this to do C versus C++ agnostic code */
-#ifdef SUSUWU_SH_PREFER_STDIO
+#if SUSUWU_SH_PREFER_STDIO
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_STDERR(LEVEL, x)
 #else
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
-#endif
+#endif /* else !SUSUWU_SH_PREFER_STDIO */
 #ifdef SUSUWU_EXPERIMENTAL
 #	define SUSUWU_ERROR(x) {SUSUWU_PRINT(ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
 #else /* SUSUWU_EXPERIMENTAL else */
@@ -1679,7 +1696,7 @@ static const int susuwuUnitTestsClassSha2Bit       = 1 << 3; /*  8: `ClassSha2.h
 static const int susuwuUnitTestsClassResultListBit = 1 << 4; /* 16: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 5; /* 32: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit    = 1 << 6; /* 64: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
-/* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise) */
+/* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 SusuwuUnitTestsBitmask main(int argc, const char **args);
 #ifdef __cplusplus
@@ -1692,10 +1709,10 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 ```
 namespace Susuwu {
 static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
-#ifdef SUSUWU_CXX17 /* `type_traits` is C++11 but `is_nothrow_invocable` is C++17 */
+#ifdef SUSUWU_CXX17
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
-	{
+{ /* if the function names (or line numbers) change, update `SECURITY.md` to new values */
 	int susuwuUnitTestsErrno = 0;
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;

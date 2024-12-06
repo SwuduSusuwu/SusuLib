@@ -26,7 +26,7 @@
 #		define SUSUWU_SH_PREFER_STDIO false
 #	endif /* else !SUSUWU_PREFER_C */
 #endif /* !defined(SUSUWU_SH_PREFER_STDIO) */
-#if !defined(SUSUWU_SH_PREFER_CSTR) 
+#if !defined(SUSUWU_SH_PREFER_CSTR)
 #	if SUSUWU_PREFER_C
 #		define SUSUWU_SH_PREFER_CSTR true
 #	else
@@ -100,10 +100,10 @@
 #endif /* defined(__has_cpp_attribute) else */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? #	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
+#	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? || SUSUWU_HAS_ATTRIBUTE(noreturn) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
 #else
-#	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
+#	define SUSUWU_NORETURN /* No-op; old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
 #	define SUSUWU_CONSTEXPR /* No-op */
 #endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
@@ -137,9 +137,9 @@
 #	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
 #	define SUSUWU_DEFAULT {} /* allows default constructors/destructors. TODO: default operators? */
 #	define SUSUWU_DELETE ; /* causes linker error if DELETEd function is called. */
-#	define SUSUWU_FINAL final /* No-op */
+#	define SUSUWU_FINAL /* No-op */
 #	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
-#	define SUSUWU_OVERRIDE override /* No-op */
+#	define SUSUWU_OVERRIDE /* No-op */
 #endif /* SUSUWU_CXX11 else */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
@@ -195,7 +195,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_SH_VERBOSE true /* diagnostic logs to `cerr`/`stderr`; can enable on `--release` with `-DSUSUWU_SH_VERBOSE=true` */
 #elif !defined(SUSUWU_SH_VERBOSE)
 #	define SUSUWU_SH_VERBOSE false /* can disable on `--debug` with `-DSUSUWU_SH_VERBOSE=false` */
-#endif
+#endif /* else defined(SUSUWU_SH_VERBOSE) */
 
 #if !defined(SUSUWU_SH_SKIP_BRACKETS) || SUSUWU_SH_SKIP_BRACKETS == false /* overridable with `-DSUSUWU_SH_SKIP_BRACKETS=true` (which you can set to mimic `g++`/`clang++` syntax for outputs) */
 #	define IF_SUSUWU_SH_BRACKETS(TRUE, FALSE) TRUE
@@ -326,7 +326,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_STDERR(LEVEL, x)
 #else
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
-#endif
+#endif /* else !SUSUWU_SH_PREFER_STDIO */
 #ifdef SUSUWU_EXPERIMENTAL
 #	define SUSUWU_ERROR(x) {SUSUWU_PRINT(ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
 #else /* SUSUWU_EXPERIMENTAL else */
