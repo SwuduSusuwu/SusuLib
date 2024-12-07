@@ -6,7 +6,7 @@ Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executable
 `Licenses: allows all uses ("Creative Commons"/"Apache 2")`
 [Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources]
 For the most new sources (+ static libs), use apps such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for **iOS**) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for **Android OS**) to run this:
-`git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build`
+`git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build.sh`
 `less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) /* removed: disabled color codes + unused OSC codes */
 ```
 /* Miscellaneous macros */
