@@ -507,7 +507,12 @@ public:
 		this->~Object();
 	}
 	const Class &getClass() const { return *this; }
-	virtual const long /* `int` gives `error: cast from pointer to smaller type 'int' loses information` */ hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
+#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
+	virtual const intptr_t hashCode() const { return reinterpret_cast<intptr_t>(this); }
+#else /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
+	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
+#endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
+	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
 	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
 	virtual void notify() {}
 	virtual void notifyAll() {}
