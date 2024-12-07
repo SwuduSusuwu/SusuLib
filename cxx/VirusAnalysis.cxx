@@ -6,12 +6,12 @@
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
-#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
+#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
 #include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
 #include <algorithm> /* std::sort */
-#include <cassert> /* assert */
-#include <cmath> /* round */
-#include <cstddef> /* size_t */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cmath>, <math.h>) /* round */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <fstream> /* std::ifstream */
 #include <ios> /* std::streamsize */
 #include <iostream> /* std::cin std::cout std::endl */

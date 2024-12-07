@@ -47,7 +47,7 @@
 
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
 #	if 199901 <= __cplusplus
 #		define SUSUWU_CXX98
 #	endif /* (199901 <= __cplusplus) */
@@ -68,7 +68,7 @@
 #	endif /* if (202002 <= __cplusplus) */
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) FALSE /* [Issue #3 (`CC` support) uses this](https://github.com/SwuduSusuwu/SubStack/issues/3) */
 #	if (199901 <= __STDC_VERSION__)
 #		define SUSUWU_C99
 #	endif /* (199901 <= __STDC_VERSION__) */
@@ -256,7 +256,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #else /* def SUSUWU_SH_SKIP_OSC else */
 #	define SUSUWU_SH_TO_CLIPBOARD_PREFIX SUSUWU_SH_OSC "52;c;" /* Command to put BASE64 str into clipboard */
 #	define SUSUWU_SH_TO_CLIPBOARD_SUFFIX "\a"
-#	define SUSUWU_SH_TO_CLIPBOARD(base64_str) fprintf(stdout, SUSUWU_SH_TO_CLIPBOARD_PREFIX "%s" SUSUWU_SH_TO_CLIPBOARD_SUFFIX, IF_SUSUWU_CPLUSPLUS(std::string(base64_str).c_str(), base64_str)); /* TODO: `std::cout` version of this */
+#	define SUSUWU_SH_TO_CLIPBOARD(base64_str) fprintf(stdout, SUSUWU_SH_TO_CLIPBOARD_PREFIX "%s" SUSUWU_SH_TO_CLIPBOARD_SUFFIX, SUSUWU_IF_CPLUSPLUS(std::string(base64_str).c_str(), base64_str)); /* TODO: `std::cout` version of this */
 #endif /* def SUSUWU_SH_SKIP_OSC else */
 #if defined(SUSUWU_SH_COLORS_UNSUPPORTED) && !defined(SUSUWU_SH_SKIP_COLORS)
 #	define SUSUWU_SH_SKIP_COLORS true /* you can use `-DSUSUWU_SH_SKIP_COLORS=false` to force unsupported color use (such as if build is for SUSUWU_WIN32 but you assume Win10+ `xterm` support) */
@@ -315,7 +315,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 
 #define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL)) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
 #define SUSUWU_CERR_IMP(WARN_LEVEL, x) SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) << (x) << SUSUWU_SH_DEFAULT
-#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ IF_SUSUWU_CPLUSPLUS(std::string(x).c_str(), x))
+#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
 
 /* WARN_LEVEL = {ERROR, WARNING, INFO, SUCCESS, NOTICE, DEBUG} */
 #define SUSUWU_ERRSTR(WARN_LEVEL, x) std::string(SUSUWU_SH_PREFIX) IF_SUSUWU_SH_FILE(+ SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE(+ std::to_string(__LINE__) + ':') IF_SUSUWU_SH_FUNC(+ std::string(__func__) + ':') IF_SUSUWU_SH_FILE_LINE_OR_FUNC(+ ' ') + SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) + SUSUWU_SH_POSTFIX

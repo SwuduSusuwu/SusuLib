@@ -7,8 +7,9 @@
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
-#include "Macros.hxx" /* SUSUWU_NOTICE_EXECUTEVERBOSE */
-#include <cassert> /* assert */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::cin std::cout */
 #include <ostream> /* std::ostream */
 #include <string> /* std::string */

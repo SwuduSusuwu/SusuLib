@@ -112,8 +112,9 @@ Most of what [_Mozilla Org_'s (_Firefox_'s) style](https://firefox-source-docs.m
 
 Code rules (lots overlap with _Mozilla Org_'s):
 
-- Files: `${C_SOURCE_PATH}/PascalCase.*` or `${CXX_SOURCE_PATH}/PascalCase.*xx` (such as: `./cxx/ClassFoo.hxx`, used as `#include "ClassFoo.hxx"`), as this is most common.
+- Files: `${C_SOURCE_PATH}/PascalCase.*` or `${CXX_SOURCE_PATH}/PascalCase.*xx` (such as: `./cxx/ClassFoo.hxx`, used as `#include "ClassFoo.hxx" /* classFooFunction() */`), as this is most common.
   - `./build.sh` requires: that all local includes prefix as `Class*.hxx` (so it knows to execute `--rebuild` if you upgrade a common include.) TODO: incremental builds which don't require this.
+  - To assist with insertion/removal of `#include` statements, comments shall list all functions/macros used.
 
 - Structs, enums, classe: `typedef struct PascalCase {} PascalCase;`, `typedef enum PascalCase {} PascalCase;`, `typedef class PascalCase {} PascalCase;`, as this is most common.
 

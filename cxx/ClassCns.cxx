@@ -2,10 +2,10 @@
 #ifndef INCLUDES_cxx_ClassCns_cxx
 #define INCLUDES_cxx_ClassCns_cxx
 #include "ClassCns.hxx" /* CnsMode std::string std::tuple */
-#include "Macros.hxx" /* SUSUWU_OVERRIDE */
-#include <cassert> /* assert */
-#include <cctype> /* size_t */
-#include <cstdlib> /* exit EXIT_FAILURE */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_OVERRIDE */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
+#include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
 namespace Susuwu {
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`

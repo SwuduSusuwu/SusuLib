@@ -1,13 +1,13 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
+#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassPortableExecutable.hxx" /* FilePath */
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
-#include <cassert> /* assert */
-#include <cerrno> /* errno */
-#include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
-#include <cstdlib> /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
+#include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
+#include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef __linux__
 #	include <linux/limits.h> /* PATH_MAX */

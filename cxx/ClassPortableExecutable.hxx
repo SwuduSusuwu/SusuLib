@@ -3,7 +3,6 @@
 #ifndef INCLUDES_cxx_ClassPortableExecutable_hxx
 #define INCLUDES_cxx_ClassPortableExecutable_hxx
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS */
-#include "Macros.hxx" /* SUSUWU_OVERRIDE */
 #include <fstream> /* std::ifstream */
 #include <iterator> /* std::istreambuf_iterator */
 #include <string> /* std::string */

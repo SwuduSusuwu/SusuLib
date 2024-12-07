@@ -1,14 +1,15 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
-#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE IF_SUSUWU_CPLUSPLUS*/
-#include <cassert> /* assert */
-#include <cstddef> /* size_t */
+#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	include IF_SUSUWU_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */
+#	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */
 #endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) */
-#include <cstring> /* memcmp memcpy */
+#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp memcpy */
 #include <ios> /* std::hex */
+#include <new> /* ::operator new */
 #include <sstream> /* std::stringstream */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
@@ -127,7 +128,7 @@ public:
 	virtual Object *cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
-		auto clone = ::operator new (getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory,llvm-qualified-auto,readability-qualified-auto) */
+		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory,llvm-qualified-auto,readability-qualified-auto) */
 		memcpy(clone, static_cast<const void *>(this), getObjectSize());
 		return static_cast<Object *>(clone);
 	}

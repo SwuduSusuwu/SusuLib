@@ -3,9 +3,9 @@
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
-#include "Macros.hxx" /* SUSUWU_CXX17 SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
-#include <cassert> /* assert */
-#include <cstddef> /* size_t */
+#include "Macros.hxx" /* SUSUWU_CXX17 SUSUWU_IF_CPLUSPLUS SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <string> /* std::string */
 #include <tuple> /* std::tuple */
 #include <typeinfo> /* typeid */

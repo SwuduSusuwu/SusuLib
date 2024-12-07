@@ -54,7 +54,7 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) TRUE
+#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
 #	if 199901 <= __cplusplus
 #		define SUSUWU_CXX98
 #	endif /* (199901 <= __cplusplus) */
@@ -75,7 +75,7 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	endif /* if (202002 <= __cplusplus) */
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
-#	define IF_SUSUWU_CPLUSPLUS(TRUE, FALSE) FALSE
+#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) FALSE /* [Issue #3 (`CC` support) uses this](https://github.com/SwuduSusuwu/SubStack/issues/3) */
 #	if (199901 <= __STDC_VERSION__)
 #		define SUSUWU_C99
 #	endif /* (199901 <= __STDC_VERSION__) */
@@ -277,7 +277,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 
 #define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL)) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
 #define SUSUWU_CERR_IMP(WARN_LEVEL, x) SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) << (x) << SUSUWU_SH_DEFAULT
-#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ IF_SUSUWU_CPLUSPLUS(std::string(x).c_str(), x))
+#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
 
 /* WARN_LEVEL = {ERROR, WARNING, INFO, SUCCESS, NOTICE, DEBUG} */
 #define SUSUWU_ERRSTR(WARN_LEVEL, x) std::string(SUSUWU_SH_PREFIX) IF_SUSUWU_SH_FILE(+ SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE(+ std::to_string(__LINE__) + ':') IF_SUSUWU_SH_FUNC(+ std::string(__func__) + ':') IF_SUSUWU_SH_FILE_LINE_OR_FUNC(+ ' ') + SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) + SUSUWU_SH_POSTFIX
@@ -496,7 +496,7 @@ public:
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
 		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory,llvm-qualified-auto,readability-qualified-auto) */
 		memcpy(clone, static_cast<const void *>(this), getObjectSize());
-		return reinterpret_cast<Object *>(clone);
+		return static_cast<Object *>(clone);
 	}
 #if SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match". */
 	virtual const bool equals(const Object &obj) const { return this == &obj; } /* Java's contract requires you to override this version of `equals` */

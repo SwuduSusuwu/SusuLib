@@ -3,13 +3,13 @@
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
 #include "ClassPortableExecutable.hxx" /* FilePath */
-#include "Macros.hxx" /* IF_SUSUWU_CPLUSPLUS SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_WARNING */
-#include <cassert> /* assert */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_WARNING */
+#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include <chrono> /* std::chrono */
-#include IF_SUSUWU_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
+#include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include <exception> /* std::exception */
-#include <iomanip> /* std::dec std::hex */
-#include <ios> /* std::streamsize */
+#include <iomanip> /* std::setw */
+#include <ios> /* std::dec std::hex std::streamsize */
 #include <iostream> /* std::cerr std::cin std::endl */
 #include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */

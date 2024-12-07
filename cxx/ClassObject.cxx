@@ -1,11 +1,11 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassObject_cxx
 #define INCLUDES_cxx_ClassObject_cxx
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_PURE_VIRTUAL_DEFAULTS SUSUWU_VIRTUAL_DEFAULTS */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_PURE_VIRTUAL_DEFAULTS SUSUWU_VIRTUAL_DEFAULTS */
 #include "ClassObject.hxx" /* Class Object SUSUWU_CLASS_DEFAULTS SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS SUSUWU_VIRTUAL_DEFAULTS */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include <memory> /* std::unique_ptr std::make_unique */
-#include <cstddef> /* size_t */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 //#include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
 namespace Susuwu {
