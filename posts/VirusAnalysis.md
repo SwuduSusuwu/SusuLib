@@ -1427,7 +1427,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT;
 
 typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const ResultListHash &fileHash);
 extern std::vector<VirusAnalysisFun> virusAnalyses;
-const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = classSha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) {analysis(file, hash);} */
+const VirusAnalysisResult virusAnalysis(const PortableExecutable &file); /* auto hash = classSha2(file.bytecode); for(VirusAnalysisFun analysis : virusAnalyses) { auto result = analysis(file, hash); if(virusAnalysisContinue != result) { return result; } } */
 const VirusAnalysisResult virusAnalysisRemoteAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* TODO: compatible hosts to upload to */
 const VirusAnalysisResult virusAnalysisManualReviewCacheless(const PortableExecutable &file, const ResultListHash &fileHash); /* Ask user to "Block", "Submit to remote hosts for analysis", or "Allow". */
 static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file, const ResultListHash &fileHash) {
@@ -1439,6 +1439,7 @@ static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecuta
 	}
 }
 static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file) { return virusAnalysisManualReview(file, classSha2(file.bytecode)); }
+static const VirusAnalysisResult virusAnalysisInteractive(const PortableExecutable &file) { auto result = virusAnalysis(file); if(virusAnalysisRequiresReview == result) { return virusAnalysisManualReview(file); } return result; }
 
 /* Setup virus fix CMS, uses more resources than `produceAnalysisCns()` */
 /* `abortOrNull` should map to `passOrNull` (`ResultList` is composed of `std::tuple`s, because just `produceVirusFixCns()` requires this),
@@ -1510,18 +1511,18 @@ const bool virusAnalysisTests() {
 	const FilePath gotOwnPath = classSysGetOwnPath();
 	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
-		if(virusAnalysisAbort == virusAnalysis(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
+		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
 		const ResultList origPassList = passList, origAbortList = abortList;
 		passList.bytecodes.push_back(executable.bytecode);
 		abortList.bytecodes.push_back("test");
 		produceAbortListSignatures(passList, abortList);
-		if(virusAnalysisAbort == virusAnalysis(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
+		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
 		}
 		virusAnalysisResetCaches();
-		if(virusAnalysisAbort != virusAnalysis(executable)) {
+		if(virusAnalysisAbort != virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort != virusAnalysis(args[0]);} /* This test was supposed to match positive but did not. */"));
 		}
 		passList = origPassList, abortList = origAbortList;
@@ -1533,6 +1534,9 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
+#ifndef SUSUWU_EXPERIMENTAL /* if `VirusAnalysis.hxx` won't include this */
+const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus);
+#endif /* ndef SUSUWU_EXPERIMENTAL */
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
@@ -1612,7 +1616,6 @@ const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
 			case virusAnalysisPass:
 				return virusAnalysisPass;
 			case virusAnalysisRequiresReview:
-				return virusAnalysisManualReview(file, fileHash); /* TODO: Is up to caller to do this? */
 				return virusAnalysisRequiresReview;
 			case virusAnalysisAbort:
 				return virusAnalysisAbort;

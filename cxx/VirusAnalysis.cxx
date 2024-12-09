@@ -79,19 +79,19 @@ const bool virusAnalysisTests() {
 	const FilePath gotOwnPath = classSysGetOwnPath();
 	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
-		if(virusAnalysisAbort == virusAnalysis(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
+		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
 		const ResultList origPassList = passList, origAbortList = abortList;
 		passList.bytecodes.push_back(executable.bytecode);
 		abortList.bytecodes.push_back("test");
 		produceAbortListSignatures(passList, abortList);
-		if(virusAnalysisAbort == virusAnalysis(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysis(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
+		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
 		}
 		virusAnalysisResetCaches();
-		if(virusAnalysisAbort != virusAnalysis(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort != virusAnalysis(args[0]);} /* This test was supposed to match positive but did not. */"));
+		if(virusAnalysisAbort != virusAnalysisInteractive(executable)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort != virusAnalysisInteractive(args[0]);} /* This test was supposed to match positive but did not. */"));
 		}
 		passList = origPassList, abortList = origAbortList;
 	}
@@ -185,7 +185,6 @@ const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
 			case virusAnalysisPass:
 				return virusAnalysisPass;
 			case virusAnalysisRequiresReview:
-				return virusAnalysisManualReview(file, fileHash); /* TODO: Is up to caller to do this? */
 				return virusAnalysisRequiresReview;
 			case virusAnalysisAbort:
 				return virusAnalysisAbort;
