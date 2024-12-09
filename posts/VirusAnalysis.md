@@ -823,9 +823,9 @@ const FilePath classSysGetOwnPath() {
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
 	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
-	char ownPathStr[MAX_PATH];
 	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	if(hModule) {
+		char ownPathStr[MAX_PATH];
 		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
 		return FilePath(ownPathStr);
 	} else {
