@@ -16,10 +16,56 @@ Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-you
 
 # Purposes
 [`./posts/`](./posts/) stages posts (school classes) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about artificial neural tissue, antivirus, assistants, plus autonomous tools.
+- [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SubStack/issues/2#issuecomment-2110726542)).
+- [`./posts/AlbatrossCNS.md#Post-with-resources`](./posts/AlbatrossCNS.md#Post-with-resources) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
+- [`./posts/VirusAnalysis.md#Post-with-resources`](./posts/VirusAnalysis.md#Post-with-resources) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SubStack/issues/8).
 
-[`./c/`](./c/) _C_ implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task), + vendored code (for now just _RFC6234_, for `sha2`).
+[`./c/`](./c/) _C_ implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task)
+- [`./c/rfc6234/`](./c/rfc6234) is vendored code (direct from the official [_RFC6234_](https://www.rfc-editor.org/rfc/rfc6234#section-8)), which is used for {`classSha128()`, `classSha256()`, `classSha512()`}.
 
-[`./cxx/`](./cxx/) _C++_ implementations of posts (for now is just neural system pure virtual template ([`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx)) + antivirus([`./cxx/VirusAnalysis.cxx`](./cxx/VirusAnalysis.cxx)) + assistant([`./cxx/AssistantCns.cxx`](./cxx/AssistantCns.cxx)), with lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
+[`./cxx/`](/cxx/) _C++_ implementations of posts
+- [`./cxx/Macros.hxx`](/cxx/Macros.hxx) is
+  - macros with wrap C++ features/attributes, such as {`SUSUWU_ASSUME`, `SUSUWU_CONSTEXPR`, `SUSUWU_DEFAULT`, `SUSUWU_DELETE`, `SUSUWU_EXPECTS`, `SUSUWU_ENSURES`, `SUSUWU_FINAL`, `SUSUWU_IF_CPLUSPLUS`, `SUSUWU_NOEXCEPT`, `SUSUWU_NORETURN`, `SUSUWU_NULLPTR`, `SUSUWU_OVERRIDE`, `SUSUWU_STATIC_ASSERT`, `SUSUWU_UNREACHABLE`} which (if used on old compilers, or with options such as `-std=c++11`) are replaced with no-ops or alternatives which have the same use,
+  - macro options (which control the macro constants/macro functions). (View [Options/setup](/README.md#Optionssetup) for options),
+  - macro constants, such as `SUSUWU_SH_<color>` (`color` = {`DEFAULT`, `BLACK`, `DARK_GRAY`, `RED`, `LIGHT_RED`, `GREEN`, `LIGHT_GREEN`, `BROWN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `PURPLE`, `LIGHT_PURPLE`, `CYAN`, `LIGHT_CYAN`, `LIGHT_GRAY`, `WHITE`}, if supported, expands to the [_ANSI_ color](https://wikipedia.org/wiki/Ansi_color) codes, else expands to ""),
+  - macro functions, such as {`SUSUWU_ERROR`, `SUSUWU_WARNING`, `SUSUWU_INFO`, `SUSUWU_SUCCESS`, which use `SUSUWU_PRINT`}, `SUSUWU_PRINT` (if `__cplusplus`, uses `SUSUWU_CERR`, else uses `SUSUWU_STDERRR`),
+  - `macroTestsNoexcept()` (unit tests, with return value for errors).
+- [`./cxx/ClassObject.hxx`](/cxx/ClassObject.hxx) is
+  - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
+  - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassPortableExecutable.hxx`](/cxx/ClassPortableExecutable.hxx) is
+  - `FilePath` (`PortableExecutable`'s constructor argument), `FileBytecode` (`classSha2`'s input argument), `FileHash` (`classSha2`'s return value)
+  - `class PortableExecutable : public Object` (stores file `path` and/or `bytecode` and/or `hex`code. TODO; `hash`?)
+  - `class PortableExecutableBytecode : public PortableExecutable` loads `bytecode` from `path`. TODO; `hash`?
+- [`./cxx/ClassSys.hxx`](/cxx/ClassSys.hxx) is
+  - typedefs {ClassSysUSeconds}
+  - globals {classSysArgc, classSysArgs}
+  - modular functions to interact with: console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`}, own process {`classSysInit()`, `classSysGetOwnPath()`, `classSysFopenOwnPath()`, `templateCatchAll()`}, strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}, the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}. TODO: filesystem (perhaps just have `cxx/ClassPortableExecutable.hxx` do this?), internet.
+  - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassSha2.hxx`](/cxx/ClassSha2.hxx) is
+  - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
+  - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassCns.hxx`](/cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6) is to implement this class.
+- [`./cxx/ClassResultList.hxx`](/cxx/ClassResultList.hxx) is
+  - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
+  - modular template (can use on all containers such as `std::vector`, `std::map` or `std::list`) `list*()` functions (such as `listMaxSize()`, `listDumpTo()`, `listToHashes()`, `listIntersections()`, `listsIntersect()`, `listFindValue()`, `listHasValue()`, `listFindSubstr()`, `listHasSubstr()`, `listProduceSignature()` (`produceAbortListSignatures` uses this), `listFindSignatureOfValue()`, `listHasSignatureOfValue()` (`signatureAnalysis()` uses this), `explodeToList` (`./cxx/AssistantCns.cxx` uses this), 
+  produce unique signature, compare file against list of signatures), most of which were produced for antivirus signature analysis.
+  - `classResultListsTests()`, or `classResultListsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/VirusAnalysis.hxx`](/cxx/VirusAnalysis.hxx) is
+  - modular helper functions {`produceAbortListSignatures()` (for `signatureAnalysis()` use), `importedFunctionsList()` (work-in-progress, `staticAnalysis()` uses this), `straceOutputsAnalysis()` (work-in-progress, `sandboxAnalysis()` uses this), `produceAnalysisCns()` (for `cnsAnalysis()` use), `produceVirusFixCns()` (for `cnsVirusFix()` use)},
+  - kernel hook function (`virusAnalysisHook()`), which uses `virusAnalysis()` to scan new downloadss (or scan all programs which execute); work-in-progress.
+  - modular scan functions {`hashAnalysis()`, `signatureAnalysis()`, `staticAnalysis()` (processes [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) or [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable)s, work-in-progress), `sandboxAnalysis()` (executes with `strace` + `chroot`, work-in-progress), `cnsAnalysis()` (uses `ClassCns.hxx`)} plus disinfection function (`cnsVirusFix()`) which form an antivirus program.
+  - `virusAnalysisTests()`, or `virusAnalysisTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/AssistantCns.hxx`](/cxx/AssistantCns.hxx) is
+  - modular functions {`assistantCnsDownloadHosts()` (uses `wget` on `assistantCnsDefaultHosts`), `assistantCnsProcessXhtml()` (uses the next 2 functions to process `wget`'s downloads: `assistantCnsProcessUrls` (uses `boost/property_tree/xml_parser.hpp` to extract new URLs), `assistantCnsProcessQuestion` (work-in-progress, extracts question), `assistantCnsProcessResponses()` (work-in-progress, extracts answers)), `produceAssistantCns()` (uses datasets for backpropagation), `assistantCnsProcess` (uses forwardpropagation to answer new questions)} which form an assistant.
+  - `assistantCnsTests()`, or `assistantCnsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/main.hxx`](/cxx/main.hxx) is `SusuwuUnitTestsBitmask main()` (executes all of those `*TestsNoexcept()` unit tests into a bitmask return value.)
+All have lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
+
+
+[`./Macros.sh`](./Macros.sh) is a modular `./bin/sh` script with functions which `./build.sh` uses.
+
+[`./build.sh`](./build.sh) does what `./configure`, `make` often do. (View [Options/setup](#Optionssetup) for options).
 
 # How to use this
 Minimum requirements (build targets which this supports):
@@ -45,17 +91,17 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
-    - `-DSUSUWU_SH_VERBOSE[=true|=false]` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `=!defined(NDEBUG)`.
+    - `-DSUSUWU_SH_VERBOSE[=true|=false]` with `=true` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `=!defined(NDEBUG)`.
     - `-DSUSUWU_SH_SKIP_BRACKETS=true` sets output format to `WARN_LEVEL: message`; default is `=false`.
     - `-DSUSUWU_SH_FILE=true` sets output format to `[__FILE__: WARN_LEVEL: message]`; default is `=SUSUWU_SH_VERBOSE`.
     - `-DSUSUWU_SH_LINE=true` sets output format to `[__LINE__: WARN_LEVEL: message]`; default is `=SUSUWU_SH_VERBOSE`.
     - `-DSUSUWU_SH_FUNC=true` sets output format to `[__func__: WARN_LEVEL: message]`; default is `=false`.
     - `-DSUSUWU_SH_SKIP_COLORS=true` to omit _VT100_ (_ANSI_) colors; default is `=defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
-    - `-DSUSUWU_SH_SKIP_COLORS=false` to force (even if unsupported) _VT100_ (_ANSI_) color use.
+    - `-DSUSUWU_SH_SKIP_COLORS=false` to force (even if unsupported) _VT100_ ([_ANSI_ color](https://wikipedia.org/wiki/Ansi_color)) use.
     - TODO (for now, no effect; once [issue #17](https://github.com/SwuduSusuwu/SubStack/issues/17) is closed, you can use):
-      - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
-      - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`/`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
-  - To match `g++`/`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
+      - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
+      - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
+  - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
   - Unstable/`experimental` flags:
     - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_VPTRS=false`: [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Class::operator==(const Class &obj) { return this->hasLayoutOf(obj) && 0 == memcmp(sizeof(NULL) + (char *)this, sizeof(NULL) + (char *)&obj, this->getObjectSize() - sizeof(NULL)); }`, thus `Susuwu::Object() == Susuwu::Class()` but `CXX` output with nonstandard `vptr` layout crashes. Default `=true`; (`return typeid(this) == typeid(obj) && 0 == memcmp(this, *obj, this->getObjectSize());`).
@@ -73,6 +119,7 @@ View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for i
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
     - Note: [sensitive issue(s)](./SECURITY.md#Sensitive-issues) have a separate protocol.
 # Contributor conventions/rules
+If your commit introduces/removes functions, have `./README.md#Purposes` include this.
 So that code is consistant, pull requests have language-specific syntax rules:
 ## Git
 Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such as through `git rebase -i`) with a previous commit, or cannot `./build.sh` if a previous commit got `git revert`, your commit message must include such as "Is followup to \<commit hash\>" (which shows temporal order).
