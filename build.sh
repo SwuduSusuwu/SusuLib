@@ -24,7 +24,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG "$@" #/* Usage: `./build.sh --debug` or `./build.sh
 
 SUSUWU_SETUP_OBJDIR "./obj/"
 SUSUWU_SETUP_BINDIR "./bin/"
-SUSUWU_SETUP_OUTPUT "a"
+SUSUWU_SETUP_OUTPUT "Susuwu"
 SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */

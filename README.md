@@ -31,15 +31,15 @@ Minimum requirements (build targets which this supports):
 ## Download
 Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
 ## Options/setup
-Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/a.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
-- [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `a.out`'s return values.
+Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/Susuwu.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
+- [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `Susuwu.out`'s return values.
 - Console flags:
   - `./build.sh` : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
   - `./build.sh --clean` : removes intermediate object files + exits; to reduce disc use.
   - `./build.sh --rebuild` : removes intermediate object files + continues; to rebuild with new flags (or if `./build.sh` doesn't rebuild code which includes updated headers).
   - `./build.sh --debug` : includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with `-Og`.
   - `./build.sh --release` : excludes `--debug` (`-DNDEBUG`), strips frame-pointers/symbols, optimizes with `-O2`.
-  - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_.
+  - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/Susuwu.exe`), for _Windows_.
 - Environment flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - Custom `sh` (console) output:
