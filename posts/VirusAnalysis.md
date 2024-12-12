@@ -1,23 +1,20 @@
-**Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure computers.**
-
-_[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners) allows all uses._
-# Table of Contents:
-- [Introduction](#Introduction)
+**Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure computers.** 
+\[This post allows all uses.\] Is [now on SubStack](https://swudususuwu.substack.com/p/howto-improve-virus-analysis).
+# Table of Contents
+- [Intro](#Intro)
 - [Source code](#Source-code)
 - [Comparison to assistants](#Comparison-to-assistants)
 - [Post, with resources](#Post-with-resources)
   - [Neural resources](#Neural-resources)
 - [Synopsis + related posts](#Synopsis-related-posts)
-# Introduction
-Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but after that **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
+# Intro
+Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (secures all app launches,) but after first launch: **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 
-"(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE), allows all uses."
-
-[README.md](../README.md) has how to use this (what follows is more of a book of source code).
+[`../README.md`](../README.md) has how to use this (what follows is more of a book of source code).
 
 (Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources.)
 
-For the most new sources (+ static libs), use apps such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for **iOS**) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for **Android OS**) to run this:
+For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build.sh`
 
 To test certificates, view [this post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).
@@ -25,8 +22,10 @@ To test certificates, view [this post](https://swudususuwu.substack.com/p/github
 To improve how fast the whole program executes; `CXXFLAGS` should include auto-vectorizes/auto-parallelizes. [^CXXFLAGS]
 
 To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]
-[^CXXFLAGS]: [^MapReduce]: [How to have computers process fast](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
+[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
 # Source code
+(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE), allows all uses.
+
 `less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) #Removed: disabled color codes + unused OSC codes
 ```
 /* Miscellaneous macros */
