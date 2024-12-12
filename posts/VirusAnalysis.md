@@ -1,13 +1,31 @@
-**Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure us**
-_[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners) allows all uses._
+**Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure computers.**
 
-Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but _caches_ reduce this to **less than 1ms** (just cost to lookup `ResultList::hashes`, which is `std::unordered_set<decltype(classSha2(const FileBytecode &))>`; a hashmap of hashes).
+_[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners) allows all uses._
+# Table of Contents:
+- [Introduction](#Introduction)
+- [Source code](#Source-code)
+- [Comparison to assistants](#Comparison-to-assistants)
+- [Post, with resources](#Post-with-resources)
+  - [Neural resources](#Neural-resources)
+- [Synopsis + related posts](#Synopsis-related-posts)
+# Introduction
+Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but after that **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 
 `Licenses: allows all uses ("Creative Commons"/"Apache 2")`
-[Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources]
+
+[README.md](../README.md) has how to use this (what follows is more of a book of source code).
+
+(Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources.)
+
 For the most new sources (+ static libs), use apps such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for **iOS**) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for **Android OS**) to run this:
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build.sh`
-`less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) /* removed: disabled color codes + unused OSC codes */
+
+To improve how fast the whole program executes; `CXXFLAGS` should include auto-vectorizes/auto-parallelizes. [^CXXFLAGS]
+
+To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]
+[^CXXFLAGS]: [^MapReduce]: [How to have computers process fast](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
+# Source code
+`less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) #Removed: disabled color codes + unused OSC codes
 ```
 /* Miscellaneous macros */
 /* To printout default preprocessor definitions:
@@ -1856,7 +1874,7 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 	return cns.processToString(file.bytecode);
 }
 ```
-`less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) /* with boilerplate */
+`less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) #With boilerplate
 ```
 /* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
 #ifndef INCLUDES_cxx_main_hxx
@@ -1997,9 +2015,8 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 #endif /* ndef INCLUDES_cxx_main_cxx */
 
 ```
-To run most of this fast (lag less,) use `CXXFLAGS` which auto-vectorizes/auto-parallelizes, and to setup CNS synapses (`Cns::setupSynapses()`) fast, use _TensorFlow_'s `MapReduce`. Resources: [How to have computers process fast](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
-
-For comparison; `produceVirusFixCns` is close to assistants (such as "ChatGPT 4.0" or "Claude-3 Opus";) have such demo as `produceAssistantCns`;
+# Comparison to assistants
+For comparison; `produceVirusFixCns()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)" or _Anthropic_'s "[_Assistant_](https://poe.com/Assistant)";) have such demo as `produceAssistantCns()`;
 `less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.hxx)
 ```
 /* (Work-in-progress) assistant bots with artificial CNS. */
@@ -2202,86 +2219,82 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */)
 	}
 }
 ```
-=================================================
-
+# Post, with resources
 **Hash resources:**
-Is just a checksum (such as sha-2) of all sample inputs, which maps to "this passes" (or "this does not pass".)
-https://wikipedia.org/wiki/Sha-2
+Hash is just a checksum (such as [Sha-2](https://wikipedia.org/wiki/Sha-2)) of all sample inputs, which maps to "this passes" (or "this does not pass".)
 
 **Signature resources:**
-Is just a substring (or regex) of infections, which the virus analysis tool checks all executables for; if the signature is found in the executable, do not allow to launch, otherwise launch this.
-https://wikipedia.org/wiki/Regex
+Signature is just a substring (or [regular expression](https://wikipedia.org/wiki/Regular_expression)) specific to infections, which the virus analysis tool searches all executables for; if the signature is found in the executable, do not allow to launch, otherwise launch this.
 
 **Static analysis resources:**
-https://github.com/topics/analysis has lots of open source (FLOSS) analysis tools (such as
-https://github.com/kylefarris/clamscan,
- which wraps https://github.com/Cisco-Talos/clamav/ ,)
-which show how to use hex dumps (or disassembled sources) of the apps/SW (executables) to deduce what the apps/SW do to your OS.
-Static analysis (such as Clang/LLVM has) just checks programs for accidental security threats (such as buffer overruns/underruns, or null-pointer-dereferences,) but could act as a basis,
-if you add a few extra checks for deliberate vulnerabilities/signs of infection (these are heuristics, so the user should have a choice to quarantine and submit for review, or continue launch of this).
-https://github.com/llvm/llvm-project/blob/main/clang/lib/StaticAnalyzer
-is part of Clang/LLVM (license is FLOSS,) does static analysis (emulation produces inputs to functions, formulas analyze stacktraces (+ heap/stack uses) to produce lists of possible unwanted side effects to warn you of); versus [`-fsanitize`](https://github.com/SwuduSusuwu/SubStack/issues/5#issuecomment-2169117084), do not have to recompile to do static analysis. `-fsanitize` requires you to produce inputs, static analysis does this for you.
-LLVM is lots of files, Phasar is just it’s static analysis:
-https://github.com/secure-software-engineering/phasar
+[https://github.com/topics/analysis](https://github.com/topics/analysis) has lots of open source ([FLOSS](https://wikipedia.org/wiki/FLOSS)) app/SW (executable) analysis tools (such as [https://github.com/kylefarris/clamscan](https://github.com/kylefarris/clamscan), which wraps [https://github.com/Cisco-Talos/clamav/](https://github.com/Cisco-Talos/clamav/),)
+which show how to process raw executables (or their disassembled sources) to deduce what those do to your OS.
 
-Example outputs (tests “_Fdroid.apk_”) from _VirusTotal_, of [static analysis](https://www.virustotal.com/gui/file/dc3bb88f6419ee7dde7d1547a41569aa03282fe00e0dc43ce035efd7c9d27d75/details) + [2 sandboxes](https://www.virustotal.com/gui/file/dc3bb88f6419ee7dde7d1547a41569aa03282fe00e0dc43ce035efd7c9d27d75/behavior);
+Most static analysis (such as _Clang_/_LLVM_ has) just checks programs for accidental issues (such as [buffer overflow](https://wikipedia.org/wiki/Buffer_overflow)s, [underrun](https://wikipedia.org/wiki/Buffer_underrun)s, or [null pointer dereference](https://wikipedia.org/wiki/Null_pointer_dereference)s,) but has uses as a basis for virus analysis;
+
+you can expand such so that checks for deliberate vulnerabilities/signs of infection (these are heuristics, so the user should have a choice to isolate and submit for review, or continue launch of this) are included.
+
+[clang/lib/StaticAnalyzer](https://github.com/llvm/llvm-project/blob/main/clang/lib/StaticAnalyzer)
+is part of Clang/LLVM (license is FLOSS,) does static analysis (emulation produces inputs to functions, formulas do analysis of stacktraces (+ heap/stack uses) to produce lists of possible unwanted side effects to warn you of).
+
+Versus instrumentation such as [`-fsanitize`](https://github.com/SwuduSusuwu/SubStack/issues/5#issuecomment-2169117084), you do not have to recompile to do static analysis. `-fsanitize` requires you to produce inputs, static analysis tests all/most possible inputs for you.
+
+_LLVM_/_Clang_ is lots of files; you can clone [Phasar](https://github.com/secure-software-engineering/phasar) if you want just it’s static analysis.
+
+Example outputs (tests “_Fdroid.apk_”), of [_VirusTotal_'s static analysis](https://www.virustotal.com/gui/file/dc3bb88f6419ee7dde7d1547a41569aa03282fe00e0dc43ce035efd7c9d27d75/details) + [2 sandboxes](https://www.virustotal.com/gui/file/dc3bb88f6419ee7dde7d1547a41569aa03282fe00e0dc43ce035efd7c9d27d75/behavior);
 the false positive outputs (from _VirusTotal_'s **Zenbox**) show the purpose of manual review.
 
 **Sandbox resources:**
 As opposed to static analysis of the executables hex (or disassembled sources,)
 sandboxes perform chroot + functional analysis.
-https://wikipedia.org/wiki/Valgrind is just meant to locate accidental security vulnerabilities, but is a common example of functional analysis.
-If compliant to POSIX (each Linux OS is), tools can use:
- `chroot()` (run `man chroot` for instructions) so that the programs you test cannot alter stuff out of the test;
- plus can use `strace()` (run `man strace` for instructions, or look at https://opensource.com/article/19/10/strace
-https://www.geeksforgeeks.org/strace-command-in-linux-with-examples/ ) which hooks all system calls and saves logs for functional analysis.
-Simple sandboxes just launch programs with "chroot()"+"strace()" for a few seconds,
-with all outputs sent for manual reviews;
-if more complex, has heuristics to guess what is important (in case of lots of submissions, so manual reviews have less to do.)
+[Valgrind](https://wikipedia.org/wiki/Valgrind) is just meant to locate accidental security vulnerabilities, but is a common example of functional analysis.
 
-Autonomous sandboxes (such as Virustotal's) use full outputs from all analyses,
- with calculus to guess if the app/SW is cool to us
- (thousands of rules such as "Should not alter files of other programs unless prompted to through OS dialogs", "Should not perform network access unless prompted to from you", "Should not perform actions leading to obfuscation which could hinder analysis",)
+If compliant to [_POSIX_](https://wikipedia.org/wiki/POSIX) (each [_Linux_](https://wikipedia.org/wiki/Linux) OS is), tools can use:
+- `chroot()` (run `man chroot` for instructions) so that executables sent to analysis are restricted to the path of analysis;
+- `strace()` (run `man strace` for instructions, or view [opensource.com's](https://opensource.com/article/19/10/strace) or [geeksforgeeks.org's](https://www.geeksforgeeks.org/strace-command-in-linux-with-examples/) examples) which hooks all system calls (to store logs for functional analysis).
+
+- Old fashioned sandboxes just test executables with `chroot()` plus `strace()` for a few seconds,
+with all outputs from `strace()` sent to manual reviews;
+- new sandboxes produce inputs (with the goal to act as a normal user) to send to those executables,
+- new sandboxes use heuristics to guess which outputs from the executable (or from `strace()`) to send to reviews (so manual reviews have less to do); for example, repetitious accesses to resources which the executable produced on its own are ignored (or are counted as one access to such resources).
+
+Autonomous sandboxes (such as _Virustotal_'s) use full outputs from all analyses,
+ with calculus to guess if the executable is good for use (thousands of rules such as "Should not alter files of other programs unless prompted to through OS dialogs", "Should not perform network access unless prompted to from you", "Should not perform actions leading to obfuscation which could hinder analysis",)
+
  which, if violated, add to the executables "danger score" (which the analysis results page shows you.)
-
+## Neural resources
 **CNS resources:**
 Once the virus analysis tool has static+functional analysis (+ sandbox,) the next logical move is to do artificial CNS.
-Just as (if humans grew trillions of neurons plus thousands of layers of cortices) one of us could parse all databases of infections (plus samples of fresh apps/SW) to setup our synapses to parse hex dumps of apps/SW (to allow us to revert all infections to fresh apps/SW, or if the whole thing is an infection just block,)
-so too could artificial CNS (with trillions of artificial neurons) do this:
-For analysis, pass training inputs mapped to outputs (infection -> block, fresh apps/SW -> pass) to artificial CNS;
-To undo infections (to restore to fresh apps/SW,)
-inputs = samples of all (infections or fresh apps/SW,)
-outputs = EOF/null (if is infection that can not revert to fresh apps/SW,) or else outputs = fresh apps/SW;
-To setup synapses, must have access to huge sample databases (such as Virustotal's access.)
+Just as (if humans grew trillions of neurons plus thousands of layers of cortices) one of us could parse all databases of infections (plus samples of fresh executables) to setup our synapses to parse hex dumps of executables (to allow us to revert all infections to fresh executables, or if the whole thing is an infection just block,)
 
-Github has lots of FLOSS (Open Source Softwares) simulators of CNS at https://github.com/topics/artificial-neural-network which have uses to do assistants (such as "ChatGPT 4.0" or "Claude-3 Opus",) but not close to complex enough to house human consciousness:
+ so too could artificial CNS (with trillions of artificial neurons) do this:
+- For analysis, pass training inputs mapped to outputs (infection -> block, fresh executables -> pass) to artificial CNS;
+- To undo infections (to restore to fresh executables,)
+  - inputs = samples of all (infections or fresh executables,)
+  - outputs = EOF/null (if is infection that can not revert to fresh executables,) or else outputs = fresh executables;
+- To setup synapses, must have access to huge sample databases (such as _Virustotal_'s access.)
 
-"HSOM" ( https://github.com/CarsonScott/HSOM , license is FLOSS ) is a simple Python neural map.
+_Github_ [has lots of _FLOSS_ simulators of neural tissue](https://github.com/topics/artificial-neural-network) which have uses to program virus analysis tools (or assistants such as _ChatGPT 4.0_ or _Claude-3 Opus_,) but not sufficient to house human consciousness:
 
-"apxr_run" ( https://github.com/Rober-t/apxr_run/ , license is FLOSS ) is almost complex enough to house human consciousness;
-"apxr_run" has various FLOSS neural network activation functions (absolute, average, standard deviation, sqrt, sin, tanh, log, sigmoid, cos), plus sensor functions (vector difference, quadratic, multiquadric, saturation [+D-zone], gaussian, cartesian/planar/polar distances): https://github.com/Rober-t/apxr_run/blob/master/src/lib/functions.erl
-Various FLOSS neuroplastic functions (self-modulation, Hebbian function, Oja's function): https://github.com/Rober-t/apxr_run/blob/master/src/lib/plasticity.erl
-Various FLOSS neural network input aggregator functions (dot products, product of differences, mult products): https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/signal_aggregator.erl
-Various simulated-annealing functions for artificial neural networks (dynamic [+ random], active [+ random], current [+ random], all [+ random]): https://github.com/Rober-t/apxr_run/blob/master/src/lib/tuning_selection.erl
-Choices to evolve connections through Darwinian or Lamarkian formulas: [https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/neuron.erl](https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/signal_aggregator.erl)
+- [_HSOM_](https://github.com/CarsonScott/HSOM) (`git clone https://github.com/CarsonScott/HSOM.git`, license is _FLOSS_) is a simple Python neural map.
+  - [`./src/examples/`](https://github.com/Rober-t/apxr_run/blob/master/src/examples/) has examples of howto setup as artificial CNS.
 
-Simple to convert Erlang functions to Java/C++ (to reuse for fast programs;
-the syntax is close to Lisp's.
+Simple to setup once you have relevant databases downloaded.
 
-Examples of howto setup APXR as artificial CNS; https://github.com/Rober-t/apxr_run/blob/master/src/examples/
-Examples of howto setup HSOM as artificial CNS; https://github.com/CarsonScott/HSOM/tree/master/examples
-Simple to setup once you have access to databases.
+- [_apxr_run_](https://github.com/Rober-t/apxr_run/) (`git clone https://github.com/Rober-t/apxr_run/.git`, license is _FLOSS_) is almost complex enough to house human consciousness;
+  - [`./src/lib/functions.erl`](https://github.com/Rober-t/apxr_run/blob/master/src/lib/functions.erl) has various FLOSS neural network activation functions (absolute, average, standard deviation, sqrt, sin, tanh, log, sigmoid, cos), plus sensor functions (vector difference, quadratic, multiquadric, saturation \[D-zone\], gaussian, cartesian/planar/polar distances).
+  - [`./src/lib/plasticity.erl`](https://github.com/Rober-t/apxr_run/blob/master/src/lib/plasticity.erl) has various FLOSS neuroplastic functions (self-modulation, Hebbian function, Oja's function).
+  - [`./src/agent_mgr/signal_aggregator.erl`](https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/signal_aggregator.erl) has various FLOSS neural network input aggregator functions (dot products, product of differences, mult products).
+  - [`./src/lib/tuning_selection.erl`](https://github.com/Rober-t/apxr_run/blob/master/src/lib/tuning_selection.erl) has various simulated-annealing functions for artificial neural networks (dynamic \[random\], active \[random\], current \[random\], all \[random\]).
+  - [`./src/agent_mgr/neuron.erl`](https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/signal_aggregator.erl) has choices to evolve connections through Darwinian or Lamarkian formulas.
+  - [`./examples/`](https://github.com/CarsonScott/HSOM/tree/master/examples) has examples of howto setup as artificial CNS.
 
-Alternative CNS:
-https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural
-=================================================
-This post was about general methods to produce virus analysis tools, does not require that local resources do all of this;
+Simple to convert [_Erlang_](https://wikipedia.org/wiki/Erlang) functions to [_Java_](https://wikipedia.org/wiki/Java)/[_C++_](https://wikipedia.org/wiki/C++) (to reuse for fast programs); the dynamic-typed, functional, concurrent syntax is close to [_Lisp_](https://wikipedia.org/wiki/Lisp)'s.) [_Fortran_](https://wikipedia.org/wiki/Fortran) to _Erlang_ converters [exist](https://www.codeconvert.ai/fortran-to-erlang-converter) (plus _Erlang_ has a [_Fortran_ frontend](https://dev.to/escribapetrus/transparent-execution-of-fortran-code-from-the-erlang-machine-using-ports-37ba)), which you can peruse for clues on how to convert _Erlang_ to _C++_.
+# Synopsis + related posts
+This post was about general methods to produce virus analysis tools, which do not require that local resources do all of this;
+- For systems with lots of resources, can use local sandboxes/CNS.
+- For systems with less resources, can submit samples (of unknown executables) to remote hosts (which perform analysis.)
+- Can have small local sandboxes (that just run for a few seconds) + small CNS (just billions of neurons with hundreds of layers, versus the trillions of neurons with thousands of layers of cortices that antivirus hosts would use for this), which forward suspicious executables to remote hosts for extra review.
+- Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes (or just add artificial CNS to antivirus hosts for extra analysis).
 
-    For systems with lots of resources, could have local sandboxes/CNS.
-
-    For systems with less resources, could just submit samples of unknown apps/SW to hosts to perform analysis.
-
-    Could have small local sandboxes (that just run for a few seconds) and small CNS (just billions of neurons with hundreds of layers, versus the trillions of neurons with thousands of layers of cortices that antivirus hosts would use for this).
-
-    Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes, or just add artificial CNS to antivirus hosts for extra analysis.
-
+Alternative CNS structure: [based on albatross](./AlbatrossCNS.md) (includes numerous resources, about all sorts of natural/artificial neural tissue).
