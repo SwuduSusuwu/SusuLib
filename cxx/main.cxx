@@ -6,9 +6,11 @@
 #include "ClassObject.hxx" /* classObjectTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysGetOwnPath classSysSetConsoleInput classSysTestsNoexcept templateCatchAll */
-#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_WARNING */
+#include "ClassSys.hxx" /* classSysGetOwnPath classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
+#endif /* SUSUWU_UNIT_TESTS */
 #include <iostream> /* std::cout std::flush std::endl */
 #include <string> /* std::to_string */
 #ifdef SUSUWU_CXX17 /* `type_traits` is C++11 but `is_nothrow_invocable` is C++17 */
@@ -16,12 +18,16 @@
 #endif /* def SUSUWU_CXX17 */
 namespace Susuwu {
 /* `clang-tidy` off: NOLINTBEGIN(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
-static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classObjectTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
+static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good())
+#if SUSUWU_UNIT_TESTS
+	SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classObjectTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
+#endif /* SUSUWU_UNIT_TESTS */
 #ifdef SUSUWU_CXX17
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
 { /* if the function names (or line numbers) change, update `SECURITY.md` to new values */
 	int susuwuUnitTestsErrno = 0;
+#if SUSUWU_UNIT_TESTS
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
@@ -82,6 +88,9 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
+#else /* else !SUSUWU_UNIT_TESTS */
+	SUSUWU_NOTICE('`' + std::string(Susuwu::classSysGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
+#endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
 }; /* namespace Susuwu */

@@ -7,7 +7,7 @@
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
 #include <map> /* std::map */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
@@ -36,6 +36,7 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
 
+#if SUSUWU_UNIT_TESTS
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
@@ -43,6 +44,7 @@ const bool virusAnalysisTests();
 static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
 static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
  * @pre @code (virusAnalysisHookDefault == virusAnalysisGetHook() || virusAnalysisHookExec == virusAnalysisGetHook() || virusAnalysisHookNewFile == virusAnalysisGetHook() || (virusAnalysisHookExec | virusAnalysisHookNewFile) == virusAnalysisGetHook()) @endcode

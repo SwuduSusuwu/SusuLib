@@ -6,7 +6,7 @@
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode FileHash */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHexOs */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #if SUSUWU_PREFER_CSTR
@@ -33,8 +33,10 @@ typedef struct ResultList : public Object { /* Lists of {metadata, executables (
 /* `clang-tidy` on: NOLINTEND(misc-non-private-member-variables-in-classes) */
 } ResultList;
 
+#if SUSUWU_UNIT_TESTS
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
 static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
+#endif /* SUSUWU_UNIT_TESTS */
 
 template<class List>
 const size_t listMaxSize(const List &list) {

@@ -1,7 +1,7 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_WARNING SUSUWU_WIN32*/
+#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassPortableExecutable.hxx" /* FilePath */
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -193,6 +193,7 @@ const bool classSysSetConsoleInput(bool input) {
 	return classSysGetConsoleInput();
 }
 
+#if SUSUWU_UNIT_TESTS
 namespace { /* [misc-use-anonymous-namespace] */
 static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
@@ -220,6 +221,7 @@ const bool classSysTests() {
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
 	return retval;
 }
+#endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_ClassSys_cxx */

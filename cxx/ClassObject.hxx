@@ -1,7 +1,7 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
-#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE */
+#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
@@ -18,8 +18,10 @@
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
 namespace Susuwu {
+#if SUSUWU_UNIT_TESTS
 const bool classObjectTests();
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
 
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:

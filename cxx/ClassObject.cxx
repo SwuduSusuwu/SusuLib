@@ -1,7 +1,8 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_ClassObject_cxx
 #define INCLUDES_cxx_ClassObject_cxx
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_PURE_VIRTUAL_DEFAULTS SUSUWU_VIRTUAL_DEFAULTS */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_PURE_VIRTUAL_DEFAULTS SUSUWU_VIRTUAL_DEFAULTS SUSUWU_UNIT_TESTS */
+#if SUSUWU_UNIT_TESTS
 #include "ClassObject.hxx" /* Class Object SUSUWU_CLASS_DEFAULTS SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS SUSUWU_VIRTUAL_DEFAULTS */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include <memory> /* std::unique_ptr std::make_unique */
@@ -217,5 +218,6 @@ const bool classObjectTests() {
 }
 
 }; /* namespace Susuwu */
+#endif /* SUSUWU_UNIT_TESTS */
 #endif /* ndef INCLUDES_cxx_ClassObject_cxx */
 

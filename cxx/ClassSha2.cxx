@@ -4,7 +4,7 @@
 #include "ClassPortableExecutable.hxx" /* FileBytecode FileHash */
 #include "ClassSha2.hxx"
 #include "ClassSys.hxx" /* classSysHexStr classSysUSecondClock templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::to_string */
@@ -42,6 +42,7 @@ ClassSha2 classSha2 = classSha256;
 	return result;
 }
 
+#if SUSUWU_UNIT_TESTS
 const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234). Use `../c/rfc6234/shatest.c` to test rfc6234. */
 	const char nulls[65536 /* 65536 == 2^16 == 64kb */] = {0};
 	std::string nullStr(nulls, &nulls[65536]);
@@ -68,6 +69,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	return true;
 }
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_ClassSha2_cxx */

@@ -7,7 +7,7 @@
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::cin std::cout */
@@ -25,6 +25,7 @@ std::vector<FilePath> assistantCnsDefaultHosts = {
 };
 std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResponses>");
 
+#if SUSUWU_UNIT_TESTS
 const bool assistantCnsTests() {
 	ResultList questionsOrNull; {
 		questionsOrNull.hashes = {}, questionsOrNull.signatures = {}, questionsOrNull.bytecodes = { /* UTF-8 */
@@ -54,6 +55,8 @@ const bool assistantCnsTests() {
 	produceAssistantCns(questionsOrNull, responsesOrNull, assistantCns);
 	return true;
 }
+#endif /* SUSUWU_UNIT_TESTS */
+
 void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, Cns &cns) {
 	std::vector<std::tuple<ResultListBytecode, ResultListBytecode>> inputsToOutputs;
 	const size_t maxConvolutionsOfMessages = 6666; /* is not conversation's max message count, but max steps to compute output. TODO: compute this value */

@@ -40,7 +40,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `./build.sh --debug` : includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with `-Og`.
   - `./build.sh --release` : excludes `--debug` (`-DNDEBUG`), strips frame-pointers/symbols, optimizes with `-O2`.
   - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/a.exe`), for _Windows_.
-- Environment flags (use `vim build.sh` to put into `FLAGS_USER`); other than `_PREFER_`/`_SKIP_`, most use more resources if set to `true`:
+- Environment flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
+  - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
     - `-DSUSUWU_SH_VERBOSE[=true|=false]` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `=!defined(NDEBUG)`.

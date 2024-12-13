@@ -52,6 +52,10 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
 
+#ifndef SUSUWU_UNIT_TESTS /* if not set with `-DSUSUWU_UNIT_TESTS=true` (or `=false`) */
+#	define SUSUWU_UNIT_TESTS true /* more stable future version could have default = `!defined(NDEBUG)` */
+#endif /* ndef SUSUWU_UNIT_TESTS */
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
@@ -170,7 +174,9 @@ For the most new sources (+ static libs), use apps such as [iSH](https://apps.ap
 #ifdef __cplusplus
 namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
 #endif /* ifdef __cplusplus */
+#if SUSUWU_UNIT_TESTS
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
@@ -323,7 +329,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 ```
 `less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.cxx)
 ```
-/* This is just unit tests. `Macros.hxx` has all which has actual use. */
+#if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #ifdef SUSUWU_CXX11
 SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    /* `int`    */) {return false;}
 SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(SUSUWU_NULLPTR) /* `void *` */) {return true;}
@@ -378,6 +384,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 	}
 	return 0;
 }
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassObject.hxx)
 ```
@@ -386,8 +393,10 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
 namespace Susuwu {
+#if SUSUWU_UNIT_TESTS
 const bool classObjectTests();
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
 
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
@@ -678,9 +687,11 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 	}
 }
 
+#if SUSUWU_UNIT_TESTS
 /* @throw std::runtime_error */
 const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
 ```
@@ -848,6 +859,7 @@ const bool classSysSetConsoleInput(bool input) {
 	return classSysGetConsoleInput();
 }
 
+#if SUSUWU_UNIT_TESTS
 static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
@@ -862,7 +874,6 @@ static void classSysHexTests(const std::string &value) {
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
-};
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
 	classSysHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
@@ -874,6 +885,7 @@ const bool classSysTests() {
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
 	return retval;
 }
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.hxx)
 ```
@@ -882,8 +894,10 @@ const bool classSysTests() {
 /* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode);
 typedef FileHash (*ClassSha2)(const FileBytecode &bytecode);
 extern ClassSha2 classSha2/* = classSha256 */; /* To compress, apps can execute `classSha2 = classSha1;`. To double hash sizes, execute `classSha2 = classSha512;`. (Notice: this does not recompute hashes which exist) */
+#if SUSUWU_UNIT_TESTS
 const bool classSha2Tests();
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.cxx)
 ```
@@ -917,6 +931,7 @@ ClassSha2 classSha2 = classSha256;
 	return result;
 }
 
+#if SUSUWU_UNIT_TESTS
 const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234). Use `../c/rfc6234/shatest.c` to test rfc6234. */
 	const char nulls[65536 /* 65536 == 2^16 == 64kb */] = {0};
 	std::string nullStr(nulls, &nulls[65536]);
@@ -943,6 +958,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	return true;
 }
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.hxx)
 ```
@@ -960,8 +976,10 @@ typedef struct ResultList : public Object { /* Lists of {metadata, executables (
 	Bytecodes bytecodes; /* Whole executables (for `VirusAnalysis`) or webpages (for `AssistantCns`); huge disk usage, just load this for signature synthesis (or CNS backpropagation). */
 } ResultList;
 
+#if SUSUWU_UNIT_TESTS
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
 static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
+#endif /* SUSUWU_UNIT_TESTS */
 
 template<class List>
 const size_t listMaxSize(const List &list) {
@@ -1129,6 +1147,7 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 ```
 `less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.cxx)
 ```
+#if SUSUWU_UNIT_TESTS
 static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
@@ -1146,6 +1165,7 @@ const bool classResultListTests() {
 	classResultListDumpToTest(resultList, false, false, true, "list.hashes={1:2};list.signatures={1:1,1:2};list.bytecodes={2:01,2:02};");
 	return true;
 }
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassCns.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassCns.hxx)
 ```
@@ -1361,6 +1381,7 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
 
+#if SUSUWU_UNIT_TESTS
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
@@ -1368,6 +1389,7 @@ const bool virusAnalysisTests();
 static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
 static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
  * @pre @code (virusAnalysisHookDefault == virusAnalysisGetHook() || virusAnalysisHookExec == virusAnalysisGetHook() || virusAnalysisHookNewFile == virusAnalysisGetHook() || (virusAnalysisHookExec | virusAnalysisHookNewFile) == virusAnalysisGetHook()) @endcode
@@ -1477,6 +1499,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 }
 std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
+#if SUSUWU_UNIT_TESTS
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
 		abortOrNull.hashes = {}, abortOrNull.signatures = {}, abortOrNull.bytecodes = { /* Produce from an antivirus vendor's (such as VirusTotal.com's) infection databases */
@@ -1566,6 +1589,7 @@ const bool virusAnalysisHookTests() {
 	}
 	return true;
 }
+#endif /* SUSUWU_UNIT_TESTS */
 
 static const bool virusAnalysisImpl(const PortableExecutable &file) {
 	switch(virusAnalysis(file)) {
@@ -1861,13 +1885,36 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 ```
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
 ```
+/* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
+#ifndef INCLUDES_cxx_main_cxx
+#define INCLUDES_cxx_main_cxx
+#include "main.hxx"
+#include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
+#include "ClassObject.hxx" /* classObjectTestsNoexcept */
+#include "ClassResultList.hxx" /* classResultListTestsNoexcept */
+#include "ClassSha2.hxx" /* classSha2TestsNoexcept */
+#include "ClassSys.hxx" /* classSysGetOwnPath classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#if SUSUWU_UNIT_TESTS
+#include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
+#endif /* SUSUWU_UNIT_TESTS */
+#include <iostream> /* std::cout std::flush std::endl */
+#include <string> /* std::to_string */
+#ifdef SUSUWU_CXX17 /* `type_traits` is C++11 but `is_nothrow_invocable` is C++17 */
+#	include <type_traits> /* std::is_nothrow_invocable */
+#endif /* def SUSUWU_CXX17 */
 namespace Susuwu {
-static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good()) SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classObjectTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
+/* `clang-tidy` off: NOLINTBEGIN(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
+static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good())
+#if SUSUWU_UNIT_TESTS
+	SUSUWU_ENSURES(0 == macrosTestsNoexcept() && true == classObjectTestsNoexcept() && true == classSysTestsNoexcept() && true == classSha2TestsNoexcept() && true == virusAnalysisTestsNoexcept() && true == assistantCnsTestsNoexcept())
+#endif /* SUSUWU_UNIT_TESTS */
 #ifdef SUSUWU_CXX17
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
 { /* if the function names (or line numbers) change, update `SECURITY.md` to new values */
 	int susuwuUnitTestsErrno = 0;
+#if SUSUWU_UNIT_TESTS
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
@@ -1928,6 +1975,9 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
+#else /* else !SUSUWU_UNIT_TESTS */
+	SUSUWU_NOTICE('`' + std::string(Susuwu::classSysGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
+#endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
 }; /* namespace Susuwu */
@@ -1943,6 +1993,9 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 #endif
 	return Susuwu::unitTestsCxx();
 }
+/* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
+#endif /* ndef INCLUDES_cxx_main_cxx */
+
 ```
 To run most of this fast (lag less,) use `CXXFLAGS` which auto-vectorizes/auto-parallelizes, and to setup CNS synapses (`Cns::setupSynapses()`) fast, use _TensorFlow_'s `MapReduce`. Resources: [How to have computers process fast](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
 
@@ -1953,12 +2006,14 @@ For comparison; `produceVirusFixCns` is close to assistants (such as "ChatGPT 4.
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
 
+#if SUSUWU_UNIT_TESTS
 /* if (with example inputs) these functions (`assistantCnsDownloadHosts()` `produceAssistantCns()`) pass, `return true;`
  * @throw std::bad_alloc
  * @throw std::logic_error
  * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
 static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 
 /* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )
@@ -2001,6 +2056,7 @@ std::vector<FilePath> assistantCnsDefaultHosts = {
 };
 std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResponses>");
 
+#if SUSUWU_UNIT_TESTS
 const bool assistantCnsTests() {
 	ResultList questionsOrNull; {
 		questionsOrNull.hashes = {}, questionsOrNull.signatures = {}, questionsOrNull.bytecodes = { /* UTF-8 */
@@ -2030,6 +2086,8 @@ const bool assistantCnsTests() {
 	produceAssistantCns(questionsOrNull, responsesOrNull, assistantCns);
 	return true;
 }
+#endif /* SUSUWU_UNIT_TESTS */
+
 void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, Cns &cns) {
 	std::vector<std::tuple<ResultListBytecode, ResultListBytecode>> inputsToOutputs;
 	const size_t maxConvolutionsOfMessages = 6666; /* is not conversation's max message count, but max steps to compute output. TODO: compute this value */

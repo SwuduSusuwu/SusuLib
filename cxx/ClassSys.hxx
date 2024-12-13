@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
 #include "ClassPortableExecutable.hxx" /* FilePath */
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include <chrono> /* std::chrono */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
@@ -144,9 +144,11 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 	}
 }
 
+#if SUSUWU_UNIT_TESTS
 /* @throw std::runtime_error */
 const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_ClassSys_hxx */

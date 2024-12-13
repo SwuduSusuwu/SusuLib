@@ -6,7 +6,7 @@
 #include "ClassPortableExecutable.hxx" /* FilePath FileBytecode */
 #include "ClassResultList.hxx" /* ResultList */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
 #include <iostream> /* std::cout */
 #include <ostream> /* std::ostream */
 #include <string> /* std::string */
@@ -16,12 +16,14 @@ namespace Susuwu {
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
 
+#if SUSUWU_UNIT_TESTS
 /* if (with example inputs) these functions (`assistantCnsDownloadHosts()` `produceAssistantCns()`) pass, `return true;`
  * @throw std::bad_alloc
  * @throw std::logic_error
  * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
 static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+#endif /* SUSUWU_UNIT_TESTS */
 
 /* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )

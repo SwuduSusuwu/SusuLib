@@ -2,10 +2,11 @@
 #ifndef INCLUDES_cxx_ClassResultList_cxx
 #define INCLUDES_cxx_ClassResultList_cxx
 #include "ClassResultList.hxx" /* resultList resultListDumpTo ResultListHash */
-#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_SH_GREEN SUSUWU_NOEXCEPT SUSUWU_SH_RED SUSUWU_SH_WHITE */
+#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_SH_GREEN SUSUWU_NOEXCEPT SUSUWU_SH_RED SUSUWU_SH_WHITE SUSUWU_UNIT_TESTS */
 #include <sstream> /* std::stringstream */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
+#if SUSUWU_UNIT_TESTS
 namespace Susuwu {
 namespace { /* [misc-use-anonymouse-namespace] */
 static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
@@ -27,5 +28,6 @@ const bool classResultListTests() {
 	return true;
 }
 }; /* namespace Susuwu */
+#endif /* SUSUWU_UNIT_TESTS */
 #endif /* ndef INCLUDES_cxx_ClassResultList_cxx */
 

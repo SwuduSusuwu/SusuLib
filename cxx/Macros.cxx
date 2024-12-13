@@ -1,8 +1,8 @@
 /* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
 #ifndef INCLUDES_cxx_Macros_cxx
 #define INCLUDES_cxx_Macros_cxx
-/* This is just unit tests. `Macros.hxx` has all which has actual use. */
-#include "Macros.hxx" /* SUSUWU_ASSUME SUSUWU_CONSTEXPR SUSUWU_DEFAULT SUSUWU_DELETE SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_STATIC_ASSERT SUSUWU_UNREACHABLE */
+#include "Macros.hxx" /* SUSUWU_ASSUME SUSUWU_CONSTEXPR SUSUWU_DEFAULT SUSUWU_DELETE SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_STATIC_ASSERT SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
+#if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit */
 namespace Susuwu {
 namespace { /* [misc-use-anonymous-namespace] */
@@ -63,5 +63,6 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 }
 
 }; /* namespace Susuwu */
+#endif /* SUSUWU_UNIT_TESTS */
 #endif /* ndef INCLUDES_cxx_Macros_cxx */
 

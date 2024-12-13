@@ -6,7 +6,7 @@
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
-#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE */
+#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE SUSUWU_UNIT_TESTS */
 #include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
 #include <algorithm> /* std::sort */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -45,6 +45,7 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 }
 std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
+#if SUSUWU_UNIT_TESTS
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
 		abortOrNull.hashes = {}, abortOrNull.signatures = {}, abortOrNull.bytecodes = { /* Produce from an antivirus vendor's (such as VirusTotal.com's) infection databases */
@@ -132,6 +133,7 @@ const bool virusAnalysisHookTests() {
 	}
 	return true;
 }
+#endif /* SUSUWU_UNIT_TESTS */
 
 namespace { /* [misc-use-anonymouse-namespace] */
 static const bool virusAnalysisImpl(const PortableExecutable &file) {

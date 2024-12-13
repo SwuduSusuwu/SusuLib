@@ -45,6 +45,10 @@
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
 
+#ifndef SUSUWU_UNIT_TESTS /* if not set with `-DSUSUWU_UNIT_TESTS=true` (or `=false`) */
+#	define SUSUWU_UNIT_TESTS true /* more stable future version could have default = `!defined(NDEBUG)` */
+#endif /* ndef SUSUWU_UNIT_TESTS */
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
@@ -163,7 +167,9 @@
 #ifdef __cplusplus
 namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
 #endif /* ifdef __cplusplus */
+#if SUSUWU_UNIT_TESTS
 const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_STATIC_ASSERT(condition) static_assert(condition, #condition)
