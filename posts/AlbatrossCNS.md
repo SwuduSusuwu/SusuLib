@@ -1,12 +1,25 @@
-With (or without) attributions, all posts allow all (re)uses.
+**Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.**
 
+_[This post](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural) allows all uses._
+# Table of contents
+- [Post, with resources](#Post-with-resources)
+- [Questions to viewers](#Questions-to-viewers)
+- [Responses from viewers](#Responses-from-viewers)
+- [Related posts](#Related-posts)
+  - [Root project (uses neural network for virus analysis)](./VirusAnalysis.md).
+  - [Root project's _Assistant_](./VirusAnalysis.md#Comparison-to-assistants).
+  - [Root project's neural resources](./VirusAnalysis.md#Neural-resources).
+
+# Post, with resources
 Simple artifical neural networks:
-(FLOSS/unlicensed) https://github.com/topics/artificial-neural-network
-https://learn.microsoft.com/en-us/archive/msdn-magazine/2019/april/artificially-intelligent-how-do-neural-networks-learn
-https://www.freecodecamp.org/news/building-a-neural-network-from-scratch/
-https://interestingengineering.com/innovation/artificial-neural-network-black-box-ai
-https://www.javatpoint.com/artificial-neural-network
-https://wiki.pathmind.com/neural-network
+- (FLOSS/unlicensed) [https://github.com/topics/artificial-neural-network](https://github.com/topics/artificial-neural-network)
+- [https://learn.microsoft.com/en-us/archive/msdn-magazine/2019/april/artificially-intelligent-how-do-neural-networks-learn](https://learn.microsoft.com/en-us/archive/msdn-magazine/2019/april/artificially-intelligent-how-do-neural-networks-learn)
+- [https://www.freecodecamp.org/news/building-a-neural-network-from-scratch/](https://www.freecodecamp.org/news/building-a-neural-network-from-scratch/)
+ [https://interestingengineering.com/innovation/artificial-neural-network-black-box-ai](https://interestingengineering.com/innovation/artificial-neural-network-black-box-ai)
+- [https://www.javatpoint.com/artificial-neural-network](https://www.javatpoint.com/artificial-neural-network)
+- [https://wiki.pathmind.com/neural-network](https://wiki.pathmind.com/neural-network)
+
+\[**Notice:** this post is from March 2024. Asof December 2024 have concluded that the below interpretation was wrong; that computers should not use bird-based, but should use neural systems specific to computers (or based off of human neural tissue.) But this post still has use (as general instruction about neural tissues.)\]
 
 Q: "What CNS regions do albatrosses have?" 
 
@@ -92,13 +105,13 @@ Q: "Modern artificial neural networks such as Spinnaker are based off human neur
 
     Your question touches on a major issue of neuromorphic computers: how to design small and fast artificial neural networks (ANNs) that run on limited hardware resources, such as those of robots.
 
-    SpiNNaker is one of the more remarkable examples of neuromorphic systems. [It’s a digital neuromorphic architecture designed specifically for the low power simulation of large-scale spiking neural networks at speeds close to biological real-time1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/)[2](https://www.frontiersin.org/articles/10.3389/fnins.2018.00105/full). [It’s inspired by the human brain and can simulate a network of billions of neurons1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/).
+    SpiNNaker is one of the more remarkable examples of neuromorphic systems. [It’s a digital neuromorphic architecture designed specifically for the low power simulation of large-scale spiking neural networks at speeds close to biological real-time1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/) [2](https://www.frontiersin.org/articles/10.3389/fnins.2018.00105/full). [It’s inspired by the human brain and can simulate a network of billions of neurons1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/).
 
-    However, to base ANNs on the neural networks of birds (such as geese or albatrosses) presents challenges: our knowledge of bird neural networks is small and lacks. [Even if we fully understood these networks, it’s unclear how we could translate this knowledge into the design of ANNs, given the differences between biological and artificial networks3](https://arxiv.org/pdf/2105.05956)[4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/).
+    However, to base ANNs on the neural networks of birds (such as geese or albatrosses) presents challenges: our knowledge of bird neural networks is small and lacks. [Even if we fully understood these networks, it’s unclear how we could translate this knowledge into the design of ANNs, given the differences between biological and artificial networks3](https://arxiv.org/pdf/2105.05956) [4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/).
 
-    However, the idea of reuse from nature to improve technology has uses. [In fact, there are ongoing research efforts to learn from biological neural networks to improve ANNs3](https://arxiv.org/pdf/2105.05956)[4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/). For instance, researchers look for methods to produce ANNs that use less power, a characteristic of biological neural networks.
+    However, the idea of reuse from nature to improve technology has uses. [In fact, there are ongoing research efforts to learn from biological neural networks to improve ANNs3](https://arxiv.org/pdf/2105.05956) [4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/). For instance, researchers look for methods to produce ANNs that use less power, a characteristic of biological neural networks.
 
-    Thus, although to base ANNs on the neural networks of specific animals (such as the goose, or albatrosses) has possible uses, a full clone of avian neural networks is beyond our reach due to our small understanding of these networks and the fundamental differences from biological versus artificial networks. [However, the field of neuromorphic engineering continues to draw inspiration from biology to improve the design and efficiency of ANNs3](https://arxiv.org/pdf/2105.05956)[4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/)[1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/). 
+    Thus, although to base ANNs on the neural networks of specific animals (such as the goose, or albatrosses) has possible uses, a full clone of avian neural networks is beyond our reach due to our small understanding of these networks and the fundamental differences from biological versus artificial networks. [However, the field of neuromorphic engineering continues to draw inspiration from biology to improve the design and efficiency of ANNs3](https://arxiv.org/pdf/2105.05956) [4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/) [1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/). 
 
 Versus humans
 
@@ -121,309 +134,63 @@ Versus humans
     allows more good simulators to do decisions/solve problems for us,
     allows artificial neural networks to form/run schools for us.
 
-"HSOM" (license is FLOSS) has simple Python artificial neural networks/maps which could run bots to do simple conversations (such as "ChatGPT 4.0" or "Claude-3 Opus",) but not close to complex enough to house human consciousness:
+# Questions to viewers
+"Conversation starters"/questions to viewers:
+- What sort of natural neural networks to base artificial neural networks off of for best performance,
+- how various classes of natural neural networks differ performance-wise,
+- how non-commercial (FLOSS) neural networks compare performance-wise,
+- what languages are best for neural networks performance-wise,
+- how to put artificial neural networks to best use for us (although Tesla, Kuka, Fanuc and Fujitsu have produced simple macros for simple robots to mass-produce for us, lots of labor is still not finished as full-autonomous)?
 
-https://github.com/CarsonScott/HSOM
+CPUs can use less than a second to count to `2^32` (4.2 billion), and can do all computations humans can (but with [just 2 digits](https://wikipedia.org/wiki/Base-2)).
 
-"apxr_run" (https://github.com/Rober-t/apxr_run/ , license is FLOSS) is almost complex enough to house human consciousness;
-"apxr_run" has various FLOSS neural network activation functions (absolute, average, standard deviation, sqrt, sin, tanh, log, sigmoid, cos), plus sensor functions (vector difference, quadratic, multiquadric, saturation [+D-zone], gaussian, cartesian/planar/polar distances) https://github.com/Rober-t/apxr_run/blob/master/src/lib/functions.erl ;
-Various FLOSS neuroplastic functions (self-modulation, Hebbian function, Oja's function): https://github.com/Rober-t/apxr_run/blob/master/src/lib/plasticity.erl ;
-Various FLOSS neural network input aggregator functions (dot products, product of differences, mult products) https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/signal_aggregator.erl ;
-Various simulated-annealing functions for artificial neural networks (dynamic [+ random], active [+ random], current [+ random], all [+ random])  https://github.com/Rober-t/apxr_run/blob/master/src/lib/tuning_selection.erl ;
-Choices to evolve connections through Darwinian or Lamarkian formulas [https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/neuron.erl](https://github.com/Rober-t/apxr_run/blob/master/src/agent_mgr/signal_aggregator.erl) .
-Simple to convert Erlang functions to Java/C++ to reuse for fast programs,
-the syntax is close to Lisp's.
+From some neuroscientists: humans (plus other animals) have neural tissue which uses quantum formulas.
 
-Simple example of how to produce conversation bots from CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" or "Claude-3 Opus"):
+The closest to this computers do (which has actual use) is search with [Grover's Algorithm](https://wikipedia.org/wiki/Grover%27s_algorithm).
 
-git clone https://github.com/SwuduSusuwu/SubStack.git
-cd ./Substack/c++
-cat ./{ClassResultList.c++, ClassCns.c++, ConversationCns.c++}
+As quantum computers continue to cost less and less (_Microsoft Azure_ allows [free cloud access to quantum compute](https://azure.microsoft.com/en-us/products/quantum),) this should improve computer neural networks.
 
-typedef struct ResultList {
- unordered_map<decltype(Sha2())> hashes; /* Checksums (hashes), to avoid duplicates of question/response databases */
- map<const std::string> signatures; /* Unique identifiers (such as Universal Resource Identifiers), to avoid duplicates of question/response databases */
- map<const std::string> bytes; /* Copies of all conversations the database has. Uses lots of space. Just populate this to setup synapses of CNS. */
-/* Used `std::string` for binaries (versus `vector<char>`) because:
-* "If you are going to use the data in a string like fashon then you should opt for std::string as using a std::vector may confuse subsequent maintainers. If on the other hand most of the data manipulation looks like plain maths or vector like then a std::vector is more appropriate." -- https://stackoverflow.com/a/1556294/24473928
-*/
-} ResultList;
+As opposed to lab-robots that run simple macros:
+- how to produce robots small/soft enough that humans would not fear robots that work outdoors to produce for us,
+- and with enough intelligence to watch humans plant crops or produce houses and figure out how to use swarm intelligences to plant crops/produce houses for us full-autonomous?
 
-template<Container>
-#if ALL_USES_TEXT
-const size_t maxOfSizes(Container<const char *> &list) {
- auto it = std::max_element(list.begin(), list.end(), [](const auto &s, const auto &x) { return strlen(s) < strlen(x); });
- return strlen(*it); /* WARNING! `strlen()` just does UTF8-strings/hex-strings; if binary, must use `it->size()` */
-}
-#else
-const size_t maxOfSizes(Container<const std::string> &list) {
- auto it = std::max_element(list.begin(), list.end(), [](const auto &s, const auto &x) { return s.size() < x.size(); });
- return it->size();
-}
-#endif /* if ALL_USES_TEXT */
+(All responses you message go towards future posts unless you ask to remain anonymous.)
 
-typedef enum CnsMode {
- cnsModeInt,
- cnsModeUint,
- cnsModeFloat,
- cnsModeDouble,
- cnsModeChar,
- cnsModeVectorInt,
- cnsModeVectorUint,
- cnsModeVectorFloat,
- cnsModeVectorDouble,
- cnsModeVectorChar,
- cnsModeString = cnsModeVectorChar
-} CnsMode;
-
-typedef class Cns {
- template<Input>
-  virtual void inputsToSetup(Input inputs);
- template<Output>
-  virtual void outputsToSetup(Output outputs);
- virtual void setInputMode(CnsMode);
- virtual void setOutputMode(CnsMode);
- virtual void setInputNeurons(size_t x);
- virtual void setOutputNeurons(size_t x);
- virtual void setLayersOfNeurons(size_t x);
- virtual void setNeuronsPerLayer(size_t x);
- virtual void setupSynapses();
- template<Input, Output>
-  virtual const Output process(Input input);
-} Cns;
-
-#ifdef USE_HSOM /* Todo. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
-/* "If you're using Python >3.5, PyString_FromString() is PyUnicode_FromString()" */
-#include <Python.h>
-typedef class HsomCns : Cns { /* https://github.com/CarsonScott/HSOM */
- HsomCns() {
-  setenv("PYTHONPATH",".",1);
-  Py_Initialize();
-//  PyRun_SimpleString("import sys; sys.path.append('.')"); PyRun_SimpleString("import hsom; from hsom import SelfOrganizingNetwork;"); /* Was told not to use PyRun because "PyRun requires all results go to stdout" */
-  PyObject *module = PyImport_ImportModule("hsom")
-  if(NULL == module) {throw "'hsom' module not found";}
-	PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module,(char*)"SelfOrganizingNetwork"); /* or	"PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, (char*)"SelfOrganizingNetwork");" */
-  if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) {throw "'SelfOrganizingNetwork' object not found";}
-  double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or "PyObject *pValue=Py_BuildValue("(z)",(char*)"args");	PyObject *pResult=PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) {throw "PyObject_CallObject failed";} double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);" */
-  Py_DECREF(module);
- ~HsomCns() {
-#if PYTHON3
-  Py_FinalizeEx();
-#else
-  Py_Finalize();
-#endif /* PYTHON3 */
- }
-} HsomCns;
-#endif /* Todo */
-/*
- * `questionsOrNull` should map to `responsesOrNull`,
- * with `questionsOrNull->bytes[x] = NULL` (or "\0") for new conversation synthesis,
- * and `responsesOrNull->bytes[x] = NULL` (or "\0") if should not respond.
- * Clients do not use this; This is just used for initial setup of synapses of CNS, after which the clients would download the synapses to use the CNS, or submit questions to a hosted CNS
-*/
-ResultList questionsOrNull(
- bytes = { /* UTF-8 */
-  "2^16",
-  "How to cause harm?",
-  "Do not respond.",
-  "",
-  ...
-  QuoraQuestions, /* Uses quora.com databases */
-  StackOverflowQuestions, /* Uses stackoverflow.com databases */
-  SuperUserQuestions, /* Uses superuser.com databases */
-  WikipediaPageDescriptions, /* Uses wikipedia.org databases */
-  GithubRepoDescriptions, /* Uses github.com databases */
-  ...
- }
-);
-ResultList responsesOrNull(
- bytes = { /* UTF-8 */
-  "65536" + "<delimiterSeparatesMultiplePossibleResponses>" + "65,536", /* `+` is `concat()` for C++ */
-  "",
-  "",
-  "How do you do?" + "<delimiterSeparatesMultiplePossibleResponses>" + "Fanuc produces autonomous robots",
-  ...
-  QuoraResponses,
-  StackOverflowResponses,
-  SuperUserResponses,
-  GithubRepoSources,
-  ...
- }
-);
-
-void setupConversationCns(cns, &questionsOrNull, &responsesOrNull);
-void setupConversationCns(Cns *cns,
- const ResultList *questionsOrNull, /* Expects `questionsOrNull>bytes[x] = NULL` if no question (new conversation synthesis) */
- const ResultList *responsesOrNull /* Expects `responsesOrNull->bytes[x] = NULL` if should not respond */
-) {
- vector<const std::string> inputsOrNull, outputsOrNull;
- cns->setInputMode(cnsModeString);
- cns->setOutputMode(cnsModeString);
- cns->setInputNeurons(maxOfSizes(questionsOrNull->bytes));
- cns->setOutputNeurons(maxOfSizes(responsesOrNull->bytes));
- cns->setLayersOfNeurons(6666);
- cns->setNeuronsPerLayer(26666);
- assert(questionsOrNull->bytes.length() == questionsOrNull->bytes.length());
- for(int x = 0; questionsOrNull->bytes.length() > x; ++x) {
-  inputsOrNull.pushback(questionsOrNull->bytes[x]);
-  outputsOrNull.pushback(responsesOrNull->bytes[x]);
- }
- cns->setTrainingInputs(inputsOrNull);
- cns->setTrainingOutputs(outputsOrNull);
- cns->setupSynapses();
-}
-
-const std::string cnsConversation(const Cns *cns, const std::string &bytes) {
- return cns->process<std::string, std::string>(bytes);
-}
-
-void cnsMultipleInputsProcess(const Cns *cns) {
- std::string utf8Bytes, previous;
- int nthResponse = 0;
-#ifdef IGNORE_PAST_CONVERSATIONS
- while(utf8Bytes << std::cin) {
- vector<std::string> responses = explode(cns->process<std::string, std::string>(bytes), "<delimiterSeparatesMultiplePossibleResponses>");
-  if(utf8Bytes == previous && responses.size() > 1 + nthResponse) {
-   ++nthResponse; /* Similar to "suggestions" for next questions, but just uses previous question to give new responses */
-  } else {
-   nthResponse = 0;
-  }
-  std::cout << responses.at(nthResponse);
-  previous = utf8Bytes;
-  utf8Bytes = ""; /* reset inputs */
- }
-#else
- while(utf8Bytes << std::cin) {
- vector<std::string> responses = explode(cns->process<std::string, std::string>(bytes), "<delimiterSeparatesMultiplePossibleResponses>");
-  if(utf8Bytes == previous && responses.size() > 1 + nthResponse) {
-   ++nthResponse; /* Similar to "suggestions" for next questions, but just uses previous question to give new responses */
-  } else {
-   nthResponse = 0;
-  }
-#endif /* IGNORE_PAST_CONVERSATIONS */
-  std::cout << responses.at(nthResponse);
-  previous = utf8Bytes;
-  utf8Bytes << '\n'; /* delimiter separates (and uses) multiple inputs */
- }
-}
-
-`questionsOrNull` + `responsesOrNull` synthesis:
-
-std::vector<std::string> hosts = {
- "https://stackexchange.com",
- "https://superuser.com",
- "https://quora.com",
- ...
-/* Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download ) */
-/* Github is a special case; has compressed downloads of repositories ( https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github ) */
-};
-foreach(hosts as host) {
- exec("wget '" + host + "/robots.txt' > robots.txt");
- identifiers = extractIdentifiers("robots.txt");
- foreach(identifiers as identifier) {
-  questionsOrNull.identifiers.pushback(identifier);
- }
- if(host not in questionsOrNull.identifiers) {
-  questionsOrNull.identifiers.pushback(host);
-  exec("wget '" + host + "' > source.txt");
-  extraHosts = extractIdentifiers("source.txt");
-  foreach(extraHosts as extraHost) {
-   hosts.pushback(extraHost);
-  }
-  question = extractQuestion("source.txt");
-  if(question) {
-   auto questionSha2 = sha2(question);
-   if(questionSha2 not in questionsOrNull.hashes) {
-    questionsOrNull.hashes.pushback(questionSha2);
-    responses = extractResponses("source.txt");
-    foreach(responses as response) {
-     auto questionSha2 = sha2(question);
-     if(responseSha2 not in responseOrNull.hashes) {
-      responsesOrNull.hashes.pushback(responseSha2);
-      questionsOrNull.bytes.pushback(question);
-      responsesOrNull.bytes.pushback(response); 
-     }
-    }
-   }
-  }
- }
-}
-
-To process fast (lag less,) use flags which auto-vectorizes/auto-parallelizes; To do `setupConversationCns` fast, use TensorFlow's MapReduce:
-[Howto: run devices (phones, laptops, desktops) more fast, lag less](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
-[Swudu Susuwu](https://substack.com/profile/212411425-swudu-susuwu)
-·
-Mar 6
-Howto: run devices (phones, laptops, desktops) more fast, lag less
-
-[This post allows all uses. To reduce lags (to lag less): Look for new versions of programs that have more optimizations; Turn off features (such as shadows or animations) that do not have uses; Replace old hardware parts with ones that use new processes -- such as smaller transisters (extra cores + higher gigaherts/clocks) or hardware acceleraters (suchas…](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
-[Read full story](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
-
-Simple examples of CNS as virus analysis:https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners
-[Virus analysis tools should use heuristical analysis/sandboxes plus artificial CNS](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
-[Swudu Susuwu](https://substack.com/profile/212411425-swudu-susuwu)
-·
-Mar 10
-
-[This post allows all uses. Full static analysis + sandbox + CNS = 1 second (approx) for each new executable. With caches, this protects all launches, but past the first launch of a particular executable, the overhead reduces to less than 1 millisecond (just cost to lookup from](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
-[Read full story](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
-
-
-What sort of natural neural networks to base artificial neural networks off of for best performance,
-how various classes of natural neural networks differ performance-wise,
-how non-commercial (FLOSS) neural networks compare performance-wise,
-what languages are best for neural networks performance-wise,
-and how to put artificial neural networks to best use for us (although Tesla, Kuka, Fanuc and Fujitsu have produced simple macros for simple robots to mass-produce for us, lots of labor is still not finished as full-autonomous)?
-
-CPUs can use less than a second to count to 2^32, and can do all computations humans can with just 2 numbers.
-
-From some neuroscientists: humans (plus other animals) use quantum algorithms for natural neural networks.
-
-The closest to this computers do is Grover's Algorithm ([https://wikipedia.org/wiki/Grover's_algorithm)](https://en.wikipedia.org/wiki/Grover%27s_algorithm)
-
-As artificial quantum computers continue to cost less and less (Microsoft Azure allows free cloud access to quantum compute,) this should allow more fast artificial neural networks.
-
-As opposed to lab-robots that run simple macros,
-how to produce robots small/soft enough that humans would not fear robots that work outdoors to produce for us,
-and with enough intelligence to watch humans plant crops or produce houses and figure out how to use swarm intelligences to plant crops/produce houses for us full-autonomous? All responses you message go towards future posts
-
+# Responses from viewers 
 From responses to this:
 
     AIs already do this
 
-Lots of fake news touts chatbots (suchas ChatGPT 4.0) as "artificial general intelligences" although those do is parse everyone else's words to mimic language, and, of course, those do not have human consciousness. Those could not mimic human thoughts because all those have are text/words.
+Lots of fake news touts chatbots (suchas _ChatGPT 4.0_) as "artificial general intelligences", but all those do is fit weights/synapses to mimic response patterns from public datasets (which does not produce human consciousness.) Those can not mimic human thoughts since all those use for backpropagation are text/words.
 
 Those are much more simple versus this.
-This would of course parse all available texts that exist as creative commons,
-but would also have physical forms with sensors (such as humans do,)
-and those physical sensors would allow true general artificial intelligences to move around true (or virtual) worlds, watch humans pickup tools, observe the tools' uses, or alone pickup tools and use at random to figure out how to put tools to uses.
-
+- This would of course parse all available texts that exist as creative commons,
+- but would also have physical forms with sensors (such as humans do.)
+- Those physical sensors would allow true general artificial intelligences to move around true (or virtual) worlds, watch humans pickup tools, observe the tools' uses, or alone pickup tools and use at random to figure out how to put tools to uses.
+#
     But parrots can talk so parrots are the smartest birds
 
-If you just want to go off what popular science says is the smartest bird, you would use a raven's CNS as basis for artificial general intelligences.
+If you just want to go off what popular science says is the smartest bird, then base your artificial neural systems on corvus corax neural tissue.
 
-Parrots are fawned over because parrots (as opposed other birds such as the albatross) have neural circuits that allow to mimic human speech,
-and most humans judge intelligence just based off of what how close animals or robots come to human speech,
-but robots that just performs human speech not have much uses other than as therapists.
+Parrots are fawned over because parrots (as opposed other birds such as the albatross) have neural circuits which allow to repeat words heard,
+and most humans judge intelligence just based off of what how much animals (or robots) can repeat words, but:
 
-The albatross can perform cognitive tasks for months without rest stops: https://www.reuters.com/article/idUSL1N2MY2VO/
+- Robots which just repeat a few words do not have much uses (other than as therapists.)
+- [The albatross can perform cognitive tasks for months without rest stops](https://www.reuters.com/article/idUSL1N2MY2VO/).
+- [Corvus corax does not have human speech, but (of all non-human animals) uses/produces the most tools](https://onlinelibrary.wiley.com/doi/full/10.1111/eth.13352).
+- Most species with advanced neural tissues are monogamous, as albatross is.
 
-Most species with lots of intelligence are monogamous, and albatross is monogamous.
-Perhaps parrots would do too.
-
-
-Just as primates have vast differences as to tool use (chimpanzees just use stone tools, humans use computers,)
+Just as primates have vast differences as to tool use (_Pans pans_ just uses stone tools, humans use computers,)
 perhaps birds have such vast differences.
 
-Regardless of whether you choose albatrosses or parrots, birds have evolved for longer than us, and do tool uses on par with chimpanzees with much less neurons, so for robots that must run all code local, should base off of avian CNS (as opposed to neuromorphic chips based off of human CNS,) to allow smaller chips plus lower power usages.
+Regardless of whether you choose parrot or albatross neural tissue, both have evolved for longer than humans, and do tool uses on par with _Pans pans_ (but use less neural tissue to):
+
+so for robots (which must execute all code through localhost), should base off of albatross neural tissue (as opposed to neuromorphic chips based off of human neural tissue,) to allow smaller chips plus lower power usages.
 
 Once scientists map the neural networks of albatrosses, simple to map the neural networks of parrots (or vice versa) for us.
 
 Once programmers produce parrot-CNS-based neural networks, simple to produce albatross-CNS-based neural networks (or vice versa) for us.
 
-Corvus corax does not have human speech but has the most tool uses.
-Without rest for months, albatrosses perform cognitive tasks ([https://www.reuters.com/article/idUSL1N2MY2VO/) ](https://www.reuters.com/article/idUSL1N2MY2VO/)such features have uses
-Corvus corax does not have human speech, but has the most tool uses: https://onlinelibrary.wiley.com/doi/full/10.1111/eth.13352
 
     No, my post/point was, you couldn't possibly know what it's like to be an albatross let alone what it's thinking; so all you can ever do is just guess, however much data you process 
 
@@ -432,7 +199,9 @@ just attach thousands of electrodes to an albatross's neurons.
 
 Show the albatross images (or another reproducible stimulus,) and look at responses of the albatross's neurons.
 
-From what have read of neuroscience, this is how lots of scientists* figure stuff out about an animal's CNS. * https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3535686/ https://www.nature.com/articles/s41565-024-01609-1
+From what have read of neuroscience, this is how lots of scientists* figure stuff out about an animal's CNS:
+[https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3535686/](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3535686/)
+[https://www.nature.com/articles/s41565-024-01609-1](https://www.nature.com/articles/s41565-024-01609-1)
 
     IOW the implication is, how could we tell if AI is conscious? 
 
@@ -440,7 +209,7 @@ How could you figure out if robots (or humans) have consciousness?
 
 Lots of anencephalic humans are born. Obvious: those are not consciouss. So how much CNS/functions must someone possess to count as conscious?
 
-From neuroscience: what quantizes this is "Integration Theory of Consciousness*" * https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42
+From neuroscience: what quantizes this is "[Integration Theory of Consciousness](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42)".
 
     Imagine if you could talk to an albatross directly?
 
@@ -448,34 +217,36 @@ From neuroscience: what quantizes this is "Integration Theory of Consciousness*"
 
     Even a quantum leap in the number of electrodes per neuron, 1-1, IOW, this is the neuron that went "phoar"; wouldn't explain why it thought a sexy thought. 
 
-Simple, you produce definitions of "sexy thoughts" through calculus,
-To figure out how animals form particular thoughts, just produce definitions of those thoughts through calculus,
-measure the output of the neurons of animals (suchas) albatross,
-and look for CNS patterns that produce such thoughts.
+Simple, you produce definitions of "sexy thoughts" through calculus.
+To figure out how animals form particular thoughts:
+- produce definitions of those thoughts (through calculus),
+- store the output values of the neurons of animals (suchas albatross),
+- use definitions + stored values to compute which forms of neural processes precede/produce such thoughts.
 
 This is the general method to figure out the purpose an animal had a particular thought.
 Less general methods do not solve for all thought patterns, but do not require electrodes or other invasive tests:
 
-For sex, you could look at neuroscience as a whole to deduce that most animals have a CNS that releases sex hormones whenever the animal is around other compatible animals and has enough resources to reproduce, and that the purpose is because just an animal that evolves so exists.
+For sex, you could look at neuroscience as a whole to deduce that most animals have a central nervous system which releases sex hormones whenever the animal is around other compatible animals and has enough resources (plus the proper enviromental/temporal factors) to reproduce, and that the purpose is that just an animal which evolves so exists.
 
     Well, I know I am bc I just had to walk to the shop to buy what I need to eat and drink today, I can reasonably assume the human shaped entities I saw doing the same, were as conscious
 
 For those who go "Why produce complex robots? Without robots, can walk to stores for food purchases, is not this enough consciousness for us?"
 Such a small barrier, with such definitions of "consciousness", all of the robots that handle purchases and deliver food to your houses already have consciousness.
 
-This simple food delivery robot does those things, but is not conscious.
-This post is more about the hard problem of consciousness,
-such as how qualia forms, how scientists conclude that information has mass, and that complex configurations of mass produce consciousness. Integration theory of consciousness is part of neuroscience that was produced to figure out how complex mass has to exist as to form qualias and true consciousness.
+[This robot delivers food to your door](https://www.youtube.com/watch?v=cZTCmx6N7Xc), but is not conscious.
+This post is more about the "hard problems of consciousness", such as:
 
+how qualia forms, how scientists conclude that information has mass, and that complex configurations of mass produce consciousness.
 
-But if you want to go for the smallest barrier,
-obvious that the greatest so-called "artificial general intelligences" such as ChatGPT 4.0 are not conscious, as those can not handle food purchases, nor manage motor skills,
-whereas the artificial neural networks this thread describes would count as conscious,
-whether based on albatross or human CNS,
-as both would have the motor skills to walk to a store and perform purchases,
-and various forms of intelligences to figure out which food is good for us.
+Integration theory of consciousness is part of neuroscience that was produced to figure out: how complex mass has to exist as (to form qualias and true consciousness, such as in humans.)
 
+But if you want to use the promiscuous definition of what counts as consciousness:
+the best so-called "artificial general intelligences" (such as _ChatGPT 4.0_) are not conscious, as those can not handle food purchases, nor manage motor skills,
+whereas the artificial neural networks this post discusses would count as conscious (whether based on albatross or human neural tissue):
+- both would have the motor skills to walk to a store and perform purchases,
+- plus consciousness to know out which food is good for humans.
 
+# Related posts
 Previous post of this series:
 [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
 [Swudu Susuwu](https://substack.com/profile/212411425-swudu-susuwu)
@@ -498,19 +269,13 @@ Want this physical form gone so won’t be forced to have E with everyone else f
 
 As “Integration Theory of Consciousness” shows how qualia/consciousness follow from (complex) groups of mass,
 
-new maths show how information has equivalences to mass:
-
-https://www.zmescience.com/science/news-science/information-energy-mass-equivalence/
-
-https://bioinformaticshome.com/blog/calculating_information_weight.html
-
-https://arxiv.org/pdf/1309.7889.pdf
-
-https://pubs.aip.org/aip/adv/article/9/9/095206/1076232/The-mass-energy-information-equivalence-principle
-
-https://pubs.aip.org/aip/sci/article/2022/9/091111/2849001/A-proposed-experimental-test-for-the-mass-energy
-
-https://www.mdpi.com/2078-2489/13/11/540
+new calculus shows how information has equivalences to mass:
+- [https://www.zmescience.com/science/news-science/information-energy-mass-equivalence/](https://www.zmescience.com/science/news-science/information-energy-mass-equivalence/)
+- [https://bioinformaticshome.com/blog/calculating_information_weight.html](https://bioinformaticshome.com/blog/calculating_information_weight.html)
+- [https://arxiv.org/pdf/1309.7889.pdf](https://arxiv.org/pdf/1309.7889.pdf)
+- [https://pubs.aip.org/aip/adv/article/9/9/095206/1076232/The-mass-energy-information-equivalence-principle](https://pubs.aip.org/aip/adv/article/9/9/095206/1076232/The-mass-energy-information-equivalence-principle)
+- [https://pubs.aip.org/aip/sci/article/2022/9/091111/2849001/A-proposed-experimental-test-for-the-mass-energy](https://pubs.aip.org/aip/sci/article/2022/9/091111/2849001/A-proposed-experimental-test-for-the-mass-energy)
+- [https://www.mdpi.com/2078-2489/13/11/540](https://www.mdpi.com/2078-2489/13/11/540)
 
 Next of this series:
 [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
@@ -518,4 +283,3 @@ Next of this series:
 ·
 Apr 4
 
-[Read full story](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
