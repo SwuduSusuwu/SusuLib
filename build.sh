@@ -2,7 +2,7 @@
 . ./Macros.sh #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() SUSUWU_INSTALL() SUSUWU_PRINT() SUSUWU_PROCESS_CLEAN_REBUILD() SUSUWU_SCAN_GIT() SUSUWU_PROCESS_MINGW() SUSUWU_PROCESS_RELEASE_DEBUG() SUSUWU_PROCESS_S() SUSUWU_PROCESS_VERBOSE() SUSUWU_SETUP_BUILD_FLAGS() SUSUWU_SETUP_CXX() SUSUWU_SETUP_BINDIR() SUSUWU_SETUP_OBJDIR() SUSUWU_SETUP_OUTPUT() SUSUWU_SH_* SUSUWU_TEST_OUTPUT() SUSUWU_UNINSTALL() */
 SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Dual licenses: choose \"Creative Commons\" or \"Apache 2\" (allows all uses)."
 
-FLAGS_USER="" #/* You can put environment flags from `README.md` into this to use. */
+FLAGS_USER="" #/* Usage: "Macro flags" from `README.md#Optionssetup`. */
 FLAGS_ANALYSIS="-Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic" #/*TODO: -`-Wno-*`, +`-Werror` */
 FLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
 CXXFLAGS_DEBUG="-std=c++11" #/* ensure unit tests pass with C++11 support as max */
@@ -11,8 +11,8 @@ FLAGS_DEBUG="${FLAGS_DEBUG} -fno-omit-frame-pointer" #/* thus optimization won't
 #FLAGS_DEBUG="${FLAGS_DEBUG} -fno-optimize-sibling-calls" #/* Don't inline functions. Does extra stacktraces. */
 FLAGS_FSAN="-fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment"
 #FLAGS_FSAN="${FLAGS_FSAN} -fsanitize=undefined" #/* causes 'cannot locate symbol "__ubsan_handle_function_type_mismatch_abort"' */
-C_SOURCE_PATH="./c/"
-CXX_SOURCE_PATH="./cxx/"
+C_SOURCE_PATH="./c/" #/* Usage: replace with directory root for _C_ source code */
+CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source code */
 
 
 SUSUWU_PROCESS_S $@ #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
@@ -22,9 +22,9 @@ SUSUWU_PROCESS_MINGW "$@" #/* Usage: `apt install mingw wine && ./build.sh --min
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
 SUSUWU_PROCESS_RELEASE_DEBUG "$@" #/* Usage: `./build.sh --debug` or `./build.sh --release` */
 
-SUSUWU_SETUP_OBJDIR "./obj/"
-SUSUWU_SETUP_BINDIR "./bin/"
-SUSUWU_SETUP_OUTPUT "Susuwu"
+SUSUWU_SETUP_OBJDIR "./obj/" #/* Usage: replace with directory root for new objects */
+SUSUWU_SETUP_BINDIR "./bin/" #/* Usage: replace with directory root for new executables */
+SUSUWU_SETUP_OUTPUT "Susuwu" #/* Usage: replace with name of your program */
 SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
