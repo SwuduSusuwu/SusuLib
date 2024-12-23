@@ -1,4 +1,4 @@
-Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-your-work/use-remix/) or _[Apache 2](LICENSE)_ (allows all uses).
+(C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE.gpl2.md) or [Apache 2](./LICENSE) (allows all uses).
 *Notice*: You switched to the [_experimental_](https://github.com/SwuduSusuwu/SubStack/blob/experimental/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SubStack/blob/trunk) (`git switch trunk`) for code which is more stable plus has more support.
 - This `experimental` branch is for [beta tests](#Beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
 - [Purposes](#Purposes)

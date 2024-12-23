@@ -1,4 +1,4 @@
-Dual licenses: choose [_Creative Commons_](https://creativecommons.org/share-your-work/use-remix/) or _[Apache 2](./LICENSE)_ (allows all uses).
+(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 
 # Table of Contents
 - [Purposes](#Purposes)

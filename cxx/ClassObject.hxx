@@ -1,4 +1,4 @@
-/* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
+/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
 #include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */

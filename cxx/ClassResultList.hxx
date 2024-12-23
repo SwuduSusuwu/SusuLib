@@ -1,4 +1,4 @@
-/* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
+/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx

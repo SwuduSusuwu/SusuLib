@@ -1,4 +1,4 @@
-/* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
+/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_Macros_cxx
 #define INCLUDES_cxx_Macros_cxx
 #include "Macros.hxx" /* SUSUWU_ASSUME SUSUWU_CONSTEXPR SUSUWU_DEFAULT SUSUWU_DELETE SUSUWU_EXPECTS SUSUWU_ENSURES SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NORETURN SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_STATIC_ASSERT SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
