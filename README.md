@@ -75,6 +75,7 @@ Minimum requirements (build targets which this supports):
 - Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
   - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_assert`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
+  - \[Notice: update [`./c/README.md#Progress`](./c/README.md#Progress) if you update this list.\]
   - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#Contributor-conventionsrules).
   - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#Contributor-conventionsrules).
 ## Download
@@ -145,8 +146,8 @@ Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such
     - From the root commit through 159940fb8b60b176a38a13cdfbd9393596daa9b5 (Date:   Thu Jul 4 07:56:01 2024 -0700), '@' was the prefix for updates. From then until this commit, '?' was the prefix for updates.
     - From this commit on (this is the successor to commit 0ae6233c02d9e04fca60027b1e32b885eb69bb8a (Date:   Sat Nov 30 17:50:40 2024 -0800)), '@' is (once more) the prefix for updates, due to: it is more common for projects to so use '@'.
 - if `echo "int newFunction() {...}" >> Exists && git add Exists`: `@\`Exists\`:+\`NewFunction()\``.
-- if `git mv OldPath/ NewPath/`: `\`OldPath/.* -> NewPath/.*\``.
-- to indent, use tabs to form blocks, such as
+- if `git mv OldPath/ NewPath/`: `\`OldPath/\` -> \`NewPath/\`` or `mv OldPath/ NewPath/`.
+- to indent: use tabs to form blocks, such as:
 ```
 ?`README.md`:
 	?`#How-to-use-this`:
@@ -154,9 +155,9 @@ Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such
 		+`## Download`: new; howto clone, howto switch branches.
 		+`## Optionssetup`: "Options/setup"; howto use `./build.sh` (with or without options.)
 	?`#How-to-contribute`,
-	?[Good first issues to contribute to]: (moved into `#How-to-contribute)
+	?[Good first issues to contribute to]: (moved into `#How-to-contribute`)
 ```
-[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to format code/paths.]
+/[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code/paths.\]
 ## `sh` source
 Is as for _C++_, except that you act as if all functions/variables are macros (which use `CONSTANT_CASE`).
 
@@ -164,7 +165,7 @@ Specific to `sh` (but doesn't conflict with _C++_):
 - Variable access: uses "${...}" (thus not `if [ true = $BOOL ]`, but `if [ true = ${BOOL} ]`), in case text is tacked onto the variable ("1(true==$BOOL2)path==$PATH" is an error, but "1)true==${BOOL}2)path==${PATH}" is cool).
 - Str variable access: uses `"${...}"` (thus not `if [ "-q" = ${PARAM}`, but `if [ "-q" = "${PARAM}" ]`), in case `${PARAM}` has spaces, also to avoid diagnostics (such as ["Double quote array expansions to avoid re-splitting elements."](https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1724).
 - For temp variables, you affix `local` (thus not `for VALUE in ${LIST}; do`, but `local VALUE; for VALUE in ${LIST}; do`).
-  - [Notice; to split (on spaces) is the purpose of the `for` loop.]
+  - \[Notice: to split (on spaces) is the purpose of the `for` loop.\]
 ## _C_/_C++_ source
 Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](./.clang-tidy) options).
 
@@ -180,7 +181,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
 
 - Macros: `#define NAMESPACE_CONSTANT_CASE(snake_case_param) assert(snake_case_param);`, as this is most common.
 
-- Indent: tabs ('^I', reduced memory use, allows local configs to set width, allows arrow keys to move fast); as much tabs as braces ('{', '}'). [All which conflicts with _Mozilla Org_'s format is tab use.]
+- Indent: tabs ('^I', reduced memory use, allows local configs to set width, allows arrow keys to move fast); as much tabs as braces ('{', '}'). \[All which conflicts with _Mozilla Org_'s format is tab use.\]
 
 - Braces, functions:
   - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SubStack/issues/10).
@@ -207,9 +208,9 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
 ```
 - [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https://stackoverflow.com/questions/1854550/c-macro-define-indentation)
 - [\_DEBUG is specific to MSVC, thus use NDEBUG](https://stackoverflow.com/questions/2290509/debug-vs-ndebug), [Pass `-D NDEBUG` to disable asssets + enable optimizations](https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release)
-- Do not perform tasks within `assert()`, due to: the standard says "[`#if NDEBUG\n#define assert(x) (0)\n#endif`]".
-- All userland errors should go to `throw std::exception()` _or derivatives of std::exception_, `std::cerr`, `extern int errno;`, or `return errno;`. Comments about possible errors should go above function declarations (Doxygen convention).
-  - `throw` / `std:cerr` should use the new common syntax for this: `"[WARN_LEVEL: OPTIONAL_FUNCTION_NAME {code which triggered the error/warning/diagnostic/notice} /* OPTIONAL COMMENTS */]"`,
+- Do not perform tasks within `assert()`, due to: the standard says "\[`#if NDEBUG\n#define assert(x) (0)\n#endif`\]".
+- All userland errors should go to `throw std::runtime_error(message)` (or `throw Q()` where `class Q : public std::exception`), `std::cerr << message`, `errno = code;`, or `return code;`. Comments about possible errors should go above function declarations (Doxygen convention).
+  - `message` should use the new common syntax for this: `"[WARN_LEVEL: OPTIONAL_FUNCTION_NAME {code which triggered the error/warning/diagnostic/notice} /* OPTIONAL COMMENTS */]"`,
   - [`./cxx/Macros.hxx`](./cxx/Macros.hxx): {SUSUWU_STR(x), SUSUWU_CERR(x), SUSUWU_STDOUT(x)} have the new syntax for this.
 - [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702):
 ```
