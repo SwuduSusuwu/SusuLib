@@ -20,6 +20,8 @@ Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executable
 For the most new sources (+ static libs), use apps such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for **iOS**) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for **Android OS**) to run this:
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build.sh`
 
+To test certificates, view [this post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).
+
 To improve how fast the whole program executes; `CXXFLAGS` should include auto-vectorizes/auto-parallelizes. [^CXXFLAGS]
 
 To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]

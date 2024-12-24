@@ -4,6 +4,7 @@
 - [Purposes](#Purposes)
 - [How to use this](#How-to-use-this)
   - [Download](#Download)
+  - [Signature/certificate](#Signaturecertificate)
   - [Options/setup](#Optionssetup)
 - [How to contribute](#How-to-contribute)
   - [Beta test/experimental builds](#Beta-testexperimental-builds)
@@ -15,6 +16,7 @@
     - [_C_/_C++_ source](#Cc-source)
 
 # Purposes
+[`./.ssh/`](./.ssh/) is to [setup signatures/certificates](#Signaturecertificate).
 [`./posts/`](./posts/) stages posts (school classes) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about artificial neural tissue, antivirus, assistants, plus autonomous tools.
 - [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SubStack/issues/2#issuecomment-2110726542)).
 - [`./posts/AlbatrossCNS.md#Post-with-resources`](./posts/AlbatrossCNS.md#Post-with-resources) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
@@ -76,6 +78,12 @@ Minimum requirements (build targets which this supports):
   - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#Contributor-conventionsrules).
 ## Download
 Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
+## Signature/certificate
+`. .ssh/setup.sh` (you can compare those certificates to [our blog post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).)
+`git log —show-signatures` (which shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SubStack/commit/3efe601f15ae0fdfd05cfbc1a75a0e6a4a08124b)),
+or `git verify-commit <ref>` (where <ref> is the hash of an individual commit).
+
+\[Notice: This [public crypto](https://docs.gitlab.com/ee/user/project/repository/signed_commits/ssh.html#verify-commits-locally) "signature", is not related to "signature analysis" ([Substr scans](#Purposes).\]
 ## Options/setup
 Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/Susuwu.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `Susuwu.out`'s return values.
