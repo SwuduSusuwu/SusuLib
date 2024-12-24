@@ -48,8 +48,8 @@ m4/lt~obsolete.m4
 # (which is called by configure script))
 Makefile
 
-#Termux
-.ssh/
+# Local environment of console
+~/.ssh/
 .*_history
 .lesshst
 .viminfo
@@ -57,8 +57,13 @@ Makefile
 .ctags
 .cache/
 .Trash/
+
+# /tmp/ (or other intermediate/local)
 *.pch
 .*.swp
-a.out
 *.o
+*.out
+*.exe
+index.xhtml
+robots.txt
 
