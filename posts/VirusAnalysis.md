@@ -11,7 +11,7 @@ _[This post](https://swudususuwu.substack.com/p/howto-produce-better-virus-scann
 # Introduction
 Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (protects all app launches,) but after that **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 
-`Licenses: allows all uses ("Creative Commons"/"Apache 2")`
+"(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE), allows all uses."
 
 [README.md](../README.md) has how to use this (what follows is more of a book of source code).
 
