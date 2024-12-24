@@ -1,5 +1,5 @@
 # Security Policy
-
+Asof 2024 December 24, all commits [signed](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) as `SSH Key Fingerprint: cZ62ZXjPj45EKWnHBh4Wvar8zWsU9M3S0OfcADrGTGE` (SwuduSusuwu <2002swudususuwu@gmail.com>).
 ## Supported versions
 Users can expect that past 2024 June 26, [`trunk`](https://github.com/SwuduSusuwu/SubStack) passes [`susuwuUnitTests()`, which uses `Susuwu::unitTestsCxx()`](./cxx/main.cxx#L22-L82)[^1] + [_GitHub_'s code scans](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=branch%3Atrunk+is%3Aopen+severity%3Amedium%2Clow%2Ccritical%2Cerror%2Chigh)[^2].
 
