@@ -3,10 +3,11 @@
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
+#include "ClassFs.hxx" /* classFsGetOwnPath classFsTestsNoexcept */
 #include "ClassObject.hxx" /* classObjectTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysGetOwnPath classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
+#include "ClassSys.hxx" /* classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
@@ -54,6 +55,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassObjectBit;
 	}
+	std::cout << "classFsTestsNoexcept(): " << std::flush;
+	if(true == classFsTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassFsBit;
+	}
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
 	if(true != classSysTestsNoexcept()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassSysBit;
@@ -90,7 +98,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
 #else /* else !SUSUWU_UNIT_TESTS */
-	SUSUWU_NOTICE('`' + std::string(Susuwu::classSysGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
+	SUSUWU_NOTICE('`' + std::string(Susuwu::classFsGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
 #endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
@@ -104,7 +112,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 		return susuwuUnitTestsClassSysBit;
 	}
 #ifdef SUSUWU_EXPERIMENTAL
-	SUSUWU_WARNING('`' + std::string(Susuwu::classSysGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
+	SUSUWU_WARNING('`' + std::string(Susuwu::classFsGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
 #endif
 	return Susuwu::unitTestsCxx();
 }

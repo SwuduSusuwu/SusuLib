@@ -53,6 +53,7 @@
   - `macroTestsNoexcept()` (unit tests, with return value for errors).
 - [`./cxx/ClassFs.hxx`](./cxx/ClassFs.hxx) is
   - `ClassFsPath` (`PortableExecutable`'s constructor argument), `ClassFsBytecode` (`classSha2`'s input argument), `ClassFsHash` (`classSha2`'s return value)
+  - modular functions to interact with filesystems {`classFsGetOwnPath()`, `classFsFopenOwnPath()`}
 - [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
   - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
@@ -64,10 +65,10 @@
   - globals {classSysArgc, classSysArgs}
   - modular functions to interact with:
     - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`}
-    - own process (`$0`) {`classSysInit()`, `classSysGetOwnPath()`, `classSysFopenOwnPath()`, `templateCatchAll()`}
+    - own process (`$0`) {`classSysInit()`, `templateCatchAll()`}
     - strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
-    - TODO: filesystem (perhaps just have `cxx/ClassPortableExecutable.hxx` do this?), internet (`socket`, `Winsock2`).
+    - TODO: internet (`socket`, `Winsock2`).
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassSha2.hxx`](./cxx/ClassSha2.hxx) is
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
