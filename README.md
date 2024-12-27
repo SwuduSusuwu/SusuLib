@@ -49,7 +49,7 @@
   - typedefs {ClassSysUSeconds}
   - globals {classSysArgc, classSysArgs}
   - modular functions to interact with:
-    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`}
+    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`, `classSysConsoleHasAnsiColors()`}
     - own process (`$0`) {`classSysInit()`, `templateCatchAll()`}
     - strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
