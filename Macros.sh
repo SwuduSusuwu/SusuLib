@@ -244,34 +244,29 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h
 		fi
 	done
 }
-SUSUWU_BUILD_CTAGS() { #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
-	local STATUS=1
+SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
+	STATUS=1
 	if command -v ctags >/dev/null; then
 		if [ -z "${1}" ] || [ -z "${2}" ]; then
-			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`SUSUWU_BUILD_CTAGS()\` was called with less than 2 params; will default to \`SUSUWU_BUILD_CTAGS \"-R --languages=C++\" \"\${C_SOURCE_PATH}\" \"\${C_SOURCE_PATH}\"\` (paths: \"${C_SOURCE_PATH}\" \"${CXX_SOURCE_PATH}\")."
-			if [ -n "${C_SOURCE_PATH}" ]; then
-				ctags -R "${C_SOURCE_PATH}"
-				STATUS=0
-			fi
-			if [ -n "${CXX_SOURCE_PATH}" ]; then
-				ctags -R --languages=C++ --c++-kinds=+p --fields=+l --extras=+q ${CXX_SOURCE_PATH}
-				#ctags -R ${CXX_SOURCE_PATH}
-				STATUS=0
-			fi
+			CTAGS_DEFAULTS="-R --exclude=.git/ --exclude=*.html ."
+			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`SUSUWU_BUILD_CTAGS()\` was called with less than 2 params; will default to \`SUSUWU_BUILD_CTAGS ${CTAGS_DEFAULTS}\`."
+		#shellcheck disable=SC2086
+			ctags ${CTAGS_DEFAULTS} && STATUS=0
 		else
-			local FLAGS=${1}
-			local SOURCE_PATH
-			shift 1 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
-			local SOURCE_PATH; for SOURCE_PATH in $@; do
-				ctags "${FLAGS}" "${SOURCE_PATH}"
-				STATUS=0
+			FLAGS=${1}
+		#shellcheck disable=SC2086
+			ctags ${FLAGS} "${2}" && STATUS=0
+			shift 2 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
+			for SOURCE_PATH in "$@"; do
+		#shellcheck disable=SC2086
+				ctags ${FLAGS} -a "${SOURCE_PATH}" || STATUS=1
 			done
 		fi
 	else
-		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`ctags not found\`; do \`apt install ctags\` to use \`SUSUWU_BUILD_CTAGS\`."
+		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`SUSUWU_BUILD_CTAGS()\`: \"ctags not found\"; do \`apt install ctags\`."
 	fi
 	return ${STATUS};
-}
+)
 SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES "[${CC} || ${CXX}] [${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
 	local BUILD=${1}
 	local SOURCE_SUFFIX=${2}

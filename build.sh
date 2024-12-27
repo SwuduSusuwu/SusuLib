@@ -29,7 +29,7 @@ SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
-SUSUWU_BUILD_CTAGS #/* Usage: `apt-get install ctags vim && vim -t tagToSearchFor` */
+SUSUWU_BUILD_CTAGS "-R --exclude=.git/ --exclude=*.html" "./Macros.sh" "${C_SOURCE_PATH}" "${CXX_SOURCE_PATH}" #/* Usage: `apt install ctags vim && vim -t tagToSearchFor` */
 SUSUWU_BUILD_OBJECTS "${CC} ${CFLAGS}" ".c" "${C_SOURCE_PATH}rfc6234/sha1.c" "${C_SOURCE_PATH}rfc6234/sha224-256.c" "${C_SOURCE_PATH}rfc6234/sha384-512.c"
 SUSUWU_BUILD_OBJECTS "${CXX} ${CXXFLAGS}" ".cxx" "${CXX_SOURCE_PATH}*.cxx"
 SUSUWU_BUILD_EXECUTABLE
