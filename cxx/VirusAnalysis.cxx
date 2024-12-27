@@ -2,13 +2,13 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassFs.hxx" /* ClassFsBytecode ClassFsPath */
+#include "ClassFs.hxx" /* ClassFsBytecode ClassFsPath classFsGetOwnPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_ERROR SUSUWU_SH_VERBOSE SUSUWU_UNIT_TESTS */
-#include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
+#include "ClassSys.hxx" /* classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS */
+#include "VirusAnalysis.hxx" /* *AnalyisCaches passList abortList */
 #include <algorithm> /* std::sort */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cmath>, <math.h>) /* round */
@@ -78,7 +78,7 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	const ClassFsPath gotOwnPath = classSysGetOwnPath();
+	const ClassFsPath gotOwnPath = classFsGetOwnPath();
 	if(ClassFsPath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {

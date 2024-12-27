@@ -1,26 +1,20 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
-#include "ClassFs.hxx" /* ClassFsPath */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
-#include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
-#ifdef __linux__
-#	include <linux/limits.h> /* PATH_MAX */
-#endif /* def __linux__ */
 #ifdef SUSUWU_POSIX
 #include <stdexcept> /* std::runtime_error */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
-#include <unistd.h> /* execve execv fork geteuid getuid readlink setuid */
+#include <unistd.h> /* execve execv fork geteuid getuid setuid */
 #else
 #	ifdef SUSUWU_WIN32
-#	include <windows.h> /* GetModuleFileName GetModuleHandle HMODULE */
-#	include <shlobj.h> /* IsUserAnAdmin */
+#		include <shlobj.h> /* IsUserAnAdmin */
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
 #endif /* def SUSUWU_POSIX */
@@ -163,41 +157,6 @@ const bool classSysSetRoot(bool root) {
 	return classSysHasRoot();
 }
 
-const FILE *classSysFopenOwnPath() {
-	return fopen(classSysGetOwnPath().c_str(), "r");
-}
-const ClassFsPath classSysGetOwnPath() {
-#ifdef __linux__
-	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
-	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
-	if (len == -1) {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	}
-	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
-//	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
-	return ClassFsPath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
-#elif defined SUSUWU_WIN32
-	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
-	if(hModule) {
-		char ownPathStr[MAX_PATH];
-		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
-		return ClassFsPath(ownPathStr);
-	} else {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	}
-#else /* def SUSUWU_WIN32 else */
-	if(SUSUWU_NULLPTR == classSysArgs) {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs) {/* `classSysInit()` was not used? */} }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	} else if(SUSUWU_NULLPTR == classSysArgs[0]) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs[0]) {/* `classSysInit()` was not used? */} }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	}
-	return ClassFsPath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-#endif /* def SUSUWU_WIN32 else */
-}
 const bool classSysSetConsoleInput(bool input) {
 	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
 	return classSysGetConsoleInput();

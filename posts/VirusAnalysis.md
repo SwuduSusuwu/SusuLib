@@ -581,6 +581,65 @@ typedef ClassFsPath ClassFsBytecode; /* Uses `std::string` for bytecode (versus 
  * "If you are going to use the data in a string like fashon then you should opt for std::string as using a std::vector may confuse subsequent maintainers. If on the other hand most of the data manipulation looks like plain maths or vector like then a std::vector is more appropriate." -- https://stackoverflow.com/a/1556294/24473928
 */
 typedef ClassFsPath ClassFsHash; /* TODO: `std::unordered_set<std::basic_string<unsigned char>>` */
+
+/* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classFsGetOwnPath()`.
+ * Error values: `return ClassFsPath();` */
+const ClassFsPath classFsGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<FilePath>::value) */;
+const FILE *classFsFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classFsGetClassFsPath()>::value) */;
+
+#if SUSUWU_UNIT_TESTS
+/* @throw std::runtime_error */
+const bool classFsTests();
+const bool classFsTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
+```
+`less` [cxx/ClassFs.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassFs.cxx)
+```
+const FILE *classFsFopenOwnPath() {
+	return fopen(classFsGetOwnPath().c_str(), "r");
+}
+const ClassFsPath classFsGetOwnPath() {
+#ifdef __linux__
+	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
+	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+	if (len == -1) {
+		SUSUWU_ERROR("classFsGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
+		return ClassFsPath(); /* return EXIT_FAILURE; */
+	}
+	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
+//	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classFsGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
+	return ClassFsPath(path); /* causes `PortableExecutableBytecode(classFsGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
+#elif defined SUSUWU_WIN32
+	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
+	if(hModule) {
+		char ownPathStr[MAX_PATH];
+		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
+		return ClassFsPath(ownPathStr);
+	} else {
+		SUSUWU_ERROR("classFsGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
+		return ClassFsPath(); /* return EXIT_FAILURE; */
+	}
+#else /* def SUSUWU_WIN32 else */
+	if(SUSUWU_NULLPTR == classFsArgs) {
+		SUSUWU_ERROR("classFsGetOwnPath(): { if(SUSUWU_NULLPTR == classFsArgs) {/* `classFsInit()` was not used? */} }");
+		return ClassFsPath(); /* return EXIT_FAILURE; */
+	} else if(SUSUWU_NULLPTR == classFsArgs[0]) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+		SUSUWU_ERROR("classFsGetOwnPath(): { if(SUSUWU_NULLPTR == classFsArgs[0]) {/* `classFsInit()` was not used? */} }");
+		return ClassFsPath(); /* return EXIT_FAILURE; */
+	}
+	return ClassFsPath(classFsArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+#endif /* def SUSUWU_WIN32 else */
+}
+
+#if SUSUWU_UNIT_TESTS
+namespace { /* [misc-use-anonymous-namespace] */
+}; /* namespace */
+const bool classFsTests() {
+	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
+	return retval;
+}
+const bool classFsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classFsTests, "classFsTests()"); }
+#endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```
@@ -656,12 +715,6 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 	}
 	return false;
 }
-
-/* Filesystems */
-/* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
- * Error values: `return ClassFsPath();` */
-const ClassFsPath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<FilePath>::value) */;
-const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetClassFsPath()>::value) */;
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
@@ -869,41 +922,6 @@ const bool classSysSetRoot(bool root) {
 	return classSysHasRoot();
 }
 
-const FILE *classSysFopenOwnPath() {
-	return fopen(classSysGetOwnPath().c_str(), "r");
-}
-const ClassFsPath classSysGetOwnPath() {
-#ifdef __linux__
-	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
-	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
-	if (len == -1) {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	}
-	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
-//	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
-	return ClassFsPath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
-#elif defined SUSUWU_WIN32
-	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
-	if(hModule) {
-		char ownPathStr[MAX_PATH];
-		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
-		return ClassFsPath(ownPathStr);
-	} else {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	}
-#else /* def SUSUWU_WIN32 else */
-	if(SUSUWU_NULLPTR == classSysArgs) {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs) {/* `classSysInit()` was not used? */} }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	} else if(SUSUWU_NULLPTR == classSysArgs[0]) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs[0]) {/* `classSysInit()` was not used? */} }");
-		return ClassFsPath(); /* return EXIT_FAILURE; */
-	}
-	return ClassFsPath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-#endif /* def SUSUWU_WIN32 else */
-}
 const bool classSysSetConsoleInput(bool input) {
 	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
 	return classSysGetConsoleInput();
@@ -1580,7 +1598,7 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	const ClassFsPath gotOwnPath = classSysGetOwnPath();
+	const ClassFsPath gotOwnPath = classFsGetOwnPath();
 	if(ClassFsPath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
@@ -1916,14 +1934,24 @@ extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , s
 /* `clang-tidy` on: NOLINTBEGIN(hicpp-signed-bitwise) */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
 /* bits in order which tests execute (not ordered included, but order used) */
-static const int susuwuUnitTestsMacrosBit          = 1 << 0; /*   1: `Macros.hxx`:`macrosTestsNoexcept()` */
-static const int susuwuUnitTestsClassObjectBit     = 1 << 1; /*   2: `ClassObjects.hxx`:`classObjectsTestsNoexcept()` */
-static const int susuwuUnitTestsConsoleBit         = 1 << 2; /*   4: `ClassSys.hxx`:`classSysSetConsoleInput()` */
-static const int susuwuUnitTestsClassSysBit        = 1 << 3; /*   8: `ClassSys.hxx`:`classSysTestsNoexcept()` */
-static const int susuwuUnitTestsClassSha2Bit       = 1 << 4; /*  16: `ClassSha2.hxx`:`classSha2TestsNoexcept()` */
-static const int susuwuUnitTestsClassResultListBit = 1 << 5; /*  32: `ClassResultList.hxx`:`classResultListTestsNoexcept()` */
-static const int susuwuUnitTestsVirusAnalysisBit   = 1 << 6; /*  64: `VirusAnalysis.hxx`:`virusAnalysisTestsNoexcept()` */
-static const int susuwuUnitTestsAssistantCnsBit    = 1 << 7; /* 128: `AssistantCns.hxx`:`assistantCnsTestsNoexcept()` */
+static const int susuwuUnitTestsMacrosBit =
+	1 << 0; /*   1: `Macros.hxx:macrosTestsNoexcept()` */
+static const int susuwuUnitTestsClassObjectBit =
+	1 << 1; /*   2: `ClassObjects.hxx:classObjectsTestsNoexcept()` */
+static const int susuwuUnitTestsClassFsBit =
+	1 << 2; /*   4: `ClassFs.hxx:classFsTestsNoexcept()` */
+static const int susuwuUnitTestsConsoleBit =
+	1 << 3; /*   8: `ClassSys.hxx:classSysSetConsoleInput()` */
+static const int susuwuUnitTestsClassSysBit =
+	1 << 4; /*  16: `ClassSys.hxx:classSysTestsNoexcept()` */
+static const int susuwuUnitTestsClassSha2Bit =
+	1 << 5; /*  32: `ClassSha2.hxx:classSha2TestsNoexcept()` */
+static const int susuwuUnitTestsClassResultListBit =
+	1 << 6; /*  64: `ClassResultList.hxx:classResultListTestsNoexcept()` */
+static const int susuwuUnitTestsVirusAnalysisBit =
+	1 << 7; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
+static const int susuwuUnitTestsAssistantCnsBit =
+	1 << 8; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 SusuwuUnitTestsBitmask main(int argc, const char **args);
@@ -1939,10 +1967,11 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
+#include "ClassFs.hxx" /* classFsGetOwnPath classFsTestsNoexcept */
 #include "ClassObject.hxx" /* classObjectTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysGetOwnPath classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
+#include "ClassSys.hxx" /* classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
@@ -1989,6 +2018,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassObjectBit;
 	}
+	std::cout << "classFsTestsNoexcept(): " << std::flush;
+	if(true == classFsTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassFsBit;
+	}
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
 	if(true != classSysTestsNoexcept()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassSysBit;
@@ -2025,7 +2061,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
 #else /* else !SUSUWU_UNIT_TESTS */
-	SUSUWU_NOTICE('`' + std::string(Susuwu::classSysGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
+	SUSUWU_NOTICE('`' + std::string(Susuwu::classFsGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
 #endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
@@ -2038,13 +2074,12 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 		return susuwuUnitTestsClassSysBit;
 	}
 #ifdef SUSUWU_EXPERIMENTAL
-	SUSUWU_WARNING('`' + std::string(Susuwu::classSysGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
+	SUSUWU_WARNING('`' + std::string(Susuwu::classFsGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
 #endif
 	return Susuwu::unitTestsCxx();
 }
 /* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
 #endif /* ndef INCLUDES_cxx_main_cxx */
-
 ```
 # Comparison to assistants
 For comparison; `produceVirusFixCns()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)" or _Anthropic_'s "[_Assistant_](https://poe.com/Assistant)";) have such demo as `produceAssistantCns()`;

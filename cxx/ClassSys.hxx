@@ -2,14 +2,12 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
-#include "ClassFs.hxx" /* ClassFsPath */
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_GREEN SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_GREEN SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include <chrono> /* std::chrono */
-#include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE */
 #include <exception> /* std::exception */
 #include <iomanip> /* std::setw */
-#include <ios> /* std::dec std::hex std::streamsize */
-#include <iostream> /* std::cerr std::cin std::endl */
+#include <ios> /* std::hex */
+#include <iostream> /* std::cin */
 #ifdef SUSUWU_CXX20
 #	include <span> /* std::span */
 #endif
@@ -20,9 +18,8 @@
 #else
 typedef int pid_t;
 #endif
-#include <type_traits> /* std::remove_const */
 #include <vector> /* std::vector */
-/* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
+/* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
 namespace Susuwu {
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
@@ -76,12 +73,6 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 	}
 	return false;
 }
-
-/* Filesystems */
-/* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
- * Error values: `return ClassFsPath();` */
-const ClassFsPath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<ClassFsPath>::value) */;
-const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetClassFsPath()>::value) */;
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
