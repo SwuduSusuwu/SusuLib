@@ -78,6 +78,7 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
+const unsigned char classSysGetConsoleAttributes(); /* if(_WIN32 || ) { return (background * 16) + foreground color; } else if(_POSIX_SOURCE) { return "\033[%1;%2m" -> (%1 * 16) + %2 ; } else { return 0; } */
 
 template<class Os, class Int,
 	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
