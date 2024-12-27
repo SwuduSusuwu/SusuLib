@@ -248,5 +248,5 @@ bool functionDeclaration(std::string input, std::deque<vector> output);
   - Regex `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/` once have _Contracts_/_C++26_.
   - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `ASSUME(X)`, which is close to `[[expects: x]]`, but `ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
   - Documentation of interfaces belongs to `*.hxx`; `*.cxx` is to do implementations. Do not duplicate interface comments.
-  - Advantages of `[[expects]]`; allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
+  - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
 
