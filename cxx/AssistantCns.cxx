@@ -3,7 +3,7 @@
 #define INCLUDES_cxx_AssistantCns_cxx
 #include "AssistantCns.hxx" /* assistantCnsProcessQuestion assistantCnsProcessResponses assistantCnsProcessUrls */
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassPortableExecutable.hxx" /* FileBytecode FilePath */
+#include "ClassFs.hxx" /* ClassFsBytecode ClassFsPath */
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
@@ -18,7 +18,7 @@
 /* (Work-in-progress) assistant bots with artificial CNS. */
 namespace Susuwu {
 Cns assistantCns;
-std::vector<FilePath> assistantCnsDefaultHosts = {
+std::vector<ClassFsPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
 	"https://superuser.com",
 	"https://www.quora.com"
@@ -77,7 +77,7 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	cns.setupSynapses(inputsToOutputs);
 }
 
-void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassFsPath> &hosts) {
 	for(const auto &host : hosts) {
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
@@ -85,7 +85,7 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
 }
-void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &localXhtml) {
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassFsPath &localXhtml) {
 	auto noRobots = assistantCnsProcessUrls("robots.txt");
 	auto question = assistantCnsProcessQuestion(localXhtml);
 	if(!question.empty()) {
@@ -124,8 +124,8 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #endif /* BOOST_VERSION */
-const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) {
-	const std::vector<FilePath> urls;
+const std::vector<ClassFsPath> assistantCnsProcessUrls(const ClassFsPath &localXhtml) {
+	const std::vector<ClassFsPath> urls;
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt;
 	read_xml(localXhtml, pt);
@@ -138,10 +138,10 @@ const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) 
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
-const FileBytecode assistantCnsProcessQuestion(const FilePath &localXhtml) {return "";} /* TODO */
-const std::vector<FileBytecode> assistantCnsProcessResponses(const FilePath &localXhtml) {return {};} /* TODO */
+const ClassFsBytecode assistantCnsProcessQuestion(const ClassFsPath &localXhtml) {return "";} /* TODO */
+const std::vector<ClassFsBytecode> assistantCnsProcessResponses(const ClassFsPath &localXhtml) {return {};} /* TODO */
 
-const std::string assistantCnsProcess(const Cns &cns, const FileBytecode &bytecode) {
+const std::string assistantCnsProcess(const Cns &cns, const ClassFsBytecode &bytecode) {
 	return cns.processToString(bytecode);
 }
 void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */) {
