@@ -1,7 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassSha2_cxx
 #define INCLUDES_cxx_ClassSha2_cxx
-#include "ClassPortableExecutable.hxx" /* FileBytecode FileHash */
+#include "ClassFs.hxx" /* ClassFsBytecode ClassFsHash */
 #include "ClassSha2.hxx"
 #include "ClassSys.hxx" /* classSysHexStr classSysUSecondClock templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING */
@@ -14,8 +14,8 @@ extern "C" {
 }
 namespace Susuwu {
 ClassSha2 classSha2 = classSha256;
-/* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode) {
-	FileHash result;
+/* const */ ClassFsHash /* 128 bits, not null-terminated */ classSha1(const ClassFsBytecode &bytecode) {
+	ClassFsHash result;
 	SHA1Context context;
 	result.resize(SHA1HashSize);
 	SHA1Reset(&context); /* If `undefined symbol: SHA1Reset`, affix `classSha1.o` to `${LD_FLAGS}` */
@@ -23,8 +23,8 @@ ClassSha2 classSha2 = classSha256;
 	SHA1Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-/* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode) {
-	FileHash result;
+/* const */ ClassFsHash /* 256 bits, not null-terminated */ classSha256(const ClassFsBytecode &bytecode) {
+	ClassFsHash result;
 	SHA256Context context;
 	result.resize(SHA256HashSize);
 	SHA256Reset(&context); /* If `undefined symbol: SHA256Reset`, affix `classSha224-256.o` to `${LD_FLAGS}` */
@@ -32,8 +32,8 @@ ClassSha2 classSha2 = classSha256;
 	SHA256Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-/* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode) {
-	FileHash result;
+/* const */ ClassFsHash /* 512 bits, not null-terminated */ classSha512(const ClassFsBytecode &bytecode) {
+	ClassFsHash result;
 	SHA512Context context;
 	result.resize(SHA512HashSize);
 	SHA512Reset(&context); /* If `undefined symbol: SHA512Reset`, affix `sha384-512.o` to `${LD_FLAGS}` */
@@ -47,7 +47,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const char nulls[65536 /* 65536 == 2^16 == 64kb */] = {0};
 	std::string nullStr(nulls, &nulls[65536]);
 	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
-	const FileHash hash = classSha2(nullStr);
+	const ClassFsHash hash = classSha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
 	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";

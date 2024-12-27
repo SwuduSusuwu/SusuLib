@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
 #include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
-#include "ClassPortableExecutable.hxx" /* FilePath */
+#include "ClassFs.hxx" /* ClassFsPath */
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
@@ -201,17 +201,17 @@ const bool classSysSetRoot(bool root) {
 const FILE *classSysFopenOwnPath() {
 	return fopen(classSysGetOwnPath().c_str(), "r");
 }
-const FilePath classSysGetOwnPath() {
+const ClassFsPath classSysGetOwnPath() {
 #ifdef __linux__
 	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
 	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
 	if (len == -1) {
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	}
 	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
-	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
+	return ClassFsPath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
@@ -220,24 +220,24 @@ const FilePath classSysGetOwnPath() {
 		char *const lpFilename = new char[nSize];
 		const size_t result = GetModuleFileName(hModule, lpFilename, nSize);
 		if(nSize == result) {
-			return FilePath(lpFilename);
+			return ClassFsPath(lpFilename);
 		} else {
 			SUSUWU_ERROR(getModuleFileNameReturn + std::to_string(nSize) + SUSUWU_SH_DEFAULT "); char *const lpFilename = new char[nSize]; (GetModuleFileName(hModule, lpFileName, nSize) == " SUSUWU_SH_PURPLE + std::to_string(result) + SUSUWU_SH_DEFAULT " /* expected `== nSize` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
-			return FilePath(); /* return EXIT_FAILURE; */
+			return ClassFsPath(); /* return EXIT_FAILURE; */
 		}
 	} else {
 		SUSUWU_ERROR(getModuleFileNameReturn + "0" SUSUWU_SH_DEFAULT " /* expected `> 0` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	}
 #else /* def SUSUWU_WIN32 else */
 	if(SUSUWU_NULLPTR == classSysArgs) {
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs) {/* `classSysInit()` was not used? */} }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	} else if(SUSUWU_NULLPTR == classSysArgs[0]) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs[0]) {/* `classSysInit()` was not used? */} }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	}
-	return FilePath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+	return ClassFsPath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 #endif /* def SUSUWU_WIN32 else */
 }
 

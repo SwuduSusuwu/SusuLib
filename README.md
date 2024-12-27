@@ -51,11 +51,12 @@
   - macro constants, such as `SUSUWU_SH_<color>` (`color` = {`DEFAULT`, `BLACK`, `DARK_GRAY`, `RED`, `LIGHT_RED`, `GREEN`, `LIGHT_GREEN`, `BROWN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `PURPLE`, `LIGHT_PURPLE`, `CYAN`, `LIGHT_CYAN`, `LIGHT_GRAY`, `WHITE`}, if supported, expands to the [_ANSI_ color](https://wikipedia.org/wiki/Ansi_color) codes, else expands to ""),
   - macro functions, such as {`SUSUWU_ERROR`, `SUSUWU_WARNING`, `SUSUWU_INFO`, `SUSUWU_SUCCESS`, which use `SUSUWU_PRINT`}, `SUSUWU_PRINT` (if `__cplusplus`, uses `SUSUWU_CERR`, else uses `SUSUWU_STDERRR`),
   - `macroTestsNoexcept()` (unit tests, with return value for errors).
+- [`./cxx/ClassFs.hxx`](./cxx/ClassFs.hxx) is
+  - `ClassFsPath` (`PortableExecutable`'s constructor argument), `ClassFsBytecode` (`classSha2`'s input argument), `ClassFsHash` (`classSha2`'s return value)
 - [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
   - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassPortableExecutable.hxx`](./cxx/ClassPortableExecutable.hxx) is
-  - `FilePath` (`PortableExecutable`'s constructor argument), `FileBytecode` (`classSha2`'s input argument), `FileHash` (`classSha2`'s return value)
   - `class PortableExecutable : public Object` (stores file `path` and/or `bytecode` and/or `hex`code. TODO; `hash`?)
   - `class PortableExecutableBytecode : public PortableExecutable` loads `bytecode` from `path`. TODO; `hash`?
 - [`./cxx/ClassSys.hxx`](./cxx/ClassSys.hxx) is

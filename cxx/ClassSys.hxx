@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
-#include "ClassPortableExecutable.hxx" /* FilePath */
+#include "ClassFs.hxx" /* ClassFsPath */
 #include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_GREEN SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include <chrono> /* std::chrono */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE */
@@ -80,9 +80,9 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 
 /* Filesystems */
 /* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
- * Error values: `return FilePath();` */
-const FilePath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<FilePath>::value) */;
-const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetFilePath()>::value) */;
+ * Error values: `return ClassFsPath();` */
+const ClassFsPath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<ClassFsPath>::value) */;
+const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetClassFsPath()>::value) */;
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */

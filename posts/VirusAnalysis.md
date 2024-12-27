@@ -9,7 +9,7 @@
 - [Synopsis + related posts](#synopsis--related-posts)
 - [Sponsor this](../README.md#sponsor)
 # Intro
-Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (secures all app launches,) but after first launch: **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
+Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (secures all app launches,) but after first launch: **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(ClassFsBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 
 [`../README.md`](../README.md) has how to use this (what follows is more of a book of source code).
 
@@ -574,28 +574,31 @@ public:
 ```
 `less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
 
-`less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
+`less` [cxx/ClassFs.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassFs.hxx)
 ```c++
-typedef std::string FilePath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
-typedef FilePath FileBytecode; /* Uses `std::string` for bytecode (versus `std::vector`) because:
+typedef std::string ClassFsPath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
+typedef ClassFsPath ClassFsBytecode; /* Uses `std::string` for bytecode (versus `std::vector`) because:
  * "If you are going to use the data in a string like fashon then you should opt for std::string as using a std::vector may confuse subsequent maintainers. If on the other hand most of the data manipulation looks like plain maths or vector like then a std::vector is more appropriate." -- https://stackoverflow.com/a/1556294/24473928
 */
-typedef FilePath FileHash; /* TODO: `std::unordered_set<std::basic_string<unsigned char>>` */
+typedef ClassFsPath ClassFsHash; /* TODO: `std::unordered_set<std::basic_string<unsigned char>>` */
+```
+`less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
+```c++
 typedef class PortableExecutable : public Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
 public:
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutable) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
-	explicit PortableExecutable(FilePath path_ = "") : path(std::move(path_)) {}
-	PortableExecutable(FilePath path_, FileBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
-/*TODO: overload on typedefs which map to the same types:	PortableExecutable(const FilePath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
-	const FilePath path; /* Suchas "C:\Program.exe" or "/usr/bin/library.so" */ /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) */
-	FileBytecode bytecode; /* compiled programs; bytecode */
+	explicit PortableExecutable(ClassFsPath path_ = "") : path(std::move(path_)) {}
+	PortableExecutable(ClassFsPath path_, ClassFsBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
+/*TODO: overload on typedefs which map to the same types:	PortableExecutable(const ClassFsPath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
+	const ClassFsPath path; /* Suchas "C:\Program.exe" or "/usr/bin/library.so" */ /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) */
+	ClassFsBytecode bytecode; /* compiled programs; bytecode */
 	std::string hex; /* `hexdump(path)`, hexadecimal, for C string functions */
 } PortableExecutable;
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutableBytecode) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
-	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
+	explicit PortableExecutableBytecode(ClassFsPath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 ```
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
@@ -657,9 +660,9 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 
 /* Filesystems */
 /* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classSysGetOwnPath()`.
- * Error values: `return FilePath();` */
-const FilePath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<FilePath>::value) */;
-const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetFilePath()>::value) */;
+ * Error values: `return ClassFsPath();` */
+const ClassFsPath classSysGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<FilePath>::value) */;
+const FILE *classSysFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classSysGetClassFsPath()>::value) */;
 
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
@@ -905,17 +908,17 @@ const bool classSysSetRoot(bool root) {
 const FILE *classSysFopenOwnPath() {
 	return fopen(classSysGetOwnPath().c_str(), "r");
 }
-const FilePath classSysGetOwnPath() {
+const ClassFsPath classSysGetOwnPath() {
 #ifdef __linux__
 	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
 	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
 	if (len == -1) {
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	}
 	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
-	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
+	return ClassFsPath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
@@ -924,24 +927,24 @@ const FilePath classSysGetOwnPath() {
 		char *const lpFilename = new char[nSize];
 		const size_t result = GetModuleFileName(hModule, lpFilename, nSize);
 		if(nSize == result) {
-			return FilePath(lpFilename);
+			return ClassFsPath(lpFilename);
 		} else {
 			SUSUWU_ERROR(getModuleFileNameReturn + std::to_string(nSize) + SUSUWU_SH_DEFAULT "); char *const lpFilename = new char[nSize]; (GetModuleFileName(hModule, lpFileName, nSize) == " SUSUWU_SH_PURPLE + std::to_string(result) + SUSUWU_SH_DEFAULT " /* expected `== nSize` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
-			return FilePath(); /* return EXIT_FAILURE; */
+			return ClassFsPath(); /* return EXIT_FAILURE; */
 		}
 	} else {
 		SUSUWU_ERROR(getModuleFileNameReturn + "0" SUSUWU_SH_DEFAULT " /* expected `> 0` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	}
 #else /* def SUSUWU_WIN32 else */
 	if(SUSUWU_NULLPTR == classSysArgs) {
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs) {/* `classSysInit()` was not used? */} }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	} else if(SUSUWU_NULLPTR == classSysArgs[0]) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		SUSUWU_ERROR("classSysGetOwnPath(): { if(SUSUWU_NULLPTR == classSysArgs[0]) {/* `classSysInit()` was not used? */} }");
-		return FilePath(); /* return EXIT_FAILURE; */
+		return ClassFsPath(); /* return EXIT_FAILURE; */
 	}
-	return FilePath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
+	return ClassFsPath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 #endif /* def SUSUWU_WIN32 else */
 }
 
@@ -977,10 +980,10 @@ const bool classSysTests() {
 ```
 `less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
 ```c++
-/* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode);
-/* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode);
-/* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode);
-typedef FileHash (*ClassSha2)(const FileBytecode &bytecode);
+/* const */ ClassFsHash /* 128 bits, not null-terminated */ classSha1(const ClassFsBytecode &bytecode);
+/* const */ ClassFsHash /* 256 bits, not null-terminated */ classSha256(const ClassFsBytecode &bytecode);
+/* const */ ClassFsHash /* 512 bits, not null-terminated */ classSha512(const ClassFsBytecode &bytecode);
+typedef ClassFsHash (*ClassSha2)(const ClassFsBytecode &bytecode);
 extern ClassSha2 classSha2/* = classSha256 */; /* To compress, apps can execute `classSha2 = classSha1;`. To double hash sizes, execute `classSha2 = classSha512;`. (Notice: this does not recompute hashes which exist) */
 #if SUSUWU_UNIT_TESTS
 const bool classSha2Tests();
@@ -991,8 +994,8 @@ const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 ```c++
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
 ClassSha2 classSha2 = classSha256;
-/* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode) {
-	FileHash result;
+/* const */ ClassFsHash /* 128 bits, not null-terminated */ classSha1(const ClassFsBytecode &bytecode) {
+	ClassFsHash result;
 	SHA1Context context;
 	result.resize(SHA1HashSize);
 	SHA1Reset(&context); /* If `undefined symbol: SHA1Reset`, affix `classSha1.o` to `${LD_FLAGS}` */
@@ -1000,8 +1003,8 @@ ClassSha2 classSha2 = classSha256;
 	SHA1Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-/* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode) {
-	FileHash result;
+/* const */ ClassFsHash /* 256 bits, not null-terminated */ classSha256(const ClassFsBytecode &bytecode) {
+	ClassFsHash result;
 	SHA256Context context;
 	result.resize(SHA256HashSize);
 	SHA256Reset(&context); /* If `undefined symbol: SHA256Reset`, affix `classSha224-256.o` to `${LD_FLAGS}` */
@@ -1009,8 +1012,8 @@ ClassSha2 classSha2 = classSha256;
 	SHA256Result(&context, reinterpret_cast<unsigned char *>(&result[0]));
 	return result;
 }
-/* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode) {
-	FileHash result;
+/* const */ ClassFsHash /* 512 bits, not null-terminated */ classSha512(const ClassFsBytecode &bytecode) {
+	ClassFsHash result;
 	SHA512Context context;
 	result.resize(SHA512HashSize);
 	SHA512Reset(&context); /* If `undefined symbol: SHA512Reset`, affix `sha384-512.o` to `${LD_FLAGS}` */
@@ -1024,7 +1027,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const char nulls[65536 /* 65536 == 2^16 == 64kb */] = {0};
 	std::string nullStr(nulls, &nulls[65536]);
 	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
-	const FileHash hash = classSha2(nullStr);
+	const ClassFsHash hash = classSha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
 	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
@@ -1050,9 +1053,9 @@ const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(cla
 ```
 `less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
 ```c++
-typedef FileHash ResultListHash;
-typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
-typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
+typedef ClassFsHash ResultListHash;
+typedef ClassFsBytecode ResultListBytecode; /* Should have structure of ClassFsBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
+typedef ClassFsPath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
 typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
@@ -1509,7 +1512,7 @@ const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const R
 /* Analysis sandbox */
 const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* `chroot(strace(file)) >> outputs; return straceOutputsAnalysis(outputs);` */
 extern std::vector<std::string> stracePotentialDangers;
-const VirusAnalysisResult straceOutputsAnalysis(const FilePath &straceOutput); /* TODO: regex */
+const VirusAnalysisResult straceOutputsAnalysis(const ClassFsPath &straceOutput); /* TODO: regex */
 
 /* Analysis CNS */
 /* Setup analysis CNS; is slow to produce (requires access to huge file databases);
@@ -1619,8 +1622,8 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	const FilePath gotOwnPath = classSysGetOwnPath();
-	if(FilePath() != gotOwnPath) {
+	const ClassFsPath gotOwnPath = classSysGetOwnPath();
+	if(ClassFsPath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
@@ -1857,7 +1860,7 @@ const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const 
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
-const VirusAnalysisResult straceOutputsAnalysis(const FilePath &straceOutput) {
+const VirusAnalysisResult straceOutputsAnalysis(const ClassFsPath &straceOutput) {
 		auto straceDump = std::ifstream(straceOutput);
 		std::vector<std::string> straceOutputs /*= explodeToList(straceDump, "\n")*/;
 		for(std::string straceOutputIt; std::getline(straceDump, straceOutputIt); ) {
@@ -1875,7 +1878,7 @@ void produceAnalysisCns(const ResultList &pass, const ResultList &abort,
 const ResultList &unreviewed /* = ResultList(), WARNING! Possible danger to use unreviewed files */,
 Cns &cns /* = analysisCns */
 ) {
-	std::vector<std::tuple<FileBytecode, float>> inputsToOutputs;
+	std::vector<std::tuple<ClassFsBytecode, float>> inputsToOutputs;
 	const size_t maxPassSize = listMaxSize(pass.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abort.bytecodes);
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
@@ -1923,7 +1926,7 @@ const VirusAnalysisResult cnsAnalysis(const PortableExecutable &file, const Resu
 }
 
 void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrNull, Cns &cns /* = virusFixCns */) {
-	std::vector<std::tuple<FileBytecode, FileBytecode>> inputsToOutputs;
+	std::vector<std::tuple<ClassFsBytecode, ClassFsBytecode>> inputsToOutputs;
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
 	const size_t maxPassSize = listMaxSize(passOrNull.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abortOrNull.bytecodes);
@@ -1942,7 +1945,7 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	cns.setupSynapses(inputsToOutputs);
 }
 
-const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /* = virusFixCns */) {
+const ClassFsBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /* = virusFixCns */) {
 	return cns.processToString(file.bytecode);
 }
 ```
@@ -2108,18 +2111,18 @@ static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCa
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )
  * Github is a special case; has compressed downloads of repositories ( https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github )
  */
-extern std::vector<FilePath> assistantCnsDefaultHosts;
+extern std::vector<ClassFsPath> assistantCnsDefaultHosts;
 
 /* @throw std::bad_alloc
  * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new  synthesis).
  * If no responses, `0 == responsesOrNull.bytecodes[x].size()` (ignore).
  * `questionsOrNull.signatures[x] = Universal Resource Locator`
  * @code classSha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
-void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts = assistantCnsDefaultHosts);
-void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &filepath = "index.xhtml");
-const std::vector<FilePath> ParseUrls(const FilePath &filepath = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
-const FileBytecode ParseQuestion(const FilePath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
-const std::vector<FileBytecode> ParseResponses(const FilePath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassFsPath> &hosts = assistantCnsDefaultHosts);
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassFsPath &filepath = "index.xhtml");
+const std::vector<ClassFsPath> ParseUrls(const FilePath &filepath = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
+const ClassFsBytecode ParseQuestion(const ClassFsPath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
+const std::vector<ClassFsBytecode> ParseResponses(const ClassFsPath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
 
 /* @pre `questionsOrNull` maps to `responsesOrNull`,
  * `0 == questionsOrNull.bytecodes[x].size()` for new  synthesis (empty question has responses),
@@ -2138,7 +2141,7 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 `less` [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
 ```c++
 Cns assistantCns;
-std::vector<FilePath> assistantCnsDefaultHosts = {
+std::vector<ClassFsPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
 	"https://superuser.com",
 	"https://www.quora.com"
@@ -2197,7 +2200,7 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	cns.setupSynapses(inputsToOutputs);
 }
 
-void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassFsPath> &hosts) {
 	for(const auto &host : hosts) {
 #ifndef SUSUWU_POSIX
     SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
@@ -2208,7 +2211,7 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
 }
-void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const FilePath &localXhtml) {
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassFsPath &localXhtml) {
 	auto noRobots = assistantCnsProcessUrls("robots.txt");
 	auto question = assistantCnsProcessQuestion(localXhtml);
 	if(!question.empty()) {
@@ -2250,8 +2253,8 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #endif /* BOOST_VERSION */
-const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) {
-	const std::vector<FilePath> urls;
+const std::vector<ClassFsPath> assistantCnsProcessUrls(const FilePath &localXhtml) {
+	const std::vector<ClassFsPath> urls;
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt;
 	read_xml(localXhtml, pt);
@@ -2264,10 +2267,10 @@ const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) 
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
-const FileBytecode assistantCnsProcessQuestion(const FilePath &localXhtml) {return "";} /* TODO */
-const std::vector<FileBytecode> assistantCnsProcessResponses(const FilePath &localXhtml) {return {};} /* TODO */
+const ClassFsBytecode assistantCnsProcessQuestion(const ClassFsPath &localXhtml) {return "";} /* TODO */
+const std::vector<ClassFsBytecode> assistantCnsProcessResponses(const ClassFsPath &localXhtml) {return {};} /* TODO */
 
-const std::string assistantCnsProcess(const Cns &cns, const FileBytecode &bytecode) {
+const std::string assistantCnsProcess(const Cns &cns, const ClassFsBytecode &bytecode) {
 	return cns.processToString(bytecode);
 }
 void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */) {
