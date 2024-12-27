@@ -37,7 +37,7 @@ SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwante
 	return ${SUSUWU_SH_REMOVE_PARAM_FOUND}
 )
 SUSUWU_FAST_IS_PREVIEW() ( #/* Usage; `if SUSUWU_FAST_IS_PREVIEW; then EXPERIMENTAL_CODE(); fi` */
-	return 1 #TODO: for experimental / preview branches, `return 0`; `SUSUWU_FAST_IS_PREVIEW()` Is fast (versus `SUSUWU_IS_PREVIEW()`, but can not auto-detect production / release versus experimental / preview branches.
+	return 0 #TODO: for production / release branches, `return 1`; `SUSUWU_FAST_IS_PREVIEW()` Is fast (versus `SUSUWU_IS_PREVIEW()`, but can not auto-detect production / release versus experimental / preview branches.
 )
 SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; then EXPERIMENTAL_CODE(); fi` */
 	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then

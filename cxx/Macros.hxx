@@ -43,7 +43,8 @@
 #	define SUSUWU_DEFAULT_BRANCH "trunk"
 #endif /* ndef SUSUWU_DEFAULT_BRANCH */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or [post the issue](https://github.com/SwuduSusuwu/SubStack/issues/new)"
+//#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `" SUSUWU_SH_GREEN " -DSUSUWU_EXPERIMENTAL " SUSUWU_SH_WHITE " `; if you experience issues, execute `" SUSUWU_SH_LIGHT_BROWN " git switch " SUSUWU_SH_LIGHT_PURPLE SUSUWU_DEFAULT_BRANCH SUSUWU_SH_WHITE " && ./build.sh" SUSUWU_SH_WHITE "` (as possible fixup), or [post the issue](https://github.com/SwuduSusuwu/SubStack/issues/new)" /* TODO: fix "error: expected ')'" */
 #else /* def SUSUWU_EXPERIMENTAL else */
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */

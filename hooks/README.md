@@ -1,4 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+
+*Notice*: You switched to the [_experimental_](https://github.com/SwuduSusuwu/SubStack/blob/experimental/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SubStack/blob/trunk/hooks/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
+- This `experimental` branch is for [beta tests](#beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
 # [Table of Contents](../README.md#table-of-contents)
 - [Purposes](#purposes)
 # Purposes
