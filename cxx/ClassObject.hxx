@@ -1,6 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
+#include "ClassSys.hxx" /* classSysHexStr */
 #include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -8,9 +9,7 @@
 #	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */
 #endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) */
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp memcpy */
-#include <ios> /* std::hex */
 #include <new> /* ::operator new */
-#include <sstream> /* std::stringstream */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
@@ -148,7 +147,9 @@ public:
 #else /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
 	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 #endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
-	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
+	virtual const std::string toString() const {
+		return getName() + '@' + classSysHexStr(hashCode());
+	}
 	virtual void notify() {}
 	virtual void notifyAll() {}
 	virtual void wait() {}

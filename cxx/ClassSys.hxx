@@ -18,6 +18,7 @@
 #else
 typedef int pid_t;
 #endif
+#include <type_traits> /* std::enable_if */
 #include <vector> /* std::vector */
 /* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
 namespace Susuwu {
@@ -77,7 +78,23 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
 
-template<class Os, class Str>
+template<class Os, class Int,
+	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
+inline Os &classSysHexOs(Os &os, const Int &value) {
+	const std::ios::fmtflags oldFlags = os.flags();
+	os << std::hex << value;
+	os.flags(oldFlags);
+	return os;
+}
+template<class Int,
+	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
+inline const std::string classSysHexStr(const Int &value) {
+	std::stringstream os;
+	classSysHexOs(os, value);
+	return os.str();
+}
+template<class Os, class Str,
+	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 inline Os &classSysHexOs(Os &os, const Str &value) {
 	const std::ios::fmtflags oldFlags = os.flags();
 	const char oldFill = os.fill();
@@ -90,7 +107,8 @@ inline Os &classSysHexOs(Os &os, const Str &value) {
 	os.flags(oldFlags);
 	return os;
 }
-template<class Str>
+template<class Str,
+	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 inline const Str classSysHexStr(const Str &value) {
 	std::stringstream os;
 	classSysHexOs(os, value);
@@ -149,4 +167,3 @@ static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchA
 
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_ClassSys_hxx */
-
