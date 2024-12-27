@@ -1,67 +1,67 @@
 [
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -x c -g -Og -fno-omit-frame-pointer  -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./c/rfc6234/sha1.c -o ./obj/sha1.o",
+		"command": "clang++  -x c -g -Og -fno-omit-frame-pointer  -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./c/rfc6234/sha1.c -o ./obj/sha1.o",
 		"file": "./c/rfc6234/sha1.c"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -x c -g -Og -fno-omit-frame-pointer  -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./c/rfc6234/sha224-256.c -o ./obj/sha224-256.o",
+		"command": "clang++  -x c -g -Og -fno-omit-frame-pointer  -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./c/rfc6234/sha224-256.c -o ./obj/sha224-256.o",
 		"file": "./c/rfc6234/sha224-256.c"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -x c -g -Og -fno-omit-frame-pointer  -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./c/rfc6234/sha384-512.c -o ./obj/sha384-512.o",
+		"command": "clang++  -x c -g -Og -fno-omit-frame-pointer  -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./c/rfc6234/sha384-512.c -o ./obj/sha384-512.o",
 		"file": "./c/rfc6234/sha384-512.c"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/AssistantCns.cxx -o ./obj/AssistantCns.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/AssistantCns.cxx -o ./obj/AssistantCns.o",
 		"file": "./cxx/AssistantCns.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassCns.cxx -o ./obj/ClassCns.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassCns.cxx -o ./obj/ClassCns.o",
 		"file": "./cxx/ClassCns.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassIo.cxx -o ./obj/ClassIo.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassIo.cxx -o ./obj/ClassIo.o",
 		"file": "./cxx/ClassIo.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassObject.cxx -o ./obj/ClassObject.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassObject.cxx -o ./obj/ClassObject.o",
 		"file": "./cxx/ClassObject.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassResultList.cxx -o ./obj/ClassResultList.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassResultList.cxx -o ./obj/ClassResultList.o",
 		"file": "./cxx/ClassResultList.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassSha2.cxx -o ./obj/ClassSha2.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassSha2.cxx -o ./obj/ClassSha2.o",
 		"file": "./cxx/ClassSha2.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassSys.cxx -o ./obj/ClassSys.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassSys.cxx -o ./obj/ClassSys.o",
 		"file": "./cxx/ClassSys.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/Macros.cxx -o ./obj/Macros.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/Macros.cxx -o ./obj/Macros.o",
 		"file": "./cxx/Macros.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/VirusAnalysis.cxx -o ./obj/VirusAnalysis.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/VirusAnalysis.cxx -o ./obj/VirusAnalysis.o",
 		"file": "./cxx/VirusAnalysis.cxx"
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
-		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/main.cxx -o ./obj/main.o",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"trunk\" -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/main.cxx -o ./obj/main.o",
 		"file": "./cxx/main.cxx"
 	}
 ]
