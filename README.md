@@ -14,6 +14,7 @@
     - [`git`](#Git)
     - [`sh` source](#Sh-source)
     - [_C_/_C++_ source](#Cc-source)
+  - [Sponsor](#Sponsor)
 
 # Purposes
 [`./.ssh/`](./.ssh/) is to [compute signatures/certificates](#Signaturecertificate).
@@ -249,4 +250,7 @@ bool functionDeclaration(std::string input, std::deque<vector> output);
   - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `ASSUME(X)`, which is close to `[[expects: x]]`, but `ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
   - Documentation of interfaces belongs to `*.hxx`; `*.cxx` is to do implementations. Do not duplicate interface comments.
   - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
+## Sponsor
+To sponsor this, send withdrawable crypto (such as _Bitcoin_) addresses to [contacts which `./SECURITY.md` lists](./SECURITY.md#Sensitive-issues).
+- If more than $100, you should encrypt with [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub)
 
