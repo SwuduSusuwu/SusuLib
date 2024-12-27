@@ -178,13 +178,13 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	pragma message("[Warning: `#define SUSUWU_INLINE static` due to `!defined(SUSUWU_C99) && !defined(SUSUWU_CXX98)`.]")
 #endif /* (defined(SUSUWU_C99) || defined(SUSUWU_CXX98)) else */
 #if defined(SUSUWU_CXX11) /* TODO? (pre-CXX11 support) || SUSUWU_HAS_FEATURE(cxx_noexcept) || (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114) */ /* [Other `noexcept` tests](https://stackoverflow.com/questions/18387640/how-to-deal-with-noexcept-in-visual-studio) */
-#	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... {info();}` is close to `void versionInfo() [[ensures: true]]; ... {info();}` or `{try {versionInfo();} catch(...) {SUSUWU_UNREACHABLE;}} */
+#	define SUSUWU_NOEXCEPT noexcept /* Usage: `void info() SUSUWU_NOEXCEPT; ... { info(); }` is close to `void versionInfo() [[ensures: true]]; ... { info(); }` or `{ try { versionInfo(); } catch(...) { SUSUWU_UNREACHABLE; } } */
 #	define SUSUWU_DEFAULT = default; /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_DELETE = delete; /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_FINAL final /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
-		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
+		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); { versionInfo(); }` is close to `{try { versionInfo(); } catch(...) {if(std::is_nothrow_constructible<U>::value) { SUSUWU_UNREACHABLE; } } }` */
 #else /* SUSUWU_CXX11 else */
 #	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
 #	define SUSUWU_DEFAULT {} /* allows default constructors/destructors. TODO: default operators? */
@@ -350,7 +350,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* else !SUSUWU_SH_PREFER_STDIO */
 
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(SUSUWU_SH_ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
+#	define SUSUWU_ERROR(x) { SUSUWU_PRINT(SUSUWU_SH_ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES); }
 #else /* SUSUWU_EXPERIMENTAL else */
 #	define SUSUWU_ERROR(x) SUSUWU_PRINT(SUSUWU_SH_ERROR, x)
 #endif /* SUSUWU_EXPERIMENTAL else */
@@ -386,8 +386,8 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 ```c++
 #if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #ifdef SUSUWU_CXX11
-SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    /* `int`    */) {return false;}
-SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(SUSUWU_NULLPTR) /* `void *` */) {return true;}
+SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    /* `int`    */) { return false; }
+SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(SUSUWU_NULLPTR) /* `void *` */) { return true; }
 SUSUWU_STATIC_ASSERT(true  == MacrosCxx11NullptrTest(SUSUWU_NULLPTR)); /* Tests that `nullptr` is `void *` */
 #endif /* def SUSUWU_CXX11 */
 class MacrosCxx11InheritanceTest {
@@ -399,7 +399,7 @@ public:
 };
 class MacrosCxx11InheritanceTestSubclass : MacrosCxx11InheritanceTest {
 public: /* Notice: inherits default constructor */
-	const bool PureVirtual() const SUSUWU_OVERRIDE {return true;}; /* Notice: `final` is not allowed since this has a subclass. `override` is optional. */
+	const bool PureVirtual() const SUSUWU_OVERRIDE { return true; }; /* Notice: `final` is not allowed since this has a subclass. `override` is optional. */
 };
 class MacrosCxx11InheritanceTestSubclass2 SUSUWU_FINAL /* Since destructor is final, cannot inherit from class. `clang++` thus warns, unless the whole class is `final`. */: MacrosCxx11InheritanceTestSubclass {
 public: /* Notice: inherits `PureVirtual()`, which you can now set `final` */
@@ -407,9 +407,9 @@ public: /* Notice: inherits `PureVirtual()`, which you can now set `final` */
 };
 static void macrosNoUniqueAddressTest() {
 	typedef class Zero {} Zero;
-	class SubClassWithBaseSubobject : public Zero {public: bool boo = true;};
-	class SubClassWithMemberSubobject {public: bool boo = true; Zero zero;};
-	class SubClassWithMemberSubobjectNoAddress {public: bool boo = true; SUSUWU_NO_UNIQUE_ADDRESS Zero zero;};
+	class SubClassWithBaseSubobject : public Zero { public: bool boo = true; };
+	class SubClassWithMemberSubobject { public: bool boo = true; Zero zero; };
+	class SubClassWithMemberSubobjectNoAddress { public: bool boo = true; SUSUWU_NO_UNIQUE_ADDRESS Zero zero; };
 #ifdef SUSUWU_CXX11 /* this is true without C++11, but `std::is_empty` doesn't exist in C++98. */
 	SUSUWU_STATIC_ASSERT(std::is_empty<Zero>::value);
 #endif /* def SUSUWU_CXX11 */
