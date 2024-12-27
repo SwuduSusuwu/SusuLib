@@ -167,7 +167,7 @@ Is as for [_C_/_C++_ source](#Cc-source), plus specifics to `sh`:
   - Rationales:
     - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
     - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2250).
-  - Exceptions: [language limits](https://www.shellcheck.net/wiki/SC3030).
+  - Exceptions: [**language limits**](https://www.shellcheck.net/wiki/SC3030).
     - To support `/bin/sh`: do not use `${@}`, but `$@`.
 - Str variable access: uses `"$..."` (thus not `ls ${STR}`, but `ls "${STR}"`).
   - Rationales:
@@ -181,14 +181,18 @@ Is as for [_C_/_C++_ source](#Cc-source), plus specifics to `sh`:
     - Avoids [SC2068](https://www.shellcheck.net/wiki/SC2068) ["Double quote array expansions to avoid re-splitting elements." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2068).
   - Exceptions: to split (on spaces) is the purpose of the `for` loop.
     - To parse numerous params: do not use `for VALUE in "$@"`; do`, but `for VALUE in $@; do`.
-- For temp variables, you affix `local` (thus not `for VALUE in ${LIST}; do`, but `local VALUE; for VALUE in ${LIST}; do`).
-  - Rationales: avoids [*shadowed variables*](https://wikipedia.org/wiki/Variable_shadowing) (such as `f2() { VALUE=false; }; f1() { VALUE=true; f2(); return VALUE; };` causes)
-  - Exceptions: [language limits](https://austingroupbugs.net/bug_view_page.php?bug_id=767).
-    - To support `/bin/sh`: do not use `local` (such as `f2() { local VALUE=false; }`), but [subshells](https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script/64946874#64946874) (such as `f2() ( VALUE=false; )`.)
-    - `local` is [not applicable to `IFS="<delimiter>"` or `cd <path>`](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493838#493838), [not applicable to `readonly`](https://unix.stackexchange.com/questions/506009/unable-to-have-a-local-variable-with-the-same-name-as-a-global-read-only-variabl) (so use subshells for this).
-    - If you require code which is consistant across platforms ([`local` has inconsistant dynamic versus static scope, plus inconsistant inheritance](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493743#493743)).
+- Restrict temp variables:
+  - Rationales: avoids [*shadowed variables*](https://wikipedia.org/wiki/Variable_shadowing) (such as `f2() { VALUE=false; }; f1() { VALUE=true; f2(); return VALUE; };` causes).
+  - If your project will always stick to `/bin/bash` (if does not have to support _POSIX_ systems), you affix `local` (thus not `for VALUE in ${LIST}; do`, but `local VALUE; for VALUE in ${LIST}; do`) to do this.
+    - Exceptions: [**language limits**](https://austingroupbugs.net/bug_view_page.php?bug_id=767).
+      - `local` is [not applicable to `IFS="<delimiter>"` or `cd <path>`](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493838#493838), [not applicable to `readonly`](https://unix.stackexchange.com/questions/506009/unable-to-have-a-local-variable-with-the-same-name-as-a-global-read-only-variabl) (so use **subshells** for this).
+      - If you require code which is consistant across platforms ([`local` has inconsistant dynamic versus static scope, plus inconsistant inheritance](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493743#493743)), use **subshells** for this.
+  - If your project supports _POSIX_ (`/bin/sh`): do not use `local` (such as `f2() { local VALUE=false; }`), but [use **subshells** for this](https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script/64946874#64946874) (such as `f2() ( VALUE=false; )`.)
+    - Rationales (other than `local`'s **language limits**):
+      - Avoids [SC3034](https://www.shellcheck.net/wiki/SC3043) ["In POSIX sh, local is undefined." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC3043).
 - Command variables: uses `$(...)` (thus not `` stat `pwd` `` , but `stat $(pwd)`).
-  - Rationales: most simple to nest (`echo $(stat $(pwd))`). Common (much known) subshell syntax is reused.
+  - Rationales:
+    - Most simple to nest (`echo $(stat $(pwd))`). Common (much known) **subshell** syntax is reused.
     - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2006).
 ## _C_/_C++_ source
 Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](./.clang-tidy) options).

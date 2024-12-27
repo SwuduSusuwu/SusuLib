@@ -1,4 +1,6 @@
 #!/bin/sh
+#shellcheck disable=SC2039
+#shellcheck disable=SC3043
 #/* TODO: [produce `for OPTION in @$; do` loops for all `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/22) */
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
@@ -24,7 +26,7 @@ SUSUWU_ESCAPE_SPACES() { #/* Usage: `OBJECTLIST="${OBJECTLIST} $(SUSUWU_ESCAPE_S
 #	echo $(echo "$@" | sed 's/ /\\\ /') #/* Error: `sed not found`, although is installed. */
 #	echo "\"${@}\""; #/* Error: if `OBJECT="obj/main.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: '"obj/main.o"'`. */
 	local ESCAPED_PATH=""
-	local PATH; for PATH in $@; do
+	local PATH; for PATH in "$@"; do
 		if [ -z "${ESCAPED_PATH}" ]; then
 			ESCAPED_PATH="${PATH}"
 		elif [ -n "${PATH}" ]; then
@@ -62,12 +64,12 @@ SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}]"
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
-	if [ "-s" = "${1}" -o "-s" = "${2}" ]; then
+	if [ "-s" = "${1}" ] || [ "-s" = "${2}" ]; then
 		SUSUWU_S=true
 	fi
 }
 SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
-	if [ "--verbose" = "${1}" -o "--verbose" = "${2}" ]; then
+	if [ "--verbose" = "${1}" ] || [ "--verbose" = "${2}" ]; then
 		SUSUWU_VERBOSE=true
 		set -x
 	fi
@@ -97,7 +99,7 @@ SUSUWU_SCAN_GIT() { #/* Usage: `SUSUWU_SCAN_GIT` */
 }
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
-	if [ "--mingw" = "${1}" -o "--mingw" = "${2}" ]; then
+	if [ "--mingw" = "${1}" ] || [ "--mingw" = "${2}" ]; then
 		CROSS_COMP=" --mingw"
 	fi
 }
@@ -146,7 +148,7 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 }
 
 SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [This processes params passed to `${0}`.] */
-	if [ "--release" = "${1}" -o "--release" = "${2}" ]; then
+	if [ "--release" = "${1}" ] || [ "--release" = "${2}" ]; then
 		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --release\` does not support profilers/debuggers (use \`${0}${CROSS_COMP} --debug\` for this)."
 		CFLAGS="${CFLAGS} ${FLAGS_RELEASE} ${CFLAGS_RELEASE}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_RELEASE} ${CXXFLAGS_RELEASE}"
@@ -224,23 +226,23 @@ SUSUWU_REBUILD_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to rebuild" 
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus continue. [Use \`${0}${CROSS_COMP} --clean\` to remove plus exit.]"
 }
 SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [This processes params passed to `${0}`.] */
-	if [ "--clean" = "${1}" -o "--clean" = "${2}" ]; then
+	if [ "--clean" = "${1}" ] || [ "--clean" = "${2}" ]; then
 		SUSUWU_CLEAN_OUTPUT "Was called with \`${0}${CROSS_COMP} --clean\`"
 	fi
-	if [ "--rebuild" = "${1}" -o "--rebuild" = "${2}" ]; then
+	if [ "--rebuild" = "${1}" ] || [ "--rebuild" = "${2}" ]; then
 		SUSUWU_REBUILD_OUTPUT "Was called with \`${0}${CROSS_COMP} --rebuild\`"
 	fi
 }
 
 SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
 	local SOURCE; for SOURCE in $@; do
-		local OBJECT="${OBJDIR}$(basename ${SOURCE} .hxx).o" #/* `basename`'s second param removes suffix */
-		local SRCCXX="$(dirname ${SOURCE})/$(basename ${SOURCE} .hxx).cxx" #/* `basename`'s second param removes suffix */
-		if [ ${OBJECT} -ot ${SOURCE} -a -e ${SOURCE} ]; then #/* `&& [ -e ${SOURCE} ]` is: skip unless `${SOURCE}` exists. */
+		local OBJECT; OBJECT="${OBJDIR}$(basename "${SOURCE}" .hxx).o" #/* `basename`'s second param removes suffix */
+		local SRC_CXX; SRC_CXX="$(dirname "${SOURCE}")/$(basename "${SOURCE}" .hxx).cxx" #/* `basename`'s second param removes suffix */
+		if [ -n "$(find "${SOURCE}" -newer "${OBJECT}" 2>/dev/null)" ] && [ -e "${SOURCE}" ]; then #/* `-n`: not nil, `-e`: exists. */
 			SUSUWU_REBUILD_OUTPUT "\`${SOURCE}\` (which is a common \`#include\`) is newer than \`${OBJECT}\`"
 			break
-		elif [ ! -e "${SRCCXX}" ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
-			touch ${OBJECT};            #/* ... then produce `*.o` (for future tests.) */
+		elif [ ! -e "${SRC_CXX}" ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
+			touch "${OBJECT}";             #/* ... then produce `*.o` (for future tests.) */
 		fi
 	done
 }
@@ -250,15 +252,15 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 		if [ -z "${1}" ] || [ -z "${2}" ]; then
 			CTAGS_DEFAULTS="-R --exclude=.git/ --exclude=*.html ."
 			SUSUWU_PRINT "${SUSUWU_SH_INFO}" "\`SUSUWU_BUILD_CTAGS()\` was called with less than 2 params; will default to \`SUSUWU_BUILD_CTAGS ${CTAGS_DEFAULTS}\`."
-		#shellcheck disable=SC2086
+#shellcheck disable=SC2086
 			ctags ${CTAGS_DEFAULTS} && STATUS=0
 		else
 			FLAGS=${1}
-		#shellcheck disable=SC2086
+#shellcheck disable=SC2086
 			ctags ${FLAGS} "${2}" && STATUS=0
 			shift 2 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
 			for SOURCE_PATH in "$@"; do
-		#shellcheck disable=SC2086
+#shellcheck disable=SC2086
 				ctags ${FLAGS} -a "${SOURCE_PATH}" || STATUS=1
 			done
 		fi
@@ -274,16 +276,19 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES "[${CC} || ${CXX}] [${
 	if [ ! true = ${SUSUWU_S} ]; then
 		set -x
 	fi
+#shellcheck disable=SC2068 #With `$@`, this breaks.
 	local SOURCE; for SOURCE in $@; do
 		local OBJECT="${OBJDIR}$(basename "${SOURCE}" "${SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
-		if [ "${OBJECT}" -ot "${SOURCE}" -o ! -s "${OBJECT}" ] >/dev/null 2>&1; then
+#shellcheck disable=SC2166 #With `set -x`, the `[] || {}` form prints 2 commands
+		if [ -n "$(find "${SOURCE}" -newer "${OBJECT}" 2>/dev/null)" -o ! -s "${OBJECT}" ]; then
 			${BUILD} -c "${SOURCE}" -o "${OBJECT}"
 			BUILDNEW=true
 		fi
-		OBJECTLIST="${OBJECTLIST} $(SUSUWU_ESCAPE_SPACES ${OBJECT})"
+		OBJECTLIST="${OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${OBJECT}")"
 	done
 }
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
+#shellcheck disable=SC2086
 	${BUILDNEW} && ${LD} ${LDFLAGS}${OBJECTLIST} -o "${BINDIR}${OUTPUT}"
 	STATUS=$?
 	if [ ! true = ${SUSUWU_S} ] && [ ! true = ${SUSUWU_VERBOSE} ]; then
@@ -291,9 +296,9 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	fi
 	if [ false = ${BUILDNEW} ]; then
 		STATUS=0
-		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "reused \`${BINDIR}${OUTPUT}\` ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	elif [ 0 -eq ${STATUS} ]; then
-		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` (`stat -c%s ${BINDIR}${OUTPUT}` bytes)."
+		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	else
 		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${LD}\` returned status code ${STATUS}. [If errors include \"ld... unknown file type\" or \"ld... undefined symbol __asan_*\", use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
 	fi
