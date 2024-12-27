@@ -15,6 +15,7 @@
     - [`sh` source](#Sh-source)
     - [_C_/_C++_ source](#Cc-source)
   - [Sponsor](#Sponsor)
+    - [Escrow](#Escrow)
 
 # Purposes
 [`./.ssh/`](./.ssh/) is to [compute signatures/certificates](#Signaturecertificate).
@@ -251,6 +252,10 @@ bool functionDeclaration(std::string input, std::deque<vector> output);
   - Documentation of interfaces belongs to `*.hxx`; `*.cxx` is to do implementations. Do not duplicate interface comments.
   - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
 ## Sponsor
-To sponsor this, send withdrawable crypto (such as _Bitcoin_) addresses to [contacts which `./SECURITY.md` lists](./SECURITY.md#Sensitive-issues).
-- If more than $100, you should encrypt with [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub)
-
+To sponsor this, you can send withdrawable crypto (such as [**Bitcoin**](https://wikipedia.org/wiki/Bitcoin)) addresses to [contacts which `./SECURITY.md` lists](./SECURITY.md#Sensitive-issues).
+- If amount is more than $100, you should encrypt with [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub).
+### Escrow
+If you want proof that your crypto/cash will go to produce specific systems, use [**escrow** services](https://wikipedia.org/wiki/Escrow) (send the **escrow** crypto/cash plus contract an [open issue which you choose](https://github.com/SwuduSusuwu/SubStack/issues/)).
+- If none of those issues match what you want, you can [post your own issue](https://github.com/SwuduSusuwu/SubStack/issues/new) for this.
+- Ensure that the **escrow** contract includes specifics as to what will count as "issue closed" [to the **escrow** service (so you do not have to trust the author),](https://wikipedia.org/wiki/Online_dispute_resolution) which will release the crypto/cash (once the **escrow** service considers your issue as closed).
+  - For example; "The **source code** (through `./build.sh`), must produce a **system** (a **shared object** or **executable**) which uses just half of the training data to [setup its neural network, which must produce virtual synapses](https://wikipedia.org/wiki/Backpropagation) which the **system** [uses to produce **accurate** results](https://wikipedia.org/wiki/Residual_neural_network#Forward_propagation) on the other half, where **accurate** (for [classifiers](https://wikipedia.org/wiki/Learning_classifier_system)) is less than 2% false negatives and less than 2% false positives, and **accurate** (for [generators](https://wikipedia.org/wiki/Generative_artificial_intelligence)) is [divergence](https://wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) of less than 2%." is a contract which an **escrow** can use for [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
