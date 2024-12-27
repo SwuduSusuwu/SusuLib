@@ -39,7 +39,7 @@ SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwante
 	return ${SUSUWU_SH_REMOVE_PARAM_FOUND} #/* allows use as `if $(SUSUWU_SH_REMOVE_PARAM "--unwanted-param" "$@"); then` */
 )
 SUSUWU_STATIC_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW_CONSTANT; then EXPERIMENTAL_CODE(); fi`. Is fast (versus `SUSUWU_IS_PREVIEW()`, but must hardcode for production (or release) versus "experimental" (or "preview") branches. */
-	return 1 #/* TODO: for "experimental" (or "preview") branches, `return 0` */
+	return 0 #/* TODO: for production (or release) branches, `return 1` */
 )
 SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; then EXPERIMENTAL_CODE(); fi` */
 	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then

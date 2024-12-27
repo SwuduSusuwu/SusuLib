@@ -20,7 +20,8 @@ SUSUWU_INCLUDE "./sh/make.sh" #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSU
 SUSUWU_PRINT "$(SUSUWU_SH_NOTICE)" "(C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses."
 
 THIS_DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "trunk")"
-export FLAGS_USER="" #/* Usage: "Macro flags" from `./README.md#optionssetup`. */
+SUSUWU_PRINT "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "experimental")\" (which is unstable & sets $(SUSUWU_SH_QUOTE "CODE" "-DSUSUWU_EXPERIMENTAL")); for production use, execute $(SUSUWU_SH_QUOTE "CODE" "git switch $(SUSUWU_SH_QUOTE "PROPOSED" "${THIS_DEFAULT_BRANCH}")")."
+export FLAGS_USER="-DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"${THIS_DEFAULT_BRANCH}\"" #/* Usage: "Macro flags" from `./README.md#optionssetup`. */
 export FLAGS_ANALYSIS="-Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic" #/*TODO: -`-Wno-*`, +`-Werror` */
 export FLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
 export CXXFLAGS_DEBUG="-std=c++11" #/* ensure unit tests pass with C++11 support as max */

@@ -1,4 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+
+*Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
+- This `preview` branch is for [beta tests](#beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
 # Table of Contents
 - [Purposes](#purposes)
 - [How to use this](#how-to-use-this)
@@ -158,8 +161,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
-  - Unstable/`experimental` flags:
-    - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
+  - Unstable/`preview` flags:
+    - `-DSUSUWU_EXPERIMENTAL` to enable `experimental` (`preview`, more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_VPTRS=false`: [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Class::operator==(const Class &obj) { return this->hasLayoutOf(obj) && 0 == memcmp(sizeof(NULL) + (char *)this, sizeof(NULL) + (char *)&obj, this->getObjectSize() - sizeof(NULL)); }`, thus `Susuwu::Object() == Susuwu::Class()` but `CXX` output with nonstandard `vptr` layout crashes. Default `=true`; (`return typeid(this) == typeid(obj) && 0 == memcmp(this, *obj, this->getObjectSize());`).
     - `-DSUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES=false`: to use [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Object::equals(const Object &obj) { return this->operator==(obj); }`. Default is `=true` (`return this == &obj`). For now, just controls `Object::equals` (in future, perhaps `SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES` inherits this).
