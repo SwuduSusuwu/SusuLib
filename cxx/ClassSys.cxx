@@ -6,6 +6,9 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
+#ifdef SUSUWU_POSIX
+#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* strlen */
+#endif /* def SUSUWU_POSIX */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef SUSUWU_POSIX
 #include <stdexcept> /* std::invalid_argument std::runtime_error */
@@ -15,7 +18,7 @@
 #else
 #	ifdef SUSUWU_WIN32
 #		include <shlobj.h> /* IsUserAnAdmin */
-#		include <windows.h> /* CloseHandle CreateProcess GetLastError PROCESS_INFORMATION STARTUPINFO ZeroMemory */
+#		include <windows.h> /* CloseHandle CONSOLE_SCREEN_BUFFER_INFO CreateProcess GetConsoleScreenBufferInfo GetLastError GetStdHandle PROCESS_INFORMATION STARTUPINFO ZeroMemory */
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
 #endif /* def SUSUWU_POSIX */
@@ -197,6 +200,40 @@ const bool classSysSetConsoleInput(bool input) {
 	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
 	return classSysGetConsoleInput();
 }
+const unsigned char classSysGetConsoleAttributes() {
+#ifdef SUSUWU_WIN32
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	if(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) {
+		SUSUWU_WARNING("classSysGetConsoleAttributes() {/* TODO: [decode response from `GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
+		return info.wAttributes;
+	} else {
+		SUSUWU_ERROR("classSysGetConsoleAttributes() {!GetConsoleScreenBufferInfo() && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+	}
+#elif defined SUSUWU_POSIX
+	std::cout << "\033[?6;1;1t" /* Request console attributes */ << std::flush;
+	char buffer[32];
+	std::cin.read/*non-blocking*/(buffer, sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
+	const size_t bytesRead = strlen(buffer);
+	if(0 < bytesRead) {
+		SUSUWU_WARNING("classSysGetConsoleAttributes() {/* TODO: [decode response from `\\033[?6;1;1t`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
+# ifdef SUSUWU_DEBUG2
+		std::cerr << "Current color settings: ";
+		for(size_t i = 0; i < bytesRead; ++i) {
+			std::cerr << buffer[i]; /* TODO: decode this response (Termux doesn't have this) */
+		}
+		std::cout << std::endl;
+# endif /* def SUSUWU_DEBUG2 */
+	} else {
+# ifndef NDEBUG
+		SUSUWU_WARNING("classSysGetConsoleAttributes() {std::cout << \"\\033[?6;1;1t\" << std::flush; char buffer[32]; (" + std::to_string(bytesRead) + " == std::cin.readsome(buffer, sizeof(buffer));)");
+# endif /* ndef NDEBUG */
+	}
+#else /* elif defined SUSUWU_POSIX else */
+	SUSUWU_NOTICE("classSysGetConsoleAttributes() { /* [TODO](https://github.com/SwuduSusuwu/SubStack/issues/17): `#if !defined(SUSUWU_WIN32) && !defined(SUSUWU_POSIX)`. Hardcoded to `errno = ENOTTY; return 0;`. */ }");
+#endif /* elif defined SUSUWU_POSIX else */
+	errno = ENOTTY;
+	return 0;
+}
 
 #if SUSUWU_UNIT_TESTS
 namespace { /* [misc-use-anonymous-namespace] */
@@ -221,6 +258,9 @@ const bool classSysTests() {
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
+#ifdef SUSUWU_EXPERIMENTAL
+	std::cout << "	classSysGetConsoleAttributes(): 0x" << classSysHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
+#endif /* def SUSUWU_EXPERIMENTAL */
 	return retval;
 }
 #endif /* SUSUWU_UNIT_TESTS */
