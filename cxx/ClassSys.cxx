@@ -1,7 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
+#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassPortableExecutable.hxx" /* FilePath */
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -72,7 +72,6 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
-#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
 	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
 	return -1;
 #endif /* ndef SUSUWU_POSIX */
@@ -82,7 +81,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	if(-1 == pid) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"));
 	}
 	waitpid(pid, &wstatus, 0);
 /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
@@ -93,7 +92,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
-	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
+	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
 #endif /* ndef SUSUWU_POSIX */
 }
 
@@ -199,14 +198,11 @@ static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
 	if(2 != ss) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
 	}
 	classSysHexOs(os, value);
 	if(2 != os.str().size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
-#ifndef SUSUWU_POSIX
-#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
-#endif /* ndef SUSUWU_POSIX */
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
 	}
 }
 }; /* namespace */

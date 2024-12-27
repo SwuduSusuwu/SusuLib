@@ -303,9 +303,9 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_SH_DEBUG SUSUWU_SH_BLUE "Debug: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_POSTFIX IF_SUSUWU_SH_BRACKETS("]", "")
 
-#define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL)) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
-#define SUSUWU_CERR_IMP(WARN_LEVEL, x) SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) << (x) << SUSUWU_SH_DEFAULT
-#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
+#define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(WARN_LEVEL) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
+#define SUSUWU_CERR_IMP(WARN_LEVEL, x) WARN_LEVEL << (x) << SUSUWU_SH_DEFAULT
+#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix WARN_LEVEL "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
 
 /* WARN_LEVEL = {ERROR, WARNING, INFO, SUCCESS, NOTICE, DEBUG} */
 #define SUSUWU_ERRSTR(WARN_LEVEL, x) std::string(SUSUWU_SH_PREFIX) IF_SUSUWU_SH_FILE(+ SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE(+ std::to_string(__LINE__) + ':') IF_SUSUWU_SH_FUNC(+ std::string(__func__) + ':') IF_SUSUWU_SH_FILE_LINE_OR_FUNC(+ ' ') + SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) + SUSUWU_SH_POSTFIX
@@ -318,18 +318,18 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
 #endif /* else !SUSUWU_SH_PREFER_STDIO */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
+#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(SUSUWU_SH_ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
 #else /* SUSUWU_EXPERIMENTAL else */
-#	define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
+#	define SUSUWU_ERROR(x) SUSUWU_PRINT(SUSUWU_SH_ERROR, x)
 #endif /* SUSUWU_EXPERIMENTAL else */
-#define SUSUWU_WARNING(x) SUSUWU_PRINT(WARNING, x)
-#define SUSUWU_INFO(x) SUSUWU_PRINT(INFO, x)
-#define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
+#define SUSUWU_WARNING(x) SUSUWU_PRINT(SUSUWU_SH_WARNING, x)
+#define SUSUWU_INFO(x) SUSUWU_PRINT(SUSUWU_SH_INFO, x)
+#define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUSUWU_SH_SUCCESS, x)
 
 /* Use this to just print debug/notices to `--debug` builds (+ do conditional execution). */
 #if SUSUWU_SH_VERBOSE
-#	define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
-#	define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
+#	define SUSUWU_NOTICE(x) SUSUWU_PRINT(SUSUWU_SH_NOTICE, x)
+#	define SUSUWU_DEBUG(x) SUSUWU_PRINT(SUSUWU_SH_DEBUG, x)
 #	define SUSUWU_EXECUTEVERBOSE(x) x /* about side-effects; do not assume that `--debug` was used. `--release -DSUSUWU_SH_VERBOSE=true` will execute this. */
 #else /* else SUSUWU_SH_VERBOSE */
 #	define SUSUWU_NOTICE(x) (true)/* skip. */
@@ -605,7 +605,7 @@ inline const ClassSysUSeconds classSysUSecondClock() {
 const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {}) SUSUWU_NOEXCEPT;
 static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
- * @throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"))
+ * @throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"))
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
@@ -761,7 +761,6 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
-#	undef ERROR /* undo `shlobj.h`'s `#define ERROR 0` */
 	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
 	return -1;
 #endif /* ndef SUSUWU_POSIX */
@@ -771,7 +770,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	if(-1 == pid) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"));
 	}
 	waitpid(pid, &wstatus, 0);
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
@@ -781,7 +780,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	}
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
-	throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
+	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
 #endif /* ndef SUSUWU_POSIX */
 }
 
@@ -886,13 +885,12 @@ static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
 	if(2 != ss) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
 	}
 	classSysHexOs(os, value);
 	if(2 != os.str().size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
 #ifndef SUSUWU_POSIX
-#	define ERROR 0 /* redo `shlobj.h`'s `#define ERROR 0` */
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
@@ -969,13 +967,13 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	}
 	SUSUWU_NOTICE("This `classSha2()` is from `./build.sh --debug`: `./build.sh --release` has 2x this throughput");
 	if(0 == hash.size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`0 == classSha2(std::string()).size();"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`0 == classSha2(std::string()).size();"));
 	} else if(hashStrTrue.size() != hashStrCompute.size() && classSha256 == classSha2) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`"));
 	} else if(hashStrTrue.size() != hashStrCompute.size()) {
 		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`");
 	} else if(hashStrTrue != hashStrCompute) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
 	}
 	return true;
 }
@@ -1174,7 +1172,7 @@ static void classResultListDumpToTest(const ResultList &resultList, bool index, 
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, std::string("classResultListDumpToTest(resultList, os, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classResultListDumpToTest(resultList, os, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
 	}
 }
 const bool classResultListTests() {
@@ -1557,18 +1555,18 @@ const bool virusAnalysisTests() {
 	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
 		const ResultList origPassList = passList, origAbortList = abortList;
 		passList.bytecodes.push_back(executable.bytecode);
 		abortList.bytecodes.push_back("test");
 		produceAbortListSignatures(passList, abortList);
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
 		}
 		virusAnalysisResetCaches();
 		if(virusAnalysisAbort != virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort != virusAnalysis(args[0]);} /* This test was supposed to match positive but did not. */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort != virusAnalysis(args[0]);} /* This test was supposed to match positive but did not. */"));
 		}
 		passList = origPassList, abortList = origAbortList;
 	}

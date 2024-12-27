@@ -4,7 +4,7 @@
 #include "ClassPortableExecutable.hxx" /* FileBytecode FileHash */
 #include "ClassSha2.hxx"
 #include "ClassSys.hxx" /* classSysHexStr classSysUSecondClock templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::to_string */
@@ -58,13 +58,13 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	}
 	SUSUWU_NOTICE("This `classSha2()` is from `./build.sh --debug`: `./build.sh --release` has 2x this throughput");
 	if(0 == hash.size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`0 == classSha2(std::string()).size();"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`0 == classSha2(std::string()).size();"));
 	} else if(hashStrTrue.size() != hashStrCompute.size() && classSha256 == classSha2) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`"));
 	} else if(hashStrTrue.size() != hashStrCompute.size()) {
 		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`");
 	} else if(hashStrTrue != hashStrCompute) {
-		throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
 	}
 	return true;
 }

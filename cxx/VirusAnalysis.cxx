@@ -6,7 +6,7 @@
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
-#include "Macros.hxx" /* ERROR NOTICE SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_VERBOSE SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_ERROR SUSUWU_SH_VERBOSE SUSUWU_UNIT_TESTS */
 #include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
 #include <algorithm> /* std::sort */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -81,18 +81,18 @@ const bool virusAnalysisTests() {
 	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
 		const ResultList origPassList = passList, origAbortList = abortList;
 		passList.bytecodes.push_back(executable.bytecode);
 		abortList.bytecodes.push_back("test");
 		produceAbortListSignatures(passList, abortList);
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* Ignored `signaturesAnalysisCaches`. */"));
 		}
 		virusAnalysisResetCaches();
 		if(virusAnalysisAbort != virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "{virusAnalysisAbort != virusAnalysisInteractive(args[0]);} /* This test was supposed to match positive but did not. */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort != virusAnalysisInteractive(args[0]);} /* This test was supposed to match positive but did not. */"));
 		}
 		passList = origPassList, abortList = origAbortList;
 	}

@@ -322,9 +322,9 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_SH_DEBUG SUSUWU_SH_BLUE "Debug: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_POSTFIX IF_SUSUWU_SH_BRACKETS("]", "")
 
-#define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL)) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
-#define SUSUWU_CERR_IMP(WARN_LEVEL, x) SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) << (x) << SUSUWU_SH_DEFAULT
-#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix SUSUWU_GLUE2(SUSUWU_SH_, WARN_LEVEL) "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
+#define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(WARN_LEVEL) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
+#define SUSUWU_CERR_IMP(WARN_LEVEL, x) WARN_LEVEL << (x) << SUSUWU_SH_DEFAULT
+#define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix WARN_LEVEL "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
 
 /* WARN_LEVEL = {ERROR, WARNING, INFO, SUCCESS, NOTICE, DEBUG} */
 #define SUSUWU_ERRSTR(WARN_LEVEL, x) std::string(SUSUWU_SH_PREFIX) IF_SUSUWU_SH_FILE(+ SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE(+ std::to_string(__LINE__) + ':') IF_SUSUWU_SH_FUNC(+ std::string(__func__) + ':') IF_SUSUWU_SH_FILE_LINE_OR_FUNC(+ ' ') + SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) + SUSUWU_SH_POSTFIX
@@ -337,18 +337,18 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
 #endif /* else !SUSUWU_SH_PREFER_STDIO */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
+#	define SUSUWU_ERROR(x) {SUSUWU_PRINT(SUSUWU_SH_ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
 #else /* SUSUWU_EXPERIMENTAL else */
-#	define SUSUWU_ERROR(x) SUSUWU_PRINT(ERROR, x)
+#	define SUSUWU_ERROR(x) SUSUWU_PRINT(SUSUWU_SH_ERROR, x)
 #endif /* SUSUWU_EXPERIMENTAL else */
-#define SUSUWU_WARNING(x) SUSUWU_PRINT(WARNING, x)
-#define SUSUWU_INFO(x) SUSUWU_PRINT(INFO, x)
-#define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUCESS, x)
+#define SUSUWU_WARNING(x) SUSUWU_PRINT(SUSUWU_SH_WARNING, x)
+#define SUSUWU_INFO(x) SUSUWU_PRINT(SUSUWU_SH_INFO, x)
+#define SUSUWU_SUCCESS(x) SUSUWU_PRINT(SUSUWU_SH_SUCCESS, x)
 
 /* Use this to just print debug/notices to `--debug` builds (+ do conditional execution). */
 #if SUSUWU_SH_VERBOSE
-#	define SUSUWU_NOTICE(x) SUSUWU_PRINT(NOTICE, x)
-#	define SUSUWU_DEBUG(x) SUSUWU_PRINT(DEBUG, x)
+#	define SUSUWU_NOTICE(x) SUSUWU_PRINT(SUSUWU_SH_NOTICE, x)
+#	define SUSUWU_DEBUG(x) SUSUWU_PRINT(SUSUWU_SH_DEBUG, x)
 #	define SUSUWU_EXECUTEVERBOSE(x) x /* about side-effects; do not assume that `--debug` was used. `--release -DSUSUWU_SH_VERBOSE=true` will execute this. */
 #else /* else SUSUWU_SH_VERBOSE */
 #	define SUSUWU_NOTICE(x) (true)/* skip. */
