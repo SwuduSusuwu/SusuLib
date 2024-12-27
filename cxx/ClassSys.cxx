@@ -1,13 +1,13 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_SH_WARNING SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
 #ifdef SUSUWU_POSIX
-#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* strlen */
+#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* strcmp strlen */
 #endif /* def SUSUWU_POSIX */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef SUSUWU_POSIX
@@ -18,7 +18,7 @@
 #else
 #	ifdef SUSUWU_WIN32
 #		include <shlobj.h> /* IsUserAnAdmin */
-#		include <windows.h> /* CloseHandle CONSOLE_SCREEN_BUFFER_INFO CreateProcess GetConsoleScreenBufferInfo GetLastError GetStdHandle PROCESS_INFORMATION STARTUPINFO ZeroMemory */
+#		include <windows.h> /* CloseHandle CONSOLE_SCREEN_BUFFER_INFO CreateProcess DWORD GetConsoleMode GetConsoleScreenBufferInfo GetLastError GetStdHandle PROCESS_INFORMATION SetConsoleMode STARTUPINFO STD_OUTPUT_HANDLE ZeroMemory */
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
 #endif /* def SUSUWU_POSIX */
@@ -47,6 +47,11 @@ const bool classSysInit(int argc, const char **args) {
 		assert(SUSUWU_NULLPTR != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		return true;
 	}
+#ifndef SUSUWU_SH_SKIP_COLORS
+	if(!classSysConsoleHasAnsiColors()) {
+		SUSUWU_WARNING("classSysInit() {(!classSysConsoleHasAnsiColors()) /* Command Sequence Introducers disabled */}");
+	}
+#endif /* ndef SUSUWU_SH_SKIP_COLORS */
 	return false;
 }
 
@@ -233,6 +238,47 @@ const unsigned char classSysGetConsoleAttributes() {
 #endif /* elif defined SUSUWU_POSIX else */
 	errno = ENOTTY;
 	return 0;
+}
+const bool classSysConsoleHasAnsiColors() {
+#if defined(SUSUWU_SH_SKIP_COLORS) && SUSUWU_SH_SKIP_COLORS
+	return false;
+#elif defined(__WIN32__)
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	if(INVALID_HANDLE_VALUE == hConsole) {
+		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {(!GetConsoleScreenBufferInfo()} && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+		return false;
+	}
+	DWORD mode;
+	if(!GetConsoleMode(hConsole, &mode)) {
+		return false;
+	}
+	if(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING /* virtual mode allows CSI colors */)) {
+		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+		return false;
+	}
+	return true;
+#elif defined _POSIX_VERSION
+	return true;
+#else /* ndef _POSIX_VERSION */
+	const char *term = getenv("TERM");
+#	if defined(SUSUWU_SH_SKIP_COLORS) && !SUSUWU_SH_SKIP_COLORS
+	static const char *uncolored[] = {"dumb", SUSUWU_NULLPTR}; /* blacklist */
+	for(const char **it = uncolored; SUSUWU_NULLPTR != *it; ++*it) {
+		if(0 == strcmp(term, *it)) {
+			return false;
+		}
+	}
+	return true;
+#	else /* ndef SUSUWU_SH_SKIP_COLORS */
+	static const char *colored[] = {"screen", "screen-256color", "vt100", "xterm", "xterm-256color", SUSUWU_NULLPTR}; /* whitelist */
+	for(const char **it = colored; SUSUWU_NULLPTR != *it; ++*it) {
+		if(0 == strcmp(term, *it)) {
+			return true;
+		}
+	}
+	return false;
+#	endif /* ndef SUSUWU_SH_SKIP_COLORS_BLACKLIST */
+#endif /* ndef _POSIX_VERSION */
 }
 
 #if SUSUWU_UNIT_TESTS

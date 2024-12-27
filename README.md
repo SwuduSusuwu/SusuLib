@@ -64,7 +64,7 @@
   - typedefs {ClassSysUSeconds}
   - globals {classSysArgc, classSysArgs}
   - modular functions to interact with:
-    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`}
+    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`, `classSysConsoleHasAnsiColors()`}
     - own process (`$0`) {`classSysInit()`, `templateCatchAll()`}
     - strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
@@ -146,7 +146,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
     - `-DSUSUWU_SH_LINE=true` sets output format to `[__LINE__: WARN_LEVEL: message]`; default is `=SUSUWU_SH_VERBOSE`.
     - `-DSUSUWU_SH_FUNC=true` sets output format to `[__func__: WARN_LEVEL: message]`; default is `=false`.
     - `-DSUSUWU_SH_SKIP_COLORS=true` to omit _VT100_ (_ANSI_) colors; default is `=defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
-    - `-DSUSUWU_SH_SKIP_COLORS=false` to force (even if unsupported) _VT100_ ([_ANSI_ color](https://wikipedia.org/wiki/Ansi_color)) use.
+    - `-DSUSUWU_SH_SKIP_COLORS=false` to force (unless `TERM` is blacklisted) _VT100_ ([_ANSI_ color](https://wikipedia.org/wiki/Ansi_color)) use.
     - TODO (for now, no effect; once [issue #17](https://github.com/SwuduSusuwu/SusuLib/issues/17) is closed, you can use):
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.

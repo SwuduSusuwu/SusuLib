@@ -828,6 +828,11 @@ const bool classSysInit(int argc, const char **args) {
 		assert(SUSUWU_NULLPTR != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		return true;
 	}
+#ifndef SUSUWU_SH_SKIP_COLORS
+	if(!classSysConsoleHasAnsiColors()) {
+		SUSUWU_WARNING("classSysInit() {(!classSysConsoleHasAnsiColors()) /* Command Sequence Introducers disabled */}");
+	}
+#endif /* ndef SUSUWU_SH_SKIP_COLORS */
 	return false;
 }
 
@@ -1013,6 +1018,47 @@ const unsigned char classSysGetConsoleAttributes() {
 #endif /* elif defined SUSUWU_POSIX else */
 	errno = ENOTTY;
 	return 0;
+}
+const bool classSysConsoleHasAnsiColors() {
+#if defined(SUSUWU_SH_SKIP_COLORS) && SUSUWU_SH_SKIP_COLORS
+	return false;
+#elif defined(__WIN32__)
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	if(INVALID_HANDLE_VALUE == hConsole) {
+		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {(!GetConsoleScreenBufferInfo()} && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+		return false;
+	}
+	DWORD mode;
+	if(!GetConsoleMode(hConsole, &mode)) {
+		return false;
+	}
+	if(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING /* virtual mode allows CSI colors */)) {
+		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+		return false;
+	}
+	return true;
+#elif defined _POSIX_VERSION
+	return true;
+#else /* ndef _POSIX_VERSION */
+	const char *term = getenv("TERM");
+#	if defined(SUSUWU_SH_SKIP_COLORS) && !SUSUWU_SH_SKIP_COLORS
+	static const char *uncolored[] = {"dumb", SUSUWU_NULLPTR}; /* blacklist */
+	for(const char **it = uncolored; SUSUWU_NULLPTR != *it; ++*it) {
+		if(0 == strcmp(term, *it)) {
+			return false;
+		}
+	}
+	return true;
+#	else /* ndef SUSUWU_SH_SKIP_COLORS */
+	static const char *colored[] = {"screen", "screen-256color", "vt100", "xterm", "xterm-256color", SUSUWU_NULLPTR}; /* whitelist */
+	for(const char **it = colored; SUSUWU_NULLPTR != *it; ++*it) {
+		if(0 == strcmp(term, *it)) {
+			return true;
+		}
+	}
+	return false;
+#	endif /* ndef SUSUWU_SH_SKIP_COLORS_BLACKLIST */
+#endif /* ndef _POSIX_VERSION */
 }
 
 #if SUSUWU_UNIT_TESTS
