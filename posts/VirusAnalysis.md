@@ -424,7 +424,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 ```
 `less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
 ```c++
-/* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/class.html)),
+/* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SusuLib/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
@@ -539,7 +539,7 @@ public:
 	virtual Object *cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
-		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory,llvm-qualified-auto,readability-qualified-auto) */
+		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
 		memcpy(clone, static_cast<const void *>(this), getObjectSize());
 		return static_cast<Object *>(clone);
 	}
@@ -557,7 +557,9 @@ public:
 #else /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
 	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 #endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
-	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
+	virtual const std::string toString() const {
+		return getName() + '@' + classSysHexStr(hashCode());
+	}
 	virtual void notify() {}
 	virtual void notifyAll() {}
 	virtual void wait() {}
@@ -660,7 +662,7 @@ public:
 ```
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
 ```c++
-/* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
+/* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -718,7 +720,23 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
 
-template<class Os, class Str>
+template<class Os, class Int,
+	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
+inline Os &classSysHexOs(Os &os, const Int &value) {
+	const std::ios::fmtflags oldFlags = os.flags();
+	os << std::hex << value;
+	os.flags(oldFlags);
+	return os;
+}
+template<class Int,
+	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
+inline const std::string classSysHexStr(const Int &value) {
+	std::stringstream os;
+	classSysHexOs(os, value);
+	return os.str();
+}
+template<class Os, class Str,
+	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 inline Os &classSysHexOs(Os &os, const Str &value) {
 	const std::ios::fmtflags oldFlags = os.flags();
 	const char oldFill = os.fill();
@@ -731,7 +749,8 @@ inline Os &classSysHexOs(Os &os, const Str &value) {
 	os.flags(oldFlags);
 	return os;
 }
-template<class Str>
+template<class Str,
+	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 inline const Str classSysHexStr(const Str &value) {
 	std::stringstream os;
 	classSysHexOs(os, value);
