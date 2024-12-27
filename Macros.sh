@@ -84,13 +84,25 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCE
 	echo "${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 )
 
-SUSUWU_SCAN_GIT() ( #/* Usage: `SUSUWU_SCAN_GIT` */
+SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH)"` */
+	DEFAULT_BRANCH="$(basename $(git symbolic-ref --short refs/remotes/$(git remote)/HEAD))" #remote branch
+	if [ ! -n "${DEFAULT_BRANCH}" ]; then #Remoteless path
+		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #local branch
+	fi
+	echo "${DEFAULT_BRANCH}"
+)
+SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE` */
 	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
-		GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-		if [ "experimental" = "${GIT_BRANCH}" ] || [ "head" = "${GIT_BRANCH}" ]; then
-			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${GIT_BRANCH}\" (which is unstable & sets \`-DSUSUWU_EXPERIMENTAL\`); for production use, execute \`git switch trunk\`."
+		THIS_BRANCH="$(git rev-parse --abbrev-ref HEAD)" #detect current branch
+		if [ -n "${1}" ]; then
+			DEFAULT_BRANCH="${1}" #use default branch from build script
 		else
-			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${GIT_BRANCH}\"."
+			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH)" #detect default branch
+		fi
+		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
+			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${THIS_BRANCH}\"."
+		else
+			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${THIS_BRANCH}\"; for production use, execute \`git switch ${DEFAULT_BRANCH}\`."
 		fi
 	fi
 )

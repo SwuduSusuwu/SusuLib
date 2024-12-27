@@ -1,7 +1,8 @@
 #!/bin/sh
-. ./Macros.sh #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() SUSUWU_INSTALL() SUSUWU_PRINT() SUSUWU_PROCESS_CLEAN_REBUILD() SUSUWU_SCAN_GIT() SUSUWU_PROCESS_MINGW() SUSUWU_PROCESS_RELEASE_DEBUG() SUSUWU_PROCESS_S() SUSUWU_PROCESS_VERBOSE() SUSUWU_SETUP_BUILD_FLAGS() SUSUWU_SETUP_CXX() SUSUWU_SETUP_BINDIR() SUSUWU_SETUP_OBJDIR() SUSUWU_SETUP_OUTPUT() SUSUWU_SH_* SUSUWU_TEST_OUTPUT() SUSUWU_UNINSTALL() */
+. ./Macros.sh #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() SUSUWU_INSTALL() SUSUWU_PRINT() SUSUWU_PROCESS_CLEAN_REBUILD() SUSUWU_PRODUCTION_USE() SUSUWU_PROCESS_MINGW() SUSUWU_PROCESS_RELEASE_DEBUG() SUSUWU_PROCESS_S() SUSUWU_PROCESS_VERBOSE() SUSUWU_SETUP_BUILD_FLAGS() SUSUWU_SETUP_CXX() SUSUWU_SETUP_BINDIR() SUSUWU_SETUP_OBJDIR() SUSUWU_SETUP_OUTPUT() SUSUWU_SH_* SUSUWU_TEST_OUTPUT() SUSUWU_UNINSTALL() */
 SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "(C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses."
 
+THIS_DEFAULT_BRANCH="trunk" #`$(SUSUWU_DEFAULT_BRANCH)` fails if no remote and local has `trunk` + `master` branches.
 FLAGS_USER="" #/* Usage: "Macro flags" from `README.md#Optionssetup`. */
 FLAGS_ANALYSIS="-Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic" #/*TODO: -`-Wno-*`, +`-Werror` */
 FLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
@@ -17,7 +18,7 @@ CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source
 
 SUSUWU_PROCESS_S $@ #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
 SUSUWU_PROCESS_VERBOSE $@ #/* Usage: `./build.sh --verbose`. Enables `SUSUWU_SH_DEBUG` ("Debug:") messages, forces `set -x`. */
-SUSUWU_SCAN_GIT
+SUSUWU_PRODUCTION_USE "${THIS_DEFAULT_BRANCH}"
 SUSUWU_PROCESS_MINGW "$@" #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
 SUSUWU_PROCESS_RELEASE_DEBUG "$@" #/* Usage: `./build.sh --debug` or `./build.sh --release` */
