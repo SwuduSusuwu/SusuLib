@@ -33,10 +33,10 @@ SUSUWU_BUILD_CTAGS "-R --exclude=.git/ --exclude=*.html" "./Macros.sh" "${C_SOUR
 SUSUWU_BUILD_OBJECTS "${CC} ${CFLAGS}" ".c" "${C_SOURCE_PATH}rfc6234/sha1.c" "${C_SOURCE_PATH}rfc6234/sha224-256.c" "${C_SOURCE_PATH}rfc6234/sha384-512.c"
 SUSUWU_BUILD_OBJECTS "${CXX} ${CXXFLAGS}" ".cxx" "${CXX_SOURCE_PATH}*.cxx"
 SUSUWU_BUILD_EXECUTABLE
-STATUS=$?
+SUSUWU_STATUS=$?
 
 SUSUWU_TEST_OUTPUT #/* Analogous to `make test` or `make execute` */
-STATUS=$?
+SUSUWU_STATUS=$?
 SUSUWU_INSTALL && SUSUWU_UNINSTALL #/* Analogous to `make install && make uninstall`. Won't clobber files which exist. */
-return ${STATUS}
+return ${SUSUWU_STATUS}
 
