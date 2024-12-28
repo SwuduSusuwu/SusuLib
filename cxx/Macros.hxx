@@ -39,9 +39,9 @@
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
 
-#ifdef SUSUWU_DEFAULT_BRANCH
+#ifndef SUSUWU_DEFAULT_BRANCH
 #	define SUSUWU_DEFAULT_BRANCH "trunk"
-#endif /* def SUSUWU_DEFAULT_BRANCH */
+#endif /* ndef SUSUWU_DEFAULT_BRANCH */
 #ifdef SUSUWU_EXPERIMENTAL
 #	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
 #else /* def SUSUWU_EXPERIMENTAL else */
