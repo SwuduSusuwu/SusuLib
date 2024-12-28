@@ -197,6 +197,9 @@ Most of what [_Mozilla Org_'s (_Firefox_'s) style](https://firefox-source-docs.m
 
 Code rules (lots overlap with _Mozilla Org_'s):
 
+- Indent: tabs ('^I'); as much tabs as braces ('{' = +1 tab, '}' = -1 tab). \[All which conflicts with _Mozilla Org_'s format is tab use.\]
+  - Rationales: reduced memory use, allows local configs (such as `~/.vimrc`) to set width, allows arrow keys to move fast.
+
 - Files: `${C_SOURCE_PATH}/PascalCase.*` or `${CXX_SOURCE_PATH}/PascalCase.*xx` (such as: `./cxx/ClassFoo.hxx`, used as `#include "ClassFoo.hxx" /* classFooFunction() */`), as this is most common.
   - `./build.sh` requires: that all local includes prefix as `Class*.hxx` (so it knows to execute `--rebuild` if you upgrade a common include.) TODO: incremental builds which don't require this.
   - To assist with insertion/removal of `#include` statements, comments shall list all functions/macros used.
@@ -204,8 +207,9 @@ Code rules (lots overlap with _Mozilla Org_'s):
 - Structs, enums, classe: `typedef struct PascalCase {} PascalCase;`, `typedef enum PascalCase {} PascalCase;`, `typedef class PascalCase {} PascalCase;`, as this is most common.
 
 - Macros: `#define NAMESPACE_CONSTANT_CASE(snake_case_param) assert(snake_case_param);`, as this is most common.
-
-- Indent: tabs ('^I', reduced memory use, allows local configs to set width, allows arrow keys to move fast); as much tabs as braces ('{', '}'). \[All which conflicts with _Mozilla Org_'s format is tab use.\]
+  - [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https://stackoverflow.com/questions/1854550/c-macro-define-indentation).
+  - [\_DEBUG is specific to MSVC, thus use NDEBUG](https://stackoverflow.com/questions/2290509/debug-vs-ndebug), [Pass `-D NDEBUG` to disable asssets + enable optimizations](https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release).
+  - Do not perform tasks within `assert()`, due to: the standard says "\[`#if NDEBUG\n#define assert(x) (0)\n#endif`\]".
 
 - Braces, functions:
   - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SubStack/issues/10).
@@ -223,6 +227,32 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
 - Args/params, local variables, objects: `const bool camelCase = true`; Global variables/objects: `extern const bool classFooFunction;`, as this is most common.
   - Functions/globals can omit "classFoo" if wrapped as `namespace ClassFoo { extern bool global; };`, or (for `class ClassFoo { static bool global; };`).
     - The project as a whole should have `namespace Susuwu {};`, but you can nest `namespace`s.)
+- For error, warning or notice syntax use: `"[WARN_LEVEL: OPTIONAL_FUNCTION_NAME {code which triggered the error/warning/diagnostic/notice} /* OPTIONAL COMMENTS */]"`,
+  - [`./cxx/Macros.hxx`](./cxx/Macros.hxx): {SUSUWU_STR(x), SUSUWU_CERR(x), SUSUWU_STDOUT(x)} have the new syntax for this.
+  - Modules should choose one of this list to send all userland errors, warnings or notices to:
+    - `throw std::runtime_error(message)` (or `throw Q()` where `class Q : public std::exception`)
+    - `std::cerr << message` (or `fprintf(stdout, message)`
+    - `errno = code;`, or `return code;`.
+
+- Comments
+  - Comments about possible `return code;`s (or `throw`s) go above function declarations (_Doxygen_ convention).
+    - It is arguable whether or not you should document all possible system errors; most _Standard Template Library_ functions can `throw`.
+  - `*.hxx` is to document interfaces (above function declarations); `*.cxx` is to do implementations (do not duplicate interface comments).
+  - Use _Markdown_. Rationales: for non-English users (or for computers), such syntax assists use.
+  - Instead of `//new single-line comments`, prefer `/* old fashioned */`.
+    - Rationale: simpler to port. More obvious where the comment stops if the comment wraps around.
+  - [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702):
+    - As soon as `clang++` (or `g++`) has _Contracts_ (part of _C++26_), regular expressions (such as `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/`) can convert _Doxygen_-ish comments into contracts.
+    - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `SUSUWU_ASSUME(X)`, which is close to `[[expects: x]]`, but `SUSUWU_ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
+    - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
+```
+/* @throw std::bad_alloc If function uses {`malloc`, `realloc`, `new[]`, `std::*::{push_back, push_front, insert}`}
+ * @throw std::logic_error Optional. Would include most functions which use `std::*`
+ * @pre @code !output.full() @endcode
+ * @post @code !output.empty() @endcode
+ */
+bool functionDeclaration(std::string input, std::deque<vector> output);
+```
 
 - Include guards:
 ```
@@ -230,32 +260,12 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
 #define INCLUDES_Path_To_File
 #endif /* ndef INCLUDES_Path_To_File */
 ```
-- [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https://stackoverflow.com/questions/1854550/c-macro-define-indentation)
-- [\_DEBUG is specific to MSVC, thus use NDEBUG](https://stackoverflow.com/questions/2290509/debug-vs-ndebug), [Pass `-D NDEBUG` to disable asssets + enable optimizations](https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release)
-- Do not perform tasks within `assert()`, due to: the standard says "\[`#if NDEBUG\n#define assert(x) (0)\n#endif`\]".
-- All userland errors should go to `throw std::runtime_error(message)` (or `throw Q()` where `class Q : public std::exception`), `std::cerr << message`, `errno = code;`, or `return code;`. Comments about possible errors should go above function declarations (Doxygen convention).
-  - `message` should use the new common syntax for this: `"[WARN_LEVEL: OPTIONAL_FUNCTION_NAME {code which triggered the error/warning/diagnostic/notice} /* OPTIONAL COMMENTS */]"`,
-  - [`./cxx/Macros.hxx`](./cxx/Macros.hxx): {SUSUWU_STR(x), SUSUWU_CERR(x), SUSUWU_STDOUT(x)} have the new syntax for this.
-- [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702):
-```
-/* @throw std::bad_alloc If function uses {malloc, realloc, new[], std::*::{push_back, push_front, insert}}
- * @throw std::logic_error Optional. Would include most functions which use std::*
- * @pre @code !output.full() @endcode
- * @post @code !output.empty() @endcode
- */
-bool functionDeclaration(std::string input, std::deque<vector> output);
-```
-- 
-  - It is arguable whether or not you should document such possible system errors; almost all Standard Template Library functions can throw derivatives of `std::logic_error`.
-  - Regex `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/` once have _Contracts_/_C++26_.
-  - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `ASSUME(X)`, which is close to `[[expects: x]]`, but `ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
-  - Documentation of interfaces belongs to `*.hxx`; `*.cxx` is to do implementations. Do not duplicate interface comments.
-  - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
 ## Sponsor
 To sponsor this, you can send withdrawable crypto (such as [**Bitcoin**](https://wikipedia.org/wiki/Bitcoin)) addresses to [contacts which `./SECURITY.md` lists](./SECURITY.md#Sensitive-issues).
-- If amount is more than $100, you should encrypt with [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub).
+- If amount is more than $100, use [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub) to encrypt withdrawable addresses of crypto.
 ### Escrow
 If you want proof that your crypto/cash will go to produce specific systems, use [**escrow** services](https://wikipedia.org/wiki/Escrow) (send the **escrow** crypto/cash plus contract an [open issue which you choose](https://github.com/SwuduSusuwu/SubStack/issues/)).
 - If none of those issues match what you want, you can [post your own issue](https://github.com/SwuduSusuwu/SubStack/issues/new) for this.
 - Ensure that the **escrow** contract includes specifics as to what will count as "issue closed" [to the **escrow** service (so you do not have to trust the author),](https://wikipedia.org/wiki/Online_dispute_resolution) which will release the crypto/cash (once the **escrow** service considers your issue as closed).
   - For example; "The **source code** (through `./build.sh`), must produce a **system** (a **shared object** or **executable**) which uses just half of the training data to [setup its neural network, which must produce virtual synapses](https://wikipedia.org/wiki/Backpropagation) which the **system** [uses to produce **accurate** results](https://wikipedia.org/wiki/Residual_neural_network#Forward_propagation) on the other half, where **accurate** (for [classifiers](https://wikipedia.org/wiki/Learning_classifier_system)) is less than 2% false negatives and less than 2% false positives, and **accurate** (for [generators](https://wikipedia.org/wiki/Generative_artificial_intelligence)) is [divergence](https://wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) of less than 2%." is a contract which an **escrow** can use for [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
+
