@@ -1,5 +1,6 @@
 #!/bin/sh
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
+#shellcheck disable=SC2031 #This triggers whenever you follow the suggestion to replace `local` with subshells (`$()`).
 #/* TODO: [produce `for OPTION in @$; do` loops for all `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/22) */
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
@@ -348,22 +349,56 @@ SUSUWU_FORMAT() ( #/* Is analogous to `make format`. */
 SUSUWU_DOCS() ( #/* Is analogous to `make docs`. */
 	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which will use tools such as \`Sphinx\` or \`Doxygen\`)"
 )
-SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL" [/usr/bin | /usr/local/bin]`. Is just for internal use. */
-	if [ -n "${2}" ]; then #/* function `${1}` was passed USRBIN as its first param (our second param) */
-		USRBIN="${2}"
-		if [ ! -d "${USRBIN}" ]; then
-			SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${USRBIN}\` is not a directory (\`${1}\` requires dir input)."
-			return 1
-		fi
+SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}")) ]`. Is just for internal use. */
+	if [ ! -d "${1}" ]; then
+		return 1
+	fi
+	if [ -z "${PATH}" ]; then
+		SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "SUSUWU_HAS_USABLE_USRBIN(): \`\${PATH}\` not set; will use \`USRBIN=\"${1}\"\` (first guessed path which exists)."
 		return 0
 	fi
-	for USRBIN in "$(realpath -q ~/.local/bin)" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "/usr/bin" "/usr/local/bin"; do
-		if [ -d "${USRBIN}" ]; then
-			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${1}\` was not passed \`USRBIN\`. Search has set \`USRBIN=\"${USRBIN}\"\`."
+	IFS=":" #`PATH` format is `"PATH_0:PATH_1:PATH_N-1"`.
+	for PATH_W in ${PATH}; do
+		if [ "${PATH_W}" = "${1}" ]; then
 			return 0
 		fi
 	done
-	SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${1}\` was not passed \`USRBIN\`. Failed to autodetect path (which \`${1}\` uses.)"
+	return 1
+)
+SUSUWU_FIRST_PATH() ( #/* Usage: `USRBIN="$(SUSUWU_FIRST_PATH)`. Is just for internal use. */
+	IFS=":" #`PATH` format is `"PATH_0:PATH_1:PATH_N-1"`.
+	for PATH_W in ${PATH}; do
+		if [ -d "${PATH_W}" ]; then
+			echo "${PATH_W}"
+			return 0
+		fi
+	done
+	SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "SUSUWU_FIRST_PATH(): \`\${PATH}\` not set."
+	return 1
+)
+SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/usr/bin"...]`. Is just for internal use. */
+	if [ -n "${2}" ]; then #/* function `${1}` was passed USRBIN as its first param (our second param) */
+		USRBIN="${2}"
+		if [ -d "${USRBIN}" ]; then
+			return 0
+		else
+			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "SUSUWU_PROCESS_USRBIN(): \`${1}\` was passed \`USRBIN=\"${USRBIN}\"\` (which is not a directory); will autodetect \`USRBIN\`."
+		fi
+	fi
+	for USRBIN in "$(realpath -q ~/.local/bin)" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "$(dirname "$(which sh)")" "/usr/local/bin" "/usr/bin" "/bin" ""; do
+		if SUSUWU_HAS_USABLE_USRBIN "${USRBIN}"; then
+			break
+		fi
+		USRBIN=""
+	done
+	if [ -z "${USRBIN}" ]; then #if array above is "", or does not have usable values
+		USRBIN="$(SUSUWU_FIRST_PATH)"
+	fi
+	if [ -d "${USRBIN}" ]; then
+		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "SUSUWU_PROCESS_USRBIN(): have set \`USRBIN=\"${USRBIN}\"\`, since \`${1}\` was not passed \`USRBIN\`."
+		return 0
+	fi
+	SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "SUSUWU_PROCESS_USRBIN(): failed to autodetect \`USRBIN\` (which \`${1}\` uses)."
 	return 1 #/* Notice: `exit 1` would cause GitHub rubbers (with unknown install paths) to fail unit tests. */
 }
 SUSUWU_INSTALL() ( #/* Usage: `SUSUWU_INSTALL [USRBIN]`. Is analogous to `make install`. */
