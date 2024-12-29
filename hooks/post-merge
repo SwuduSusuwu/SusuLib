@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# This is [custom `post-merge`](https://github.com/SwuduSusuwu/SubStack/blob/preview/hooks/post-merge):
+# Produces `./tags` [for `vim`](../README.md#purposes).
+GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
+. "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() */
+STATUS_CODE=$?
+SUSUWU_BUILD_CTAGS 2>/dev/null #/* Produce `./tags`. */
+return ${STATUS_CODE}
+

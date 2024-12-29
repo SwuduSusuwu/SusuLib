@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# This is [custom `pre-rebase`](https://github.com/SwuduSusuwu/SubStack/blob/preview/hooks/pre-rebase):
+# Restores metadata to prevent "error: cannot rebase: You have unstaged changes."
+GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
+. "${GIT_ROOT}/sh/Macros.sh" #/* SUSUWU_IS_PREVIEW() */
+STATUS_CODE=$?
+if SUSUWU_IS_PREVIEW; then #/* If `./tags` is tracked; */
+	git restore "${GIT_ROOT}/tags" 2>/dev/null #/* TODO: run soon enough to prevent "error: cannot rebase: You have unstaged changes." */
+fi
+return ${STATUS_CODE}
+

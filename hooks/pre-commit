@@ -1,7 +1,13 @@
 #!/bin/sh
 #
 # This is [custom `pre-commit`](https://github.com/SwuduSusuwu/SubStack/blob/preview/hooks/pre-commit):
-# Calls [sample `pre-commit` (which scans for non-ASCII filenames, conflict markers or whitespace errors)](../.git/hooks/pre-commit.sample)
+# Produces `./tags` [for `vim`](../README.md#purposes), calls [sample `pre-commit` (which scans for non-ASCII filenames, conflict markers or whitespace errors)](../.git/hooks/pre-commit.sample)
+GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" # `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
+. "${GIT_ROOT}/sh/make.sh" || exit $? #/* SUSUWU_BUILD_CTAGS() SUSUWU_IS_PREVIEW() */
+if SUSUWU_IS_PREVIEW; then #/* If `./tags` is tracked; */
+	SUSUWU_BUILD_CTAGS 2>/dev/null && git add "${GIT_ROOT}/tags" #/* produce&add `./tags`. */
+fi
+
 git config core.whitespace -blank-at-eof # Prevents "new blank line at EOF."
 . "$0.sample" # "An example hook script to verify what is about to be committed."
 

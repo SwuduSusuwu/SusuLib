@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# This is [custom `prepare-commit-msg`](https://github.com/SwuduSusuwu/SubStack/blob/preview/hooks/prepare-commit-msg):
+# Produces `./tags` [for `vim`](../README.md#purposes)
+GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
+. "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() */
+STATUS_CODE=$?
+if SUSUWU_IS_PREVIEW; then #/* If `./tags` is tracked; */
+	SUSUWU_BUILD_CTAGS 2>/dev/null && git add "${GIT_ROOT}/tags" || (#/* produce&add `./tags`. */
+		echo "$0: [Error]: Could not update \"${GIT_ROOT}/tags\"."
+	)
+fi
+return ${STATUS_CODE}
+
