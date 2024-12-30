@@ -65,8 +65,11 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	include <iostream> /* std::cerr std::cout std::endl */
 #endif
 
+#ifndef SUSUWU_DEFAULT_BRANCH
+#	define SUSUWU_DEFAULT_BRANCH "trunk"
+#endif /* ndef SUSUWU_DEFAULT_BRANCH */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch trunk && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
 #else /* def SUSUWU_EXPERIMENTAL else */
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
@@ -435,13 +438,13 @@ public:
 } Instrumentation;
 
 #ifndef SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* override with `-DSUSUWU_VIRTUAL_EQUALS_USE_ADDRESES=false` */
-# define SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES true /* Default is: Interpret `Java`'s `Object::equals` standard as "Addresses must match". */
+#	define SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES true /* Default is: Interpret `Java`'s `Object::equals` standard as "Addresses must match". */
 #endif /* ndef SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES */
 #define SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES false /* TODO: inherit from `SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES`? */
 #define SUSUWU_VPTR_SZ sizeof(SUSUWU_NULLPTR) /* TODO: use documented constant for `vptr` byte count. */
 #define SUSUWU_VPTR_OFFSET SUSUWU_VPTR_SZ /* Notice: assumes that first data member is `vptr`. */
 #ifndef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS /* override with `-DSUSUWU_VIRTUAL_VPTR_COMPARISON=false` to use `hasLayoutOf()` && data members comparison */
-# define SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS true /* Default: `Class::operator==` does `typeid` && data members comparison */
+#	define SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS true /* Default: `Class::operator==` does `typeid` && data members comparison */
 #endif /* ndef SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
 
 #define SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR { return typeid(*this) == typeid(obj) && 0 == memcmp(reinterpret_cast<const void *>(this), reinterpret_cast<const void *>(&obj), this->getObjectSize()); } /* cast silences "warning: first operand of this 'memcmp' call is a pointer to dynamic class 'Object'; vtable pointer will be compared [-Wdynamic-class-memaccess]" */

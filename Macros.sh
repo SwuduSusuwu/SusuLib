@@ -86,9 +86,9 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCE
 )
 
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH)"` */
-	DEFAULT_BRANCH="$(basename $(git symbolic-ref --short refs/remotes/$(git remote)/HEAD))" #remote branch
-	if [ ! -n "${DEFAULT_BRANCH}" ]; then #Remoteless path
-		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #local branch
+DEFAULT_BRANCH="$(git symbolic-ref --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #remote branch
+	if [ -z "${DEFAULT_BRANCH}" ]; then #if `git remote` not found
+		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #local branch; if you update this, update `README.md#git`.
 	fi
 	echo "${DEFAULT_BRANCH}"
 )
