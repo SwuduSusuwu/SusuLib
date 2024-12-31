@@ -79,6 +79,9 @@ All have lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which 
 
 [`./build.sh`](./build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). (View [Options/setup](#optionssetup) for options).
 
+[`./hooks/`](./hooks) is `git` scripts ([`man githooks`](https://git-scm.com/docs/githooks)) which assist you; install with `cp -ra ./hooks/* ./.git/hooks/`.
+- [`./hooks/pre-commit`](./hooks/pre-commit) is [`.git/hooks/pre-commit.sample` (scans for non-ASCII filenames, conflict markers or whitespace errors)](https://github.com/auth0/gitzero/blob/master/tests/example/_git/hooks/pre-commit.sample)
+
 # How to use this
 Minimum requirements (build targets which this supports):
 - Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
