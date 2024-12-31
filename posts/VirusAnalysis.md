@@ -1,12 +1,12 @@
 **Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure computers.** 
 \[This post allows all uses.\] Is [now on SubStack](https://swudususuwu.substack.com/p/howto-improve-virus-analysis).
 # Table of Contents
-- [Intro](#Intro)
-- [Source code](#Source-code)
-- [Comparison to assistants](#Comparison-to-assistants)
-- [Post, with resources](#Post-with-resources)
-  - [Neural resources](#Neural-resources)
-- [Synopsis + related posts](#Synopsis--related-posts)
+- [Intro](#intro)
+- [Source code](#source-code)
+- [Comparison to assistants](#comparison-to-assistants)
+- [Post, with resources](#post-with-resources)
+  - [Neural resources](#neural-resources)
+- [Synopsis + related posts](#synopsis--related-posts)
 # Intro
 Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (secures all app launches,) but after first launch: **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 

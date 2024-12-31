@@ -1,95 +1,93 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 
 # Table of Contents
-- [Purposes](#Purposes)
-- [How to use this](#How-to-use-this)
-  - [Download](#Download)
-  - [Signature/certificate](#Signaturecertificate)
-  - [Options/setup](#Optionssetup)
-- [How to contribute](#How-to-contribute)
-  - [Beta test/experimental builds](#Beta-testexperimental-builds)
+- [Purposes](#purposes)
+- [How to use this](#how-to-use-this)
+  - [Download](#download)
+  - [Signature/certificate](#signaturecertificate)
+  - [Options/setup](#optionssetup)
+- [How to contribute](#how-to-contribute)
+  - [Beta test/experimental builds](#beta-testexperimental-builds)
   - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SubStack/contribute)
-  - [Sensitive issues](./SECURITY.md#Sensitive-issues)
-  - [Contributor conventions/rules](#Contributor-conventionsrules)
-    - [`git`](#Git)
-    - [`sh` source](#Sh-source)
-    - [_C_/_C++_ source](#Cc-source)
-  - [Sponsor](#Sponsor)
-    - [Escrow](#Escrow)
+  - [Sensitive issues](./SECURITY.md#sensitive-issues)
+  - [Contributor conventions/rules](#contributor-conventionsrules)
+    - [`git`](#git)
+    - [`sh` source](#sh-source)
+    - [_C_/_C++_ source](#cc-source)
+  - [Sponsor](#sponsor)
+    - [Escrow](#escrow)
 
 # Purposes
-[`./.ssh/`](./.ssh/) is to [compute signatures/certificates](#Signaturecertificate).
+[`./.ssh/`](./.ssh/) is to [compute signatures/certificates](#signaturecertificate).
 
 [`./posts/`](./posts/) stages posts (school classes) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about artificial neural tissue, antivirus, assistants, plus autonomous tools.
 - [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SubStack/issues/2#issuecomment-2110726542)).
-- [`./posts/AlbatrossCNS.md#Post-with-resources`](./posts/AlbatrossCNS.md#Post-with-resources) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
-- [`./posts/VirusAnalysis.md#Post-with-resources`](./posts/VirusAnalysis.md#Post-with-resources) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SubStack/issues/8).
+- [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
+- [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SubStack/issues/8).
 
-[`./c/`](./c/) _C_ implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task)
+[`./c/`](./c/) [_C_](https://wikipedia.org/wiki/C_(programming_language)) implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task)
 - [`./c/rfc6234/`](./c/rfc6234) is vendored code (direct from the official [_RFC6234_](https://www.rfc-editor.org/rfc/rfc6234#section-8)), which is used for {`classSha128()`, `classSha256()`, `classSha512()`}.
 
-[`./cxx/`](/cxx/) _C++_ implementations of posts
-- [`./cxx/Macros.hxx`](/cxx/Macros.hxx) is
+[`./cxx/`](./cxx/) [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) implementations of posts
+- [`./cxx/Macros.hxx`](./cxx/Macros.hxx) is
   - macros with wrap C++ features/attributes, such as {`SUSUWU_ASSUME`, `SUSUWU_CONSTEXPR`, `SUSUWU_DEFAULT`, `SUSUWU_DELETE`, `SUSUWU_EXPECTS`, `SUSUWU_ENSURES`, `SUSUWU_FINAL`, `SUSUWU_IF_CPLUSPLUS`, `SUSUWU_NOEXCEPT`, `SUSUWU_NORETURN`, `SUSUWU_NULLPTR`, `SUSUWU_OVERRIDE`, `SUSUWU_STATIC_ASSERT`, `SUSUWU_UNREACHABLE`} which (if used on old compilers, or with options such as `-std=c++11`) are replaced with no-ops or alternatives which have the same use,
-  - macro options (which control the macro constants/macro functions). (View [Options/setup](/README.md#Optionssetup) for options),
+  - macro options (which control the macro constants/macro functions). (View [Options/setup](#optionssetup) for options),
   - macro constants, such as `SUSUWU_SH_<color>` (`color` = {`DEFAULT`, `BLACK`, `DARK_GRAY`, `RED`, `LIGHT_RED`, `GREEN`, `LIGHT_GREEN`, `BROWN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `PURPLE`, `LIGHT_PURPLE`, `CYAN`, `LIGHT_CYAN`, `LIGHT_GRAY`, `WHITE`}, if supported, expands to the [_ANSI_ color](https://wikipedia.org/wiki/Ansi_color) codes, else expands to ""),
   - macro functions, such as {`SUSUWU_ERROR`, `SUSUWU_WARNING`, `SUSUWU_INFO`, `SUSUWU_SUCCESS`, which use `SUSUWU_PRINT`}, `SUSUWU_PRINT` (if `__cplusplus`, uses `SUSUWU_CERR`, else uses `SUSUWU_STDERRR`),
   - `macroTestsNoexcept()` (unit tests, with return value for errors).
-- [`./cxx/ClassObject.hxx`](/cxx/ClassObject.hxx) is
+- [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
   - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/ClassPortableExecutable.hxx`](/cxx/ClassPortableExecutable.hxx) is
+- [`./cxx/ClassPortableExecutable.hxx`](./cxx/ClassPortableExecutable.hxx) is
   - `FilePath` (`PortableExecutable`'s constructor argument), `FileBytecode` (`classSha2`'s input argument), `FileHash` (`classSha2`'s return value)
   - `class PortableExecutable : public Object` (stores file `path` and/or `bytecode` and/or `hex`code. TODO; `hash`?)
   - `class PortableExecutableBytecode : public PortableExecutable` loads `bytecode` from `path`. TODO; `hash`?
-- [`./cxx/ClassSys.hxx`](/cxx/ClassSys.hxx) is
+- [`./cxx/ClassSys.hxx`](./cxx/ClassSys.hxx) is
   - typedefs {ClassSysUSeconds}
   - globals {classSysArgc, classSysArgs}
   - modular functions to interact with: console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`}, own process {`classSysInit()`, `classSysGetOwnPath()`, `classSysFopenOwnPath()`, `templateCatchAll()`}, strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}, the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}. TODO: filesystem (perhaps just have `cxx/ClassPortableExecutable.hxx` do this?), internet.
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/ClassSha2.hxx`](/cxx/ClassSha2.hxx) is
+- [`./cxx/ClassSha2.hxx`](./cxx/ClassSha2.hxx) is
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
   - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/ClassCns.hxx`](/cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6) is to implement this class.
-- [`./cxx/ClassResultList.hxx`](/cxx/ClassResultList.hxx) is
+- [`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6) is to implement this class.
+- [`./cxx/ClassResultList.hxx`](./cxx/ClassResultList.hxx) is
   - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
   - modular template (can use on all containers such as `std::vector`, `std::map` or `std::list`) `list*()` functions (such as `listMaxSize()`, `listDumpTo()`, `listToHashes()`, `listIntersections()`, `listsIntersect()`, `listFindValue()`, `listHasValue()`, `listFindSubstr()`, `listHasSubstr()`, `listProduceSignature()` (`produceAbortListSignatures` uses this), `listFindSignatureOfValue()`, `listHasSignatureOfValue()` (`signatureAnalysis()` uses this), `explodeToList` (`./cxx/AssistantCns.cxx` uses this), 
   produce unique signature, compare file against list of signatures), most of which were produced for antivirus signature analysis.
   - `classResultListsTests()`, or `classResultListsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/VirusAnalysis.hxx`](/cxx/VirusAnalysis.hxx) is
+- [`./cxx/VirusAnalysis.hxx`](./cxx/VirusAnalysis.hxx) is
   - modular helper functions {`produceAbortListSignatures()` (for `signatureAnalysis()` use), `importedFunctionsList()` (work-in-progress, `staticAnalysis()` uses this), `straceOutputsAnalysis()` (work-in-progress, `sandboxAnalysis()` uses this), `produceAnalysisCns()` (for `cnsAnalysis()` use), `produceVirusFixCns()` (for `cnsVirusFix()` use)},
   - kernel hook function (`virusAnalysisHook()`), which uses `virusAnalysis()` to scan new downloadss (or scan all programs which execute); work-in-progress.
   - modular scan functions {`hashAnalysis()`, `signatureAnalysis()`, `staticAnalysis()` (processes [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) or [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable)s, work-in-progress), `sandboxAnalysis()` (executes with `strace` + `chroot`, work-in-progress), `cnsAnalysis()` (uses `ClassCns.hxx`)} plus disinfection function (`cnsVirusFix()`) which form an antivirus program.
   - `virusAnalysisTests()`, or `virusAnalysisTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/AssistantCns.hxx`](/cxx/AssistantCns.hxx) is
+- [`./cxx/AssistantCns.hxx`](./cxx/AssistantCns.hxx) is
   - modular functions {`assistantCnsDownloadHosts()` (uses `wget` on `assistantCnsDefaultHosts`), `assistantCnsProcessXhtml()` (uses the next 2 functions to process `wget`'s downloads: `assistantCnsProcessUrls` (uses `boost/property_tree/xml_parser.hpp` to extract new URLs), `assistantCnsProcessQuestion` (work-in-progress, extracts question), `assistantCnsProcessResponses()` (work-in-progress, extracts answers)), `produceAssistantCns()` (uses datasets for backpropagation), `assistantCnsProcess` (uses forwardpropagation to answer new questions)} which form an assistant.
   - `assistantCnsTests()`, or `assistantCnsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/main.hxx`](/cxx/main.hxx) is `SusuwuUnitTestsBitmask main()` (executes all of those `*TestsNoexcept()` unit tests into a bitmask return value.)
+- [`./cxx/main.hxx`](./cxx/main.hxx) is `SusuwuUnitTestsBitmask main()` (executes all of those `*TestsNoexcept()` unit tests into a bitmask return value.)
 All have lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
 
 
 [`./Macros.sh`](./Macros.sh) is a modular `./bin/sh` script with functions which `./build.sh` uses.
 
-[`./build.sh`](./build.sh) does what `./configure`, `make` often do. (View [Options/setup](#Optionssetup) for options).
+[`./build.sh`](./build.sh) does what `./configure`, `make` often do. (View [Options/setup](#optionssetup) for options).
 
 # How to use this
 Minimum requirements (build targets which this supports):
 - Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
   - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_assert`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
-  - \[Notice: update [`./c/README.md#Progress`](./c/README.md#Progress) if you update this list.\]
-  - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#Contributor-conventionsrules).
-  - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#Contributor-conventionsrules).
+  - \[Notice: update [`./c/README.md#progress`](./c/README.md#progress) if you update this list.\]
+  - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#contributor-conventionsrules).
+  - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#contributor-conventionsrules).
 ## Download
 Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
 ## Signature/certificate
-`.ssh/setup.sh` (you can compare those certificates to [our blog post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).)
+[`./.ssh/setup.sh`](./setup.sh) is to setup `gpg.ssh.allowedSignersFile` (allows to use `git verify <ref>` or `git log --show-signature`).
+- `git verify <ref>` or `git log —show-signatures` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SubStack/commit/3efe601f15ae0fdfd05cfbc1a75a0e6a4a08124b)
+- You can compare those certificates to [our blog post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).)
 
-`git log —show-signatures` (which shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SubStack/commit/3efe601f15ae0fdfd05cfbc1a75a0e6a4a08124b)),
-
-or `git verify-commit <ref>` (where <ref> is the hash of an individual commit).
-
-\[Notice: This [public crypto](https://docs.gitlab.com/ee/user/project/repository/signed_commits/ssh.html#verify-commits-locally) "signature", is not related to "signature analysis" ([Substr scans](#Purposes)).\]
+\[Notice: This [public crypto](https://docs.gitlab.com/ee/user/project/repository/signed_commits/ssh.html#verify-commits-locally) "signature", is not related to "signature analysis" ([Substr scans](#purposes)).\]
 ## Options/setup
 Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/Susuwu.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `Susuwu.out`'s return values.
@@ -132,11 +130,11 @@ View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for i
 - `git switch experimental && ./build.sh`
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
-    - Note: [sensitive issue(s)](./SECURITY.md#Sensitive-issues) have a separate protocol.
+    - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
 # Contributor conventions/rules
-If your commit introduces/removes functions, have `./README.md#Purposes` include this.
+If your commit introduces/removes functions, have `./README.md#purposes` include this.
 So that code is consistant, pull requests have language-specific syntax rules:
-## Git
+## `git`
 Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such as through `git rebase -i`) with a previous commit, or cannot `./build.sh` if a previous commit got `git revert`, your commit message must include such as "Is followup to \<commit hash\>" (which shows temporal order).
 
 `git commit` message format/syntax:
@@ -162,7 +160,7 @@ Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such
 ```
 /[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code/paths.\]
 ## `sh` source
-Is as for [_C_/_C++_ source](#Cc-source), plus specifics to `sh`:
+Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
 - Act as if all functions/variables are macros (which use `CONSTANT_CASE`).
 - Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
   - Rationales:
@@ -266,7 +264,7 @@ bool functionDeclaration(std::string input, std::deque<vector> output);
 #endif /* ndef INCLUDES_Path_To_File */
 ```
 ## Sponsor
-To sponsor this, you can send withdrawable crypto (such as [**Bitcoin**](https://wikipedia.org/wiki/Bitcoin)) addresses to [contacts which `./SECURITY.md` lists](./SECURITY.md#Sensitive-issues).
+To sponsor this, you can send withdrawable crypto (such as [**Bitcoin**](https://wikipedia.org/wiki/Bitcoin)) addresses to [contacts which `./SECURITY.md` lists](./SECURITY.md#sensitive-issues).
 - If amount is more than $100, use [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub) to encrypt withdrawable addresses of crypto.
 ### Escrow
 If you want proof that your crypto/cash will go to produce specific systems, use [**escrow** services](https://wikipedia.org/wiki/Escrow) (send the **escrow** crypto/cash plus contract an [open issue which you choose](https://github.com/SwuduSusuwu/SubStack/issues/)).

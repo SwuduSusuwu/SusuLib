@@ -10,8 +10,8 @@ Tools compatible with this howto:
 - For _OSX_: `brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-libass --with-libvorbis --with-libvpx --with-opus` (or [alternatives](https://superuser.com/questions/624561/install-ffmpeg-on-os-x/624562#624562)).
 - For _Windows_: [_FFmpeg_ - Official app in the _Microsoft Store_](https://apps.microsoft.com/detail/9nb2flx7x7wg?hl=en-za&gl=ZA).
 # Table of Contents
-- [Howto](#Howto)
-- [External resources](#External-resources)
+- [Howto](#howto)
+- [External resources](#external-resources)
 # Howto
 \[*Notice*: versus stock _Android_, have moved default paths `/Music/` to `/Sounds/`, `/Movies/` to `/Visuals/`.\]
 

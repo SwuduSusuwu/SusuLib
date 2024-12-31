@@ -2,10 +2,10 @@
 
 _[This post](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural) allows all uses._
 # Table of contents
-- [Post, with resources](#Post-with-resources)
-- [Questions to viewers](#Questions-to-viewers)
-- [Responses from viewers](#Responses-from-viewers)
-- [Related posts](#Related-posts)
+- [Post, with resources](#post-with-resources)
+- [Questions to viewers](#questions-to-viewers)
+- [Responses from viewers](#responses-from-viewers)
+- [Related posts](#related-posts)
   - [Root project (uses neural network for virus analysis)](./VirusAnalysis.md).
   - [Root project's _Assistant_](./VirusAnalysis.md#Comparison-to-assistants).
   - [Root project's neural resources](./VirusAnalysis.md#Neural-resources).

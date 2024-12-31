@@ -3,7 +3,7 @@
 SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "(C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses."
 
 THIS_DEFAULT_BRANCH="trunk" #`$(SUSUWU_DEFAULT_BRANCH)` fails if no remote and local has `trunk` + `master` branches.
-FLAGS_USER="" #/* Usage: "Macro flags" from `README.md#Optionssetup`. */
+FLAGS_USER="" #/* Usage: "Macro flags" from `README.md#optionssetup`. */
 FLAGS_ANALYSIS="-Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic" #/*TODO: -`-Wno-*`, +`-Werror` */
 FLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
 CXXFLAGS_DEBUG="-std=c++11" #/* ensure unit tests pass with C++11 support as max */

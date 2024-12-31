@@ -1,6 +1,7 @@
-# Table of contents
-- [Issue/workaround](#Issueworkaround)
-- [Progress](#Progress)
+(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+# [Table of contents](../README.md#table-of-contents)
+- [Issue/workaround](#issueworkaround)
+- [Progress](#progress)
 ## Issue/workaround
 If your project can not use [_C++_](../cxx/) includes,
 
@@ -22,6 +23,6 @@ Most languages allow you to include&use _C++_ functions.
 respond to [this issue](https://github.com/SwuduSusuwu/SubStack/issues/3) as to how a _C_ version would assist you (will produce if enough ask for this).
 ## Progress
 To replace _C++_'s _Standard Template Library_, [`../cxx/ClassObject.hxx`](../cxx/ClassObject.hxx) ports [_Java_](https://wikipedia.org/wiki/Java)'s [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html) to `class Instrumentation`, [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html) to `class Class : public Instrumentation`, [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) to `class Object : Public Class`.
-- It is simple to port those to _C_, as [all this project depends on is _C++98_'s {`throw`, single inheritance}, _Standard Template Library_, and _C++11_'s {`auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`}](../README.md#How-to-use-this)
+- It is simple to port those to _C_, as [all this project depends on is _C++98_'s {`throw`, single inheritance}, _Standard Template Library_, and _C++11_'s {`auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`}](../README.md#how-to-use-this)
   - Most functions which use `throw` have alternatives which `std::nothrow` (to allow `extern "C" {`).
 
