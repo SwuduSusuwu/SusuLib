@@ -87,17 +87,8 @@ export SUSUWU_SH_CYAN="\033[0;36m" #xterm256 "\033[38;5;6m"
 export SUSUWU_SH_LIGHT_CYAN="\033[1;36m" #xterm256 "\033[38;5;14m"
 export SUSUWU_SH_LIGHT_GRAY="\033[0;37m" #xterm256 "\033[38;5;7m"
 export SUSUWU_SH_WHITE="\033[1;37m" #xterm256 "\033[38;5;15m"
-
-#/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
-#/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
-export SUSUWU_SH_ERROR="${SUSUWU_SH_RED}Error: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_WARNING="${SUSUWU_SH_PURPLE}Warning: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_INFO="${SUSUWU_SH_CYAN}Info: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_SUCCESS="${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_NOTICE="${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_DEBUG="${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
-SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
-
+export SUSUWU_SH_RESET_WHITE="\033[0;1;37m" #xterm256 "\033[38;5;15m"
+export SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
 SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` */
 	SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS=8
 	if [ -n "${SUSUWU_SH_COLOR_COUNT_CACHE}" ]; then
@@ -142,10 +133,31 @@ SUSUWU_SH_HAS_256COLOR_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_256COLOR_CONSOLE
 		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "256" #test that color count is Greater or Equal to 256
 		return $? #return `test`'s output value
 )
-if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
-	echo "[$0: ${SUSUWU_SH_WARNING}\`SUSUWU_SH_HAS_UNIX_CONSOLE()\` failed. TODO: support systems without UNIX console codes. If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) shows colors (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute \`export TERM=\"linux\"\` to enable console code use.]" >&2
-	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
-fi
+SUSUWU_SH_USE() ( #/* Usage: `SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_DEFAULT}"] ["&1"]`. Uses <attribute> on <message>. */
+#	if [ ! $(SUSUWU_SH_HAS_UNIX_CONSOLE) ]; then
+#		case "${1}" in
+#			"${SUSUWU_SH_}") #TODO; non-standard code routes (such as `ConsoleApi2.h:SetConsoleTextAttribute`).
+#			;;
+#		esac
+#	fi
+	if SUSUWU_SH_HAS_UNIX_CONSOLE; then
+		echo "${1}${2}${3:-${SUSUWU_SH_DEFAULT}}" #TODO: `>${4:-&1}` #/* `&1` is `std::cout`/`stdout` */
+	else
+		echo "${2}" #TODO: `>${4:-&1}` #/* `&1` is `std::cout`/`stdout` */
+	fi
+)
+SUSUWU_SH_USE2() ( #/* Usage: `SUSUWU_SH_USE2 "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_RESET_WHITE}"] ["&2"]`. Is `SUSUWU_SH_USE` for `&2`. */
+	SUSUWU_SH_USE "${1}" "${2}" "${3:-${SUSUWU_SH_RESET_WHITE}}" "${4:-&2}" #/* `&2` is `std::cerr`/`stderr` */
+)
+
+#/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
+#/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
+export SUSUWU_SH_ERROR="$(SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "Error: ")"
+export SUSUWU_SH_WARNING="$(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "Warning: ")"
+export SUSUWU_SH_INFO="$(SUSUWU_SH_USE2 "${SUSUWU_SH_CYAN}" "Info: ")"
+export SUSUWU_SH_SUCCESS="$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: ")"
+export SUSUWU_SH_NOTICE="$(SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: ")"
+export SUSUWU_SH_DEBUG="$(SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: ")"
 
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
@@ -178,7 +190,7 @@ export SUSUWU_SH_FILE="${SUSUWU_SH_FILE:-""}"
 export SUSUWU_SH_LINE="${SUSUWU_SH_LINE:-""}"
 export SUSUWU_SH_FUNC="${SUSUWU_SH_FUNC:-"true"}"
 export SUSUWU_SH_FILE_OR_LINE="${SUSUWU_SH_FILE:-${SUSUWU_SH_LINE}}"
-SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_SH_<warn-level>)" "<message>" */
+SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "${SUSUWU_SH_<warn-level>}" "<message>" */
 	if [ "$#" -eq 3 ]; then
 		CALLER_FUNC="${1}"; shift
 	fi
@@ -207,6 +219,10 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	printf '%b\n' "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 	return $?
 )
+if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
+	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
+	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "${SUSUWU_SH_WARNING}" "failed. TODO: support systems without UNIX console codes. If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute \`export TERM=\"linux\"\` to enable console code use."
+fi
 
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
 	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #remote branch
@@ -224,9 +240,9 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #detect default branch
 		fi
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${THIS_BRANCH}\"."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${THIS_BRANCH}")\"."
 		else
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${THIS_BRANCH}\"; for production use, execute \`git switch ${DEFAULT_BRANCH}\`."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_WARNING}" "\`git branch\` is \"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${THIS_BRANCH}")\"; for production use, execute \`git switch $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${DEFAULT_BRANCH}")\`."
 		fi
 	fi
 )

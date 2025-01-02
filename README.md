@@ -250,6 +250,13 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
     - `throw std::runtime_error(message)` (or `throw Q()` where `class Q : public std::exception`)
     - `std::cerr << message` (or `fprintf(stdout, message)`
     - `errno = code;`, or `return code;`.
+- Have follow tools such as {`clang++`, `g++`, `vim`}:
+  - use `./cxx/Macros.hxx:SUSUWU_SH_RED` to quote error messages.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_PURPLE` to quote status codes (or return values).
+  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_CYAN` to quote names of variables/constants.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_GREEN` to quote current arguments/values.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_PURPLE` to quote speculative replacement arguments/values.
+  - [`.sh`](#sh-source) code uses `./sh/Macros.sh:SUSUWU_SH_<color>`.
 
 - Comments
   - Comments about possible `return code;`s (or `throw`s) go above function declarations (_Doxygen_ convention).
