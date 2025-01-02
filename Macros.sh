@@ -385,13 +385,14 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/us
 			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "SUSUWU_PROCESS_USRBIN(): \`${1}\` was passed \`USRBIN=\"${USRBIN}\"\` (which is not a directory); will autodetect \`USRBIN\`."
 		fi
 	fi
-	for USRBIN in "$(realpath -q ~/.local/bin)" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "$(dirname "$(which sh)")" "/usr/local/bin" "/usr/bin" "/bin" ""; do
+	for USRBIN in "$(realpath -q ~/.local/bin)" "$(realpath -q ~/../usr/bin)" "$(realpath -q ~/../usr/local/bin)" "$(realpath -q ~/../local/bin)" "$(dirname "$(which sh)")" "/usr/local/bin" "/usr/bin" "/bin"; do
 		if SUSUWU_HAS_USABLE_USRBIN "${USRBIN}"; then
 			break
 		fi
 		USRBIN=""
 	done
 	if [ -z "${USRBIN}" ]; then #if array above is "", or does not have usable values
+		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "SUSUWU_PROCESS_USRBIN(): none of the usual paths for \`USRBIN\` suitable to use; will use the first directory from \`\${PATH}\` which exists."
 		USRBIN="$(SUSUWU_FIRST_PATH)"
 	fi
 	if [ -d "${USRBIN}" ]; then
