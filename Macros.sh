@@ -229,21 +229,21 @@ SUSUWU_CLEAN_OUTPUT_IMPL() ( #/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to cle
 	rm "${BINDIR}"*.exe 2>/dev/null
 	rm "${BINDIR}"*.out 2>/dev/null
 )
-SUSUWU_CLEAN_OUTPUT() ( #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
+SUSUWU_CLEAN_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus exit. [Use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
 	exit 0
-)
+}
 SUSUWU_REBUILD_OUTPUT() ( #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to rebuild" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus continue. [Use \`${0}${CROSS_COMP} --clean\` to remove plus exit.]"
 )
-SUSUWU_PROCESS_CLEAN_REBUILD() ( #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [This processes params passed to `${0}`.] */
+SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [This processes params passed to `${0}`.] */
 	if [ "--clean" = "${1}" ] || [ "--clean" = "${2}" ]; then
 		SUSUWU_CLEAN_OUTPUT "Was called with \`${0}${CROSS_COMP} --clean\`"
 	fi
 	if [ "--rebuild" = "${1}" ] || [ "--rebuild" = "${2}" ]; then
 		SUSUWU_REBUILD_OUTPUT "Was called with \`${0}${CROSS_COMP} --rebuild\`"
 	fi
-)
+}
 
 SUSUWU_PROCESS_INCLUDES() ( #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
 #shellcheck disable=SC2068
