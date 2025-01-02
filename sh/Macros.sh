@@ -19,6 +19,23 @@ SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param" "$@";`. [Th
 	done
 	return 1
 )
+SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwanted-param" "$@")"`. [This processes params passed to `${0}`.] */
+	PARAM=${1}; shift;
+	NEW_PARAMS=""
+	SUSUWU_SH_REMOVE_PARAM_FOUND=1
+	for PARAM_W in "$@"; do
+		if [ "${PARAM}" != "${PARAM_W}" ]; then
+			SUSUWU_SH_REMOVE_PARAM_FOUND=0
+			if [ -z "${NEW_PARAMS}" ]; then
+				NEW_PARAMS="${PARAM_W}"
+			elif [ -n "${NEW_PARAMS}" ]; then
+				NEW_PARAMS="${NEW_PARAMS} ${PARAM_W}" #/* TODO: spaces? */
+			fi
+		fi
+	done
+	echo "${NEW_PARAMS}"
+	return ${SUSUWU_SH_REMOVE_PARAM_FOUND}
+)
 SUSUWU_DIR_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}") */
 	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */

@@ -4,7 +4,7 @@
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
-. ./sh/Macros.sh #/* SUSUWU_SH_CONSOLE_PARAMS SUSUWU_PRINT() SUSUWU_SH_HAS_PARAM() SUSUWU_S SUSUWU_SH_* SUSUWU_VERBOSE */
+. ./sh/Macros.sh #/* SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_* SUSUWU_VERBOSE */
 
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
@@ -58,14 +58,14 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 
 SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "--release" "$@"; then
-		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --release\` does not support profilers/debuggers (use \`${0}${CROSS_COMP} --debug\` for this)."
+		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "${SUSUWU_SH_NOTICE}" "\`${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") --release\` does not support profilers/debuggers (use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") --debug\` for this)."
 		CFLAGS="${CFLAGS} ${FLAGS_RELEASE} ${CFLAGS_RELEASE}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_RELEASE} ${CXXFLAGS_RELEASE}"
 	else
 		if ! SUSUWU_SH_HAS_PARAM "--debug" "$@"; then
 			SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "${SUSUWU_SH_NOTICE}" "\`${0} $*\` defaults to \`${0} $* --debug\`."
 		fi
-		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --debug\` is slow (use \`${0}${CROSS_COMP} --release\` to improve how fast \"\${BINDIR}/\${OUTPUT}\" executes)."
+		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "${SUSUWU_SH_NOTICE}" "\`--debug\` is slow (use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") --release\` to improve how fast \"\${BINDIR}/\${OUTPUT}\" executes)."
 		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
 		if [ true = ${USE_FSAN} ]; then
@@ -128,18 +128,18 @@ SUSUWU_CLEAN_OUTPUT_IMPL() ( #/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to cle
 	rm "${BINDIR}"*.out 2>/dev/null
 )
 SUSUWU_CLEAN_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
-	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus exit. [Use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
+	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus exit. [Use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--clean") --rebuild\` to remove plus continue.]"
 	exit 0
 }
 SUSUWU_REBUILD_OUTPUT() ( #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to rebuild" */
-	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus continue. [Use \`${0}${CROSS_COMP} --clean\` to remove plus exit.]"
+	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus continue. [Use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--rebuild") --clean\` to remove plus exit.]"
 )
 SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "--clean" "$@"; then
-		SUSUWU_CLEAN_OUTPUT "Was called with \`${0}${CROSS_COMP} --clean\`"
+		SUSUWU_CLEAN_OUTPUT "Was called as \`${0} $(SUSUWU_SH_REMOVE_PARAM "--clean" "$@") --clean\`"
 	fi
 	if SUSUWU_SH_HAS_PARAM "--rebuild" "$@"; then
-		SUSUWU_REBUILD_OUTPUT "Was called with \`${0}${CROSS_COMP} --rebuild\`"
+		SUSUWU_REBUILD_OUTPUT "Was called as \`${0} $(SUSUWU_SH_REMOVE_PARAM "--rebuild" "$@") --rebuild\`"
 	fi
 }
 
