@@ -1,6 +1,5 @@
 #!/bin/sh
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
-#shellcheck disable=SC2031 #This triggers whenever you follow the suggestion to replace `local` with subshells (`$()`).
 #/* TODO: [produce `for OPTION in @$; do` loops for all `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/22) */
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
@@ -25,15 +24,15 @@ SUSUWU_DIR_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "${BI
 SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${OBJECT}"). */
 #	echo $(echo "$@" | sed 's/ /\\\ /') #/* Error: `sed not found`, although is installed. */
 #	echo "\"${@}\""; #/* Error: if `OBJECT="obj/main.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: '"obj/main.o"'`. */
-	ESCAPED_PATH=""
-	for PATH in "$@"; do
-		if [ -z "${ESCAPED_PATH}" ]; then
-			ESCAPED_PATH="${PATH}"
-		elif [ -n "${PATH}" ]; then
-			ESCAPED_PATH="${ESCAPED_PATH}\\ ${PATH}" #/* Error: if `OBJECT="obj/long path.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: 'obj/long\'\nclang++: error: no such file or directory: 'path.o'`. TODO: fix this. */
-		fi #/* Is not a regression (`Macros.sh` never supported spaces; our patbs don't have spaces.) */
+	NEW_PATH=""
+	for OLD_PATH in "$@"; do
+		if [ -z "${NEW_PATH}" ]; then
+			NEW_PATH="${OLD_PATH}"
+		elif [ -n "${NEW_PATH}" ]; then
+			NEW_PATH="${NEW_PATH}\\ ${OLD_PATH}" #/* Error: if `OBJECT="obj/long path.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: 'obj/long\'\nclang++: error: no such file or directory: 'path.o'`. TODO: fix this. Is not a regression (`Macros.sh` never supported spaces; `build.sh`'s paths don't have spaces.) */
+		fi
 	done
-	echo "${ESCAPED_PATH}"
+	echo "${NEW_PATH}"
 )
 
 #/* Based on cxx/Macros.hxx */
