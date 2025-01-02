@@ -2,9 +2,23 @@
 #
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
 #/* Based on ../cxx/Macros.hxx */
-#/* TODO: [produce `for OPTION in @$; do` loops for all `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/22) */
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
+
+export SUSUWU_SH_CONSOLE_PARAMS="$*" #/* For functions which are not passed `$@` */
+SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param" "$@";`. [This processes params passed to `${0}`.] */
+	if [ "$#" -eq 1 ]; then
+		SUSUWU_SH_HAS_PARAM "${1}" "${SUSUWU_SH_CONSOLE_PARAMS}"
+		return $?
+	fi
+	PARAM=${1}; shift;
+	for PARAM_W in "$@"; do
+		if [ "${PARAM}" = "${PARAM_W}" ]; then
+			return 0
+		fi
+	done
+	return 1
+)
 SUSUWU_DIR_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}") */
 	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
@@ -65,12 +79,12 @@ SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
-	if [ "-s" = "${1}" ] || [ "-s" = "${2}" ]; then
+	if SUSUWU_SH_HAS_PARAM "-s" "$@"; then
 		SUSUWU_S=true
 	fi
 }
 SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
-	if [ "--verbose" = "${1}" ] || [ "--verbose" = "${2}" ]; then
+	if SUSUWU_SH_HAS_PARAM "--verbose" "$@"; then
 		SUSUWU_VERBOSE=true
 		set -x
 	fi
