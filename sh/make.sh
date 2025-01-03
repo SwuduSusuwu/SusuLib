@@ -4,7 +4,7 @@
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
-. ./sh/Macros.sh #/* SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code> SUSUWU_SH_<warn-level> SUSUWU_VERBOSE */
+. ./sh/Macros.sh #/* SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_ECHO_COMMANDS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_VERBOSE */
 
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
@@ -192,9 +192,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 	LOCAL_BUILDFLAGS=${2} #`=$(echo ${2} | xargs)` strips quotes, which breaks `-DSUSUWU_DEFAULT_BRANCH="trunk"`.
 	LOCAL_SOURCE_SUFFIX=${3}
 	shift 3 #/* `${@:4}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
-	if [ ! true = ${SUSUWU_S} ]; then
-		set -x
-	fi
+	SUSUWU_ECHO_COMMANDS true
 #shellcheck disable=SC2068 #`"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'"
 	for LOCAL_SOURCE in $@; do
 		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
@@ -211,9 +209,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 #shellcheck disable=SC2046 #Is not possible to use more quotes.
 	${BUILDNEW} && "${LD}" $(echo "${LDFLAGS}${SUSUWU_OBJECTLIST}" | xargs) -o "${BINDIR}${OUTPUT}"
 	SUSUWU_STATUS=$?
-	if [ ! true = ${SUSUWU_S} ] && [ ! true = ${SUSUWU_VERBOSE} ]; then
-		set +x
-	fi
+	SUSUWU_ECHO_COMMANDS false
 	if [ false = ${BUILDNEW} ]; then
 		SUSUWU_STATUS=0
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Reused $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
