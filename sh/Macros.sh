@@ -299,6 +299,10 @@ SUSUWU_SH_QUOTE_SUB() { #/* Usage: `SUSUWU_SH_QUOTE_SUB "<type-of-quote>" "<code
 
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
+SUSUWU_ECHO_COMMANDS() { #/* Usage: `SUSUWU_ECHO_COMMANDS [true | false]`. ] */
+	${1} && (! ${SUSUWU_S}) && set -x
+	(! ${1}) && (! ${SUSUWU_VERBOSE}) && set +x
+}
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "-s" "$@"; then
 		SUSUWU_S=true
@@ -307,7 +311,7 @@ SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params pa
 SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "--verbose" "$@"; then
 		SUSUWU_VERBOSE=true
-		set -x
+		SUSUWU_ECHO_COMMANDS true
 	fi
 }
 SUSUWU_SH_HAS_FUNCNAME() ( #/* Usage: `if SUSUWU_SH_HAS_FUNCNAME 2>/dev/null; then echo "${FUNCNAME[0]}(): used FUNCNAME."` */
