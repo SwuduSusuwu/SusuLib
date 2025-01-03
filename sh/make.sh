@@ -36,7 +36,8 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 		if command -v "${CC}" >/dev/null; then
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "${SUSUWU_SH_INFO}" "\`\${CC}\` (\"${CC}\") found, will use this."
 		else
-			CC="${CXX} -x c"
+			CC="${CXX}"
+			CFLAGS="${CFLAGS} -x c"
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "${SUSUWU_SH_INFO}" "\`\${CC}\` not found, will use \"\${CXX} -x -c\" (\"${CC}\")."
 		fi
 		if command -v "${LD}" >/dev/null; then
@@ -52,7 +53,8 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 		exit 1
 	fi
 	LD="${CXX}"
-	CC="${CXX} -x c"
+	CC="${CXX}"
+	CFLAGS="${CFLAGS} -x c"
 	return 0
 }
 
