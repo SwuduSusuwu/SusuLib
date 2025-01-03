@@ -181,27 +181,30 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 	fi
 	return ${SUSUWU_STATUS};
 )
-SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES "[${CC} || ${CXX}] [${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
+SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES "[${CC} || ${CXX}]" "[${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
 	LOCAL_BUILD=${1}
-	LOCAL_SOURCE_SUFFIX=${2}
-	shift 2 #/* `${@:3}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
+	LOCAL_BUILDFLAGS=${2} #`=$(echo ${2} | xargs)` strips quotes, which breaks `-DSUSUWU_DEFAULT_BRANCH="trunk"`.
+	LOCAL_SOURCE_SUFFIX=${3}
+	shift 3 #/* `${@:4}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
 	if [ ! true = ${SUSUWU_S} ]; then
 		set -x
 	fi
-#shellcheck disable=SC2068 #With `$@`, this breaks.
+#shellcheck disable=SC2068 #`"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'"
 	for LOCAL_SOURCE in $@; do
 		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
 #shellcheck disable=SC2166 #With `set -x`, the `[] || {}` form prints 2 commands
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
-			${LOCAL_BUILD} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}"
+#shellcheck disable=SC2086 #`"${LOCAL_BUILDFLAGS}"` gives "clang++: error: language not recognized"
+			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}"
 			BUILDNEW=true
 		fi
 		SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${LOCAL_OBJECT}")"
 	done
 }
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
-#shellcheck disable=SC2086
-	${BUILDNEW} && ${LD} ${LDFLAGS}${SUSUWU_OBJECTLIST} -o "${BINDIR}${OUTPUT}"
+#shellcheck disable=SC2086 #Is not possible to use more quotes.
+#shellcheck disable=SC2046 #Is not possible to use more quotes.
+	${BUILDNEW} && "${LD}" $(echo "${LDFLAGS}${SUSUWU_OBJECTLIST}" | xargs) -o "${BINDIR}${OUTPUT}"
 	SUSUWU_STATUS=$?
 	if [ ! true = ${SUSUWU_S} ] && [ ! true = ${SUSUWU_VERBOSE} ]; then
 		set +x
@@ -220,10 +223,10 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 SUSUWU_TEST_OUTPUT() {
 	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${BUILDNEW} ]; then
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
-			${BINDIR}${OUTPUT}
+			"${BINDIR}${OUTPUT}"
 		else #/* if `--mingw` */
 			if command -v wine >/dev/null; then
-				wine ${BINDIR}${OUTPUT}
+				wine "${BINDIR}${OUTPUT}"
 			else
 				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "${SUSUWU_SH_INFO}" "\`wine not found\`. do \`apt install wine\`."
 				return 1
