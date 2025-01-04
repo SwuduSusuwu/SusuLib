@@ -2,7 +2,7 @@
 #
 #/* Builds `./c/` and `./cxx/` into `./obj/` and `./bin/`. Usage: "Console flags" from `./README.md#optionssetup`. */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./$(basename "$0")\` was not executed from this repo's root.]"
-. ./sh/Macros.sh #/* SUSUWU_DEFAULT_BRANCH() SUSUWU_PRINT() SUSUWU_PROCESS_S() SUSUWU_PROCESS_VERBOSE() SUSUWU_PRODUCTION_USE() SUSUWU_SH_* */
+. ./sh/Macros.sh #/* SUSUWU_DEFAULT_BRANCH() SUSUWU_PRINT() SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR() SUSUWU_PROCESS_S() SUSUWU_PROCESS_VERBOSE() SUSUWU_PRODUCTION_USE() SUSUWU_SH_* */
 . ./sh/make.sh #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() SUSUWU_INSTALL() SUSUWU_PROCESS_CLEAN_REBUILD() SUSUWU_PROCESS_MINGW() SUSUWU_PROCESS_RELEASE_DEBUG() SUSUWU_SETUP_BUILD_FLAGS() SUSUWU_SETUP_CXX() SUSUWU_SETUP_BINDIR() SUSUWU_SETUP_OBJDIR() SUSUWU_SETUP_OUTPUT() SUSUWU_TEST_BASH() SUSUWU_TEST_OUTPUT() SUSUWU_UNINSTALL() */
 SUSUWU_PRINT "$(SUSUWU_SH_NOTICE)" "(C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses."
 
@@ -26,6 +26,7 @@ SUSUWU_PRODUCTION_USE "${THIS_DEFAULT_BRANCH}"
 SUSUWU_PROCESS_MINGW "$@" #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
 SUSUWU_PROCESS_RELEASE_DEBUG "$@" #/* Usage: `./build.sh --debug` or `./build.sh --release` */
+SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR "$@" #/* Usage: `./build.sh --abort-on-first-error`. If an object fails to build, `exit 1`. */
 
 SUSUWU_SETUP_OBJDIR "./obj/" #/* Usage: replace with directory root for new objects */
 SUSUWU_SETUP_BINDIR "./bin/" #/* Usage: replace with directory root for new executables */

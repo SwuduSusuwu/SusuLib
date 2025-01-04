@@ -356,6 +356,13 @@ if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; the
 	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_QUOTE "CODE" "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute $(SUSUWU_SH_QUOTE "CODE" "export TERM=\"linux\"") to enable console code use."
 fi
 
+export SUSUWU_ABORT_ON_FIRST_ERROR=false
+SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR() { #/* Usage: `SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR $@`. */
+	if SUSUWU_SH_HAS_PARAM "--abort-on-first-error" "$@"; then
+		SUSUWU_ABORT_ON_FIRST_ERROR=true
+	fi
+}
+
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
 	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #remote branch
 	if [ -z "${DEFAULT_BRANCH}" ]; then #if `git remote` not found

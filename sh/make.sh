@@ -4,7 +4,7 @@
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
-. ./sh/Macros.sh #/* SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_ECHO_COMMANDS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_VERBOSE */
+. ./sh/Macros.sh #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_ECHO_COMMANDS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_VERBOSE */
 
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
@@ -199,7 +199,18 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 #shellcheck disable=SC2166 #With `set -x`, the `[] || []` form prints 2 commands
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
 #shellcheck disable=SC2086 #`"${LOCAL_BUILDFLAGS}"` gives "clang++: error: language not recognized"
-			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}"
+			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}" || {
+				SUSUWU_STATUS=$?
+				SUSUWU_ECHO_COMMANDS false
+				SUSUWU_BUILD_OBJECT_ERROR_CODE="$(SUSUWU_SH_QUOTE "CODE" "${LOCAL_BUILD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). "
+				if [ true = ${SUSUWU_ABORT_ON_FIRST_ERROR} ]; then
+					SUSUWU_PRINT "SUSUWU_BUILD_OBJECTS()" "$(SUSUWU_SH_ERROR)" "${SUSUWU_BUILD_OBJECT_ERROR_CODE}[Due to $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_QUOTE "CURRENT" "--abort-on-first-error")"), this is fatal.]"
+					exit 1
+				else
+					SUSUWU_PRINT "SUSUWU_BUILD_OBJECTS()" "$(SUSUWU_SH_WARNING)" "${SUSUWU_BUILD_OBJECT_ERROR_CODE}[Pass $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_QUOTE "PROPOSED" "--abort-on-first-error")") to abort on such status codes.]"
+				fi
+				SUSUWU_ECHO_COMMANDS true
+			}
 			BUILDNEW=true
 		fi
 		SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${LOCAL_OBJECT}")"
