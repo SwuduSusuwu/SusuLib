@@ -56,6 +56,7 @@ Those compression ratio guesses are based on the amount of visuals which human c
   - Or process input such as [this show about simple autonomous tools which mass-produce simple autonomous tools](https://youtu.be/hLDbRm-98cs), once processed, can accept inserts such as `As opposed to the standalone robotic arms shown, produces tools with locomotive systems + 2 arms`, which will output a show about such improved tools.
 
 ## Synopsis + related posts/resources
+- [\[Preview\] How to use _FLOSS_ code to produce autonomous _Arduino_/_Elegoo_ tools](./ArduinoElegooTools.md)
 - [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
 
 Previous posts about artificial neural tissue:
