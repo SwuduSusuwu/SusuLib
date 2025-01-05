@@ -46,6 +46,7 @@ You could input such as [Fanuc's videos of somewhat-autonomous robots](https://y
 ## Related posts
 - [How to improve how fast desktops/laptops/phones execute code](./SimdGpgpuTpu.md)
 - [Neural resources](./VirusAnalysis.md#neural-resources)
+- [\[Preview\] How to use _FLOSS_ code to produce autonomous _Arduino_/_Elegoo_ tools](./ArduinoElegooTools.md)
 
 Previous posts about artificial neural tissue:
 - [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
@@ -53,3 +54,4 @@ Previous posts about artificial neural tissue:
 - [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
 - [Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved](./VirusAnalysis.md)
 - [Want this physical form gone; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
+
