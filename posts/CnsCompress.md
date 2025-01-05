@@ -48,6 +48,7 @@ Expected compression ratios: parse inputs of 1024*1280@60fps (2.6gbps), output t
 You could input such as [Fanuc's videos of somewhat-autonomous robots](https://youtu.be/7lI-PY7InV8), convert to text, add stuff to the text such as "Plus produces X", the CNS would produce videos that show Fanuc's robots produce for us. Or you could use [videos of how to mass produce robots](https://youtu.be/hLDbRm-98cs), have the CNS convert thus to text, and add to the text such as "Next, instead of standalone robot arms, produces robots with 2 arms + 2 legs" and the CNS would produce videos of how to mass produce this.
 
 ## Related posts
+- [\[Preview\] How to use _FLOSS_ code to produce autonomous _Arduino_/_Elegoo_ tools](./ArduinoElegooTools.md)
 - [How to improve how fast desktops/laptops/phones execute code](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
 - [Neural resources](./VirusAnalysis.md#neural-resources)
 
@@ -57,3 +58,4 @@ Previous posts about artificial neural tissue:
 - [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
 - [Virus analysis tools should use functional analysis + sandboxes + artificial CNS (central nervous systems)](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
 - [Want this physical form gone; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
+
