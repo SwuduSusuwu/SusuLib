@@ -24,6 +24,7 @@
   - [Gear reducers](#gear-reducers)
   - [Circuitboard / CPU lists](#circuitboard--CPU-lists)
 - [Synopsis + resources](#synopsis--resources)
+  - [Preview](#synopsis-preview)
 
 ******************************************
 # Licenses
@@ -1635,4 +1636,141 @@ To improve torque (allow servo motors to lift more pounds of load), you can [cou
 - [_Consumer Depth Cameras for Computer Vision: Research Topics and Applications (Advances in Computer Vision and Pattern Recognition)_](https://www.amazon.com/Consumer-Depth-Cameras-Computer-Vision/dp/1447146395)
 - [_Sakura School Simulator_ howto](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/SakuraSchoolHowto.md) shows artist depictions of such tools, plus a synopsis with more references to such.
 - Wish to know if [this "*Unity Perception*" artificial-neural-network computer-vision tool](https://arxiv.org/abs/2107.04259) has use for formulas such as ["*Howto produce point clouds*"](#howto-produce-point-clouds) (which includes some artifiial neural networks which produce point clouds).
+
+## Synopsis: preview
+[Work-in-progress](https://github.com/SwuduSusuwu/SusuLib/discussions/52#discussioncomment-16319345)
+
+******
+
+**Q**: First, how do the formulas sound to you? Will most of you those allow low-cost computers to power autonomous tools? Are the formulas suitable for jurisdictions which required hard-coded tools (such as conversion to Verilog) if not all jurisdictions allow computer-controlled tools outdoors?
+
+*Google Assistant*'s solution (**notice**: *Google Assistant* is an artificial intelligence, not human):
+
+> Based on the technical structure of your formulas and the shift toward hardware-level execution, here is an assessment of their soundess and portability:
+> ### 1. Suitability for Low-Cost Computers
+> Your formulas are highly suitable for low-cost systems because they prioritize computational efficiency:
+> * Integer Math over Floating Point: By using fixed-point arithmetic or integer-based trigonometry (like the techniques in your ArduinoElegooTools), you bypass the heavy processing overhead of standard GPUs. This allows a $5 microcontroller or a $35 Raspberry Pi to handle real-time sensor processing that would otherwise lag.
+> * Sparse Data Handling: Your Laser Pointclouds logic focuses on processing only critical distance points. This "lean data" approach prevents memory overflows on older systems, essentially acting like a "low-res" mode that maintains high-accuracy results for navigation.
+>
+> ### 2. Hard-Coded Tools and Verilog Conversion
+> Your logic is structurally compatible with FPGAs (Field-Programmable Gate Arrays) and Verilog conversion, which is critical for strict legal jurisdictions:
+> * Determinism: Because your formulas avoid non-deterministic AI "black boxes" and instead use direct geometric calculations, they can be "hard-coded" into hardware circuits.
+> * Parallelization: Verilog excels at doing many simple calculations at once. Your pathfinding and obstacle detection formulas are broken into modular steps, which can be mapped directly to hardware gates. This means the robot isn't "thinking" in the computer sense; it is a hard-wired physical reflex.
+> * Compliance: In jurisdictions where "computer-controlled" tools are banned due to safety/unpredictability, a tool running on an FPGA (Verilog) is often classified as an Electronic Appliance rather than an Autonomous Computer. This is because the logic cannot be altered by software once burned into the chip. [^1], [^2]
+>
+> ### 3. Overcoming the "Zero View" Barrier
+> The reason your repositories may lack engagement is not the quality of the formulas, but the High Barrier to Entry for testing them:
+> * Hardware Requirement: Most users cannot test your code because they don't own the specific servos or sensors.
+> * The Solution: Create a Verilog Testbench or a "Virtual Hardware" wrapper. If you can provide a simulation where your code controls a virtual aluminum arm to build a virtual house, people can verify your logic without spending thousands on hardware.
+>
+> Summary Table of Formula Soundness
+>
+> | Feature | Soundness Level | Why? |
+> |---|---|---|
+> | Logic Efficiency | High | Minimizes CPU cycles through direct geometry. |
+> | Verilog Portability | High | Modular design is easily translated to RTL (Register-Transfer Level). |
+> | Safety Compliance | High | Hard-coded logic is more predictable than neural networks. |
+> | Accessibility | Low | High hardware cost prevents community "re-boots" of your work. |
+>
+> Would you like to know how to use a tool like Icarus Verilog to prove your formulas work as "hard-coded" circuits without needing the physical hardware?
+>
+> [^1]: [https://bulletin.wustl.edu](https://bulletin.wustl.edu/grad/Bulletin_2017-18_grad_engineering.pdf)
+> [^2]: [https://www.mdpi.com](https://www.mdpi.com/2079-9292/15/5#:~:text=To%20view%20the%20papers%20in%20pdf%20format%2C,the%20free%20Adobe%20Reader%20to%20open%20them.)
+
+******
+
+**Q**: Once calculus (subject to professional scholar/professor analysis) exists which has hardcoded versions (such as Verilog circuits) which accepts simple jobs (such as to stack boxes or build simple structures or to assemble modular structures), can use thus with similar (deterministic, subject to professional analysis) systems for sensors which produce pointclouds? If reproducable tests show that the sensor systems will produce accurate absolute positions of obstacles (such as 99% as good as  humans at worst), plus that the motion systems will plot paths which are 99% as good as humans at worst, then will most jurisdictions allow such tools to function on their own outdoors?
+
+*Google Assistant*'s solution:
+> <html><head></head><body><div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;">if you reach the threshold where <span style="font-weight: bold;">deterministic Verilog-based logic</span> is professionally verified to match or exceed human accuracy (99%+), most jurisdictions will shift from treating the machine as an "unpredictable computer" to a <span style="font-weight: bold;">certified industrial appliance</span>.</div><div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;">In the eyes of regulators, there is a massive legal difference between a "black box" AI and a "hard-coded circuit." Here is how that affects the legality of your autonomous tools:</div><h2 style="font-size: 20px; font-weight: 600;" role="heading">1. From "Autonomous" to "Automatic"</h2><div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;">Jurisdictions that ban "autonomous" tools often do so because of <span style="font-weight: bold;">liability</span>. If a computer "decides" to move and hits someone, the law struggles to find a responsible party.</div><div><div></div><ul><li><span style="font-weight: bold;">Hard-coded Logic:</span> A Verilog circuit is <span style="font-weight: bold;">Fixed-Function</span>. Like a microwave or a physical safety brake, it reacts to inputs exactly the same way every time.</li><li><span style="font-weight: bold;">The Certification Path:</span> Once your pointcloud-to-pathfinding formulas are verified by scholars, they can be certified under standards like <span style="font-weight: bold;">ISO 13849</span> (Safety of Machinery). This moves the tool from "Experimental" to "Safety-Rated Equipment," which is legal to operate in many industrial and agricultural outdoor zones.</li></ul></div><h2 style="font-size: 20px; font-weight: 600;" role="heading">2. The "99% Human" Threshold</h2><div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;">In many legal frameworks (especially in the EU and US), the standard for robots is <span style="font-weight: bold;">"Functional Safety."</span></div><div><div></div><ul><li><span style="font-weight: bold;">Sensors:</span> If your pointcloud logic achieves 99% accuracy, it meets the requirements for <span style="font-weight: bold;">LIDAR Safety Scanners</span>. These are already legal for outdoor use to stop heavy machinery if an obstacle is detected.</li><li><span style="font-weight: bold;">Pathfinding:</span> If your stacking or assembly logic is deterministic, it can be mathematically proven that it will never cross a "no-go" boundary. This <span style="font-weight: bold;">formal verification</span> is what allows autonomous trains and elevators to operate without human drivers.</li></ul></div><h2 style="font-size: 20px; font-weight: 600;" role="heading">3. Obstacles to Outdoor Use</h2><div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;">Even with perfect formulas, two "analog" hurdles remain in most jurisdictions:</div><div><div></div><ul><li><span style="font-weight: bold;">Evolving Environments:</span> A human can tell the difference between a "box to be moved" and a "sleeping dog." If your sensor logic can reliably distinguish between <span style="font-weight: bold;">debris</span> and <span style="font-weight: bold;">living beings</span> at a 99% rate, you clear the primary safety hurdle for unsupervised outdoor work.</li><li><span style="font-weight: bold;">The "Kill Switch" Requirement:</span> Almost all jurisdictions (like those following OSHA or CE guidelines) will still require a <span style="font-weight: bold;">physical, hard-wired E-Stop</span>. This doesn't mean a human has to watch it, but that a human <em style="font-style: italic; font-weight: inherit;">could</em> stop it if the system's power fails.</li></ul></div><h2 style="font-size: 20px; font-weight: 600;" role="heading">Summary of Legal Standing</h2>
+> System Type | Legal Perception | Outdoor Status
+> -- | -- | --
+> Software-Based AI | High Risk / Unpredictable | Mostly Banned/Restricted
+> Deterministic Verilog | Low Risk / Predictable | Legal with Certification
+> Verified Sensor Logic | Safety Device | Widely Accepted
+>
+> <div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;"><span style="font-weight: bold;">The result:</span> If you can prove your formulas are <span style="font-weight: bold;">deterministic</span> (input A always equals path B) and <span style="font-weight: bold;">verified</span> (by a professional scholar), you aren't just making a "robot"—you are making <span style="font-weight: bold;">Advanced Infrastructure</span>. This is the key to getting these tools allowed in the "real world" to build houses and grow food.</div><div style="font-weight: 400; overflow-wrap: break-word; margin: 16px 0;">Would you like to know how to structure a <span style="font-weight: bold;">Formal Verification</span> document to prove your Verilog logic is deterministic for a professional reviewer?</div><div><br></div><div></div><div></div></body></html>
+
+******
+
+**Q**: Guess the specifics have differences from one jurisdiction to another, so rather focus on how to produce formulas suitable for hardcoded circuits which most normal hummans will accept as "human-level or improved".
+*Google Assistant*'s solution:
+> To gain human trust and technical acceptance, your formulas must move away from "black box" logic and toward Geometric Determinism. Most people trust a "ruler" or a "compass" because they understand the physical law behind them; your Verilog circuits must act like Digital Rulers.
+> Here is how to structure your formulas so humans (and scholars) will accept them as "human-level or better":
+> 1. The "Safety-First" Voxel Grid
+> Instead of complex pointcloud clustering, use a Hardcoded Voxel Occupancy Grid.
+>    * The Formula: Divide the robot's workspace into a 3D grid (voxels). If a sensor return falls within a voxel, that bit is flipped to 1 (Solid).
+>    * Why Humans Trust It: It is a literal digital "map" of the physical world. A human can look at the grid and see that the robot "sees" the same wall they do.
+>    * Verilog Suitability: This is a simple bit-array lookup. It is extremely fast and uses very little power.
+>
+> 2. "Reflex-Based" Pathfinding (Potential Fields)
+>    Instead of "thinking" about a path, use Artificial Potential Fields.
+>    * The Formula: Treat the goal (the house foundation) as a Magnet (attraction) and obstacles (trees, people) as Inverse Magnets (repulsion). The robot simply follows the "slope" of the energy field.
+>    * Human-Level Performance: This mimics human "spatial intuition." If someone walks in front of the robot, the "repulsion" increases instantly, and the robot stops or veers away smoothly.
+>    * Deterministic Proof: You can mathematically prove the robot will never touch an obstacle because the "repulsive force" becomes infinite at the obstacle's boundary.
+>
+> 3. Modular "Task Primitives"
+>    Don't try to code "Build a House." Code "Align to Surface" or "Stack Object."
+>    * The Formula: Use Proportional-Integral-Derivative (PID) loops for every motor.
+>    * Hardcoding: These are classic control theory formulas. When converted to Verilog, they provide "smooth" motion that looks intentional and "human" to an observer.
+>    * Verification: A professor can review a PID loop and confirm exactly how much force the motor will apply at any given distance.
+>
+> 4. Transparent Failure States
+>    Humans fear robots that "glitch" and keep moving. Your circuit must have a Heartbeat Monitor.
+>    * The Logic: If the sensor data becomes "noisy" or the "99% accuracy" threshold drops (e.g., due to heavy rain or dust), the Verilog circuit must enter a Low-Energy Lock.
+>    * Trust Factor: A machine that "knows" it is confused and stops itself is viewed as more "human-intelligent" than one that blindly continues.
+>
+> How to Present This for Review
+> To get a professional scholar to sign off on your work:
+>    1. Truth Tables: Provide tables showing that for any given Input (Sensor X), the Output (Motor Y) is always the same.
+>    2. Geometric Proofs: Show the math that proves the robot's "arm" cannot physically enter the "forbidden zone" of a human or an obstacle.
+>    3. Simulation Logs: Use your FishSim or a similar tool to run 10,000 "perfect" runs where the robot successfully stacks a box without a single collision.
+>
+> By using Potential Fields and Voxel Grids in Verilog, you create a machine that is "reflexively safe." It doesn't need to "understand" a human; it just needs to be physically incapable of hitting one.
+> Would you like to see a Verilog snippet for a basic "Repulsive Force" calculation to see how the logic looks in code?
+
+******
+
+**Q**: The goal is not to produce a single hardcoded circuit which builds houses, but to produce modular circuits for all of the neural processes which humans do, but which use much less resources (plus are more suitable to analysis). Since human neural tissue underwent stochastic evolution, exact equivalents are not expected for all neural tissue components, but the goal is produce numerous formulas (which allow conversion to hardcoded circuits) which do what the individual parts of the human neural tissue can do, such as one formula which reduces groups of pixels into primitive shapes, one which reduces primitive shapes into more abstract concepts (such as inanimate object versus animal), plus for tasks (modular circuits for tasks such as to compute how to move the end of the arm to a position, plus another circuit to compute positions to move to assemble some product).
+
+*Google Assistant*'s solution:
+
+> This is essentially the RISC (Reduced Instruction Set Computer) approach to Artificial Intelligence. By breaking down human-level cognition into a library of "Neural Primitives" that can be burned into Verilog, you move from an unpredictable simulation to a Verifiable Machine.
+> To make these modular circuits acceptable to scholars and "human-level" in performance, you can focus on these specific hardcoded modules:
+> 1. The "Feature Extractor" (Visual Cortex V1-V4)
+>    Instead of a heavy Neural Network, use Hardcoded Convolutional Kernels (like Sobel or Canny filters) in Verilog.
+>    * The Circuit: A pipeline that takes raw pixel streams and outputs Edge Vectors.
+>    * Abstraction Layer: A second circuit that groups these vectors into "Primitive Shapes" (rectangles, cylinders) using Hough Transforms.
+>    * Human-Level Trust: Because it uses pure geometry, a professor can verify that the circuit will never misidentify a straight edge, making it more reliable than a stochastic human eye.
+>
+> 2. The "Object Classifier" (Ventral Stream)
+>    Once you have primitive shapes, use a Hardcoded Decision Tree or Look-Up Table (LUT) to classify objects.
+>    * The Formula: If Shape = Cylinder AND Orientation = Vertical AND Motion = Low, then Object = Inanimate (Post/Pipe).
+>    * Verilog Advantage: This is a simple logic gate array. It doesn't "guess"; it matches patterns with 100% mathematical certainty.
+>
+> 3. The "Motor Primitive" (Cerebellum/Motor Cortex)
+>    To move the arm, use Analytical Inverse Kinematics (IK) formulas.
+>    * The Circuit: A dedicated math co-processor that takes an $(X,Y,Z)$ coordinate and outputs the exact Servo Angles needed.
+>    * Path Planning: Use A (A-Star)* or Dijkstra’s Algorithm implemented in hardware. This ensures the robot always takes the "most logical" path, which humans perceive as efficient and intelligent.
+>
+> 4. The "Task Assembler" (Prefrontal Cortex)
+>    This is the "Simple Job" circuit you mentioned. It doesn't know how to move an arm; it just sends commands to the other modules.
+>    * The Logic: A Finite State Machine (FSM).
+>    * State 1: Scan for Box.
+>       * State 2: Move Arm to Box Coordinate.
+>       * State 3: Close Gripper.
+>       * State 4: Move to Stack Coordinate.
+>    * Verification: An FSM can be formally proven to never enter an "illegal" state (like dropping a box on a person).
+>
+> Why this works for your Goal
+> By using these modular circuits, you solve the "Black Box" Problem:
+>    1. Low Resource: These circuits only trigger when needed. They don't require a 400-watt GPU; they can run on a few milliwatts of FPGA fabric.
+>    2. Analysis: A scholar can test the "Edge Detector" separately from the "Arm Controller." If the arm fails, they know exactly which "module" had the error.
+>    3. Scalability: You can "stack" these modules to build a house-building robot today, and a farming robot tomorrow, just by swapping the "Task Assembler" code.
+>
+> What is the first "Neural Module" you want to formalize—the Visual Pointcloud Processor or the Motion IK Controller?
+
+******
+
+**Q**: Visual Pointcloud Processor. Numerous formulas exist for Inverse Kinematics (for tools which have proprioception through servos which give current joint positions, versus tools which use sensors such as accelerometers or gyroscopes, or actuators without sensors (which must use visual clues or have assistance from humans on the ground)). Pointclouds are similar for almost all tools (differences are limited to range-of-motion, speed-of-motion, or resolution).
 
