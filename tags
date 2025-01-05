@@ -135,10 +135,13 @@ Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corrupt
 Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corruption code *\/$/;"	m	struct:HMACContext	typeref:typename:int
 DataTypeToEnum	cxx/ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
 DimSz	cxx/ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
+Disclaimer	posts/ArduinoElegooTools.md	/^## Disclaimer$/;"	s	chapter:Licenses
 Download	README.md	/^## Download$/;"	s	chapter:How to use this
 Errata/footnotes	SECURITY.md	/^## Errata\/footnotes$/;"	s	chapter:Security Policy
 Escrow	README.md	/^### Escrow$/;"	S	section:Contributor conventions/rules""Sponsor
+External resources	posts/ArduinoElegooTools.md	/^# External resources$/;"	c
 External resources	posts/TranscodeMuxHowto.md	/^# External resources$/;"	c
+Group route pseudocode	posts/ArduinoElegooTools.md	/^## Group route pseudocode$/;"	s	chapter:Howto route
 HASHCOUNT	c/rfc6234/shatest.c	/^#define HASHCOUNT /;"	d	file:
 HKDFContext	c/rfc6234/sha.h	/^typedef struct HKDFContext {$/;"	s
 HKDFContext	c/rfc6234/sha.h	/^} HKDFContext;$/;"	t	typeref:struct:HKDFContext
@@ -150,6 +153,7 @@ Hashes	cxx/ClassResultList.hxx	/^	typedef std::unordered_set<ResultListHash> Has
 How to contribute	README.md	/^# How to contribute$/;"	c
 How to use this	README.md	/^# How to use this$/;"	c
 Howto	posts/TranscodeMuxHowto.md	/^# Howto$/;"	c
+Howto route	posts/ArduinoElegooTools.md	/^# Howto route$/;"	c
 HsomCns	cxx/ClassCns.cxx	/^typedef class HsomCns : Cns { \/* TODO. ( https:\/\/stackoverflow.com\/questions\/3286448\/calli/;"	c	namespace:Susuwu	file:
 HsomCns	cxx/ClassCns.cxx	/^} HsomCns;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::HsomCns	file:
 HsomCns	cxx/ClassCns.hxx	/^typedef class HsomCns : public Cns {$/;"	c	namespace:Susuwu
@@ -187,6 +191,7 @@ Intermediate_Hash	c/rfc6234/sha.h	/^		uint32_t Intermediate_Hash[SHA1HashSize\/4
 Intermediate_Hash	c/rfc6234/sha.h	/^		uint32_t Intermediate_Hash[SHA256HashSize\/4]; \/* Message Digest *\/$/;"	m	struct:SHA256Context	typeref:typename:uint32_t[]
 Intermediate_Hash	c/rfc6234/sha.h	/^		uint32_t Intermediate_Hash[SHA512HashSize\/4]; \/* Message Digest  *\/$/;"	m	struct:SHA512Context	typeref:typename:uint32_t[]
 Intro	VirusAnalysis.md	/^# Intro$/;"	c
+Intro	posts/ArduinoElegooTools.md	/^# Intro$/;"	c
 Intro	posts/VirusAnalysis.md	/^# Intro$/;"	c
 Issue/workaround	c/README.md	/^# Issue\/workaround$/;"	c
 Issues/workarounds	sh/README.md	/^# Issues\/workarounds$/;"	c
@@ -195,6 +200,8 @@ Length_High	c/rfc6234/sha.h	/^		uint32_t Length_High;               \/* Message 
 Length_High	c/rfc6234/sha.h	/^		uint32_t Length_High;               \/* Message length in bits *\/$/;"	m	struct:SHA256Context	typeref:typename:uint32_t
 Length_Low	c/rfc6234/sha.h	/^		uint32_t Length_Low;                \/* Message length in bits *\/$/;"	m	struct:SHA1Context	typeref:typename:uint32_t
 Length_Low	c/rfc6234/sha.h	/^		uint32_t Length_Low;                \/* Message length in bits *\/$/;"	m	struct:SHA256Context	typeref:typename:uint32_t
+Licenses	posts/ArduinoElegooTools.md	/^# Licenses$/;"	c
+Limbed _Arduino_/_Elegoo_ robot code	posts/ArduinoElegooTools.md	/^## Limbed _Arduino_\/_Elegoo_ robot code$/;"	s	chapter:Howto route
 ListFormat	cxx/ClassResultList.hxx	/^typedef enum ListFormat : char {$/;"	g	namespace:Susuwu	typeref:typename:char
 ListFormat	cxx/ClassResultList.hxx	/^} ListFormat;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ListFormat
 MacrosCxx11InheritanceTest	cxx/Macros.cxx	/^class MacrosCxx11InheritanceTest {$/;"	c	namespace:Susuwu::__anona3432b6d0111	file:
@@ -717,6 +724,7 @@ TEST9_512	c/rfc6234/shatest.c	/^#define TEST9_512 /;"	d	file:
 TESTCOUNT	c/rfc6234/shatest.c	/^#define TESTCOUNT /;"	d	file:
 Table of Contents	README.md	/^# Table of Contents$/;"	c
 Table of Contents	VirusAnalysis.md	/^# Table of Contents$/;"	c
+Table of Contents	posts/ArduinoElegooTools.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/README.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/TranscodeMuxHowto.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/VirusAnalysis.md	/^# Table of Contents$/;"	c
@@ -748,6 +756,7 @@ VirusAnalysisHook	cxx/VirusAnalysis.hxx	/^typedef enum VirusAnalysisHook : unsig
 VirusAnalysisHook	cxx/VirusAnalysis.hxx	/^} VirusAnalysisHook;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::VirusAnalysisHook
 VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^typedef enum VirusAnalysisResult : char { \/* TODO? All other cases convert to `bool(true)` unle/;"	g	namespace:Susuwu	typeref:typename:char
 VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^} VirusAnalysisResult; \/* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == /;"	t	namespace:Susuwu	typeref:enum:Susuwu::VirusAnalysisResult
+Wheeled _Arduino_/_Elegoo_ robot code	posts/ArduinoElegooTools.md	/^## Wheeled _Arduino_\/_Elegoo_ robot code$/;"	s	chapter:Howto route
 With	VirusAnalysis.md	/^`less` [`cxx\/main.cxx`](..\/cxx\/main.cxx) #With boilerplate$/;"	h	chapter:Source code
 With	VirusAnalysis.md	/^`less` [`cxx\/main.hxx`](..\/cxx\/main.hxx) #With boilerplate$/;"	h	chapter:Source code
 With	posts/VirusAnalysis.md	/^`less `[`cxx\/main.cxx`](https:\/\/github.com\/SwuduSusuwu\/SusuLib\/blob\/trunk\/cxx\/main.cxx)/;"	h	chapter:Source code
