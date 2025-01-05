@@ -26,7 +26,7 @@
 - [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
 - [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SubStack/issues/8).
 
-[`./c/`](./c/) [_C_](https://wikipedia.org/wiki/C_(programming_language)) implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can contribute to, or can request that more resources go to this task)
+[`./c/`](./c/) [_C_](https://wikipedia.org/wiki/C_(programming_language)) implementations of posts (TODO, [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can [contribute to](#how-to-contribute), or can request that more resources go to this task)
 - [`./c/rfc6234/`](./c/rfc6234) is vendored code (direct from the official [_RFC6234_](https://www.rfc-editor.org/rfc/rfc6234#section-8)), which is used for {`classSha128()`, `classSha256()`, `classSha512()`}.
 
 [`./cxx/`](./cxx/) [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) implementations of posts
@@ -71,7 +71,7 @@
   - modular functions {`assistantCnsDownloadHosts()` (uses `wget` on `assistantCnsDefaultHosts`), `assistantCnsProcessXhtml()` (uses the next 2 functions to process `wget`'s downloads: `assistantCnsProcessUrls` (uses `boost/property_tree/xml_parser.hpp` to extract new URLs), `assistantCnsProcessQuestion` (work-in-progress, extracts question), `assistantCnsProcessResponses()` (work-in-progress, extracts answers)), `produceAssistantCns()` (uses datasets for backpropagation), `assistantCnsProcess` (uses forwardpropagation to answer new questions)} which form an assistant.
   - `assistantCnsTests()`, or `assistantCnsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/main.hxx`](./cxx/main.hxx) is `SusuwuUnitTestsBitmask main()` (executes all of those `*TestsNoexcept()` unit tests into a bitmask return value.)
-All have lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can contribute to, or can request that more resources go to).
+All have lots of [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can [contribute to](#how-to-contribute), or can request that more resources go to).
 
 [`./sh/`](./sh/) is [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) scripts.
 - [`./sh/Macros.sh`](./sh/Macros.sh) is a standalone lib for common console tasks (can do most of what [ncurses](https://wikipedia.org/wiki/Ncurses) can do). `./build.sh` and `./sh/make.sh` use this.
@@ -103,8 +103,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `./build.sh` : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
   - `./build.sh --clean` : removes intermediate object files + exits; to reduce disc use.
   - `./build.sh --rebuild` : removes intermediate object files + continues; to rebuild with new flags (or if `./build.sh` doesn't rebuild code which includes updated headers).
-  - `./build.sh --debug` : includes frame-pointers/debug symbols (`-g`), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with `-Og`.
-  - `./build.sh --release` : excludes `--debug` (`-DNDEBUG`), strips frame-pointers/symbols, optimizes with `-O2`.
+  - `./build.sh --debug` : around 6.2 megabyte executable. Includes [frame-pointers](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fomit-frame-pointer)/debug symbols (`-g`, which also includes [`-funreachable-traps`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-funreachable-traps)), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with [`-Og`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-Og).
+  - `./build.sh --release` : around 322 kilobyte executable. Excludes `--debug`; strips [frame-pointers](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fomit-frame-pointer)/symbols, [`-DNDEBUG`](https://en.cppreference.com/w/c/error/assert), optimizes with [`-O2`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-O2).
   - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/Susuwu.exe`), for _Windows_.
 - Macro flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).

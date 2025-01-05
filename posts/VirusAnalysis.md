@@ -511,7 +511,7 @@ SUSUWU_INLINE const bool instanceof(const Class &obj, const Class &thiso) { retu
 	SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL_PURE_VIRTUAL(SUBCLASS)
 typedef enum ObjectCloneAs : unsigned char { /* Is extra (not part of Java); accomodates the numerous types of C++ clones. */
 	objectCloneAsNone           = 0, /* `!isCloneabble()` */
-	objectCloneAsDeep           = 1, /* Recursive `new` */
+	objectCloneAsDeep           = 1, /* Recursive `new` */ /* [If overload `operator new`, set `-flifetime-dse=1](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fno-lifetime-dse) */
 	objectCloneAsShallow        = 2, /* `memcpy` */
 	objectCloneAsReferenceCount = 4, /* `std::shared_ptr` */ /* TODO: `objectCloneAsReferenceCount` with const `clone` */
 	objectCloneAsCoW            = 8  /* [Copy-on-Write](https://wikipedia.org/wiki/Copy-on-write)  */
@@ -568,7 +568,8 @@ public:
 #define SUSUWU_OBJECT_OVERRIDE SUSUWU_OVERRIDE /* ... but is `override` for subclasses. */
 
 /* Is some slowdown to use inheritance+polymorphism with all classes;
- * https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754 shows howto use `final` (requires C++11) to fix this. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
+ * `--release` sets `-o2`, [`-o2` sets `-devirtualize`, which convert some polymorphic calls into constant calls](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fdevirtualize)
+ * [`-devirtualize` is improved if functions use `final` (which requires C++11)](https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754]. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
 }; /* namespace Susuwu */
 ```
 `less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
