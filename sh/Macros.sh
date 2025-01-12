@@ -71,22 +71,22 @@ SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(S
 #/* `SUSUWU_SH_<color>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
 #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "${SUSUWU_SH_<color>}<message>${SUSUWU_SH_DEFAULT}"`. */
 export SUSUWU_SH_DEFAULT="\033[0m"
-export SUSUWU_SH_BLACK="\033[0;30m"
-export SUSUWU_SH_DARK_GRAY="\033[1;30m"
-export SUSUWU_SH_RED="\033[0;31m"
-export SUSUWU_SH_LIGHT_RED="\033[1;31m"
-export SUSUWU_SH_GREEN="\033[0;32m"
-export SUSUWU_SH_LIGHT_GREEN="\033[1;32m"
-export SUSUWU_SH_BROWN="\033[0;33m"
-export SUSUWU_SH_YELLOW="\033[1;33m"
-export SUSUWU_SH_BLUE="\033[0;34m"
-export SUSUWU_SH_LIGHT_BLUE="\033[1;34m"
-export SUSUWU_SH_PURPLE="\033[0;35m"
-export SUSUWU_SH_LIGHT_PURPLE="\033[1;35m"
-export SUSUWU_SH_CYAN="\033[0;36m"
-export SUSUWU_SH_LIGHT_CYAN="\033[1;36m"
-export SUSUWU_SH_LIGHT_GRAY="\033[0;37m"
-export SUSUWU_SH_WHITE="\033[1;37m"
+export SUSUWU_SH_BLACK="\033[0;30m" #xterm256 "\033[38;5;0m"
+export SUSUWU_SH_DARK_GRAY="\033[1;30m" #xterm256 "\033[38;5;8m"
+export SUSUWU_SH_RED="\033[0;31m" #xterm256 "\033[38;5;1m"
+export SUSUWU_SH_LIGHT_RED="\033[1;31m" #xterm256 "\033[38;5;9m"
+export SUSUWU_SH_GREEN="\033[0;32m" #xterm256 "\033[38;5;2m"
+export SUSUWU_SH_LIGHT_GREEN="\033[1;32m" #xterm256 "\033[38;5;10m"
+export SUSUWU_SH_BROWN="\033[0;33m" #xterm256 "\033[38;5;3m"
+export SUSUWU_SH_YELLOW="\033[1;33m" #xterm256 "\033[38;5;11m"
+export SUSUWU_SH_BLUE="\033[0;34m" #xterm256 "\033[38;5;4m"
+export SUSUWU_SH_LIGHT_BLUE="\033[1;34m" #xterm256 "\033[38;5;12m"
+export SUSUWU_SH_PURPLE="\033[0;35m" #xterm256 "\033[38;5;5m"
+export SUSUWU_SH_LIGHT_PURPLE="\033[1;35m" #xterm256 "\033[38;5;13m"
+export SUSUWU_SH_CYAN="\033[0;36m" #xterm256 "\033[38;5;6m"
+export SUSUWU_SH_LIGHT_CYAN="\033[1;36m" #xterm256 "\033[38;5;14m"
+export SUSUWU_SH_LIGHT_GRAY="\033[0;37m" #xterm256 "\033[38;5;7m"
+export SUSUWU_SH_WHITE="\033[1;37m" #xterm256 "\033[38;5;15m"
 
 #/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
 #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
@@ -97,6 +97,34 @@ export SUSUWU_SH_SUCCESS="${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_NOTICE="${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_DEBUG="${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
+
+SUSUWU_SH_HAS_UNIX_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_UNIX_CONSOLE; then echo "\033[0;34mThis is blue."` */
+	SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS=8
+	if [ "${TERM}" = "" ]; then #/* GitHub runner workaround. */
+		if [ -z "${SUSUWU_SH_HAS_UNIX_CONSOLE_CACHE+set}" ]; then #/* Don't print duplicate messages */
+			echo "[Warning: SUSUWU_SH_HAS_UNIX_CONSOLE(): If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) lacks colors (has glitches, or literal codes such as \"\\\033[1;34m\"), execute \`export TERM=\"dumb\"\` to disable those.]" >&2
+		fi
+		return 0 #/* TODO: include other tests (`return 1` if the console does not allow color codes) */
+	fi
+	if command -v "tput" >/dev/null; then #if installed `ncurses-utils`
+		COLOR_COUNT="$(tput colors 2>/dev/null)" || return 1
+		test "${COLOR_COUNT}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
+		return $? #return `test`'s return value
+	else
+		SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "${SUSUWU_SH_DEBUG}" "The program \`tput\` was not found; use \`apt install ncurses-utils\` to have \`SUSUWU_SH_*()\` compatible with all consoles."
+	fi
+	for CONSOLE in "xterm" "xterm-color" "xterm-256color" "screen" "screen-color" "screen-256color" "tmux" "tmux-color" "tmux-256color" "linux" "rxvt" "rxvt-unicode"; do
+		if [ "${TERM}" = "${CONSOLE}" ]; then
+			return 0 #standard console
+		fi
+	done
+	return 1
+)
+SUSUWU_SH_HAS_UNIX_CONSOLE_CACHE=$(SUSUWU_SH_HAS_UNIX_CONSOLE)
+if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
+	echo "[$0: Warning: \`SUSUWU_SH_HAS_UNIX_CONSOLE()\` failed. TODO: support systems without UNIX console codes. If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute \`export TERM=\"linux\"\` to enable console code use.]" >&2
+	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
+fi
 
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
