@@ -314,12 +314,14 @@ SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params pa
 	if SUSUWU_SH_HAS_PARAM "-s --silent --quiet --debug=n" "$@"; then
 		SUSUWU_S=true
 	fi
+#	SUSUWU_PRINT "SUSUWU_PROCESS_VERBOSE()" "$(SUSUWU_SH_INFO)" "Was passed \`$(SUSUWU_SH_QUOTE "CURRENT" "--silent")\` (or an alias), so $(SUSUWU_SH_QUOTE "CODE" "\$(SUSUWU_SH_NOTICE)") is disabled." #TODO? Is it against the principles of `--silent` to print about it?
 }
 SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "-v --verbose -d --debug=a" "$@"; then
 		SUSUWU_VERBOSE=true
 		SUSUWU_ECHO_COMMANDS true
 	fi
+	SUSUWU_PRINT "SUSUWU_PROCESS_VERBOSE()" "$(SUSUWU_SH_DEBUG)" "Was passed \`$(SUSUWU_SH_QUOTE "CURRENT" "--verbose")\` (or an alias), so $(SUSUWU_SH_QUOTE "CODE" "\$(SUSUWU_SH_DEBUG)") is enabled."
 }
 SUSUWU_SH_HAS_FUNCNAME() ( #/* Usage: `if SUSUWU_SH_HAS_FUNCNAME 2>/dev/null; then echo "${FUNCNAME[0]}(): used FUNCNAME."` */
 #	[ "$(uname)" = "Darwin" ] && return 0 #redundant (due to `${FUNCNAME[0]}` test).
