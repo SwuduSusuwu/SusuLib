@@ -98,31 +98,52 @@ export SUSUWU_SH_NOTICE="${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_DEBUG="${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
 
-SUSUWU_SH_HAS_UNIX_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_UNIX_CONSOLE; then echo "\033[0;34mThis is blue."` */
+SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` */
 	SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS=8
-	if [ "${TERM}" = "" ]; then #/* GitHub runner workaround. */
-		if [ -z "${SUSUWU_SH_HAS_UNIX_CONSOLE_CACHE+set}" ]; then #/* Don't print duplicate messages */
-			echo "[Warning: SUSUWU_SH_HAS_UNIX_CONSOLE(): If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) lacks colors (has glitches, or literal codes such as \"\\\033[1;34m\"), execute \`export TERM=\"dumb\"\` to disable those.]" >&2
-		fi
+	if [ -n "${SUSUWU_SH_COLOR_COUNT_CACHE}" ]; then
+		echo "${SUSUWU_SH_COLOR_COUNT_CACHE}"
+		test "${SUSUWU_SH_COLOR_COUNT_CACHE}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
+		return $? #return `test`'s return value
+	fi
+	if [ "${TERM}" = "" ]; then
+		echo "[$0: ${SUSUWU_SH_WARNING}SUSUWU_SH_COLOR_COUNT(): If your console (\`[ \"\${TERM}\" = \"${TERM}\", which _GitHub_ uses ]\`) lacks colors (shows glitches, or literal codes such as \"\\\033[0;34m\"), execute \`export TERM=\"dumb\"\` to disable those.]" >&2
+		echo 8 #/* [_GitHub_ Autobuild](https://github.com/SwuduSusuwu/SubStack/actions/runs/13209802112/job/36880995224) workaround. */
 		return 0 #/* TODO: include other tests (`return 1` if the console does not allow color codes) */
 	fi
 	if command -v "tput" >/dev/null; then #if installed `ncurses-utils`
-		COLOR_COUNT="$(tput colors 2>/dev/null)" || return 1
+		COLOR_COUNT="$(tput colors 2>/dev/null)" || COLOR_COUNT="-1"
+		echo "${COLOR_COUNT}"
 		test "${COLOR_COUNT}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
 		return $? #return `test`'s return value
 	else
-		SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "${SUSUWU_SH_DEBUG}" "The program \`tput\` was not found; use \`apt install ncurses-utils\` to have \`SUSUWU_SH_*()\` compatible with all consoles."
+		echo "[$0: ${SUSUWU_SH_DEBUG}SUSUWU_SH_COLOR_COUNT(): The program \`tput\` was not found; use \`apt install ncurses-utils\` to have \`SUSUWU_SH_*()\` compatible with all consoles."
 	fi
-	for CONSOLE in "xterm" "xterm-color" "xterm-256color" "screen" "screen-color" "screen-256color" "tmux" "tmux-color" "tmux-256color" "linux" "rxvt" "rxvt-unicode"; do
+	for CONSOLE in "xterm-256color" "screen-256color" "tmux-256color" "rxvt-256color"; do
 		if [ "${TERM}" = "${CONSOLE}" ]; then
-			return 0 #standard console
+			echo 256 #256-color console
+			return 0
 		fi
 	done
-	return 1
+	for CONSOLE in "xterm" "xterm-color" "screen" "screen-color" "tmux" "tmux-color" "linux" "rxvt" "rxvt-unicode"; do
+		if [ "${TERM}" = "${CONSOLE}" ]; then
+			echo 8 #standard console
+			return 0
+		fi
+	done
+	echo -1
+	return 1 #unsupported console
 )
-SUSUWU_SH_HAS_UNIX_CONSOLE_CACHE=$(SUSUWU_SH_HAS_UNIX_CONSOLE)
+SUSUWU_SH_COLOR_COUNT_CACHE="$(SUSUWU_SH_COLOR_COUNT)"
+SUSUWU_SH_HAS_UNIX_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_UNIX_CONSOLE; then echo "\033[0;34mThis is blue."` */
+		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "8" #test that color count is Greater or Equal to 8
+		return $? #return `test`'s output value
+)
+SUSUWU_SH_HAS_256COLOR_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_256COLOR_CONSOLE; then echo "\033[38;5;4mThis is blue."` */
+		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "256" #test that color count is Greater or Equal to 256
+		return $? #return `test`'s output value
+)
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
-	echo "[$0: Warning: \`SUSUWU_SH_HAS_UNIX_CONSOLE()\` failed. TODO: support systems without UNIX console codes. If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute \`export TERM=\"linux\"\` to enable console code use.]" >&2
+	echo "[$0: ${SUSUWU_SH_WARNING}\`SUSUWU_SH_HAS_UNIX_CONSOLE()\` failed. TODO: support systems without UNIX console codes. If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) shows colors (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute \`export TERM=\"linux\"\` to enable console code use.]" >&2
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
 fi
 
