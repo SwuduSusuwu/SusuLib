@@ -139,9 +139,9 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE` */
 			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH)" #detect default branch
 		fi
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
-			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${THIS_BRANCH}\"."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${THIS_BRANCH}\"."
 		else
-			SUSUWU_PRINT "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${THIS_BRANCH}\"; for production use, execute \`git switch ${DEFAULT_BRANCH}\`."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_WARNING}" "\`git branch\` is \"${THIS_BRANCH}\"; for production use, execute \`git switch ${DEFAULT_BRANCH}\`."
 		fi
 	fi
 )
