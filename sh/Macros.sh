@@ -86,7 +86,17 @@ if [ -z "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" ]; then
 	SUSUWU_SH_HAS_FUNCNAME 2>/dev/null #`/bin/sh` ignores the `2>/dev/null` in `SUSUWU_SH_HAS_FUNCNAME()`.
 	export SUSUWU_SH_HAS_FUNCNAME_RESULT=$? #/* Usage: `if [ ${SUSUWU_SH_HAS_FUNCNAME_RESULT} -eq 0 ]; then echo "${FUNCNAME[0]}: used FUNCNAME."` */
 fi
-SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "<message>" */
+#for var in SUSUWU_SH_FILE SUSUWU_SH_LINE SUSUWU_SH_FUNC; do
+#	[ -z "${!var}" ] && export "$var=true" #prints "Bad substitution".
+#done
+export SUSUWU_SH_FILE="${SUSUWU_SH_FILE:-""}"
+export SUSUWU_SH_LINE="${SUSUWU_SH_LINE:-""}"
+export SUSUWU_SH_FUNC="${SUSUWU_SH_FUNC:-"true"}"
+export SUSUWU_SH_FILE_OR_LINE="${SUSUWU_SH_FILE:-${SUSUWU_SH_LINE}}"
+SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller name>"] "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "<message>" */
+	if [ "$#" -eq 3 ]; then
+		CALLER_FUNC="${1}"; shift
+	fi
 	LEVEL="${1}"
 	MESSAGE="${2}"
 	case "${LEVEL}" in
@@ -97,7 +107,19 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCE
 			(! ${SUSUWU_VERBOSE}) && return 1
 			;;
 	esac
-	echo "[${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}]" >&2 #/* fd=2 is `std::cerr`/`stderr` */
+	NEW_MESSAGE="[${SUSUWU_SH_FILE:+"$0:"}${SUSUWU_SH_LINE:+"${LINENO}:"}${SUSUWU_SH_FILE_OR_LINE:+" "}${LEVEL}"
+	if [ "true" = "${SUSUWU_SH_FUNC}" ]; then
+		if [ -n "${CALLER_FUNC}" ]; then
+			NEW_MESSAGE="${NEW_MESSAGE}${CALLER_FUNC}: "
+		elif [ "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" -eq 0 ]; then
+#shellcheck disable=SC2039 #if `SUSUWU_SH_HAS_FUNCNAME`, console supports this
+			NEW_MESSAGE="${NEW_MESSAGE}${FUNCNAME[1]}(): "
+		elif [ -n "$KSH_VERSION" ]; then
+			NEW_MESSAGE="${NEW_MESSAGE}${.sh.fun}: "
+		fi
+	fi
+	NEW_MESSAGE="${NEW_MESSAGE}${MESSAGE}${SUSUWU_SH_CLOSE_}]"
+	echo "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 	return $?
 )
 
