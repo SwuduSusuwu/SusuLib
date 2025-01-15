@@ -55,13 +55,13 @@ export SUSUWU_SH_CYAN="\033[0;36m"
 export SUSUWU_SH_LIGHT_CYAN="\033[1;36m"
 export SUSUWU_SH_LIGHT_GRAY="\033[0;37m"
 export SUSUWU_SH_WHITE="\033[1;37m"
-export SUSUWU_SH_ERROR="[${SUSUWU_SH_RED}Error: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_WARNING="[${SUSUWU_SH_PURPLE}Warning: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_INFO="[${SUSUWU_SH_CYAN}Info: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_SUCCESS="[${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_NOTICE="[${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
-export SUSUWU_SH_DEBUG="[${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
-SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}]"
+export SUSUWU_SH_ERROR="${SUSUWU_SH_RED}Error: ${SUSUWU_SH_WHITE}"
+export SUSUWU_SH_WARNING="${SUSUWU_SH_PURPLE}Warning: ${SUSUWU_SH_WHITE}"
+export SUSUWU_SH_INFO="${SUSUWU_SH_CYAN}Info: ${SUSUWU_SH_WHITE}"
+export SUSUWU_SH_SUCCESS="${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
+export SUSUWU_SH_NOTICE="${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
+export SUSUWU_SH_DEBUG="${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
+SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
@@ -75,16 +75,19 @@ SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This process
 		set -x
 	fi
 }
-SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "message" */
+SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "<message>" */
 	LEVEL="${1}"
 	MESSAGE="${2}"
-	if [ true = ${SUSUWU_S} ] && [ "${SUSUWU_SH_NOTICE}" = "${LEVEL}" ]; then
-		return 0
-	fi
-	if [ "${SUSUWU_SH_DEBUG}" = "${LEVEL}" ] && [ ! true = ${SUSUWU_VERBOSE} ]; then
-		return 0
-	fi
-	echo "${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
+	case "${LEVEL}" in
+		"${SUSUWU_SH_NOTICE}")
+			${SUSUWU_S} && return 1
+			;;
+		"${SUSUWU_SH_DEBUG}")
+			(! ${SUSUWU_VERBOSE}) && return 1
+			;;
+	esac
+	echo "[${LEVEL}${MESSAGE}${SUSUWU_SH_CLOSE_}]" >&2 #/* fd=2 is `std::cerr`/`stderr` */
+	return $?
 )
 
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH)"` */
