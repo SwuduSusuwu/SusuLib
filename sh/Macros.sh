@@ -75,6 +75,17 @@ SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This process
 		set -x
 	fi
 }
+SUSUWU_SH_HAS_FUNCNAME() ( #/* Usage: `if SUSUWU_SH_HAS_FUNCNAME 2>/dev/null; then echo "${FUNCNAME[0]}(): used FUNCNAME."` */
+#	[ "$(uname)" = "Darwin" ] && return 0 #redundant (due to `${FUNCNAME[0]}` test).
+#	test "$(type -t FUNCNAME)" = "array" #always returns "1".
+	#shellcheck disable=SC2039 #this is a feature test, so disable "In POSIX sh, array references are undefined."
+	test "${FUNCNAME[0]}" = "SUSUWU_SH_HAS_FUNCNAME" 2>/dev/null #if no arrays, prints "Bad substitution".
+	return $?
+)
+if [ -z "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" ]; then
+	SUSUWU_SH_HAS_FUNCNAME 2>/dev/null #`/bin/sh` ignores the `2>/dev/null` in `SUSUWU_SH_HAS_FUNCNAME()`.
+	export SUSUWU_SH_HAS_FUNCNAME_RESULT=$? #/* Usage: `if [ ${SUSUWU_SH_HAS_FUNCNAME_RESULT} -eq 0 ]; then echo "${FUNCNAME[0]}: used FUNCNAME."` */
+fi
 SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "<message>" */
 	LEVEL="${1}"
 	MESSAGE="${2}"
