@@ -66,7 +66,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 		if [ "--debug" != "${1}" ] && [ "--debug" != "${2}" ]; then
 			SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP}\` defaults to \`${0}${CROSS_COMP} --debug\`."
 		fi
-		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "Use \`${0}${CROSS_COMP} --release\` to improve how fast this executes."
+		SUSUWU_PRINT "${SUSUWU_SH_NOTICE}" "\`${0}${CROSS_COMP} --debug\` is slow (use \`${0}${CROSS_COMP} --release\` to improve how fast \"\${BINDIR}/\${OUTPUT}\" executes)."
 		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
 		if [ true = ${USE_FSAN} ]; then
@@ -211,7 +211,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	elif [ 0 -eq ${SUSUWU_STATUS} ]; then
 		SUSUWU_PRINT "${SUSUWU_SH_SUCCESS}" "produced \`${BINDIR}${OUTPUT}\` ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	else
-		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${LD}\` returned status code ${SUSUWU_STATUS}. [If errors include \"ld... unknown file type\" or \"ld... undefined symbol __asan_*\", use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
+		SUSUWU_PRINT "${SUSUWU_SH_ERROR}" "\`${LD}\` returned status code ${SUSUWU_STATUS}. [If errors include \"ld... unknown file type\" or \"ld... undefined symbol __asan_*\"; remove intermediate objects (\`rm \"${OBJDIR}\"*.o\`). Use \`${0}${CROSS_COMP} --rebuild\` to remove plus continue.]"
 	fi
 	return ${SUSUWU_STATUS}
 }
