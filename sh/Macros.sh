@@ -154,12 +154,12 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller name>"] "${SUSUWU_S
 	return $?
 )
 
-SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH)"` */
+SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
 	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #remote branch
 	if [ -z "${DEFAULT_BRANCH}" ]; then #if `git remote` not found
 		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #local branch; if you update this, update `README.md#git`.
 	fi
-	echo "${DEFAULT_BRANCH}"
+	echo "${DEFAULT_BRANCH:-${1}}" #https://github.com/SwuduSusuwu/SubStack/actions/runs/<number>/job/<number> has bare repos, which use <fallback>.
 )
 SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE` */
 	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
@@ -167,7 +167,7 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE` */
 		if [ -n "${1}" ]; then
 			DEFAULT_BRANCH="${1}" #use default branch from build script
 		else
-			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH)" #detect default branch
+			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #detect default branch
 		fi
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
 			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "${SUSUWU_SH_NOTICE}" "\`git branch\` is \"${THIS_BRANCH}\"."
