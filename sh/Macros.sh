@@ -161,7 +161,7 @@ SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>
 	fi
 	echo "${DEFAULT_BRANCH:-${1}}" #https://github.com/SwuduSusuwu/SubStack/actions/runs/<number>/job/<number> has bare repos, which use <fallback>.
 )
-SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE` */
+SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]` */
 	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
 		THIS_BRANCH="$(git rev-parse --abbrev-ref HEAD)" #detect current branch
 		if [ -n "${1}" ]; then
