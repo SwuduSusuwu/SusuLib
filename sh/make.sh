@@ -268,9 +268,9 @@ SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${U
 	done
 	return 1
 )
-SUSUWU_FIRST_PATH() ( #/* Usage: `USRBIN="$(SUSUWU_FIRST_PATH)`. Is just for internal use. */
+SUSUWU_FIRST_PATH() ( #/* Usage: `USRBIN="$(SUSUWU_FIRST_PATH)"`. Is just for internal use. */
 	IFS=":" #`PATH` format is `"PATH_0:PATH_1:PATH_N-1"`.
-	for PATH_W in ${PATH}; do
+	for PATH_W in ${PATH}; do #With `in "${PATH|"`, this will not loop
 		if [ -d "${PATH_W}" ]; then
 			echo "${PATH_W}"
 			return 0
