@@ -243,14 +243,14 @@ SUSUWU_TEST_OUTPUT() {
 }
 
 SUSUWU_TODO_LIST() ( #/* Usage: `SUSUWU_TODO_LIST "NameOfTool" "what to expect from future versions"` */
-	SUSUWU_PRINT "SUSUWU_TODO_LIST()" "${SUSUWU_SH_ERROR}" "\`${1}\` ${2} is on a long \"TODO\" list. If you want this: contribute (at https://github.com/SwuduSusuwu/SubStack/#Contributor-conventionsrules), or ask for this at https://github.com/SwuduSusuwu/SubStack/issues/new"
+	SUSUWU_PRINT "SUSUWU_TODO_LIST()" "${SUSUWU_SH_ERROR}" "\`${1}\` ${2} is on a long \"TODO\" list. If you want this soon; you can [contribute](https://github.com/SwuduSusuwu/SubStack/#Contributor-conventionsrules), or [ask for this](https://github.com/SwuduSusuwu/SubStack/issues/new)."
 	exit 1
 )
 SUSUWU_FORMAT() ( #/* Is analogous to `make format`. */
 	SUSUWU_TODO_LIST "SUSUWU_FORMAT()" "(which will use tools such as \`prettier\` or \`clang-format\`)"
 )
 SUSUWU_DOCS() ( #/* Is analogous to `make docs`. */
-	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which will use tools such as \`Sphinx\` or \`Doxygen\`)"
+	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which will use tools such as \`sphinx\` or \`doxygen\`)"
 )
 SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}")) ]`. Is just for internal use. */
 	if [ ! -d "${1}" ]; then
