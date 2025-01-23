@@ -150,7 +150,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller name>"] "${SUSUWU_S
 		fi
 	fi
 	NEW_MESSAGE="${NEW_MESSAGE}${MESSAGE}${SUSUWU_SH_CLOSE_}]"
-	echo "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
+	printf '%b\n' "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 	return $?
 )
 
