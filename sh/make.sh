@@ -180,9 +180,9 @@ SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 		OBJDIR="${1}"
 		SUSUWU_SETUP_OBJDIR_OLD() ( SUSUWU_SH_QUOTE "CURRENT PATH" "${OBJDIR}" )
 		SUSUWU_SETUP_OBJDIR_NEW() ( SUSUWU_SH_QUOTE "PROPOSED PATH" "<new-path>" )
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\${OBJ}.o\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)") (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\${OBJ}.o\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)")), use $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)") (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${OBJDIR}")\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${OBJDIR}")\"") until you use $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
 	fi
 	OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")" #/* if inherit OBJDIR, perhaps it is without last '/' */
 	OBJDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
@@ -194,9 +194,9 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		BINDIR="${1}"
 		SUSUWU_SETUP_BINDIR_OLD() ( SUSUWU_SH_QUOTE "CURRENT PATH" "${BINDIR}" )
 		SUSUWU_SETUP_BINDIR_NEW() ( SUSUWU_SH_QUOTE "PROPOSED PATH" "<new-path>" )
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${OUTPUT}\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)") (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${OUTPUT}\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)")), use $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)") (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${$(SUSUWU_SH_QUOTE "VAR" "OUTPUT" "${SUSUWU_SH_BROWN}")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${$(SUSUWU_SH_QUOTE "VAR" "OUTPUT" "${SUSUWU_SH_BROWN}")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you use $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
 	fi
 	BINDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}")" #/* if inherit BINDIR, perhaps it is without last '/' */
 	BINDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
@@ -280,7 +280,7 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 			done
 		fi
 	else
-		SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_ERROR)" "\"ctags not found\"; do $(SUSUWU_SH_QUOTE "CODE" "apt install ctags")."
+		SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_ERROR)" "\"ctags not found\"; use $(SUSUWU_SH_QUOTE "CODE" "apt install ctags")."
 	fi
 	return "${SUSUWU_STATUS}"
 )
@@ -342,7 +342,7 @@ SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OU
 			fi
 		else #/* if `--mingw` */
 			if ! command -v wine >/dev/null; then
-				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). Do $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
+				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). Use $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
 				return 1
 			fi
 			if [ true = "${SUSUWU_S}" ]; then
