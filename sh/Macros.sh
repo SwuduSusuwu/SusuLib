@@ -81,7 +81,7 @@ SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN=\"$(SUSUWU_UNAMBIGUOUS_PATH
 )
 SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<function>" "<path>" && cp "${0}" "<path>"` */
 	if [ -e "${2}" ]; then
-		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "PATH" "${2}") exists. Use $(SUSUWU_SH_QUOTE "CODE" "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_QUOTE "CODE" "rm \"${2}\"")) and re-execute $(SUSUWU_SH_QUOTE "CODE FUNCTION" "${1}") (perhaps with $(SUSUWU_SH_QUOTE "CODE" "${0}")) to continue."
+		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "PATH" "${2}") exists. Use $(SUSUWU_SH_QUOTE "CODE" "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_QUOTE "CODE" "rm \"${2}\"")) and re-execute $(SUSUWU_SH_QUOTE "CODE FUNCTION" "${1}") (perhaps use $(SUSUWU_SH_QUOTE "CODE" "${0}")) to continue."
 		exit 1 #/* Exit with status 1, unless a subshell invoked this. */
 	fi
 	return 0
@@ -379,7 +379,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 SUSUWU_PRINT "SUSUWU_PRINT()" "$(SUSUWU_SH_DEBUG)" "Test: $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_PUSH") ... $(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_POP")"). TODO: test should have ellipses ($(SUSUWU_SH_QUOTE "CODE" "...")) brown."
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
-	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_QUOTE "CODE" "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SusuLib/issues/new) about this, or execute $(SUSUWU_SH_QUOTE "CODE" "export TERM=\"linux\"") to enable console code use."
+	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_QUOTE "CODE" "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SusuLib/issues/new) about this, or use $(SUSUWU_SH_QUOTE "CODE" "export TERM=\"linux\"") to enable console code use."
 fi
 
 export SUSUWU_ABORT_ON_FIRST_ERROR=false
@@ -412,7 +412,7 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
 			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "${THIS_BRANCH}")\"."
 		else
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "${THIS_BRANCH}")\"; for production use, execute $(SUSUWU_SH_QUOTE "CODE" "git switch $(SUSUWU_SH_QUOTE "PROPOSED" "${DEFAULT_BRANCH}")")."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "${THIS_BRANCH}")\"; for production use, use $(SUSUWU_SH_QUOTE "CODE" "git switch $(SUSUWU_SH_QUOTE "PROPOSED" "${DEFAULT_BRANCH}")")."
 		fi
 	fi
 )
@@ -421,7 +421,7 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then #/* If system has `bash`, && this is not an infinite loop (`${0}` not executed though `bash`) ...
 		BASH_PATH="${0}.bash" # * ... , path for `bash` version of this. */
 		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" #/* Stop if user disabled this (or if this crashed on last execution). */
-		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") to test $(SUSUWU_SH_QUOTE "CODE" "/bin/bash"). Execute $(SUSUWU_SH_QUOTE "CODE" "touch '${BASH_PATH}'") to disable this."
+		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") to test $(SUSUWU_SH_QUOTE "CODE" "/bin/bash"). Use $(SUSUWU_SH_QUOTE "CODE" "touch '${BASH_PATH}'") to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
 		if sed 's|#!/bin/sh$|#!/bin/bash|' -i'' "${BASH_PATH}"; then #/* If produced `/bin/bash` version... */
 			#shellcheck disable=SC2016 #/* This is not supposed to "expand". */
