@@ -133,10 +133,15 @@ View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for i
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
 # Contributor conventions/rules
-If your commit introduces/removes functions, have `./README.md#purposes` include this.
+If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
 So that code is consistant, pull requests have language-specific syntax rules:
 ## `git`
-Do atomic commits: if you cannot `./build.sh` your commit if it is swapped (such as through `git rebase -i`) with a previous commit, or cannot `./build.sh` if a previous commit got `git revert`, your commit message must include such as "Is followup to \<commit hash\>" (which shows temporal order).
+Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) -- or if `git revert` of a previous commit -- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
+> Is followup to: \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\] \[; \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\]\]...
+
+- This shows the temporal order of commits required for `./build.sh` to pass.
+- `<commit-message>` is so that `git rebase` (which changes `<commit-hash>`) does not make it impossible to follow (plus, so comments are reduced), thus you should use the exact message. You can use ellipsis (`...`) to omit extra lines, but it is best if the first line is exact (left as-is).
+- Notice: [commit 9eda0ed5ed2abcdcec92c5b265f6e950e1196558 (+`sh/Macros.sh:SUSUWU_SH_{FILE, LINE, FUNC}`)](https://github.com/SwuduSusuwu/SubStack/commit/9eda0ed5ed2abcdcec92c5b265f6e950e1196558/), and older, used `,` (as opposed to `;`) to delimit the list of commits; those extra `<ref | commit-hash>`'s are not extra comments, but are extra commits. The new format allows comments to include `<commit-hash>`'s and `,`'s (just not `;`'s).
 
 `git commit` message format/syntax:
 - affix "()" onto functions (regardless of number of arguments), such as `function()`, or use the function name (such as `function`) alone.
