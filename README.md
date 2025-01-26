@@ -133,9 +133,10 @@ View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for i
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
 # Contributor conventions/rules
-If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
-So that code is consistant, pull requests have language-specific syntax rules:
+General comment/message syntax rules: `<>` goes around type of option/argument (such as `<commit-hash>`, `[]` goes around optional comments/options/arguments (such as `[<optional fallback value>]`, `...` is affixed to allow multiple options/arguments (such as `[; optional extra arguments]...`). This rule is used to document function arguments (such as `sh`, `C` or `C++` use), plus to document `git` uses.
+To ensure consistent code, submissions of code (such as through [pull requests](https://github.com/SwuduSusuwu/SubStack/pulls)) have language-specific syntax rules:
 ## `git`
+If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
 Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) -- or if `git revert` of a previous commit -- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
 > Is followup to: \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\] \[; \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\]\]...
 
