@@ -37,7 +37,7 @@ All of the [sources](../cxx/)  which follow, start with this 4-row attribution n
 
 ******************************************
 
-`less `[`cxx/Macros.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled [color codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C0_controls) + unused [**OSC**](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls) codes
+`less `[`cxx/Macros.hxx`](../cxx/Macros.hxx) #Removed: disabled [color codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C0_controls) + unused [**OSC**](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls) codes
 ```c++
 /* Miscellaneous macros */
 /* To printout default preprocessor definitions:
@@ -392,7 +392,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) SUSUWU_EXECUTEVERBOSE((SUSUWU_DEBUG(#x), x))
 ```
 
-`less `[`cxx/Macros.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.cxx)
+`less `[`cxx/Macros.cxx`](../cxx/Macros.cxx)
 ```c++
 #if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #ifdef SUSUWU_CXX11
@@ -453,7 +453,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 ```
 ******************************************
 
-`less `[`cxx/ClassObject.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
+`less `[`cxx/ClassObject.hxx`](../cxx/ClassObject.hxx)
 ```c++
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
@@ -606,10 +606,10 @@ public:
 }; /* namespace Susuwu */
 ```
 
-`less `[`cxx/ClassObject.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
+`less `[`cxx/ClassObject.cxx`](../cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
 ******************************************
 
-`less `[`cxx/ClassIo.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassIo.hxx)
+`less `[`cxx/ClassIo.hxx`](../cxx/ClassIo.hxx)
 ```c++
 #if !SUSUWU_INHERIT_GSL_OWNER /* If `gsl::owner` was not included */
 namespace gsl {
@@ -947,7 +947,7 @@ const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT;
 }; /* namespace Susuwu */
 ```
 
-`less `[`cxx/ClassIo.cxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassIo.cxx)
+`less `[`cxx/ClassIo.cxx`](../cxx/ClassIo.cxx)
 ```c++
 const gsl::owner<FILE *> classIoFopenOwnPath() {
 	return fopen(classIoGetOwnPath().c_str(), "r");
@@ -1143,7 +1143,7 @@ const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(clas
 ```
 ******************************************
 
-`less `[`cxx/ClassPortableExecutable.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
+`less `[`cxx/ClassPortableExecutable.hxx`](../cxx/ClassPortableExecutable.hxx)
 ```c++
 typedef std::string PortableExecutableFunctionSig;
 typedef class PortableExecutable : public Object {
@@ -1166,7 +1166,7 @@ public:
 ```
 ******************************************
 
-`less `[`cxx/ClassPortableExecutable.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.cxx)
+`less `[`cxx/ClassPortableExecutable.cxx`](../cxx/ClassPortableExecutable.cxx)
 ```c++
 const std::vector<PortableExecutableFunctionSig> PortableExecutable::importedFunctionsList() const {
 	static_cast<void>(bytecode); /* silences `[functionStatic]`, plus hints how to implement this */
@@ -1184,7 +1184,7 @@ PortableExecutableBytecode::PortableExecutableBytecode(ClassIoPath path_) : Port
 }
 ```
 
-`less `[`cxx/ClassSys.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
+`less `[`cxx/ClassSys.hxx`](../cxx/ClassSys.hxx)
 ```c++
 /* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
 #ifdef SUSUWU_CXX20
@@ -1271,7 +1271,7 @@ static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatch
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
-`less `[`cxx/ClassSys.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.cxx)
+`less `[`cxx/ClassSys.cxx`](../cxx/ClassSys.cxx)
 ```c++
 #ifdef SUSUWU_CXX20
 std::span<const char *> classSysArgs({}); /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
@@ -1487,7 +1487,7 @@ const bool classSysTests() {
 ```
 ******************************************
 
-`less `[`cxx/ClassSha2.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
+`less `[`cxx/ClassSha2.hxx`](../cxx/ClassSha2.hxx)
 ```c++
 /* const */ ClassIoHash /* 128 bits, not null-terminated */ classSha1(const ClassIoBytecode &bytecode);
 /* const */ ClassIoHash /* 256 bits, not null-terminated */ classSha256(const ClassIoBytecode &bytecode);
@@ -1500,7 +1500,7 @@ const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
-`less `[`cxx/ClassSha2.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.cxx)
+`less `[`cxx/ClassSha2.cxx`](../cxx/ClassSha2.cxx)
 ```c++
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
 ClassSha2 classSha2 = classSha256;
@@ -1564,7 +1564,7 @@ const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(cl
 ```
 ******************************************
 
-`less `[`cxx/ClassResultList.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
+`less `[`cxx/ClassResultList.hxx`](../cxx/ClassResultList.hxx)
 ```c++
 typedef ClassIoHash ResultListHash;
 typedef ClassIoBytecode ResultListBytecode; /* Should have structure of ClassIoBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
@@ -1955,7 +1955,7 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 }
 ```
 
-`less `[`cxx/ClassResultList.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx)
+`less `[`cxx/ClassResultList.cxx`](../cxx/ClassResultList.cxx)
 ```c++
 #if SUSUWU_UNIT_TESTS
 static void classResultListLoadFromTest(std::stringstream &is, const bool index, const bool whitespace, const bool pascalValues, const ListFormat listFormat, const std::string &expectedValue) {
@@ -2005,7 +2005,7 @@ const bool classResultListTests() {
 ```
 ******************************************
 
-`less `[`cxx/ClassWebBrowse.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassWebBrowse.hxx)
+`less `[`cxx/ClassWebBrowse.hxx`](../cxx/ClassWebBrowse.hxx)
 ```c++
 /* Abstractions used to web browse */
 extern bool classWebBrowseUseIfModifiedSince; /* Does what `wget -N` does. Notice: incompatible with `.localOutput`. Notice: depends on accurate system unix clock. */
@@ -2028,7 +2028,7 @@ const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
-`less `[`cxx/ClassWebBrowse.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassWebBrowse.cxx)
+`less `[`cxx/ClassWebBrowse.cxx`](../cxx/ClassWebBrowse.cxx)
 ```c++
 #ifdef BOOST_VERSION
 #	include <boost/property_tree/ptree.hpp> /* boost::property_tree::ptree */
@@ -2132,7 +2132,7 @@ const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchA
 ```
 ******************************************
 
-`less `[`cxx/ClassCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
+`less `[`cxx/ClassCns.hxx`](../cxx/ClassCns.hxx)
 ```c++
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
@@ -2253,7 +2253,7 @@ typedef class ApxrCns : public Cns {
 #endif /* USE_APXR_CNS */
 ```
 
-`less `[`cxx/ClassCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.cxx)
+`less `[`cxx/ClassCns.cxx`](../cxx/ClassCns.cxx)
 ```c++
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
@@ -2340,7 +2340,7 @@ typedef class ApxrCns : Cns {
 ```
 ******************************************
 
-`less `[`cxx/VirusAnalysis.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
+`less `[`cxx/VirusAnalysis.hxx`](../cxx/VirusAnalysis.hxx)
 ```c++
 /* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus [artificial *central nervous systems*](./ClassCns.hxx) (such as [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)) */
 typedef enum VirusAnalysisHook : unsigned char {
@@ -2477,7 +2477,7 @@ void produceVirusFixCns(
 const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = virusFixCns);
 ```
 
-`less `[`cxx/VirusAnalysis.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx)
+`less `[`cxx/VirusAnalysis.cxx`](../cxx/VirusAnalysis.cxx)
 ```c++
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
@@ -2890,7 +2890,7 @@ const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns
 ```
 ******************************************
 
-`less `[`cxx/main.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
+`less `[`cxx/main.hxx`](../cxx/main.hxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #pragma once
@@ -2931,7 +2931,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
 
-`less `[`cxx/main.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx) #With boilerplate
+`less `[`cxx/main.cxx`](../cxx/main.cxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_cxx
@@ -3068,7 +3068,7 @@ For comparison; `produceVirusFixCns()` with `cnsVirusFix()` is close to assistan
 
 Have used `class Cns` to implement assistant demo through `produceAssistantCns()`, `assistantCnsProcess()` and  `assistantCnsLoopProcess()`:
 ******************************************
-`less `[`cxx/AssistantCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
+`less `[`cxx/AssistantCns.hxx`](../cxx/AssistantCns.hxx)
 ```c++
 /* (Work-in-progress) system which uses tuples of inputs (questions, or document titles) plus solutions (answers, or documents), to setup artificial neural tissue (such as [**HSOM**](https://github.com/SwuduSusuwu/SusuLib/blob/5eff71e6486562b1d5c7b349618fba9634d479cd/cxx/ClassCns.cxx#L11-L81) or [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)), which then uses new inputs to produce new solutions (similar to _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])") */
 extern Cns assistantCns;
@@ -3116,7 +3116,7 @@ const std::string assistantCnsProcess(const Cns &cns, const std::string &bytecod
 void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 ```
 
-`less `[`cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
+`less `[`cxx/AssistantCns.cxx`](../cxx/AssistantCns.cxx)
 ```c++
 #if defined(SUSUWU_USE_PUGIXML) /* !def BOOST_VERSION */
 #	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
