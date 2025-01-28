@@ -256,7 +256,7 @@ ROTR_temp1	c/rfc6234/sha384-512.c	/^static uint32_t ROTR_temp1[2], ROTR_temp2[2]
 ROTR_temp2	c/rfc6234/sha384-512.c	/^static uint32_t ROTR_temp1[2], ROTR_temp2[2];$/;"	v	typeref:typename:uint32_t[2]	file:
 Related posts	posts/AlbatrossCNS.md	/^# Related posts$/;"	c
 Related posts	posts/CnsCompress.md	/^## Related posts$/;"	s
-Removed	posts/VirusAnalysis.md	/^`less` [cxx\/Macros.hxx](https:\/\/github.com\/SwuduSusuwu\/SubStack\/blob\/trunk\/cxx\/Macros.h/;"	h	chapter:Source code
+Removed	posts/VirusAnalysis.md	/^`less` [cxx\/Macros.hxx](..\/cxx\/Macros.hxx) #Removed: disabled color codes + unused OSC codes$/;"	h	chapter:Source code
 Responses from viewers	posts/AlbatrossCNS.md	/^# Responses from viewers $/;"	c
 ResultList	cxx/ClassResultList.hxx	/^typedef struct ResultList : public Object { \/* Lists of {metadata, executables (or pages)} *\/$/;"	s	namespace:Susuwu
 ResultList	cxx/ClassResultList.hxx	/^} ResultList;$/;"	t	namespace:Susuwu	typeref:struct:Susuwu::ResultList
@@ -705,7 +705,7 @@ Table of Contents	posts/TranscodeMuxHowto.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/VirusAnalysis.md	/^# Table of Contents$/;"	c
 Table of contents	posts/AlbatrossCNS.md	/^# Table of contents$/;"	c
 Test	resources/ObjectSizeFetcher.java	/^public class Test {$/;"	c
-This	posts/VirusAnalysis.md	/^`less` [cxx\/ClassObject.cxx](https:\/\/github.com\/SwuduSusuwu\/SubStack\/blob\/trunk\/cxx\/Cla/;"	h	chapter:Source code
+This	posts/VirusAnalysis.md	/^`less` [cxx\/ClassObject.cxx](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject.h/;"	h	chapter:Source code
 USHABlockSize	c/rfc6234/usha.c	/^int USHABlockSize(enum SHAversion whichSha)$/;"	f	typeref:typename:int
 USHAContext	c/rfc6234/sha.h	/^typedef struct USHAContext {$/;"	s
 USHAContext	c/rfc6234/sha.h	/^} USHAContext;$/;"	t	typeref:struct:USHAContext
@@ -725,7 +725,7 @@ VirusAnalysisHook	cxx/VirusAnalysis.hxx	/^} VirusAnalysisHook;$/;"	t	namespace:S
 VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^typedef enum VirusAnalysisResult : char { \/* TODO? All other cases convert to `bool(true)` unle/;"	g	namespace:Susuwu	typeref:typename:char
 VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^} VirusAnalysisResult; \/* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == /;"	t	namespace:Susuwu	typeref:enum:Susuwu::VirusAnalysisResult
 Wheeled _Arduino_/_Elegoo_ robot code	posts/ArduinoElegooTools.md	/^# Wheeled _Arduino_\/_Elegoo_ robot code$/;"	c
-With	posts/VirusAnalysis.md	/^`less` [cxx\/main.hxx](https:\/\/github.com\/SwuduSusuwu\/SubStack\/blob\/trunk\/cxx\/main.hxx) /;"	h	chapter:Source code
+With	posts/VirusAnalysis.md	/^`less` [cxx\/main.hxx](..\/cxx\/main.hxx) #With boilerplate$/;"	h	chapter:Source code
 Zero	cxx/Macros.cxx	/^	typedef class Zero {} Zero;$/;"	c	function:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest	file:
 Zero	cxx/Macros.cxx	/^	typedef class Zero {} Zero;$/;"	t	function:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest	typeref:class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::Zero	file:
 Zero	examples/noaddress.hxx	/^typedef class Zero {} Zero;$/;"	c
