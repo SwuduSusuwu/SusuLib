@@ -274,8 +274,13 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #ifdef SUSUWU_SH_RUNTIME_COLORS
 #	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
 #endif /* #elif !defined(SUSUWU_POSIX) TODO */
+
 #define SUSUWU_SH_ESC "\033" /* Escape */
-#define SUSUWU_SH_CSI SUSUWU_SH_ESC "[" /* Control Sequence Introducer */
+#define SUSUWU_SH_OSC SUSUWU_SH_ESC "]" /* [Operating System Command](https://wikipedia.org/wiki/ANSI_escape_code#Operating_System_Command_sequences) */
+#define SUSUWU_SH_ST SUSUWU_SH_ESC "\\" /* String Terminator of commands */ /* `BEL` reduces this to 1 byte, but just functions as `ST` on `xterm`. */
+#define SUSUWU_SH_CSI SUSUWU_SH_ESC "[" /* [Control Sequence Introducer](https://wikipedia.org/wiki/ANSI_escape_code#Control_Sequence_Introducer_commands) */
+/* `SUSUWU_SH_<color>`. Notice: update [sh/Macros.sh](sh/Macros.sh) if you update those. */
+/* Usage: `SUSUWU_PRINT(SUSUWU_SH_<warn-level>, ${SUSUWU_SH_<color>} "<message>" ${SUSUWU_SH_DEFAULT})`. */
 #define SUSUWU_SH_DEFAULT	SUSUWU_SH_CSI "0m"
 #define SUSUWU_SH_BLACK	SUSUWU_SH_CSI "0;30m"
 #define SUSUWU_SH_DARK_GRAY	SUSUWU_SH_CSI "1;30m"
@@ -293,30 +298,38 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_SH_LIGHT_CYAN	SUSUWU_SH_CSI "1;36m"
 #define SUSUWU_SH_LIGHT_GRAY	SUSUWU_SH_CSI "0;37m"
 #define SUSUWU_SH_WHITE	SUSUWU_SH_CSI "1;37m"
+
 #define SUSUWU_SH_FILE __FILE__ ":"
 #define SUSUWU_SH_PREFIX IF_SUSUWU_SH_BRACKETS("[", "") SUSUWU_SH_WHITE
+#define SUSUWU_SH_POSTFIX IF_SUSUWU_SH_BRACKETS("]", "")
+
+/* `SUSUWU_SH_<warn-level>`. Notice: update [sh/Macros.sh](sh/Macros.sh) if you update those. */
+/* Usage: `SUSUWU_PRINT(SUSUWU_SH_<warn-level>, "<message>")`. */
 #define SUSUWU_SH_ERROR SUSUWU_SH_RED "Error: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_WARNING SUSUWU_SH_PURPLE "Warning: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_INFO SUSUWU_SH_CYAN "Info: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_SUCCESS SUSUWU_SH_GREEN "Success: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_NOTICE SUSUWU_SH_BLUE "Notice: " SUSUWU_SH_WHITE
 #define SUSUWU_SH_DEBUG SUSUWU_SH_BLUE "Debug: " SUSUWU_SH_WHITE
-#define SUSUWU_SH_POSTFIX IF_SUSUWU_SH_BRACKETS("]", "")
 
 #define SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) std::string(WARN_LEVEL) + std::string(x) + std::string(SUSUWU_SH_DEFAULT)
 #define SUSUWU_CERR_IMP(WARN_LEVEL, x) WARN_LEVEL << (x) << SUSUWU_SH_DEFAULT
 #define SUSUWU_STDERR_IMP(WARN_LEVEL, prefix, postfix, x, ... /* must pass SUSUWU_COMMA after __VA_ARGS__ params */) fprintf(stderr, prefix WARN_LEVEL "%s" SUSUWU_SH_DEFAULT postfix, __VA_ARGS__ SUSUWU_IF_CPLUSPLUS(std::string(x).c_str(), x))
 
-/* WARN_LEVEL = {ERROR, WARNING, INFO, SUCCESS, NOTICE, DEBUG} */
+/* Usage: `throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_<warn-level>, "<message>"));`. */
 #define SUSUWU_ERRSTR(WARN_LEVEL, x) std::string(SUSUWU_SH_PREFIX) IF_SUSUWU_SH_FILE(+ SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE(+ std::to_string(__LINE__) + ':') IF_SUSUWU_SH_FUNC(+ std::string(__func__) + ':') IF_SUSUWU_SH_FILE_LINE_OR_FUNC(+ ' ') + SUSUWU_ERRSTR_IMP(WARN_LEVEL, x) + SUSUWU_SH_POSTFIX
+/* Usage: `SUSUWU_CERR(SUSUWU_SH_<warn-level>, "<message>");`. */
 #define SUSUWU_CERR(WARN_LEVEL, x) std::cerr << SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(<< std::string(SUSUWU_SH_FILE)) IF_SUSUWU_SH_LINE(<< std::to_string(__LINE__) << ":") IF_SUSUWU_SH_FUNC(<< std::string(__func__) << ":") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(<< ' ') << SUSUWU_CERR_IMP(WARN_LEVEL, x) << SUSUWU_SH_POSTFIX << std::endl
+/* Usage: `SUSUWU_STDERR(SUSUWU_SH_<warn-level>, "<message>");`. */
 #define SUSUWU_STDERR(WARN_LEVEL, x) SUSUWU_STDERR_IMP(WARN_LEVEL, SUSUWU_SH_PREFIX IF_SUSUWU_SH_FILE(SUSUWU_SH_FILE) IF_SUSUWU_SH_LINE("%i:") IF_SUSUWU_SH_FUNC("%s:") IF_SUSUWU_SH_FILE_LINE_OR_FUNC(" "), SUSUWU_SH_POSTFIX "\n", x, IF_SUSUWU_SH_LINE(__LINE__ SUSUWU_COMMA) IF_SUSUWU_SH_FUNC(__func__ SUSUWU_COMMA))
-/* Use this to do C versus C++ agnostic code */
+
+/* Usage: `SUSUWU_PRINT(SUSUWU_SH_<warn-level>, "<message>");`, to do C versus C++ agnostic code. */
 #if SUSUWU_SH_PREFER_STDIO
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_STDERR(LEVEL, x)
 #else
 #	define SUSUWU_PRINT(LEVEL, x) SUSUWU_CERR(LEVEL, x)
 #endif /* else !SUSUWU_SH_PREFER_STDIO */
+
 #ifdef SUSUWU_EXPERIMENTAL
 #	define SUSUWU_ERROR(x) {SUSUWU_PRINT(SUSUWU_SH_ERROR, x); SUSUWU_WARNING("`$0` " SUSUWU_EXPERIMENTAL_ISSUES);}
 #else /* SUSUWU_EXPERIMENTAL else */

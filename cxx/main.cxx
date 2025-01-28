@@ -17,6 +17,7 @@
 #	include <type_traits> /* std::is_nothrow_invocable */
 #endif /* def SUSUWU_CXX17 */
 namespace Susuwu {
+namespace { /* [misc-use-anonymous-namespace] */
 /* `clang-tidy` off: NOLINTBEGIN(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
 static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good())
 #if SUSUWU_UNIT_TESTS
@@ -93,6 +94,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 #endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
+}; /* anonymous namespace */ /* [misc-use-anonymous-namespace] */
 }; /* namespace Susuwu */
 const SusuwuUnitTestsBitmask susuwuUnitTests() {
 	return Susuwu::unitTestsCxx();

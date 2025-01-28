@@ -3,10 +3,9 @@
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
 #include "ClassPortableExecutable.hxx" /* FilePath */
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WARNING */
-#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_GREEN SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include <chrono> /* std::chrono */
-#include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
+#include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE */
 #include <exception> /* std::exception */
 #include <iomanip> /* std::setw */
 #include <ios> /* std::dec std::hex std::streamsize */
@@ -47,7 +46,7 @@ inline const ClassSysUSeconds classSysUSecondClock() {
 const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {}) SUSUWU_NOEXCEPT;
 static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
- * @throw std::runtime_error(SUSUWU_ERRSTR(ERROR, "execves: -1 == execvesFork()"))
+ * @throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"))
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}

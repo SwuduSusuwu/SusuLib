@@ -45,7 +45,12 @@
 - [`./cxx/ClassSys.hxx`](./cxx/ClassSys.hxx) is
   - typedefs {ClassSysUSeconds}
   - globals {classSysArgc, classSysArgs}
-  - modular functions to interact with: console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`}, own process {`classSysInit()`, `classSysGetOwnPath()`, `classSysFopenOwnPath()`, `templateCatchAll()`}, strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}, the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}. TODO: filesystem (perhaps just have `cxx/ClassPortableExecutable.hxx` do this?), internet.
+  - modular functions to interact with:
+    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`}
+    - own process (`$0`) {`classSysInit()`, `classSysGetOwnPath()`, `classSysFopenOwnPath()`, `templateCatchAll()`}
+    - strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`}
+    - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
+    - TODO: filesystem (perhaps just have `cxx/ClassPortableExecutable.hxx` do this?), internet (`socket`, `Winsock2`).
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassSha2.hxx`](./cxx/ClassSha2.hxx) is
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.

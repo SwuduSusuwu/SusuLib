@@ -68,7 +68,8 @@ SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(S
 	echo "${NEW_PATH}"
 )
 
-#/* Based on cxx/Macros.hxx */
+#/* `SUSUWU_SH_<color>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
+#/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "${SUSUWU_SH_<color>}<message>${SUSUWU_SH_DEFAULT}"`. */
 export SUSUWU_SH_DEFAULT="\033[0m"
 export SUSUWU_SH_BLACK="\033[0;30m"
 export SUSUWU_SH_DARK_GRAY="\033[1;30m"
@@ -86,6 +87,9 @@ export SUSUWU_SH_CYAN="\033[0;36m"
 export SUSUWU_SH_LIGHT_CYAN="\033[1;36m"
 export SUSUWU_SH_LIGHT_GRAY="\033[0;37m"
 export SUSUWU_SH_WHITE="\033[1;37m"
+
+#/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
+#/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
 export SUSUWU_SH_ERROR="${SUSUWU_SH_RED}Error: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_WARNING="${SUSUWU_SH_PURPLE}Warning: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_INFO="${SUSUWU_SH_CYAN}Info: ${SUSUWU_SH_WHITE}"
@@ -93,6 +97,7 @@ export SUSUWU_SH_SUCCESS="${SUSUWU_SH_GREEN}Success: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_NOTICE="${SUSUWU_SH_BLUE}Notice: ${SUSUWU_SH_WHITE}"
 export SUSUWU_SH_DEBUG="${SUSUWU_SH_BLUE}Debug: ${SUSUWU_SH_WHITE}"
 SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
+
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
@@ -124,7 +129,7 @@ export SUSUWU_SH_FILE="${SUSUWU_SH_FILE:-""}"
 export SUSUWU_SH_LINE="${SUSUWU_SH_LINE:-""}"
 export SUSUWU_SH_FUNC="${SUSUWU_SH_FUNC:-"true"}"
 export SUSUWU_SH_FILE_OR_LINE="${SUSUWU_SH_FILE:-${SUSUWU_SH_LINE}}"
-SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller name>"] "${SUSUWU_SH_{ERROR,WARNING,INFO,SUCCESS,NOTICE,DEBUG}}" "<message>" */
+SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_SH_<warn-level>)" "<message>" */
 	if [ "$#" -eq 3 ]; then
 		CALLER_FUNC="${1}"; shift
 	fi

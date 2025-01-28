@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassPortableExecutable.hxx" /* PortableExecutable */
+#include "ClassPortableExecutable.hxx" /* FileBytecode FilePath PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */

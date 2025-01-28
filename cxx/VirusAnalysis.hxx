@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_hxx
 #define INCLUDES_cxx_VirusAnalysis_hxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassPortableExecutable.hxx" /* PortableExecutable FilePath FileBytecode */
+#include "ClassPortableExecutable.hxx" /* PortableExecutable FilePath */
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
