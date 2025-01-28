@@ -283,7 +283,7 @@ ROTR_temp2	c/rfc6234/sha384-512.c	/^static uint32_t ROTR_temp1[2], ROTR_temp2[2]
 Related posts	posts/AlbatrossCNS.md	/^# Related posts$/;"	c
 Related posts	posts/CnsCompress.md	/^## Related posts$/;"	s
 Removed	VirusAnalysis.md	/^`less` [`cxx\/Macros.hxx`](..\/cxx\/Macros.hxx) #Removed: disabled color codes + unused OSC code/;"	h	chapter:Source code
-Removed	posts/VirusAnalysis.md	/^`less `[`cxx\/Macros.hxx`](https:\/\/github.com\/SwuduSusuwu\/SusuLib\/blob\/trunk\/cxx\/Macros./;"	h	chapter:Source code
+Removed	posts/VirusAnalysis.md	/^`less `[`cxx\/Macros.hxx`](..\/cxx\/Macros.hxx) #Removed: disabled [color codes](https:\/\/en.wi/;"	h	chapter:Source code
 Responses from viewers	posts/AlbatrossCNS.md	/^# Responses from viewers $/;"	c
 ResultList	cxx/ClassResultList.hxx	/^typedef struct ResultList : public Object { \/* Lists of {metadata, executables (or pages)} *\/$/;"	s	namespace:Susuwu
 ResultList	cxx/ClassResultList.hxx	/^} ResultList;$/;"	t	namespace:Susuwu	typeref:struct:Susuwu::ResultList
@@ -769,7 +769,7 @@ TensorFlowCnsLoss	ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { te
 TensorFlowCnsLoss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	s	namespace:Susuwu
 TensorFlowCnsLoss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	t	namespace:Susuwu	typeref:struct:Susuwu::TensorFlowCnsLoss
 This	VirusAnalysis.md	/^`less` [`cxx\/ClassObject.cxx`](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject/;"	h	chapter:Source code
-This	posts/VirusAnalysis.md	/^`less `[`cxx\/ClassObject.cxx`](https:\/\/github.com\/SwuduSusuwu\/SusuLib\/blob\/trunk\/cxx\/Cl/;"	h	chapter:Source code
+This	posts/VirusAnalysis.md	/^`less `[`cxx\/ClassObject.cxx`](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject/;"	h	chapter:Source code
 ToObjectMode	ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	s	namespace:Susuwu
 ToObjectMode	cxx/ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	s	namespace:Susuwu
 USHABlockSize	c/rfc6234/usha.c	/^int USHABlockSize(enum SHAversion whichSha)$/;"	f	typeref:typename:int
@@ -794,8 +794,8 @@ VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^} VirusAnalysisResult; \/* if(virusA
 Wheeled _Arduino_/_Elegoo_ robot code	posts/ArduinoElegooTools.md	/^## Wheeled _Arduino_\/_Elegoo_ robot code$/;"	s	chapter:Howto route
 With	VirusAnalysis.md	/^`less` [`cxx\/main.cxx`](..\/cxx\/main.cxx) #With boilerplate$/;"	h	chapter:Source code
 With	VirusAnalysis.md	/^`less` [`cxx\/main.hxx`](..\/cxx\/main.hxx) #With boilerplate$/;"	h	chapter:Source code
-With	posts/VirusAnalysis.md	/^`less `[`cxx\/main.cxx`](https:\/\/github.com\/SwuduSusuwu\/SusuLib\/blob\/trunk\/cxx\/main.cxx)/;"	h	chapter:Source code
-With	posts/VirusAnalysis.md	/^`less `[`cxx\/main.hxx`](https:\/\/github.com\/SwuduSusuwu\/SusuLib\/blob\/trunk\/cxx\/main.hxx)/;"	h	chapter:Source code
+With	posts/VirusAnalysis.md	/^`less `[`cxx\/main.cxx`](..\/cxx\/main.cxx) #With boilerplate$/;"	h	chapter:Source code
+With	posts/VirusAnalysis.md	/^`less `[`cxx\/main.hxx`](..\/cxx\/main.hxx) #With boilerplate$/;"	h	chapter:Source code
 Zero	cxx/Macros.cxx	/^	typedef class Zero {} Zero;$/;"	c	function:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest	file:
 Zero	cxx/Macros.cxx	/^	typedef class Zero {} Zero;$/;"	t	function:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest	typeref:class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::Zero	file:
 [Table of Contents](../README.md#table-of-contents)	.ssh/README.md	/^# [Table of Contents](..\/README.md#table-of-contents)$/;"	c
