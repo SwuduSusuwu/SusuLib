@@ -7,12 +7,13 @@
 - [Post, with resources](#post-with-resources)
   - [Neural resources](#neural-resources)
 - [Synopsis + related posts](#synopsis--related-posts)
+- [Sponsor this](../README.md#sponsor)
 # Intro
 Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (secures all app launches,) but after first launch: **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(FileBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 
 [`../README.md`](../README.md) has how to use this (what follows is more of a book of source code).
 
-(Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.hxx`; follow URLs for whole sources.)
+(Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.*xx`; follow URLs for whole sources.)
 
 For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
 `git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build.sh`
@@ -557,7 +558,6 @@ public:
 	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 #endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
 	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
-	virtual const std::string toString() const { std::stringstream os; os << getName() << '@' << std::hex << hashCode(); return os.str(); }
 	virtual void notify() {}
 	virtual void notifyAll() {}
 	virtual void wait() {}
@@ -699,9 +699,9 @@ inline Os &classSysColoredParamOs(Os &os, const List &argvS, const bool parenthe
 	}
 	return os;
 }
-template<template<class> class List, class Str>
-inline const Str classSysColoredParamStr(const List<Str> &argvS, const bool parenthesis/* {...} */ = true) {
-	Str str = (parenthesis ? "{" : "");
+template<class List>
+inline const typename List::value_type classSysColoredParamStr(const List &argvS, const bool parenthesis/* {...} */ = true) {
+	typename List::value_type str = (parenthesis ? "{" : "");
 	for(const auto &it: argvS) {
 		if(&it != &*argvS.cbegin()) {
 			str += ", ";
@@ -1903,7 +1903,7 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 ```
 `less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) #With boilerplate
 ```
-/* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
+/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_hxx
 #define INCLUDES_cxx_main_hxx
 #ifdef __cplusplus
@@ -1930,7 +1930,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 ```
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
 ```
-/* Licenses: allows all uses ("Creative Commons"/"Apache 2") */
+/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_cxx
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
