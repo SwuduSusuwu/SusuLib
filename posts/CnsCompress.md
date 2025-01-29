@@ -1,14 +1,14 @@
-Next class: have computers do most of central nervous system, such as thalamus, auditory cortex, visual cortices, homunculus
-Parse inputs of 1024*1280@60fps (2.6gbps), output text at a few kbps, reproduce originals from text (with small losses.)
+**\[Preview\] Have computers do most of central nervous system, such as thalamus, auditory cortex, visual cortices, homunculus**
+_Parse inputs of 1024*1280@60fps (2.6gbps), output text at a few kbps, reproduce originals from text (with small losses.)_
 
-_Allows all uses._
+\[This post [from _SubStack_](https://swudususuwu.substack.com/p/future-plans-have-computers-do-most) allows [_all uses_](https://creativecommons.org/licenses/by/2.0/).]
 
 For the most new sources, use programs such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for iOS) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for Android OS) to run this:
-
+```
 git clone https://github.com/SwuduSusuwu/SubStack.git
 cd SubStack/cxx && ls
-
-Pull requests should goto: https://github.com/SwuduSusuwu/SubStack/issues/2
+```
+Pull requests should goto: [https://github.com/SwuduSusuwu/SubStack/issues/2](https://swudususuwu.substack.com/p/future-plans-have-computers-do-most)
 
 [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.cxx) has correspondances to [neocortex](https://wikipedia.org/wiki/Neocortex). which is what humans use as databases.
 [cxx/VirusAnalysis.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.cxx) + [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.cxx)  has some correspondances to [Broca's area](https://wikipedia.org/wiki/Broca's_area) (produces language through recursive processes), [Wernicke’s area](https://wikipedia.org/wiki/Wernicke's_area) (parses languages through [recursive](https://wikipedia.org/wiki/recursion) processes), plus [hippocampus](https://wikipedia.org/wiki/Hippocampus) (integration to the neocortex + [imagination](https://wikipedia.org/wiki/Procedural_generation) through various regions).
@@ -24,7 +24,7 @@ passes those to V1 [visual cortex](https://wikipedia.org/wiki/Visual_cortex),
 which synthesizes those into more abstract datums (such as a simulator's specific instances of individual humans, tools, or houses),
 and passes the most abstract (from V2 visual cortex) plus complex (from V1 visual cortex) to [hippocampus](https://wikipedia.org/wiki/Hippocampus) (which performs temporary storage tasks while active, and, at rest, encodes this to neocortex).
 Just as humans can use the [neocortex](https://wikipedia.org/wiki/Neocortex)'s stored resources for synthesis of new animations/visuals,
-so too could artificial central nervous systems (run on [CPU](https://wikipedia.org/wiki/CPU) or [GPU](https://wikipedia.org/wiki/GPU)) setup [synapses](https://wikipedia.org/wiki/synapses) to allow to compress gigabytes of visuals from videos into a few kilobytes of text (the hippocampus has dual uses, so can expand the compressed "text" back to good visuals).
+so too can artificial neural tissue (ran on [CPU](https://wikipedia.org/wiki/CPU) or [GPU](https://wikipedia.org/wiki/GPU)) setup [synapses](https://wikipedia.org/wiki/synapses) to allow to compress gigabytes of visuals from videos into a few kilobytes of text (the hippocampus has dual uses, so can expand the compressed "text" back to good visuals).
 
 2 routes to this:
 
@@ -47,12 +47,13 @@ Expected compression ratios: parse inputs of 1024*1280@60fps (2.6gbps), output t
 
 You could input such as [Fanuc's videos of somewhat-autonomous robots](https://youtu.be/7lI-PY7InV8), convert to text, add stuff to the text such as "Plus produces X", the CNS would produce videos that show Fanuc's robots produce for us. Or you could use [videos of how to mass produce robots](https://youtu.be/hLDbRm-98cs), have the CNS convert thus to text, and add to the text such as "Next, instead of standalone robot arms, produces robots with 2 arms + 2 legs" and the CNS would produce videos of how to mass produce this.
 
-How to process this more fast:
-[Howto: process devices (phones, laptops, desktops) more fast, lag less](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
+## Related posts
+- [How to improve how fast desktops/laptops/phones execute code](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
+- [Neural resources](./VirusAnalysis.md#neural-resources)
 
-Previous posts of artificial CNS series:
-[Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
-[Albatross performs lots of neural processes per neural volume versus humans, howto base artificial neural networks off of albatross](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural)
-[Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
-[Virus analysis tools should use functional analysis + sandboxes + artificial CNS (central nervous systems)](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
-[Want this physical form gone so won’t be forced to do "E" with everyone else from now on; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
+Previous posts about artificial neural tissue:
+- [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
+- [Albatross performs lots of neural processes per neural volume versus humans, howto base artificial neural networks off of albatross](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural)
+- [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
+- [Virus analysis tools should use functional analysis + sandboxes + artificial CNS (central nervous systems)](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
+- [Want this physical form gone; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
