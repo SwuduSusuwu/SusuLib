@@ -12,6 +12,8 @@
 - [Accelerometer / gyroscope (**IMU**)](#accelerometer--gyroscope-imu)
   - [**IMU** as **GPS** / magnetometer substitute](#imu-as-gps--magnetometer-substitute)
   - [**IMU** as kinematic collision detection](#imu-as-kinematic-collision-detection)
+- [Howto produce point clouds](#howto-produce-point-clouds)
+  - [Howto use point clouds to route](#howto-use-point-clouds-to-route)
 - [External resources](#external-resources)
 
 # Licenses
@@ -734,6 +736,316 @@ def isGyroscopeOutOfRange(currentGyroscope, expectedGyroscope, anchorPointGyrosc
 - `anchorPointAcceleration` (and `anchorPointGyroscope`) assume that the anchor-point IMU is close to current servor (thus, IMU at distal tip of segment). If this assumption does not hold, use a new kinematic model (such as the more compute-intensive realistic kinematics model from the referenced discussion with _Assistant_) to compute those.
   - If there is just 1 servo (or if the servos are independent), then `kinematicsDependence = false` and the kinematics models (such as the code which uses `anchor*Acceleration`) are redundant (the program will skip those).
 
+# Howto produce point clouds
+Those [point clouds](https://wikipedia.org/wiki/Point_cloud) show obstacles which autonomous tools must [route around](https://wikipedia.org/wiki/Obstacle_avoidance).
+
+Some pseudocode [from _Assistant_](https://poe.com/s/sx1MuZzPcLy3p9u0elpq) (just examples of what this post is about; future versions of this post will include own code):
+## Depth-image to point cloud
+Has the most simple code, but requires [advanced sensors](https://www.amazon.com/Consumer-Depth-Cameras-Computer-Vision/dp/1447146395) (such as [LIDAR](https://wikipedia.org/wiki/Lidar)) to produce images.
+```python
+import numpy as np
+import tensorflow as tf
+import cv2
+
+def create_point_cloud(color_image, depth_image, fx, fy, cx, cy):
+	# Get image dimensions
+	height, width, _ = color_image.shape
+
+	# Generate grid of pixel coordinates
+	x, y = np.meshgrid(np.arange(width), np.arange(height))
+
+	# Calculate normalized image coordinates
+	z = depth_image / 1000.0  # Convert depth to meters
+	x = (x - cx) * z / fx
+	y = (y - cy) * z / fy
+
+	# Stack to create point cloud
+	point_cloud = np.stack((x, y, z), axis=-1)
+
+	# Combine with color information
+	point_cloud_rgb = np.concatenate((point_cloud.reshape(-1, 3), color_image.reshape(-1, 3) / 255.0), axis=-1)
+
+	return point_cloud_rgb
+
+# Load your images
+color_image = cv2.imread('color_image.png')
+depth_image = cv2.imread('depth_image.png', cv2.IMREAD_UNCHANGED)
+
+# Camera parameters (example values)
+fx = 525.0  # Focal length in x
+fy = 525.0  # Focal length in y
+cx = 319.5  # Optical center x
+cy = 239.5  # Optical center y
+
+# Create point cloud
+point_cloud = create_point_cloud(color_image, depth_image, fx, fy, cx, cy)
+
+# Save or process the point cloud
+np.savetxt('point_cloud.txt', point_cloud)
+```
+
+## Optical flow processing of visuals into point cloud (limited; static z-axis)
+Uses [`cv2.calcOpticalFlowFarneback`](https://docs.opencv.org/4.x/d4/dee/tutorial_optical_flow.html#autotoc_md1162) of [_H264_](https://wikipedia.org/wiki/h264) to produce point cloud (limited; static z-axis)
+```python
+import cv2
+import numpy as np
+import tensorflow as tf
+
+def calculate_optical_flow(prev_frame, next_frame):
+	# Convert frames to grayscale
+	prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+	next_gray = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
+
+	# Calculate optical flow
+	flow = cv2.calcOpticalFlowFarneback(prev_gray, next_gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+
+	return flow
+
+def create_point_cloud_from_flow(flow, color_frame):
+	h, w = flow.shape[:2]
+	points = []
+
+	for y in range(h):
+		for x in range(w):
+			dx, dy = flow[y, x].astype(int)
+			z = 1  # Set constant depth or calculate based on your requirements
+			point = (x + dx, y + dy, z)  # Adjust based on motion
+			color = color_frame[y, x] / 255.0  # Normalize color
+
+			points.append((*point, *color))
+
+	return np.array(points)
+
+# Load video frames (example using a video file)
+cap = cv2.VideoCapture('motion_video.mp4')
+
+# Read the first frame
+ret, prev_frame = cap.read()
+if not ret:
+	print("Error reading video")
+	exit()
+
+point_clouds = []
+
+while True:
+	ret, next_frame = cap.read()
+	if not ret:
+		break
+
+	# Calculate optical flow
+	flow = calculate_optical_flow(prev_frame, next_frame)
+
+	# Create point cloud from flow and color frame
+	point_cloud = create_point_cloud_from_flow(flow, next_frame)
+	point_clouds.append(point_cloud)
+
+	# Set current frame as previous frame for the next iteration
+	prev_frame = next_frame
+
+cap.release()
+
+# Save or process all point clouds
+for i, pc in enumerate(point_clouds):
+	np.savetxt(f'point_cloud_{i}.txt', pc)
+```
+
+## _TensorFlow_: static image to point clouds
+[_TensorFlow_](https://tensorflow.org/) computes z-axis, but limited to how accurate [MiDaS (monocular depth estimation)](https://pytorch.org/hub/intelisl_midas_v2/) is.
+```python
+import tensorflow as tf
+import numpy as np
+import cv2
+
+# Load a pre-trained depth estimation model (e.g., MiDaS)
+model = tf.keras.models.load_model('path_to_your_depth_model.h5')
+
+def estimate_depth(image):
+	# Preprocess the image for the model
+	input_image = cv2.resize(image, (384, 384))  # Resize as per model requirements
+	input_image = np.expand_dims(input_image, axis=0) / 255.0  # Normalize
+	depth_map = model.predict(input_image)
+	return depth_map[0, :, :, 0]  # Assuming the model outputs a single channel depth map
+
+def create_point_cloud(color_image, depth_map):
+	h, w = depth_map.shape
+	points = []
+
+	for y in range(h):
+		for x in range(w):
+			z = depth_map[y, x]  # Get depth value
+			if z > 0:  # Only consider valid depth
+				point = (x, y, z)  # (x, y, z)
+				color = color_image[y, x] / 255.0  # Normalize color
+				points.append((*point, *color))
+
+	return np.array(points)
+
+# Load your color image
+color_image = cv2.imread('color_image.png')
+
+# Estimate depth from the color image
+depth_map = estimate_depth(color_image)
+
+# Create point cloud
+point_cloud = create_point_cloud(color_image, depth_map)
+
+# Save the point cloud
+np.savetxt('point_cloud.txt', point_cloud)
+```
+## Optical flow processing of visuals into point cloud (computes z-axis)
+Uses [`cv2.calcOpticalFlowFarneback`](https://docs.opencv.org/4.x/d4/dee/tutorial_optical_flow.html#autotoc_md1162) of [_H264_](https://wikipedia.org/wiki/h264) to produce point cloud (computes z-axis)
+```python
+import cv2
+import numpy as np
+
+def calculate_optical_flow(prev_frame, next_frame):
+	prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+	next_gray = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
+
+	# Calculate optical flow using Farneback method
+	flow = cv2.calcOpticalFlowFarneback(prev_gray, next_gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+	return flow
+
+def estimate_depth_from_motion(flow, known_height):
+	h, w = flow.shape[:2]
+	depth_map = np.zeros((h, w))
+
+	for y in range(h):
+		for x in range(w):
+			dx, dy = flow[y, x].astype(float)
+			# Assuming a simple linear relationship for depth estimation
+			depth = known_height / (1 + np.sqrt(dx**2 + dy**2))
+			depth_map[y, x] = max(depth, 0)  # Ensure non-negative depth values
+
+	return depth_map
+
+def create_point_cloud(color_frame, flow, depth_map):
+	h, w = depth_map.shape
+	points = []
+
+	for y in range(h):
+		for x in range(w):
+			z = depth_map[y, x]
+			if z > 0:  # Only consider valid depth
+				point = (x, y, z)  # (x, y, z)
+				color = color_frame[y, x] / 255.0  # Normalize color
+				points.append((*point, *color))
+
+	return np.array(points)
+
+# Load video frames (example using a video file)
+cap = cv2.VideoCapture('motion_video.mp4')
+
+# Read the first frame
+ret, prev_frame = cap.read()
+if not ret:
+	print("Error reading video")
+	exit()
+
+# Known height of objects in the scene (or average height)
+known_height = 1.5  # Example value in meters
+
+point_clouds = []
+
+while True:
+	ret, next_frame = cap.read()
+	if not ret:
+		break
+
+	# Calculate optical flow
+	flow = calculate_optical_flow(prev_frame, next_frame)
+
+	# Estimate depth from motion
+	depth_map = estimate_depth_from_motion(flow, known_height)
+
+	# Create point cloud
+	point_cloud = create_point_cloud(next_frame, flow, depth_map)
+	point_clouds.append(point_cloud)
+
+	# Set current frame as previous frame for the next iteration
+	prev_frame = next_frame
+
+cap.release()
+
+# Save or process all point clouds
+for i, pc in enumerate(point_clouds):
+	np.savetxt(f'point_cloud_{i}.txt', pc)
+```
+
+## Howto use point clouds to route
+Start with [this code (also from _Assistant_)](https://poe.com/s/p0NTuGJRBDlol01YJY5c), which goes into the code from [Howto route](#howto-route):
+```python
+function detectObstacles(pointCloud):
+	for point in pointCloud:
+		if isObstacle(point):
+			return true  // Obstacle detected
+	return false  // No obstacles
+
+function moveTo(targetLocation):
+	pointCloud = generatePointCloud()  // Generate or update point cloud
+	if detectObstacles(pointCloud):
+		adjustPath()  // Modify path to avoid obstacles
+	else:
+		proceedTo(targetLocation)  // Move to target location
+```
+```python
+function isObstacle(point):
+	// Define a threshold distance for obstacle detection
+	OBSTACLE_THRESHOLD = 0.5  // Example value in meters
+
+	// Check if the point's z-coordinate (depth) is below the threshold
+	if point.z < OBSTACLE_THRESHOLD:
+		return true  // Point is an obstacle
+	return false  // Point is not an obstacle
+function adjustPath():
+	// Get the current location and target location
+	currentLocation = getCurrentLocation()
+	targetLocation = getTargetLocation()
+
+	// Calculate a new target location that avoids the obstacle
+	avoidanceVector = computeAvoidanceVector(currentLocation, targetLocation)
+
+	// Set the new target location
+	newTargetLocation = targetLocation + avoidanceVector
+	setTargetLocation(newTargetLocation)
+
+function computeAvoidanceVector(currentLocation, targetLocation):
+	// Calculate the direction vector from current to target location
+	direction = targetLocation - currentLocation
+
+	// Normalize the direction vector
+	direction = normalize(direction)
+
+	// Create an avoidance vector
+	avoidanceDistance = 0.3  // Distance to move away from the obstacle
+	avoidanceVector = direction.perpendicular() * avoidanceDistance  // Move perpendicular to the direction
+
+	return avoidanceVector
+```
+**Errata**
+- `computeAvoidanceVector` is 2D\*; _Assistant_ did not use conversation context to deduce that `computeAvoidanceVector` must include altitude.
+  - \*since `direction.perpendicular()` can not go over or under obstacles.
+```python
+function main():
+	while true:
+		pointCloud = generatePointCloud()  // Update point cloud
+
+		// Check for obstacles
+		obstacleDetected = false
+		for point in pointCloud:
+			if isObstacle(point):
+				obstacleDetected = true
+				break
+
+		if obstacleDetected:
+			adjustPath()  // Modify path to avoid obstacles
+		else:
+			proceedTo(getTargetLocation())  // Move towards target location
+
+		wait(SIMULATION_TIME_STEP)  // Control loop frequency
+```
+, plus make [_Howto use point clouds to route_](#howto-use-point-clouds-to-route) continuous — such as how (opposed to the [_A\*_ path formula](https://wikipedia.org/wiki/A*_search_algorithm), which must restart if sensor input is new,) the [_D\*_ path formula](https://wikipedia.org/wiki/D*) allows continuous sensor use — the example code uses stored (not continuous) visuals to produce point clouds.
+
 # External resources
 - [_Assistant_ suggests to replace _Ardunio Uno_'s _ATmega328P_ 16MHz 2KB (or _Arduino Mega_'s 16MHz 8KB _ATmega2560_) with 240MHz 4MB _ESP32_ for $6](https://poe.com/s/0E2w6XDUf6Aw5hUpOA68)
   - [_Arduino_ _UNO R3_](https://docs.arduino.cc/hardware/uno-rev3/) circuitboard
@@ -744,4 +1056,8 @@ def isGyroscopeOutOfRange(currentGyroscope, expectedGyroscope, anchorPointGyrosc
 - [\[Preview\] Have computers do most of central nervous system, such as thalamus, auditory cortex, visual cortices, homunculus](./CnsCompress.md)
 - [SubStack post which has list of related posts at bottom](https://swudususuwu.substack.com/p/how-to-mix-blender-with-robotics)
 - [Pseudocode (+ some _Arduino_/_Elegoo_ code) from _Assistant_, which plans tasks and controls motor output](https://poe.com/s/bkHWeb6vWGFf3CdUzIch)
+- [_NumPy_ + _CV2_ + _TensorFlow_ code from _Assistant_, which produces point clouds (for obstacle avoidance)](https://poe.com/s/sx1MuZzPcLy3p9u0elpq)
+- [_CV2_ `calcOpticalFlowFarneback`](https://docs.opencv.org/4.x/d4/dee/tutorial_optical_flow.html#autotoc_md1162)
+- [_MathWorks_ `opticalFlowFarneback`](https://www.mathworks.com/help/vision/ref/opticalflowfarneback.html)
+- [_Consumer Depth Cameras for Computer Vision: Research Topics and Applications (Advances in Computer Vision and Pattern Recognition)_](https://www.amazon.com/Consumer-Depth-Cameras-Computer-Vision/dp/1447146395)
 
