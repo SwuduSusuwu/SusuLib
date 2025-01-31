@@ -587,8 +587,12 @@ public:
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.hxx)
 ```
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
+#ifdef SUSUWU_CXX20
+extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
+#else
 extern int classSysArgc;
 extern const char **classSysArgs;
+#endif
 /* Called from main(), stores {argc, args} into {classSysArgc, classSysArgs}
  * Much simpler to use path from args[0] (versus https://stackoverflow.com/questions/1528298/get-path-of-executable/34109000#34109000)
  * @pre @code (0 < argc && SUSUWU_NULLPTR != args && SUSUWU_NULLPTR != args[0]
@@ -717,12 +721,20 @@ static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchA
 ```
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
 ```
+#ifdef SUSUWU_CXX20
+std::span<const char *> classSysArgs({}); /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
+#else
 int classSysArgc = 0;
 const char **classSysArgs = {SUSUWU_NULLPTR};
+#endif
 const bool classSysInit(int argc, const char **args) {
+#ifdef SUSUWU_CXX20
+	classSysArgs = {args, static_cast<size_t>(argc)}; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
+#else
 	classSysArgc = argc;
+	classSysArgs = args;
+#endif
 	if(0 < argc) {
-		classSysArgs = args;
 		assert(SUSUWU_NULLPTR != args);
 		assert(SUSUWU_NULLPTR != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		return true;
@@ -2300,3 +2312,4 @@ This post was about general methods to produce virus analysis tools, which do no
 - Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes (or just add artificial CNS to antivirus hosts for extra analysis).
 
 Alternative CNS structure: [based on albatross](./AlbatrossCNS.md) (includes numerous resources, about all sorts of natural/artificial neural tissue).
+

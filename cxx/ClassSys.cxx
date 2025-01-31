@@ -1,7 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
 #include "ClassPortableExecutable.hxx" /* FilePath */
 #include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -24,16 +24,27 @@
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
 #endif /* def SUSUWU_POSIX */
+#ifdef SUSUWU_CXX20
+#	include <span> /* std::span */
+#endif
 #include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */
 #include <vector> /* std::vector */
 namespace Susuwu {
+#ifdef SUSUWU_CXX20
+std::span<const char *> classSysArgs({}); /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
+#else
 int classSysArgc = 0;
 const char **classSysArgs = {SUSUWU_NULLPTR};
+#endif
 const bool classSysInit(int argc, const char **args) {
+#ifdef SUSUWU_CXX20
+	classSysArgs = {args, static_cast<size_t>(argc)}; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
+#else
 	classSysArgc = argc;
+	classSysArgs = args;
+#endif
 	if(0 < argc) {
-		classSysArgs = args;
 		assert(SUSUWU_NULLPTR != args);
 		assert(SUSUWU_NULLPTR != args[0]); /* `clangtidy` off: NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 		return true;

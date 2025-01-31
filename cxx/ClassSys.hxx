@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
 #include "ClassPortableExecutable.hxx" /* FilePath */
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include <chrono> /* std::chrono */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
@@ -11,6 +11,9 @@
 #include <iomanip> /* std::setw */
 #include <ios> /* std::dec std::hex std::streamsize */
 #include <iostream> /* std::cerr std::cin std::endl */
+#ifdef SUSUWU_CXX20
+#	include <span> /* std::span */
+#endif
 #include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */
 #ifdef SUSUWU_POSIX
@@ -22,8 +25,12 @@ typedef int pid_t;
 #include <vector> /* std::vector */
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 namespace Susuwu {
+#ifdef SUSUWU_CXX20
+extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
+#else
 extern int classSysArgc;
 extern const char **classSysArgs;
+#endif
 /* Called from main(), stores {argc, args} into {classSysArgc, classSysArgs}
  * Much simpler to use path from args[0] (versus https://stackoverflow.com/questions/1528298/get-path-of-executable/34109000#34109000)
  * @pre @code (0 < argc && SUSUWU_NULLPTR != args && SUSUWU_NULLPTR != args[0]
