@@ -79,6 +79,9 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassFsPath> &hosts) {
 	for(const auto &host : hosts) {
+#ifndef SUSUWU_POSIX
+    SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+#endif /* ndef SUSUWU_POSIX */
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
 		questionsOrNull.signatures.push_back(host);
@@ -114,6 +117,9 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
+#ifndef SUSUWU_POSIX
+			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+#endif /* ndef SUSUWU_POSIX */
 			execvex("wget '" + url + "' -O" += localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
