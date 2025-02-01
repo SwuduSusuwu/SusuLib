@@ -624,6 +624,7 @@ const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&p
 static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
  * @throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"))
+ * @throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) // TODO: non-POSIX systems with multiple commands
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
 static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
@@ -787,8 +788,11 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
-	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
-	return -1;
+	if(1 != argvS.size()) {
+		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */");
+		return -1;
+	}
+	return system(argvS[0].c_str());
 #endif /* ndef SUSUWU_POSIX */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
@@ -796,7 +800,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	if(-1 == pid) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"));
+		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"));
 	}
 	waitpid(pid, &wstatus, 0);
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
@@ -806,7 +810,10 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	}
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
-	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
+	if(1 != argvS.size()) {
+		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */"));
+	}
+	return system(argvS[0].c_str());
 #endif /* ndef SUSUWU_POSIX */
 }
 
@@ -1587,7 +1594,7 @@ const bool virusAnalysisTests() {
 	if(FilePath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
 		const ResultList origPassList = passList, origAbortList = abortList;
 		passList.bytecodes.push_back(executable.bytecode);
@@ -1598,7 +1605,7 @@ const bool virusAnalysisTests() {
 		}
 		virusAnalysisResetCaches();
 		if(virusAnalysisAbort != virusAnalysisInteractive(executable)) {
-			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort != virusAnalysis(args[0]);} /* This test was supposed to match positive but did not. */"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort != virusAnalysisInteractive(args[0]);} /* This test was supposed to match positive but did not. */"));
 		}
 		passList = origPassList, abortList = origAbortList;
 	}
@@ -1609,9 +1616,6 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
-#ifndef SUSUWU_EXPERIMENTAL /* if `VirusAnalysis.hxx` won't include this */
-const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus);
-#endif /* ndef SUSUWU_EXPERIMENTAL */
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
@@ -1811,12 +1815,17 @@ const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const 
 		const auto result = sandboxAnalysisCaches.at(fileHash);
 		return result;
 	} catch (...) {
+#ifdef SUSUWU_POSIX
 		execvex("cp -r '/usr/home/sandbox/' '/usr/home/sandbox.bak'"); /* or produce FS snapshot */
 		execvex("cp '" + file.path + "' '/usr/home/sandbox/'");
 		execvex("chroot '/usr/home/sandbox/' \"strace basename '" + file.path + "'\" >> strace.outputs");
 		execvex("mv/ '/usr/home/sandbox/strace.outputs' '/tmp/strace.outputs'");
 		execvex("rm -r '/usr/home/sandbox/' && mv '/usr/home/sandbox.bak' '/usr/home/sandbox/'"); /* or restore FS snapshot */
 		return sandboxAnalysisCaches[fileHash] = straceOutputsAnalysis("/tmp/strace.outputs");
+#else /* ndef SUSUWU_POSIX */
+		SUSUWU_ERROR("sandboxAnalysis: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
+		return sandboxAnalysisCaches[fileHash] = virusAnalysisRequiresReview;
+#endif /* ndef SUSUWU_POSIX */
 	}
 }
 const VirusAnalysisResult straceOutputsAnalysis(const FilePath &straceOutput) {
@@ -2161,6 +2170,9 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
 	for(const auto &host : hosts) {
+#ifndef SUSUWU_POSIX
+    SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+#endif /* ndef SUSUWU_POSIX */
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
 		questionsOrNull.signatures.push_back(host);
@@ -2196,7 +2208,10 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
-			execvex("wget '" + url + "' -O" + localXhtml);
+#ifndef SUSUWU_POSIX
+			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+#endif /* ndef SUSUWU_POSIX */
+			execvex("wget '" + url + "' -O" += localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}

@@ -7,7 +7,7 @@
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::cin std::cout */
@@ -79,6 +79,9 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<FilePath> &hosts) {
 	for(const auto &host : hosts) {
+#ifndef SUSUWU_POSIX
+    SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+#endif /* ndef SUSUWU_POSIX */
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
 		questionsOrNull.signatures.push_back(host);
@@ -114,6 +117,9 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	auto urls = assistantCnsProcessUrls(localXhtml);
 	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
+#ifndef SUSUWU_POSIX
+			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+#endif /* ndef SUSUWU_POSIX */
 			execvex("wget '" + url + "' -O" += localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
@@ -134,7 +140,7 @@ const std::vector<FilePath> assistantCnsProcessUrls(const FilePath &localXhtml) 
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
 #else /* else !BOOST_VERSION */
-# pragma message("TODO: process XHTML without Boost")
+#	pragma message("TODO: process XHTML without Boost")
 #endif /* else !BOOST_VERSION */
 	return urls;
 }

@@ -7,13 +7,13 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
-#include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol */
+#include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef __linux__
 #	include <linux/limits.h> /* PATH_MAX */
 #endif /* def __linux__ */
 #ifdef SUSUWU_POSIX
-#include <stdexcept> /* std::runtime_error */
+#include <stdexcept> /* std::invalid_argument std::runtime_error */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
 #include <unistd.h> /* execve execv fork geteuid getuid readlink setuid */
@@ -83,8 +83,11 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	}
 	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
-	SUSUWU_ERROR("execvesFork: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}");
-	return -1;
+	if(1 != argvS.size()) {
+		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */");
+		return -1;
+	}
+	return system(argvS[0].c_str());
 #endif /* ndef SUSUWU_POSIX */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
@@ -92,7 +95,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	const pid_t pid = execvesFork(argvS, envpS);
 	int wstatus = 0;
 	if(-1 == pid) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"));
+		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"));
 	}
 	waitpid(pid, &wstatus, 0);
 /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
@@ -103,7 +106,10 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
-	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: {#ifndef SUSUWU_POSIX /* TODO: convert to win32 */}"));
+	if(1 != argvS.size()) {
+		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */"));
+	}
+	return system(argvS[0].c_str());
 #endif /* ndef SUSUWU_POSIX */
 }
 
