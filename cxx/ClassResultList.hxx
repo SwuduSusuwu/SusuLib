@@ -52,6 +52,7 @@ const size_t listMaxSize(const List &list) {
 
 template<class List, class Os>
 void listDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
+	const std::string assignment = whitespace ? " = " : "=";
 	size_t index_ = 0;
 	os << '{';
 	for(const auto &value : list) {
@@ -62,8 +63,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 			os << std::endl << '\t';
 		}
 		if(index) {
-			os << index_;
-			whitespace ? (os << " = ") : (os << '=');
+			os << index_ << assignment;
 		}
 		if(pascalValues) {
 			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
@@ -80,14 +80,15 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 	} else {
 		os << "};";
 	}
-} /* view `ClassResultList.cxx`:`classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
+} /* view `ClassResultList.cxx:classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
 template<class List, class Os>
 void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
-	os << "list.hashes" << (whitespace ? " = " : "=");
+	const std::string assignment = whitespace ? " = " : "=";
+	os << "list.hashes" << assignment;
 	listDumpTo(list.hashes, os, index, whitespace, pascalValues);
-	os << "list.signatures" << (whitespace ? " = " : "=");
+	os << "list.signatures" << assignment;
 	listDumpTo(list.signatures, os, index, whitespace, pascalValues);
-	os << "list.bytecodes" << (whitespace ? " = " : "=");
+	os << "list.bytecodes" << assignment;
 	listDumpTo(list.bytecodes, os, index, whitespace, pascalValues);
 }
 
