@@ -19,8 +19,8 @@
 #include <unistd.h> /* execve execv fork geteuid getuid readlink setuid */
 #else
 #	ifdef SUSUWU_WIN32
-#	include <windows.h> /* GetModuleFileName GetModuleHandle HMODULE */
-#	include <shlobj.h> /* IsUserAnAdmin */
+#		include <shlobj.h> /* IsUserAnAdmin */
+#		include <windows.h> /* CloseHandle CreateProcess GetLastError PROCESS_INFORMATION STARTUPINFO ZeroMemory */
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
 #endif /* def SUSUWU_POSIX */
@@ -53,14 +53,6 @@ const bool classSysInit(int argc, const char **args) {
 }
 
 const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) SUSUWU_NOEXCEPT {
-#ifdef SUSUWU_POSIX
-	const pid_t pid = fork();
-	if(0 != pid) {
-		if(-1 == pid) {
-			SUSUWU_ERROR("execvesFork(): {(-1 == pid)}, errno=" + std::to_string(errno));
-		}
-		return pid;
-	} /* if 0, is fork */
 	const std::vector<std::string> argvSmutable = {argvS.cbegin(), argvS.cend()};
 	std::vector<char *> argv;
 	argv.reserve(argvSmutable.size());
@@ -69,6 +61,14 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 		argv.push_back(const_cast<char *>(x.c_str()));
 	}
 	argv.push_back(SUSUWU_NULLPTR);
+#ifdef SUSUWU_POSIX
+	const pid_t pid = fork();
+	if(0 != pid) {
+		if(-1 == pid) {
+			SUSUWU_ERROR("execvesFork(): {(-1 == pid)}, errno=" + std::to_string(errno));
+		}
+		return pid;
+	} /* if 0, is fork */
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
 		execv(argv[0], &argv[0]); /* has `noreturn` */
 	} else {
@@ -87,7 +87,30 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */");
 		return -1;
 	}
-	return system(argvS[0].c_str());
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	ZeroMemory(&pi, sizeof(pi));
+	si.cb = sizeof(si);
+	if(CreateProcess(
+		NULL,    /* No module name (use command line) */
+		argv[0], /* Command line */
+		NULL,    /* Process handle not inheritable */
+		NULL,    /* Thread handle not inheritable */
+		FALSE,   /* Set handle inheritance to FALSE */
+		0,       /* No creation flags */
+		NULL,    /* Use parent's environment block */
+		NULL,    /* Use parent's working directory */
+		&si,     /* Pointer to STARTUPINFO structure */
+		&pi)     /* Pointer to PROCESS_INFORMATION structure */
+	) {
+		SUSUWU_NOTICE("execvesFork(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, non-blocking }}}");
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	} else {
+		SUSUWU_NOTICE("execvesFork(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+	}
+	return 0;
 #endif /* ndef SUSUWU_POSIX */
 }
 const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
@@ -109,7 +132,13 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	if(1 != argvS.size()) {
 		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */"));
 	}
-	return system(argvS[0].c_str());
+	const int status = system(argvS[0].c_str());
+	if(status) {
+		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+	} else {
+		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, blocking }}}");
+	}
+	return status;
 #endif /* ndef SUSUWU_POSIX */
 }
 
