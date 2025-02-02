@@ -2,12 +2,14 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_GREEN SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_GREEN SUSUWU_SH_RED SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include <chrono> /* std::chrono */
 #include <exception> /* std::exception */
 #include <iomanip> /* std::setw */
 #include <ios> /* std::hex */
 #include <iostream> /* std::cin */
+#include <istream> /* std::basic_istream */
+#include <stdexcept> /* std::runtime_error */
 #ifdef SUSUWU_CXX20
 #	include <span> /* std::span */
 #endif
@@ -160,6 +162,127 @@ inline const typename List::value_type classSysColoredParamStr(const List &argvS
 		str += '}';
 	}
 	return str;
+}
+template<class Is>
+/* Usage: @code classSysDebugIs(__func__, is); @endcode */
+static void classSysDebugIs(const std::string &func, Is &is) {
+#ifdef NDEBUG
+	(void)func; (void)is; /* suppress `clang-tidy`/`lint` notices */
+#else /* ndef NDEBUG */
+	const std::streampos pos = is.tellg();
+	std::string token;
+	if(!is.good()) {
+		SUSUWU_DEBUG("(!is.good())");
+		return;
+	} /* auto isState = is.getstate(); */
+	if(is >> token) {
+		SUSUWU_DEBUG(func + ": " + std::string(__func__) + ": is == \"" + token + "\"");
+	} else if(is.fail() && !(is.bad() || is.eof())) {
+		is.clear(std::ios::goodbit); /* is.setstate(isState); */
+	}
+	is.seekg(pos);
+#endif /* ndef NDEBUG */
+}
+template<class Is, class Int,
+	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
+/* @pre @code is.good(); @endcode */
+inline Is &classSysHexIs(Is &is, Int &value) {
+	const std::ios::fmtflags oldFlags = is.flags();
+	const char oldFill = is.fill();
+	is << std::hex;
+	is.fill('0');
+	/* classSysDebugIs(std::string(__func__) + "(pre)", is); */
+	if(!is.good()) {
+		SUSUWU_NOTICE(std::string(__func__) + ": (!is.good())");
+		return is;
+	} /* auto isState = is.getstate(); */
+	std::streampos pos = is.tellg();
+	if(is >> std::hex >> std::setw(2)/* `setw` is unset after each use */ >> value) {
+		const std::streampos newPos = is.tellg();
+		/* SUSUWU_DEBUG(std::string(__func__) + ": value == 0x" + classSysHexStr(value) + ", pos += " + std::to_string(newPos - pos)); */
+		pos = newPos;
+	} else if(is.fail() && !(is.bad() || is.eof())) {
+		is.seekg(pos); /* TODO: prove if this can be removed for all flags*/
+		is.clear(std::ios::goodbit); /* is.setstate(isState); */
+	}
+	/* classSysDebugIs(std::string(__func__) + "(post)", is); */
+	is.fill(oldFill);
+	is.flags(oldFlags);
+	return is;
+} /* TODO: refactor this and the `Str` version, to reuse common code */
+template<class Is, class Str,
+	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
+/* @pre @code is.good(); @endcode */
+inline Is &classSysHexIs(Is &is, Str &value) {
+	const std::ios::fmtflags oldFlags = is.flags();
+	const char oldFill = is.fill();
+	value.clear(); /* TODO; move after `if(!is.good()) { ... return is; }`? */
+	is << std::hex;
+	is.fill('0');
+	/* classSysDebugIs(std::string(__func__) + "(pre)", is); */
+	if(!is.good()) {
+		SUSUWU_NOTICE(std::string(__func__) + ": (!is.good())");
+		return is;
+	} /* auto isState = is.getstate(); */
+	std::streampos pos = is.tellg();
+	for(unsigned int ch; /* NOLINT(cppcoreguidelines-init-variables): is unitialized so that accidental removal of `is >> ch;` will warn when `ch` is used */ is >> std::hex >> std::setw(2)/* `setw` is unset after each use */ >> ch; ) {
+		const std::streampos newPos = is.tellg();
+		/* SUSUWU_DEBUG(std::string(__func__) + ": ch == 0x" + classSysHexStr(ch) + ", pos += " + std::to_string(newPos - pos)); */
+		for(auto i = ((newPos - pos) >> 1) - (SUSUWU_HEX_DOES_PREFIX ? 1 : 0); i--; ) {
+			value += reinterpret_cast<unsigned char *>(&ch)[i];
+		}
+		pos = newPos;
+	}
+	if(is.fail() && !(is.bad() || is.eof())) {
+		is.seekg(pos); /* TODO: prove if this can be removed for all flags*/
+		is.clear(std::ios::goodbit); /* is.setstate(isState); */
+	}
+	classSysDebugIs(std::string(__func__) + "(post)", is);
+	is.fill(oldFill);
+	is.flags(oldFlags);
+	/* classSysDebugIs(std::string(__func__) + "(post)", is); */
+	return is;
+}
+template<class Is, class Value>
+/* usage: @code U value = classSysHexIs<U>(is); @endcode
+ * @pre @code is.good(); @endcode */
+inline const Value classSysHexIs(Is &is) {
+	Value value;
+	classSysHexIs(is, &value);
+	return value;
+}
+template <class CharT, class Traits, class Allocator>
+/* Usage: is as `std::getline` except that `delim` is not consumed
+ * @pre @code is.good(); @endcode */
+static std::basic_istream<CharT, Traits>& classSysGetline(std::basic_istream<CharT, Traits>& is, std::basic_string<CharT, Traits, Allocator>& str, CharT delim = '\n') {
+	str.clear();
+	for(char token = delim; is.good(); str += token) {
+		const std::streampos pos = is.tellg();
+		is >> token;
+		if(delim == token) {
+			is.seekg(pos);
+			return is;
+		}
+	}
+	return is;
+}
+/* Usage: @code is >> value; classSysCheckChar(__func__, '{', value); @endcode */
+inline void classSysCheckChar(const std::string &func, const char expected, const char got) {
+	if(expected != got) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": " + __func__ + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
+	} /* classSysCheckStr(func, std::string(expected), got); */
+}
+/* Usage: @code is >> value; classSysCheckSz(__func__, 42, value); @endcode */
+inline void classSysCheckSz(const std::string &func, const size_t expected, const size_t got) {
+	if(expected != got) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": " + __func__ + ": expected '" SUSUWU_SH_GREEN + std::to_string(expected) + SUSUWU_SH_DEFAULT "', got '" SUSUWU_SH_RED + std::to_string(got) + SUSUWU_SH_DEFAULT "'"));
+	} /* classSysCheckStr(func, std::to_string(expected), std::to_string(got)); */
+}
+/* Usage: @code if(rand() % 2) {is >> value;} else {classSysGetline(is, value);} classSysCheckStr(__func__, "};", value); @endcode */
+static void classSysCheckStr(const std::string &func, const std::string &expected, const std::string &got) {
+	if(expected != got) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": " + __func__ + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" + SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
+	}
 }
 
 template<typename Func, typename... Args>
