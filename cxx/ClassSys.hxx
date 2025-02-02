@@ -28,6 +28,7 @@ namespace Susuwu {
 #	define SUSUWU_HEX_DOES_PREFIX false
 #endif /* ndef SUSUWU_HEX_DOES_PREFIX */
 #define SUSUWU_HEX_PREFIX_SZ (SUSUWU_HEX_DOES_PREFIX ? 2 : 0)
+#define SUSUWU_SYS_INPUT_WHITESPACE false /* true if `getline` includes characters such as '\n' */
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
