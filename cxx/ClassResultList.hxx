@@ -5,10 +5,12 @@
 #include "ClassFs.hxx" /* ClassFsPath ClassFsBytecode ClassFsHash */
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysHexOs SUSUWU_HEX_DOES_PREFIX */
+#include "ClassSys.hxx" /* classSysCheckChar classSysCheckStr classSysCheckSz classSysGetline classSysHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_IO_WHITESPACE */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
+#include <iostream> /* std::endl std::getline std::streamsize */
+//#include <stdexcept> /* std::runtime_error */
 #if SUSUWU_PREFER_CSTR
 #	include <cstring> /* strlen memmem */
 #endif /* SUSUWU_PREFER_CSTR */
@@ -83,7 +85,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 	} else {
 		os << "};";
 	}
-} /* view `ClassResultList.cxx:classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
+} /* view `ClassResultList.cxx:classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. */
 template<class List, class Os>
 void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
 	const std::string assignment = whitespace ? " = " : "=";
@@ -93,6 +95,94 @@ void resultListDumpTo(const List &list, Os &os, const bool index, const bool whi
 	listDumpTo(list.signatures, os, index, whitespace, pascalValues);
 	os << "list.bytecodes" << assignment;
 	listDumpTo(list.bytecodes, os, index, whitespace, pascalValues);
+}
+template<class List, class Is>
+void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
+	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
+	const std::string assignment = whitespaceFrom ? " = " : "=";
+	const std::string hexPrefix = whitespace ? " 0" : "0";
+	char delim = '\0';
+	is >> delim;
+	classSysCheckChar(__func__, '{', delim);
+//	decltype(list.front()) value;
+#ifdef SUSUWU_LIST_COUNT
+	size_t count = 0;
+	is >> count;
+	is >> delim;
+	classSysCheckChar(__func__, ':', delim);
+	list.reserve(count);
+#endif /* def SUSUWU_LIST_COUNT */
+	for(size_t index_ = 0; is.good(); ++index_) {
+		std::string token;
+		const std::streampos pos = is.tellg();
+		if(whitespaceFrom) {
+			is >> delim;
+			classSysCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
+		}
+		is >> delim;
+		if('}' == delim) {
+#ifdef SUSUWU_LIST_COUNT
+			classSysCheckSz(__func__, count, index_);
+#endif /* def SUSUWU_LIST_COUNT */
+			break;
+		}
+		if(0 == index_) {
+			is.seekg(pos);
+		} else {
+			classSysCheckChar(__func__, ',', delim);
+		}
+		if(whitespaceFrom) {
+			is >> delim;
+			classSysCheckChar(__func__, '\t', delim); /* is >> token; classSysCheckStr(__func__, "\n\t", token); */
+		}
+		if(index) {
+			is >> token;
+			classSysCheckStr(__func__, std::to_string(index_), token);
+			is >> token;
+			classSysCheckStr(__func__, assignment, token);
+		}
+		typename List::value_type value;
+		if(pascalValues) {
+			std::streamsize tokenSz = 0;
+			is >> tokenSz;
+			is >> delim;
+			classSysCheckChar(__func__, ':' /* TODO: replace "%Dec:" with "%Bin" */, delim);
+			value.resize(tokenSz);
+			if(0 < tokenSz) {
+				is.read(&value[0], tokenSz); /* `is >> value;` won't do binary code */
+				if(is.gcount() < tokenSz) {
+					value.resize(is.gcount());
+				}
+				classSysCheckSz(__func__, is.gcount(), tokenSz);
+			}
+		} else {
+#if !SUSUWU_HEX_DOES_PREFIX
+//			is >> token; classSysCheckStr(__func__, "0x", token);
+			std::getline(is, token, 'x'); /* used `std::getline` so 'x' is swallowed */
+			classSysCheckStr(__func__, hexPrefix, token);
+#endif /* !SUSUWU_HEX_DOES_PREFIX */
+			classSysHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
+		}
+		list.insert(list.end(), value); /* list.push_back(value); */
+	}
+	classSysCheckChar(__func__, '}', delim);
+	is >> delim;
+	classSysCheckChar(__func__, ';', delim);
+} /* view `ClassResultList.cxx:classResultListTests()` for examples of input from `listLoadFrom()`+`resultListLoadFrom`. */
+template<class List, class Is>
+void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
+	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
+	const std::string assignment = whitespaceFrom ? " = " : "=";
+	std::string token;
+	classSysGetline(is, token, '{');
+	classSysCheckStr(__func__, std::string("list.hashes") + assignment, token);
+	listLoadFrom(list.hashes, is, index, whitespace, pascalValues);
+	classSysGetline(is, token, '{');
+	classSysCheckStr(__func__, std::string("list.signatures") + assignment, token);
+	listLoadFrom(list.signatures, is, index, whitespace, pascalValues);
+	classSysGetline(is, token, '{');
+	classSysCheckStr(__func__, std::string("list.bytecodes") + assignment, token);
+	listLoadFrom(list.bytecodes, is, index, whitespace, pascalValues);
 }
 
 template<class List, class List2>

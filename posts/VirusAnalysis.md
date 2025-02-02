@@ -676,6 +676,9 @@ public:
 #ifndef SUSUWU_USE_STD_HEX
 #	define SUSUWU_USE_STD_HEX false /* prefer `std::hex` for conversions */
 #endif /* ndef SUSUWU_STD_HEX */
+#ifndef SUSUWU_IO_WHITESPACE
+#	define SUSUWU_IO_WHITESPACE false /* true if `getline` includes characters such as '\n' */
+#endif /* ndef SUSUWU_IO_WHITESPACE */
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -1495,7 +1498,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 	} else {
 		os << "};";
 	}
-} /* view `ClassResultList.cxx:classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
+} /* view `ClassResultList.cxx:classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. */
 template<class List, class Os>
 void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
 	const std::string assignment = whitespace ? " = " : "=";
@@ -1505,6 +1508,94 @@ void resultListDumpTo(const List &list, Os &os, const bool index, const bool whi
 	listDumpTo(list.signatures, os, index, whitespace, pascalValues);
 	os << "list.bytecodes" << assignment;
 	listDumpTo(list.bytecodes, os, index, whitespace, pascalValues);
+}
+template<class List, class Is>
+void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
+	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
+	const std::string assignment = whitespaceFrom ? " = " : "=";
+	const std::string hexPrefix = whitespace ? " 0" : "0";
+	char delim = '\0';
+	is >> delim;
+	classSysCheckChar(__func__, '{', delim);
+//	decltype(list.front()) value;
+#ifdef SUSUWU_LIST_COUNT
+	size_t count = 0;
+	is >> count;
+	is >> delim;
+	classSysCheckChar(__func__, ':', delim);
+	list.reserve(count);
+#endif /* def SUSUWU_LIST_COUNT */
+	for(size_t index_ = 0; is.good(); ++index_) {
+		std::string token;
+		const std::streampos pos = is.tellg();
+		if(whitespaceFrom) {
+			is >> delim;
+			classSysCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
+		}
+		is >> delim;
+		if('}' == delim) {
+#ifdef SUSUWU_LIST_COUNT
+			classSysCheckSz(__func__, count, index_);
+#endif /* def SUSUWU_LIST_COUNT */
+			break;
+		}
+		if(0 == index_) {
+			is.seekg(pos);
+		} else {
+			classSysCheckChar(__func__, ',', delim);
+		}
+		if(whitespaceFrom) {
+			is >> delim;
+			classSysCheckChar(__func__, '\t', delim); /* is >> token; classSysCheckStr(__func__, "\n\t", token); */
+		}
+		if(index) {
+			is >> token;
+			classSysCheckStr(__func__, std::to_string(index_), token);
+			is >> token;
+			classSysCheckStr(__func__, assignment, token);
+		}
+		typename List::value_type value;
+		if(pascalValues) {
+			std::streamsize tokenSz = 0;
+			is >> tokenSz;
+			is >> delim;
+			classSysCheckChar(__func__, ':' /* TODO: replace "%Dec:" with "%Bin" */, delim);
+			value.resize(tokenSz);
+			if(0 < tokenSz) {
+				is.read(&value[0], tokenSz); /* `is >> value;` won't do binary code */
+				if(is.gcount() < tokenSz) {
+					value.resize(is.gcount());
+				}
+				classSysCheckSz(__func__, is.gcount(), tokenSz);
+			}
+		} else {
+#if !SUSUWU_HEX_DOES_PREFIX
+//			is >> token; classSysCheckStr(__func__, "0x", token);
+			std::getline(is, token, 'x'); /* used `std::getline` so 'x' is swallowed */
+			classSysCheckStr(__func__, hexPrefix, token);
+#endif /* !SUSUWU_HEX_DOES_PREFIX */
+			classSysHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
+		}
+		list.insert(list.end(), value); /* list.push_back(value); */
+	}
+	classSysCheckChar(__func__, '}', delim);
+	is >> delim;
+	classSysCheckChar(__func__, ';', delim);
+} /* view `ClassResultList.cxx:classResultListTests()` for examples of input from `listLoadFrom()`+`resultListLoadFrom`. */
+template<class List, class Is>
+void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
+	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
+	const std::string assignment = whitespaceFrom ? " = " : "=";
+	std::string token;
+	classSysGetline(is, token, '{');
+	classSysCheckStr(__func__, std::string("list.hashes") + assignment, token);
+	listLoadFrom(list.hashes, is, index, whitespace, pascalValues);
+	classSysGetline(is, token, '{');
+	classSysCheckStr(__func__, std::string("list.signatures") + assignment, token);
+	listLoadFrom(list.signatures, is, index, whitespace, pascalValues);
+	classSysGetline(is, token, '{');
+	classSysCheckStr(__func__, std::string("list.bytecodes") + assignment, token);
+	listLoadFrom(list.bytecodes, is, index, whitespace, pascalValues);
 }
 
 template<class List, class List2>
@@ -1623,26 +1714,43 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 `less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx)
 ```c++
 #if SUSUWU_UNIT_TESTS
-static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
+static void classResultListLoadFromTest(std::stringstream &is, const bool index, const bool whitespace, const bool pascalValues, const std::string &expectedValue) {
+//	std::cout << is.str();
+	try {
+		ResultList resultList;
+		resultListLoadFrom(resultList, is, index, whitespace, pascalValues);
+		std::stringstream os2;
+		resultListDumpTo(resultList, os2, index, whitespace, pascalValues);
+		if(expectedValue != os2.str()) {
+			throw std::logic_error(SUSUWU_SH_RED + os2.str() + SUSUWU_SH_WHITE " == os2.str(); " SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE " != os2.str();");
+		}
+	} catch (std::exception &w) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classResultListLoadFromTest(os, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); caught `std::exception::what() == \"" + w.what() + "\"`"));
+	}
+}
+static void classResultListDumpToTest(const ResultList &resultList, const bool index, const bool whitespace, const bool pascalValues, const std::string &expectedValue) {
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classResultListDumpToTest(resultList, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
 	}
+	classResultListLoadFromTest(os, index, whitespace, pascalValues, expectedValue);
 }
 const bool classResultListTests() {
 	ResultList resultList;
 	resultList.hashes.insert(ResultListHash({'\x32'})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
-	resultList.signatures = {"1", "2"};
-	resultList.bytecodes = {"01", "02"};
+	resultList.signatures = {"", "2"};
+	resultList.bytecodes = {"", "02"};
 #ifdef SUSUWU_LIST_COUNT
 	const std::string listHashesSz = "1:", listSignaturesSz = "2:", listBytecodesSz = "2:";
 #else /* def SUSUWU_LIST_COUNT else */
 	const std::string listHashesSz = "", listSignaturesSz = "", listBytecodesSz = ""; /* NOLINT(readability-redundant-string-init): define that those are "". */
 #endif /* ndef SUSUWU_LIST_COUNT */
-	classResultListDumpToTest(resultList, false, false, false, "list.hashes={" + listHashesSz + "0x32};list.signatures={" + listSignaturesSz + "0x31,0x32};list.bytecodes={" + listBytecodesSz + "0x3031,0x3032};");
-	classResultListDumpToTest(resultList, true, true, false, "list.hashes = {" + listHashesSz + "\n\t0 = 0x32\n};\nlist.signatures = {" + listSignaturesSz + "\n\t0 = 0x31,\n\t1 = 0x32\n};\nlist.bytecodes = {" + listBytecodesSz + "\n\t0 = 0x3031,\n\t1 = 0x3032\n};\n");
-	classResultListDumpToTest(resultList, false, false, true, "list.hashes={" + listHashesSz + "1:2};list.signatures={" + listSignaturesSz + "1:1,1:2};list.bytecodes={" + listBytecodesSz + "2:01,2:02};");
+	classResultListDumpToTest(resultList, false, false, false, "list.hashes={" + listHashesSz + "0x32};list.signatures={" + listSignaturesSz + "0x,0x32};list.bytecodes={" + listBytecodesSz + "0x,0x3032};");
+	classResultListDumpToTest(resultList, true, true, false, "list.hashes = {" + listHashesSz + "\n\t0 = 0x32\n};\nlist.signatures = {" + listSignaturesSz + "\n\t0 = 0x,\n\t1 = 0x32\n};\nlist.bytecodes = {" + listBytecodesSz + "\n\t0 = 0x,\n\t1 = 0x3032\n};\n");
+	classResultListDumpToTest(resultList, false, false, true, "list.hashes={" + listHashesSz + "1:2};list.signatures={" + listSignaturesSz + "0:,1:2};list.bytecodes={" + listBytecodesSz + "0:,2:02};");
+	resultList.bytecodes = {"\001", "\002"};
+	classResultListDumpToTest(resultList, false, false, true, "list.hashes={" + listHashesSz + "1:2};list.signatures={" + listSignaturesSz + "0:,1:2};list.bytecodes={" + listBytecodesSz + "1:\001,1:\002};");
 	return true;
 }
 #endif /* SUSUWU_UNIT_TESTS */

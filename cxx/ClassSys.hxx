@@ -51,6 +51,9 @@ namespace Susuwu {
 #ifndef SUSUWU_USE_STD_HEX
 #	define SUSUWU_USE_STD_HEX false /* prefer `std::hex` for conversions */
 #endif /* ndef SUSUWU_STD_HEX */
+#ifndef SUSUWU_IO_WHITESPACE
+#	define SUSUWU_IO_WHITESPACE false /* true if `getline` includes characters such as '\n' */
+#endif /* ndef SUSUWU_IO_WHITESPACE */
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
