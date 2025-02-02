@@ -1081,6 +1081,7 @@ const size_t listMaxSize(const List &list) {
 
 template<class List, class Os>
 void listDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
+	const std::string assignment = whitespace ? " = " : "=";
 	size_t index_ = 0;
 	os << '{';
 	for(const auto &value : list) {
@@ -1091,8 +1092,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 			os << std::endl << '\t';
 		}
 		if(index) {
-			os << index_;
-			whitespace ? (os << " = ") : (os << '=');
+			os << index_ << assignment;
 		}
 		if(pascalValues) {
 			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
@@ -1110,11 +1110,12 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 } /* view `ClassResultList.cxx`:`classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. TODO: +`listLoadFrom()`/+`resultListLoadFrom()` */
 template<class List, class Os>
 void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
-	os << "list.hashes" << (whitespace ? " = " : "=");
+	const std::string assignment = whitespace ? " = " : "=";
+	os << "list.hashes" << assignment;
 	listDumpTo(list.hashes, os, index, whitespace, pascalValues);
-	os << "list.signatures" << (whitespace ? " = " : "=");
+	os << "list.signatures" << assignment;
 	listDumpTo(list.signatures, os, index, whitespace, pascalValues);
-	os << "list.bytecodes" << (whitespace ? " = " : "=");
+	os << "list.bytecodes" << assignment;
 	listDumpTo(list.bytecodes, os, index, whitespace, pascalValues);
 }
 
@@ -1238,7 +1239,7 @@ static void classResultListDumpToTest(const ResultList &resultList, bool index, 
 	std::stringstream os;
 	resultListDumpTo(resultList, os, index, whitespace, pascalValues);
 	if(expectedValue != os.str()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classResultListDumpToTest(resultList, os, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classResultListDumpToTest(resultList, ") + (index ? "true" : "false") + ", " + (whitespace ? "true" : "false") + ", " + (pascalValues ? "true" : "false") + "); \"" SUSUWU_SH_RED + os.str() + SUSUWU_SH_WHITE "\" == os.str(); \"" SUSUWU_SH_GREEN + expectedValue + SUSUWU_SH_WHITE "\" != os.str();")); /* TODO: standard macros for error/success colors, plus `SUSUWU_ERR` default color */
 	}
 }
 const bool classResultListTests() {
