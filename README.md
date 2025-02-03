@@ -21,6 +21,9 @@
     - [Affiliates](#affiliates)
 
 # Purposes
+[This repo](https://github.com/SwuduSusuwu/SubStack/) as a whole is: [computer-related blog posts](https://github.com/SwuduSusuwu/SubStack/tree/trunk/posts) and [modular {`Susuwu::`, `susuwu*`, `SUSUWU_*`} code about those posts](https://github.com/SwuduSusuwu/SubStack?tab=readme-ov-file#purposes).
+- \[Notice\] Plan to move this repo to [https://github.com/SwuduSusuwu/Susuwu/](https://github.com/SwuduSusuwu/Susuwu/) (since the focus shifted from blog posts to source code).
+
 [`./.ssh/`](./.ssh/) is to [compute signatures/certificates](#signaturecertificate).
 
 [`./posts/`](./posts/) stages posts (school classes) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about artificial neural tissue, antivirus, assistants, plus autonomous tools.
