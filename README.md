@@ -19,6 +19,10 @@
     - [Affiliates](#affiliates)
 
 # Purposes
+<https://github.com/SwuduSusuwu/SubStack/> as a whole is: [computer-related blog posts](./posts/) and modular {[`Susuwu::*`, `susuwu*`](./cxx/), [`SUSUWU_*`](./sh/)} code about those posts.
+- \[Notice\] Moved this repo to <https://github.com/SwuduSusuwu/SusuLib/> ([since the focus shifted from blog posts to source code](https://github.com/SwuduSusuwu/SubStack/discussions/58).)
+- \[Notice\] Plan to move {`Susuwu::*`, `susuwu*`, `SUSUWU_*`} to {`SusuLib::*`, `susulib*`, `SUSULIB_*`}.
+
 [`./.ssh/`](./.ssh/) is to [use signatures / certificates](#signaturecertificate).
 
 [`./posts/`](./posts/) stages posts (virtual schools) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about: artificial neural tissue, antiviruses, assistants, plus autonomous tools.
