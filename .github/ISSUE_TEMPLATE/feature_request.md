@@ -1,4 +1,4 @@
---- <!--lint disable remark-lint-no-undefined-references-->
+<!--lint disable remark-lint-no-undefined-references-->---
 name: Feature request
 about: Suggest how to improve code/workflow
 title: "[Improve] \<relative path\>: \<what to do\>"
