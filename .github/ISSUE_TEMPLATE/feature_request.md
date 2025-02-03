@@ -1,14 +1,15 @@
 ---
 name: Feature request
 about: Suggest how to improve code/workflow
-title: "\[Improve\] <relative path>: <what to do>"
+<!--lint ignore remark-lint-no-undefined-references-->
+title: "[Improve] <relative path>: <what to do>"
 labels: improve
 assignees: ''
 
 ---
 
 **Rationales**
-- Reasons to do this to `Susuwu` (the namespace used throughout https://github.com/SwuduSusuwu/SubStack and possible future name for this).
+- Reasons to do this to `Susuwu` (the namespace used throughout [https://github.com/SwuduSusuwu/SubStack/](https://github.com/SwuduSusuwu/SubStack/) and possible future name for this).
   - Which functions (if applicable) that this will improve.
   - Which other [issues](https://github.com/SwuduSusuwu/SubStack/issues)/[milestones](https://github.com/SwuduSusuwu/SubStack/milestones) (if applicable) that this will improve (but if all this is about is an issue which issues, you should just respond to that issue).
 
