@@ -1,6 +1,7 @@
 ---
 name: Feature request
-about: Suggest how to improve code/workflow<!--lint disable remark-lint-no-undefined-references-->
+about: Suggest how to improve code/workflow
+<!--lint disable remark-lint-no-undefined-references-->
 title: "[Improve] <relative path>: <what to do>"
 labels: improve
 assignees: ''
