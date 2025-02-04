@@ -55,6 +55,9 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 	const std::string assignment = whitespace ? " = " : "=";
 	size_t index_ = 0;
 	os << '{';
+#ifdef SUSUWU_LIST_COUNT
+	os << list.size() << ':';
+#endif /* def SUSUWU_LIST_COUNT */
 	for(const auto &value : list) {
 		if(0 != index_) {
 			os << ',';

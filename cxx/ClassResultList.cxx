@@ -22,9 +22,14 @@ const bool classResultListTests() {
 	resultList.hashes.insert(ResultListHash({'\x32'})); /* `.hashes` is `std::unordered_set`, thus test just 1 value. */
 	resultList.signatures = {"1", "2"};
 	resultList.bytecodes = {"01", "02"};
-	classResultListDumpToTest(resultList, false, false, false, "list.hashes={0x32};list.signatures={0x31,0x32};list.bytecodes={0x3031,0x3032};");
-	classResultListDumpToTest(resultList, true, true, false, "list.hashes = {\n\t0 = 0x32\n};\nlist.signatures = {\n\t0 = 0x31,\n\t1 = 0x32\n};\nlist.bytecodes = {\n\t0 = 0x3031,\n\t1 = 0x3032\n};\n");
-	classResultListDumpToTest(resultList, false, false, true, "list.hashes={1:2};list.signatures={1:1,1:2};list.bytecodes={2:01,2:02};");
+#ifdef SUSUWU_LIST_COUNT
+	const std::string listHashesSz = "1:", listSignaturesSz = "2:", listBytecodesSz = "2:";
+#else /* def SUSUWU_LIST_COUNT else */
+	const std::string listHashesSz = "", listSignaturesSz = "", listBytecodesSz = ""; /* NOLINT(readability-redundant-string-init): define that those are "". */
+#endif /* ndef SUSUWU_LIST_COUNT */
+	classResultListDumpToTest(resultList, false, false, false, "list.hashes={" + listHashesSz + "0x32};list.signatures={" + listSignaturesSz + "0x31,0x32};list.bytecodes={" + listBytecodesSz + "0x3031,0x3032};");
+	classResultListDumpToTest(resultList, true, true, false, "list.hashes = {" + listHashesSz + "\n\t0 = 0x32\n};\nlist.signatures = {" + listSignaturesSz + "\n\t0 = 0x31,\n\t1 = 0x32\n};\nlist.bytecodes = {" + listBytecodesSz + "\n\t0 = 0x3031,\n\t1 = 0x3032\n};\n");
+	classResultListDumpToTest(resultList, false, false, true, "list.hashes={" + listHashesSz + "1:2};list.signatures={" + listSignaturesSz + "1:1,1:2};list.bytecodes={" + listBytecodesSz + "2:01,2:02};");
 	return true;
 }
 }; /* namespace Susuwu */
