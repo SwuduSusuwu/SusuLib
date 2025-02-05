@@ -176,7 +176,7 @@ static void classSysDebugIs(const std::string &func, Is &is) {
 		return;
 	} /* auto isState = is.getstate(); */
 	if(is >> token) {
-		SUSUWU_DEBUG(func + ": " + std::string(__func__) + ": is == \"" + token + "\"");
+		SUSUWU_DEBUG(func + ": is == \"" + token + "\"");
 	} else if(is.fail() && !(is.bad() || is.eof())) {
 		is.clear(std::ios::goodbit); /* is.setstate(isState); */
 	}
@@ -193,13 +193,13 @@ inline Is &classSysHexIs(Is &is, Int &value) {
 	is.fill('0');
 	/* classSysDebugIs(std::string(__func__) + "(pre)", is); */
 	if(!is.good()) {
-		SUSUWU_NOTICE(std::string(__func__) + ": (!is.good())");
+		SUSUWU_NOTICE("(!is.good())");
 		return is;
 	} /* auto isState = is.getstate(); */
 	std::streampos pos = is.tellg();
 	if(is >> std::hex >> std::setw(2)/* `setw` is unset after each use */ >> value) {
 		const std::streampos newPos = is.tellg();
-		/* SUSUWU_DEBUG(std::string(__func__) + ": value == 0x" + classSysHexStr(value) + ", pos += " + std::to_string(newPos - pos)); */
+		/* SUSUWU_DEBUG("value == 0x" + classSysHexStr(value) + ", pos += " + std::to_string(newPos - pos)); */
 		pos = newPos;
 	} else if(is.fail() && !(is.bad() || is.eof())) {
 		is.seekg(pos); /* TODO: prove if this can be removed for all flags*/
@@ -221,13 +221,13 @@ inline Is &classSysHexIs(Is &is, Str &value) {
 	is.fill('0');
 	/* classSysDebugIs(std::string(__func__) + "(pre)", is); */
 	if(!is.good()) {
-		SUSUWU_NOTICE(std::string(__func__) + ": (!is.good())");
+		SUSUWU_NOTICE("(!is.good())");
 		return is;
 	} /* auto isState = is.getstate(); */
 	std::streampos pos = is.tellg();
 	for(unsigned int ch; /* NOLINT(cppcoreguidelines-init-variables): is unitialized so that accidental removal of `is >> ch;` will warn when `ch` is used */ is >> std::hex >> std::setw(2)/* `setw` is unset after each use */ >> ch; ) {
 		const std::streampos newPos = is.tellg();
-		/* SUSUWU_DEBUG(std::string(__func__) + ": ch == 0x" + classSysHexStr(ch) + ", pos += " + std::to_string(newPos - pos)); */
+		/* SUSUWU_DEBUG("ch == 0x" + classSysHexStr(ch) + ", pos += " + std::to_string(newPos - pos)); */
 		for(auto i = ((newPos - pos) >> 1) - (SUSUWU_HEX_DOES_PREFIX ? 1 : 0); i--; ) {
 			value += reinterpret_cast<unsigned char *>(&ch)[i];
 		}
@@ -237,7 +237,6 @@ inline Is &classSysHexIs(Is &is, Str &value) {
 		is.seekg(pos); /* TODO: prove if this can be removed for all flags*/
 		is.clear(std::ios::goodbit); /* is.setstate(isState); */
 	}
-	classSysDebugIs(std::string(__func__) + "(post)", is);
 	is.fill(oldFill);
 	is.flags(oldFlags);
 	/* classSysDebugIs(std::string(__func__) + "(post)", is); */
@@ -269,19 +268,19 @@ static std::basic_istream<CharT, Traits>& classSysGetline(std::basic_istream<Cha
 /* Usage: @code is >> value; classSysCheckChar(__func__, '{', value); @endcode */
 inline void classSysCheckChar(const std::string &func, const char expected, const char got) {
 	if(expected != got) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": " + __func__ + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
 	} /* classSysCheckStr(func, std::string(expected), got); */
 }
 /* Usage: @code is >> value; classSysCheckSz(__func__, 42, value); @endcode */
 inline void classSysCheckSz(const std::string &func, const size_t expected, const size_t got) {
 	if(expected != got) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": " + __func__ + ": expected '" SUSUWU_SH_GREEN + std::to_string(expected) + SUSUWU_SH_DEFAULT "', got '" SUSUWU_SH_RED + std::to_string(got) + SUSUWU_SH_DEFAULT "'"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": expected '" SUSUWU_SH_GREEN + std::to_string(expected) + SUSUWU_SH_DEFAULT "', got '" SUSUWU_SH_RED + std::to_string(got) + SUSUWU_SH_DEFAULT "'"));
 	} /* classSysCheckStr(func, std::to_string(expected), std::to_string(got)); */
 }
 /* Usage: @code if(rand() % 2) {is >> value;} else {classSysGetline(is, value);} classSysCheckStr(__func__, "};", value); @endcode */
 static void classSysCheckStr(const std::string &func, const std::string &expected, const std::string &got) {
 	if(expected != got) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": " + __func__ + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" + SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" + SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
 	}
 }
 
