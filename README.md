@@ -250,13 +250,16 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
     - `throw std::runtime_error(message)` (or `throw Q()` where `class Q : public std::exception`)
     - `std::cerr << message` (or `fprintf(stdout, message)`
     - `errno = code;`, or `return code;`.
-- Have follow tools such as {`clang++`, `g++`, `vim`}:
+- Follow tools such as {`clang++`, `g++`, `vim`, _Markdown_}:
+  - use [`./cxx/Macros.hxx`](./cxx/Macros.hxx)`:SUSUWU_SH_BROWN` (and / or `` `<code>` ``) to quote code (or commands).
+  - use `./cxx/Macros.hxx:SUSUWU_SH_PURPLE` (and / or `"<path>"`) to quote paths.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_CYAN` to quote names of functions.
   - use `./cxx/Macros.hxx:SUSUWU_SH_RED` to quote error messages.
   - use `./cxx/Macros.hxx:SUSUWU_SH_PURPLE` to quote status codes (or return values).
-  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_CYAN` to quote names of variables/constants.
-  - use `./cxx/Macros.hxx:SUSUWU_SH_GREEN` to quote current arguments/values.
-  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_PURPLE` to quote speculative replacement arguments/values.
-  - [`.sh`](#sh-source) code uses `./sh/Macros.sh:SUSUWU_SH_<color>`.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_CYAN` to quote names of variables / constants.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_GREEN` to quote (current) arguments / values.
+  - use `./cxx/Macros.hxx:SUSUWU_SH_LIGHT_PURPLE` to quote (speculative / proposed) replacement arguments / values.
+  - [`.sh`](#sh-source) code uses `./sh/Macros.sh:SUSUWU_SH_<color>`; new values above should also goto [`./sh/Macros.sh`](./sh/Macros.sh).
 
 - Comments
   - Comments about possible `return code;`s (or `throw`s) go above function declarations (_Doxygen_ convention).
