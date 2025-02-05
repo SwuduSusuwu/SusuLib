@@ -66,4 +66,5 @@ Makefile
 *.exe
 index.xhtml
 robots.txt
+compile_commands.json
 

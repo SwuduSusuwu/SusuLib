@@ -4,18 +4,49 @@
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
-. ./sh/Macros.sh #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_ECHO_COMMANDS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_VERBOSE */
+. ./sh/Macros.sh #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
 
+SUSUWU_COMPILER_JSON_PATH_="$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json" # [`clang-tidy` compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration)
 SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
-	if [ true = "${1}" ]; then
-		export SUSUWU_NEW_BUILD=true # If is first build, or passed `--rebuild`, or global headers `touch`d; `SUSUWU_NEW_BUILD=true`.
-		export SUSUWU_RELINK=true # If `SUSUWU_NEW_BUILD` or sources `touch`d; `SUSUWU_RELINK=true`.
-	else
-		export SUSUWU_NEW_BUILD=false
-		export SUSUWU_RELINK=false
+	if [ true = "${1}" ]; then       #/* If is first build, or passed `--rebuild`, or global headers `touch`d;
+		export SUSUWU_NEW_BUILD=true   # * build "${OBJDIR}${OUTPUT}",
+		export SUSUWU_RELINK=true      # * build "${BINDIR}${OUTPUT}",
+		export SUSUWU_COMPILER_JSON_PATH="${SUSUWU_COMPILER_JSON_PATH_}" #*and regenerate compilation database. */
+	else                                           #/* If is built;
+		export SUSUWU_NEW_BUILD=false                # * don't clobber,
+		export SUSUWU_RELINK=false                   # * don't clobber,
+		export SUSUWU_COMPILER_JSON_PATH="/dev/null" # * don't clobber. */
 	fi
 }
 SUSUWU_SET_NEW_BUILD false
+SUSUWU_COMPILER_COMMAND() { #/* Usage: `SUSUWU_COMPILER_COMMAND "<directory>" "<file>" ["<command>" | <arguments>...]"`. Allows to echo commands ( + produce `./${SUSUWU_COMPILER_JSON_PATH}`). */
+	if [ "/dev/null" != "${SUSUWU_ECHO_COMMANDS_TO}" ]; then
+		SUSUWU_PRINT "SUSUWU_COMPILER_COMMAND()" "$(SUSUWU_SH_NOTICE)" "${3}" #"${SUSUWU_ECHO_COMMANDS_TO}" #TODO: redirection
+	fi
+	{
+		echo "	{"
+		echo "		\"directory\": \"${1}\","
+		echo "		\"command\": \"$(SUSUWU_ESCAPE_QUOTED "${3}")\","
+		echo "		\"file\": \"${2}\""
+		echo "	},"
+	} >> "${SUSUWU_COMPILER_JSON_PATH}"
+	${3}
+	return $?
+}
+SUSUWU_LOCAL_WORKSPACE_JSON() ( #/* Usage: `git pull && SUSUWU_LOCAL_WORKSPACE_PATH_JSON && clang-tidy ${CXX_SOURCE_PATH}` [Replaces `${{ github.workspace }}` with `$(pwd)`] */
+	[ -n "$(SUSUWU_LOCAL_WORKSPACE_PATH)" ] && sed "s|\"directory\": \"[^\"]\+\"|\"directory\": \"$(SUSUWU_LOCAL_WORKSPACE_PATH)\"|g" -i"" "${SUSUWU_COMPILER_JSON_PATH_}"
+)
+SUSUWU_LOCAL_WORKSPACE_JSON #TODO: suitable spot to put this, perhaps into `SUSUWU_SETUP_CXX()`.
+SUSUWU_GITHUB_WORKSPACE_JSON() ( #/* Usage: `echo "SUSUWU_GITHUB_WORKSPACE_JSON" >> .git/hooks/pre-commit` [Replaces `$(pwd)` with `${{ github.workspace }}` */
+	JSON_BACKUP_SUFFIX=".bak" #TODO; remove, since this is restored with `SUSUWU_LOCAL_WORKSPACE_PATH`?
+	JSON_BACKUP_PATH="${SUSUWU_COMPILER_JSON_PATH_}${JSON_BACKUP_SUFFIX}"
+	if SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_GITHUB_WORKSPACE_JSON()" "${JSON_BACKUP_PATH}"; then
+		sed 's|"directory": "\([^"]\+\)"|"directory": "/home/runner/work/SubStack/SubStack"|g' -i"${JSON_BACKUP_SUFFIX}" "${SUSUWU_COMPILER_JSON_PATH_}"
+		git add -f "${SUSUWU_COMPILER_JSON_PATH_}"
+		rm "${JSON_BACKUP_PATH}" # mv "${JSON_BACKUP_PATH}" "${SUSUWU_COMPILER_JSON_PATH_}" causes "error: cannot rebase: You have unstaged changes."
+	fi
+)
+
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
 	if SUSUWU_SH_HAS_PARAM "--mingw" "$@"; then
@@ -170,21 +201,20 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}
 		if [ -n "$(find "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" -newer "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" 2>/dev/null)" ] && [ -e "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" ]; then #/* `-n`: not nil, `-e`: exists. */
 			SUSUWU_REBUILD_OUTPUT "$(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_SOURCE_}") (which is a common $(SUSUWU_SH_QUOTE "CODE" "#include")) is newer than $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_OBJECT_}")"
 			break
-		else
+		elif [ ! -e "${SUSUWU_PROCESS_INCLUDES_SRCCXX_}" ]; then
 			if [ ! -e "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" ]; then
-				SUSUWU_SET_NEW_BUILD true #/* Don't need `--rebuild`, but will regenerate `${SUSUWU_COMPILATION_JSON}` */
+				SUSUWU_SET_NEW_BUILD true #/* Don't need `--rebuild`, but must regenerate `${SUSUWU_COMPILER_JSON_PATH}` */
 			fi
-			if [ ! -e "${SUSUWU_PROCESS_INCLUDES_SRCCXX_}" ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
-				touch "${SUSUWU_PROCESS_INCLUDES_OBJECT_}";            #/* ... then produce `*.o` (for future tests.) */
-			fi
+			touch "${SUSUWU_PROCESS_INCLUDES_OBJECT_}"; #/* If `*.hxx` doesn't have `*.cxx` match, produce `*.o` (for future tests.) */
 		fi
 	done
+	echo "[" > "${SUSUWU_COMPILER_JSON_PATH}"
 }
 SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
 	SUSUWU_STATUS=1
 	if command -v ctags >/dev/null; then
 		if [ -z "${1}" ] || [ -z "${2}" ]; then
-			CTAGS_DEFAULTS="-R --exclude=.git/ --exclude=*.html ."
+			CTAGS_DEFAULTS="-R --exclude=.git/ --exclude=*.html --exclude=compile_commands.json ."
 			SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_NOTICE)" "Was called with less than 2 params; will default to $(SUSUWU_SH_QUOTE "CODE" "SUSUWU_BUILD_CTAGS ${CTAGS_DEFAULTS}")."
 #shellcheck disable=SC2086
 			ctags ${CTAGS_DEFAULTS} && SUSUWU_STATUS=0
@@ -214,8 +244,9 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
 #shellcheck disable=SC2166 #With `set -x`, the `[] || []` form prints 2 commands
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
+				SUSUWU_COMPILER_COMMAND "$(pwd)" "${LOCAL_SOURCE}" "${LOCAL_BUILD} ${LOCAL_BUILDFLAGS} -c ${LOCAL_SOURCE} -o ${LOCAL_OBJECT}" || { #TODO: figure out how to quote `${LOCAL_BUILD}`, `${LOCAL_SOURCE}` `${LOCAL_OBJECT}`
 #shellcheck disable=SC2086 #`"${LOCAL_BUILDFLAGS}"` gives "clang++: error: language not recognized"
-			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}" || {
+#			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}" || {
 				SUSUWU_STATUS=$?
 				SUSUWU_ECHO_COMMANDS false
 				SUSUWU_BUILD_OBJECT_ERROR_CODE="$(SUSUWU_SH_QUOTE "CODE" "${LOCAL_BUILD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). "
@@ -233,6 +264,8 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 	done
 }
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
+	echo "]" >> "${SUSUWU_COMPILER_JSON_PATH}" && \
+	sed ':a;N;$!ba;s/},\n]/}\n]/g' -i'' "${SUSUWU_COMPILER_JSON_PATH}" 2>/dev/null
 #shellcheck disable=SC2046 #Is not possible to use more quotes.
 	${SUSUWU_RELINK} && "${LD}" $(echo "${LDFLAGS}${SUSUWU_OBJECTLIST}" | xargs) -o "${BINDIR}${OUTPUT}"
 	SUSUWU_STATUS=$?
