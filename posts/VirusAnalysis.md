@@ -647,7 +647,7 @@ const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests
 
 template<class Os, class Str>
 inline Os &classSysHexOs(Os &os, const Str &value) {
-	const std::ios::fmtflags oldFlags = std::cout.flags();
+	const std::ios::fmtflags oldFlags = os.flags();
 	const char oldFill = os.fill();
 	os << std::hex;
 	os.fill('0');
