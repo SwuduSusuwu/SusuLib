@@ -229,6 +229,17 @@ SUSUWU_SH_SUCCESS() (SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: ")
 SUSUWU_SH_NOTICE() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: ")
 SUSUWU_SH_DEBUG() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: ")
 
+#/* `SUSUWU_SH_<type-of-code>`. Notice: update [`README.md#cc-source`](README.md#cc-source) if you update those.
+# * Usage: `SUSUWU_PRINT "$(SUSUWU_SH_<warn-level>)" "[<optional message>] $(SUSUWU_SH_<type-of-code> "<code>" ["<optional original color>"]) [<optional message>]"`. */
+SUSUWU_SH_CODE_QUOTE() ( echo "\`$(SUSUWU_SH_USE2 "${SUSUWU_SH_BROWN}" "${1}" "${2}")\`"; ) # Usage: `SUSUWU_SH_CODE_QUOTE "<script or source code>"`
+SUSUWU_SH_PATH_QUOTE() ( echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}")\""; ) # Usage: `SUSUWU_SH_PATH_QUOTE "<path>"`
+SUSUWU_SH_FUNCTION() ( SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_FUNCTION "<script or source code>"`
+SUSUWU_SH_ERROR_MESSAGE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_ERROR_MESSAGE "<error messages>"`
+SUSUWU_SH_STATUS_CODE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_STATUS_CODE "<status codes (or return value)>"`
+SUSUWU_SH_VAR() ( SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_VAR "<name of variable/constant>"`
+SUSUWU_SH_CURRENT_VALUE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_CURRENT_VALUE "<current argument/value>"`
+SUSUWU_SH_PROPOSED_VALUE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_PROPOSED_VALUE "<speculative replacement argument/value>"`
+
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
@@ -291,7 +302,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 )
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
-	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute \`export TERM=\"linux\"\` to enable console code use."
+	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_CODE_QUOTE "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute $(SUSUWU_SH_CODE_QUOTE "export TERM=\"linux\"") to enable console code use."
 fi
 
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
@@ -310,9 +321,9 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #detect default branch
 		fi
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_NOTICE)" "\`git branch\` is \"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${THIS_BRANCH}")\"."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_CODE_QUOTE "git branch") is \"$(SUSUWU_SH_CURRENT_VALUE "${THIS_BRANCH}")\"."
 		else
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_WARNING)" "\`git branch\` is \"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${THIS_BRANCH}")\"; for production use, execute \`git switch $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${DEFAULT_BRANCH}")\`."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_CODE_QUOTE "git branch") is \"$(SUSUWU_SH_CURRENT_VALUE "${THIS_BRANCH}")\"; for production use, execute $(SUSUWU_SH_CODE_QUOTE "git switch $(SUSUWU_SH_PROPOSED_VALUE "${DEFAULT_BRANCH}")")."
 		fi
 	fi
 )
@@ -333,9 +344,9 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 		BASH_STATUS=$?
 		rm "${BASH_PATH}"
 		if [ 0 -eq ${BASH_STATUS} ]; then
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${BASH_STATUS}")."
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
 		else
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${BASH_STATUS}")."
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
 		fi
 		return ${BASH_STATUS}
 	fi
