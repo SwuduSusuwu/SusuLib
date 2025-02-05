@@ -1,10 +1,11 @@
 #!/bin/sh
 #
 # This is [custom `post-checkout`](https://github.com/SwuduSusuwu/SubStack/blob/preview/hooks/post-checkout):
-# Produces `./tags` [for `vim`](../README.md#purposes).
+# Produces `./tags` [for `vim`](../README.md#purposes), uses `SUSUWU_LOCAL_WORKSPACE_JSON` [for local `compile_commands.json` tools](../README.md#purposes).
 GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
-. "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() */
+. "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() SUSUWU_LOCAL_WORKSPACE_JSON() */
 STATUS_CODE=$?
+SUSUWU_LOCAL_WORKSPACE_JSON #/* Replace `${{ github.workspace }}` with `$(pwd)` */
 SUSUWU_BUILD_CTAGS 2>/dev/null #/* Produce `./tags` */
 return ${STATUS_CODE}
 

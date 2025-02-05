@@ -5,7 +5,8 @@
 GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
 . "${GIT_ROOT}/sh/Macros.sh" #/* SUSUWU_IS_PREVIEW() */
 STATUS_CODE=$?
-if SUSUWU_IS_PREVIEW; then #/* If `./tags` is tracked; */
+SUSUWU_GITHUB_WORKSPACE_JSON #/* Replace `$(pwd)` with `${{ github.workspace }}` */
+if SUSUWU_IS_PREVIEW; then #/* if `./tags` is tracked */
 	git restore "${GIT_ROOT}/tags" 2>/dev/null #/* TODO: run soon enough to prevent "error: cannot rebase: You have unstaged changes." */
 fi
 return ${STATUS_CODE}

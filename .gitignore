@@ -67,3 +67,5 @@ Makefile
 build.sh.bash
 index.xhtml
 robots.txt
+compile_commands.json
+

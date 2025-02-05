@@ -302,9 +302,12 @@ SUSUWU_SH_QUOTE_SUB() { #/* Usage: `SUSUWU_SH_QUOTE_SUB "<type-of-quote>" "<code
 
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
+export SUSUWU_ECHO_COMMANDS_TO="/dev/null" #/* `sh/make.sh:SUSUWU_SH_COMPILER_COMMAND`'s path for `echo`. */
 SUSUWU_ECHO_COMMANDS() { #/* Usage: `SUSUWU_ECHO_COMMANDS [true | false]`. ] */
-	${1} && (! ${SUSUWU_S}) && set -x
-	(! ${1}) && (! ${SUSUWU_VERBOSE}) && set +x
+	(  ${1}) && (${SUSUWU_VERBOSE}) && set -x
+	(! ${1}) && (${SUSUWU_VERBOSE}) && set +x
+	(  ${1}) && (! ${SUSUWU_S}) && SUSUWU_ECHO_COMMANDS_TO="&2" #TODO: fix variable descriptors
+	(! ${1}) && (! ${SUSUWU_VERBOSE}) && SUSUWU_ECHO_COMMANDS_TO="/dev/null"
 }
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "-s" "$@"; then
@@ -377,6 +380,10 @@ SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR() { #/* Usage: `SUSUWU_PROCESS_ABORT_ON_FIRS
 	fi
 }
 
+SUSUWU_LOCAL_WORKSPACE_PATH() ( #/* Usage: `"$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json"` [Substitute for `${GIT_WORK_TREE}` or `${GIT_DIR}`]` */
+	git rev-parse --absolute-git-dir >/dev/null 2>&1 || return 1
+	dirname "$(git rev-parse --absolute-git-dir 2>/dev/null)"
+)
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
 	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #remote branch
 	if [ -z "${DEFAULT_BRANCH}" ]; then #if `git remote` not found
