@@ -11,7 +11,7 @@
 #endif /* def SUSUWU_POSIX */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef SUSUWU_POSIX
-#include <stdexcept> /* std::invalid_argument std::runtime_error */
+#include <stdexcept> /* std::invalid_argument std::logic_error std::runtime_error */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
 #include <unistd.h> /* execve execv fork geteuid getuid setuid */
@@ -287,11 +287,11 @@ static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
 	if(2 != ss) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
 	}
 	classSysHexOs(os, value);
 	if(2 != os.str().size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
 	}
 }
 }; /* namespace */
