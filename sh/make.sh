@@ -6,6 +6,16 @@
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
 . ./sh/Macros.sh #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_ECHO_COMMANDS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_VERBOSE */
 
+SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
+	if [ true = "${1}" ]; then
+		export SUSUWU_NEW_BUILD=true # If is first build, or passed `--rebuild`, or global headers `touch`d; `SUSUWU_NEW_BUILD=true`.
+		export SUSUWU_RELINK=true # If `SUSUWU_NEW_BUILD` or sources `touch`d; `SUSUWU_RELINK=true`.
+	else
+		export SUSUWU_NEW_BUILD=false
+		export SUSUWU_RELINK=false
+	fi
+}
+SUSUWU_SET_NEW_BUILD false
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
 	if SUSUWU_SH_HAS_PARAM "--mingw" "$@"; then
@@ -124,9 +134,9 @@ SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 		OUTPUT="${1}.exe"
 	fi
 	if [ -e "${BINDIR}${OUTPUT}" ]; then
-		BUILDNEW=false
+		SUSUWU_RELINK=false
 	else
-		BUILDNEW=true
+		SUSUWU_RELINK=true
 	fi
 }
 SUSUWU_CLEAN_OUTPUT_IMPL() ( #/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript" */
@@ -139,9 +149,10 @@ SUSUWU_CLEAN_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus exit. [Use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--clean") $(SUSUWU_SH_QUOTE "PROPOSED" "--rebuild")") to remove plus continue.]"
 	exit 0
 }
-SUSUWU_REBUILD_OUTPUT() ( #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to rebuild" */
+SUSUWU_REBUILD_OUTPUT() { #/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to rebuild" */
 	SUSUWU_CLEAN_OUTPUT_IMPL "${1}" ", plus continue. [Use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--rebuild") $(SUSUWU_SH_QUOTE "PROPOSED" "--clean")") to remove plus exit.]"
-)
+	SUSUWU_SET_NEW_BUILD true
+}
 SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "--clean" "$@"; then
 		SUSUWU_CLEAN_OUTPUT "Was called as $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--clean" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--clean")")"
@@ -151,19 +162,24 @@ SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [T
 	fi
 }
 
-SUSUWU_PROCESS_INCLUDES() ( #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
+SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
 #shellcheck disable=SC2068
-	for LOCAL_SOURCE in $@; do
-		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" .hxx).o" #/* `basename`'s second param removes suffix */
-		LOCAL_SRCCXX="$(dirname "${LOCAL_SOURCE}")/$(basename "${LOCAL_SOURCE}" .hxx).cxx" #/* `basename`'s second param removes suffix */
-		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" ] && [ -e "${LOCAL_SOURCE}" ]; then #/* `-n`: not nil, `-e`: exists. */
-			SUSUWU_REBUILD_OUTPUT "$(SUSUWU_SH_QUOTE "PATH" "${LOCAL_SOURCE}") (which is a common $(SUSUWU_SH_QUOTE "CODE" "#include")) is newer than $(SUSUWU_SH_QUOTE "PATH" "${LOCAL_OBJECT}")"
+	for SUSUWU_PROCESS_INCLUDES_SOURCE_ in $@; do
+		SUSUWU_PROCESS_INCLUDES_OBJECT_="${OBJDIR}$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" .hxx).o" #/* `basename`'s second param removes suffix */
+		SUSUWU_PROCESS_INCLUDES_SRCCXX_="$(dirname "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")/$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" .hxx).cxx" #/* `basename`'s second param removes suffix */
+		if [ -n "$(find "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" -newer "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" 2>/dev/null)" ] && [ -e "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" ]; then #/* `-n`: not nil, `-e`: exists. */
+			SUSUWU_REBUILD_OUTPUT "$(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_SOURCE_}") (which is a common $(SUSUWU_SH_QUOTE "CODE" "#include")) is newer than $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_OBJECT_}")"
 			break
-		elif [ ! -e "${LOCAL_SRCCXX}" ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
-			touch "${LOCAL_OBJECT}";            #/* ... then produce `*.o` (for future tests.) */
+		else
+			if [ ! -e "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" ]; then
+				SUSUWU_SET_NEW_BUILD true #/* Don't need `--rebuild`, but will regenerate `${SUSUWU_COMPILATION_JSON}` */
+			fi
+			if [ ! -e "${SUSUWU_PROCESS_INCLUDES_SRCCXX_}" ]; then #/* If `*.hxx` doesn't have `*.cxx` match,     */
+				touch "${SUSUWU_PROCESS_INCLUDES_OBJECT_}";            #/* ... then produce `*.o` (for future tests.) */
+			fi
 		fi
 	done
-)
+}
 SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SOURCE_DIR]...`. Return value: if `ctags` is called; `0`, if not; `1`. */
 	SUSUWU_STATUS=1
 	if command -v ctags >/dev/null; then
@@ -211,17 +227,17 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 				fi
 				SUSUWU_ECHO_COMMANDS true
 			}
-			BUILDNEW=true
+			SUSUWU_RELINK=true
 		fi
 		SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${LOCAL_OBJECT}")"
 	done
 }
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
 #shellcheck disable=SC2046 #Is not possible to use more quotes.
-	${BUILDNEW} && "${LD}" $(echo "${LDFLAGS}${SUSUWU_OBJECTLIST}" | xargs) -o "${BINDIR}${OUTPUT}"
+	${SUSUWU_RELINK} && "${LD}" $(echo "${LDFLAGS}${SUSUWU_OBJECTLIST}" | xargs) -o "${BINDIR}${OUTPUT}"
 	SUSUWU_STATUS=$?
 	SUSUWU_ECHO_COMMANDS false
-	if [ false = ${BUILDNEW} ]; then
+	if [ false = ${SUSUWU_RELINK} ]; then
 		SUSUWU_STATUS=0
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Reused $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	elif [ 0 -eq ${SUSUWU_STATUS} ]; then
@@ -233,7 +249,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 }
 
 SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-execution>]; exit $?` */
-	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${BUILDNEW} ]; then
+	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${SUSUWU_RELINK} ]; then
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
 			if [ true = ${SUSUWU_S} ]; then
 				"${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
