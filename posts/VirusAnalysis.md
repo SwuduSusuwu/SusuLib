@@ -951,11 +951,11 @@ static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
 	if(2 != ss) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
 	}
 	classSysHexOs(os, value);
 	if(2 != os.str().size()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
 #ifndef SUSUWU_POSIX
 #endif /* ndef SUSUWU_POSIX */
 	}
