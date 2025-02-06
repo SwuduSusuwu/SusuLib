@@ -97,6 +97,9 @@ SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(S
 	done
 	echo "${NEW_PATH}"
 )
+SUSUWU_ESCAPE_QUOTED() ( #/* Usage: `echo "\"param\": \"$(SUSUWU_ESCAPE_QUOTED "${VALUE}")\"" >> out.json`. */
+	echo "$@" | sed 's/"/\\"/g' | sed 's/\\/\\\\/g'
+)
 
 SUSUWU_STR_TOKEN_FIRST() ( # Usage: `SUSUWU_STR_TOKEN_FIRST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all before last <delimiter>.
 	echo "${1%${2}*}" #echo "${1}" | sed "s/\(${2}[^${2}]*\)\$//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001
