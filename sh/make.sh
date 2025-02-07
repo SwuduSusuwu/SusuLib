@@ -19,9 +19,17 @@ SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
 	fi
 }
 SUSUWU_SET_NEW_BUILD false
+SUSUWU_HAS_PARTIAL_JSON() ( #/* Usage: `if $(SUSUWU_HAS_PARTIAL_JSON "compile_commands.json"); then RESUME_JSON_BUILD... ` */
+	[ "[" = "$(head -c1 "${1}")" ] && [ "}," = "$(tail -c3 "${1}")" ] #	[ "]" != "$(tail -c2 "${1}")" ]
+	return $?
+)
 SUSUWU_COMPILE_COMMAND() { #/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command>" | <arguments>...]"`. Allows to echo commands ( + produce `./${SUSUWU_COMPILE_JSON_PATH}`). */
 	if [ "/dev/null" != "${SUSUWU_ECHO_COMMANDS_TO}" ]; then
 		SUSUWU_PRINT "SUSUWU_COMPILE_COMMAND()" "$(SUSUWU_SH_NOTICE)" "${3}" #"${SUSUWU_ECHO_COMMANDS_TO}" #TODO: redirection
+	fi
+	if SUSUWU_HAS_PARTIAL_JSON "${SUSUWU_COMPILE_JSON_PATH_}" && [ "/dev/null" = "${SUSUWU_COMPILE_JSON_PATH}" ]; then
+		SUSUWU_PRINT "SUSUWU_HAS_PARTIAL_JSON()" "$(SUSUWU_SH_INFO)" "found partial $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_COMPILE_JSON_PATH_}"), will resume."
+		export SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" #Notice: assumes that `SUSUWU_PROCESS_INCLUDES()` is not called once `SUSUWU_COMPILE_COMMAND()` is.
 	fi
 	{
 		echo "	{"
@@ -217,9 +225,9 @@ SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}
 			SUSUWU_REBUILD_OUTPUT "$(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_SOURCE_}") (which is a common $(SUSUWU_SH_QUOTE "CODE" "#include")) is newer than $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_OBJECT_}")"
 			break
 		elif [ ! -e "${SUSUWU_PROCESS_INCLUDES_SRCCXX_}" ]; then
-			if [ ! -e "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" ]; then
-				SUSUWU_SET_NEW_BUILD true #/* Don't need `--rebuild`, but must regenerate `${SUSUWU_COMPILE_JSON_PATH}` */
-			fi
+#			if [ ! -e "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" ]; then
+#				SUSUWU_SET_NEW_BUILD true #/* Don't need `--rebuild`, but must regenerate `${SUSUWU_COMPILE_JSON_PATH}` */
+#			fi #/* TODO: remove this code block once `SUSUWU_HAS_PARTIAL_JSON()` is perfect. */
 			touch "${SUSUWU_PROCESS_INCLUDES_OBJECT_}"; #/* If `*.hxx` doesn't have `*.cxx` match, produce `*.o` (for future tests.) */
 		fi
 	done
