@@ -8,7 +8,6 @@
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <string> /* std::string */
 #include <tuple> /* std::tuple */
-#include <typeinfo> /* typeid */
 #include <vector> /* std::vector */
 namespace Susuwu {
 typedef enum CnsMode : char {

@@ -36,14 +36,14 @@ SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwante
 	echo "${NEW_PARAMS}"
 	return ${SUSUWU_SH_REMOVE_PARAM_FOUND}
 )
-SUSUWU_DIR_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}") */
+SUSUWU_DIR_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}")` */
 	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
 		DIR="${DIR}/" #/* if original doesn't have, append '/' */
 	fi
 	echo "${DIR}" #/* return with slash */
 )
-SUSUWU_DIR_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_ENSURE_DIR_SLASH "${BINDIR}") */
+SUSUWU_DIR_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_DIR_AFFIX_DOTSLASH "${BINDIR}")` */
 	DIR=${1}
 	case "${DIR}" in
 		./*) #/* original has "./" */

@@ -106,7 +106,7 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		SUSUWU_SETUP_BINDIR_NEW="$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "./objnew/")"
 		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect \`${LD} ... -o $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "\${BINDIR}")\${OUTPUT}\` (which has \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=\"${SUSUWU_SETUP_BINDIR_OLD}\"\`), execute \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=\"${SUSUWU_SETUP_BINDIR_NEW}\"\` (where \"${SUSUWU_SETUP_BINDIR_NEW}\" is a directory which you choose)."
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "\`${LD} ... -o \${BINDIR}\${OUTPUT}\` inherits local \`BINDIR=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")\"\` until you execute \`./bin/unset BINDIR\`."
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "\`${LD} ... -o \${BINDIR}\${OUTPUT}\` inherits local \`BINDIR=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")\"\` until you execute \`unset BINDIR\`."
 	fi
 	BINDIR=$(SUSUWU_DIR_SUFFIX_SLASH "${BINDIR}") #/* if inherit BINDIR, perhaps it is without last '/' */
 	mkdir -p "${BINDIR}"
