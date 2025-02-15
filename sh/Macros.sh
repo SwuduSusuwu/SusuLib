@@ -82,7 +82,7 @@ SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN='$(SUSUWU_UNAMBIGUOUS_PATH 
 )
 SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<function>" "<path>" && cp "${0}" "<path>"` */
 	if [ -e "${2}" ]; then
-		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "\"${2}\" exists. Use \`mv \"${2}\" \"${2}.bak\"\` (or \`rm \"${2}\"\`) and re-execute \`${1}\` (perhaps with \`${0}\`) to continue."
+		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_PATH_QUOTE "${2}") exists. Use $(SUSUWU_SH_CODE_QUOTE "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_CODE_QUOTE "rm \"${2}\"") and re-execute $(SUSUWU_SH_CODE_QUOTE "$(SUSUWU_SH_FUNCTION "${1}")") (perhaps with $(SUSUWU_SH_CODE_QUOTE "${0}")) to continue."
 		exit 1
 	fi
 	return 0
@@ -310,12 +310,12 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	NEW_MESSAGE="[${SUSUWU_SH_FILE:+"$0:"}${SUSUWU_SH_LINE:+"${LINENO}:"}${SUSUWU_SH_FILE_OR_LINE:+" "}${LEVEL}"
 	if [ "true" = "${SUSUWU_SH_FUNC}" ]; then
 		if [ -n "${CALLER_FUNC}" ]; then
-			NEW_MESSAGE="${NEW_MESSAGE}${CALLER_FUNC}: "
+			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_FUNCTION "${CALLER_FUNC}: ")"
 		elif [ "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" -eq 0 ]; then
 #shellcheck disable=SC2039 #if `SUSUWU_SH_HAS_FUNCNAME`, console supports this
-			NEW_MESSAGE="${NEW_MESSAGE}${FUNCNAME[1]}(): "
+			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_FUNCTION "${FUNCNAME[1]}(): ")"
 		elif [ -n "${KSH_VERSION}" ]; then
-			NEW_MESSAGE="${NEW_MESSAGE}${.sh.fun}: "
+			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_FUNCTION "${.sh.fun}: ")"
 		fi
 	fi
 	NEW_MESSAGE="${NEW_MESSAGE}${MESSAGE}${SUSUWU_SH_CLOSE_}]"
@@ -355,7 +355,7 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then # If system has `bash`, && this is not an infinite loop;
 		BASH_PATH="${0}.bash" # , path for `bash` version of this.
 		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" # In case user wants to disable this (or this crashed on last execution).
-		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce \"${BASH_PATH}\" to test \`/bin/bash\`. Execute \`touch \"${BASH_PATH}\"\` to disable this."
+		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_CODE_QUOTE "${BASH_PATH}") to test $(SUSUWU_SH_CODE_QUOTE "/bin/bash"). Execute $(SUSUWU_SH_CODE_QUOTE "touch '${BASH_PATH}'") to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
 		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then # If produced `/bin/bash` version;
 			#shellcheck disable=SC2016 # That's not supposed to expand
@@ -367,9 +367,9 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 		BASH_STATUS=$?
 		rm "${BASH_PATH}"
 		if [ 0 -eq ${BASH_STATUS} ]; then
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "$(SUSUWU_SH_CODE_QUOTE "${BASH_PATH}") returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
 		else
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_CODE_QUOTE "${BASH_PATH}") returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
 		fi
 		return ${BASH_STATUS}
 	fi
