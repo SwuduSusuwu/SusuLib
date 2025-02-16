@@ -98,6 +98,27 @@ SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(S
 	echo "${NEW_PATH}"
 )
 
+SUSUWU_STR_TOKEN_FIRST() ( # Usage: `SUSUWU_STR_TOKEN_FIRST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all before last <delimiter>.
+	echo "${1%${2}*}" #echo "${1}" | sed "s/\(${2}[^${2}]*\)\$//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001
+) #TODO: allow <delimiter>="\033".
+[ "uwu" = "$(SUSUWU_STR_TOKEN_FIRST "uwu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
+[ "uwu:q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu:q:mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
+[ "uwu^q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu^q^mukyu" "^")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
+#[ "uwu\033q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu\033q\033mukyu" "\\033")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
+#[ "uwu$'\033'q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu$'\033'q$'\033'mukyu" $'\033')" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
+SUSUWU_STR_TOKEN_LAST() ( # Usage: `SUSUWU_STR_TOKEN_LAST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all after last <delimiter>.
+	RESULT="${1#*${2}}"
+	if [ "${RESULT}" != "${1}" ]; then
+		SUSUWU_STR_TOKEN_LAST "${RESULT}" "${2}"
+	else
+		echo "${RESULT}" #echo "${1}" | sed "s/^.*${2}//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001
+	fi
+)
+[ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
+[ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "uwu:q:mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
+[ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "uwu^q^mukyu" "^")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
+[ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "uwu\033q\033mukyu" "\033")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
+
 #/* `SUSUWU_SH_<color>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
 #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "${SUSUWU_SH_<color>}<message>${SUSUWU_SH_DEFAULT}"`. */
 export SUSUWU_SH_DEFAULT="\033[0m"
