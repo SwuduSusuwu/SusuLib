@@ -203,7 +203,36 @@ SUSUWU_SH_HAS_256COLOR_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_256COLOR_CONSOLE
 		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "256" #test that color count is Greater or Equal to 256
 		return $? #return `test`'s output value
 )
-SUSUWU_SH_USE() ( #/* Usage: `SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_DEFAULT}"] ["&1"]`. Uses <attribute> on <message>. */
+export SUSUWU_SH_USE_PUSH_DEFAULT="${SUSUWU_SH_DEFAULT}"
+export SUSUWU_SH_USE_PUSH_RESET_WHITE="${SUSUWU_SH_RESET_WHITE}"
+SUSUWU_SH_USE_PUSH_DEBUG() ( #/* Usage: `SUSUWU_SH_USE_PUSH_DEBUG "${FUNCNAME}" "<arg>" "<step>"` */
+	${SUSUWU_VERBOSE} && printf "[Debug: ${SUSUWU_SH_LIGHT_CYAN}${1}${SUSUWU_SH_WHITE}(\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\"): ${3} ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_DEFAULT${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\", ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_RESET_WHITE${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\", ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_USE_PUSH_DEFAULT${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\", ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_USE_PUSH_RESET_WHITE${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\"]\n" "${2}" "${SUSUWU_SH_DEFAULT}" "${SUSUWU_SH_RESET_WHITE}" "${SUSUWU_SH_USE_PUSH_DEFAULT}" "${SUSUWU_SH_USE_PUSH_RESET_WHITE}" >&2
+)
+SUSUWU_SH_USE_PUSH() { #/* Usage: `SUSUWU_SH_USE_PUSH "${SUSUWU_SH_<attribute>}" && SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_RESET_WHITE}"] && SUSUWU_SH_USE_POP`. Purpose: nested `SUSUWU_SH_USE`. */
+	if SUSUWU_STATIC_IS_PREVIEW; then
+		SUSUWU_SH_USE_PUSH_DEBUG "SUSUWU_SH_USE_PUSH" "${1}" "Pushing:"
+		SUSUWU_SH_DEFAULT="${1}"
+		SUSUWU_SH_RESET_WHITE="${1}"
+		SUSUWU_SH_USE_PUSH_DEFAULT="${SUSUWU_SH_USE_PUSH_DEFAULT}^${1}"
+		SUSUWU_SH_USE_PUSH_RESET_WHITE="${SUSUWU_SH_USE_PUSH_RESET_WHITE}^${1}"
+		SUSUWU_SH_USE_PUSH_DEBUG "SUSUWU_SH_USE_PUSH" "${1}" "Pushed:"
+	fi
+}
+SUSUWU_SH_USE_POP() { #/* Usage: `SUSUWU_SH_USE_PUSH "${SUSUWU_SH_<attribute>}" && SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_RESET_WHITE}"] && SUSUWU_SH_USE_POP`. Purpose: nested `SUSUWU_SH_USE`. */
+	if SUSUWU_STATIC_IS_PREVIEW; then
+		SUSUWU_SH_USE_PUSH_DEBUG "SUSUWU_SH_USE_POP" "" "Popping:"
+#		SUSUWU_SH_USE_PUSH_DEFAULT="$(SUSUWU_STR_TOKEN_FIRST "${SUSUWU_SH_USE_PUSH_DEFAULT}" '^')"
+#		SUSUWU_SH_USE_PUSH_RESET_WHITE="$(SUSUWU_STR_TOKEN_FIRST "${SUSUWU_SH_USE_PUSH_RESET_WHITE}" '^')"
+#		SUSUWU_SH_DEFAULT="$(SUSUWU_STR_TOKEN_LAST "${SUSUWU_SH_USE_PUSH_DEFAULT}" '^')" #'\033')"
+#		SUSUWU_SH_RESET_WHITE="$(SUSUWU_STR_TOKEN_LAST "${SUSUWU_SH_USE_PUSH_RESET_WHITE}" '^')" #TODO: figure out why this doesn't restore last color code
+		SUSUWU_SH_USE_PUSH_DEFAULT="${SUSUWU_SH_USE_PUSH_DEFAULT%^*}"
+		SUSUWU_SH_USE_PUSH_RESET_WHITE="${SUSUWU_SH_USE_PUSH_RESET_WHITE%^*}"
+		SUSUWU_SH_DEFAULT="${SUSUWU_SH_USE_PUSH_DEFAULT##*^}"
+		SUSUWU_SH_RESET_WHITE="${SUSUWU_SH_USE_PUSH_RESET_WHITE##*^}"
+		SUSUWU_SH_USE_PUSH_DEBUG "SUSUWU_SH_USE_POP" "" "Popped:"
+	fi
+} #TODO: figure out if/why this is always executed sequential (does not nest blocks, which is required to push & pop)
+SUSUWU_SH_USE() { #/* Usage: `SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_DEFAULT}"] ["&1"]`. Uses <attribute> on <message>. */
 #	if [ ! $(SUSUWU_SH_HAS_UNIX_CONSOLE) ]; then
 #		case "${1}" in
 #			"${SUSUWU_SH_}") #TODO; non-standard code routes (such as `ConsoleApi2.h:SetConsoleTextAttribute`).
@@ -211,14 +240,18 @@ SUSUWU_SH_USE() ( #/* Usage: `SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message
 #		esac
 #	fi
 	if SUSUWU_SH_HAS_UNIX_CONSOLE; then
-		echo "${1}${2}${3:-${SUSUWU_SH_DEFAULT}}" #TODO: `>${4:-&1}` #/* `&1` is `std::cout`/`stdout` */
+		printf '%b' "${1}"
+		SUSUWU_SH_USE_PUSH "${1}"
+		printf '%b' "${2}"
+		SUSUWU_SH_USE_POP
+		echo "${3:-${SUSUWU_SH_RESET_WHITE}}" #echo "${3:-${SUSUWU_SH_DEFAULT}}"
 	else
 		echo "${2}" #TODO: `>${4:-&1}` #/* `&1` is `std::cout`/`stdout` */
 	fi
-)
-SUSUWU_SH_USE2() ( #/* Usage: `SUSUWU_SH_USE2 "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_RESET_WHITE}"] ["&2"]`. Is `SUSUWU_SH_USE` for `&2`. */
+}
+SUSUWU_SH_USE2() { #/* Usage: `SUSUWU_SH_USE2 "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_RESET_WHITE}"] ["&2"]`. Is `SUSUWU_SH_USE` for `&2`. */
 	SUSUWU_SH_USE "${1}" "${2}" "${3:-${SUSUWU_SH_RESET_WHITE}}" "${4:-&2}" #/* `&2` is `std::cerr`/`stderr` */
-)
+}
 
 #/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
 #/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
@@ -231,14 +264,14 @@ SUSUWU_SH_DEBUG() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: ")
 
 #/* `SUSUWU_SH_<type-of-code>`. Notice: update [`README.md#cc-source`](README.md#cc-source) if you update those.
 # * Usage: `SUSUWU_PRINT "$(SUSUWU_SH_<warn-level>)" "[<optional message>] $(SUSUWU_SH_<type-of-code> "<code>" ["<optional original color>"]) [<optional message>]"`. */
-SUSUWU_SH_CODE_QUOTE() ( echo "\`$(SUSUWU_SH_USE2 "${SUSUWU_SH_BROWN}" "${1}" "${2}")\`"; ) # Usage: `SUSUWU_SH_CODE_QUOTE "<script or source code>"`
-SUSUWU_SH_PATH_QUOTE() ( echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}")\""; ) # Usage: `SUSUWU_SH_PATH_QUOTE "<path>"`
-SUSUWU_SH_FUNCTION() ( SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_FUNCTION "<script or source code>"`
-SUSUWU_SH_ERROR_MESSAGE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_ERROR_MESSAGE "<error messages>"`
-SUSUWU_SH_STATUS_CODE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_STATUS_CODE "<status codes (or return value)>"`
-SUSUWU_SH_VAR() ( SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_VAR "<name of variable/constant>"`
-SUSUWU_SH_CURRENT_VALUE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_CURRENT_VALUE "<current argument/value>"`
-SUSUWU_SH_PROPOSED_VALUE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${1}" "${2}"; ) # Usage: `SUSUWU_SH_PROPOSED_VALUE "<speculative replacement argument/value>"`
+SUSUWU_SH_CODE_QUOTE() { echo "\`$(SUSUWU_SH_USE2 "${SUSUWU_SH_BROWN}" "${1}" "${2}")\`"; } # Usage: `SUSUWU_SH_CODE_QUOTE "<script or source code>"`
+SUSUWU_SH_PATH_QUOTE() { echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}")\""; } # Usage: `SUSUWU_SH_PATH_QUOTE "<path>"`
+SUSUWU_SH_FUNCTION() { SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_FUNCTION "<script or source code>"`
+SUSUWU_SH_ERROR_MESSAGE() { SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_ERROR_MESSAGE "<error messages>"`
+SUSUWU_SH_STATUS_CODE() { SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_STATUS_CODE "<status codes (or return value)>"`
+SUSUWU_SH_VAR() { SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_VAR "<name of variable/constant>"`
+SUSUWU_SH_CURRENT_VALUE() { SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_CURRENT_VALUE "<current argument/value>"`
+SUSUWU_SH_PROPOSED_VALUE() { SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_PROPOSED_VALUE "<speculative replacement argument/value>"`
 
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
@@ -300,6 +333,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	printf '%b\n' "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 	return $?
 )
+SUSUWU_PRINT "SUSUWU_PRINT()" "$(SUSUWU_SH_DEBUG)" "Test: $(SUSUWU_SH_CODE_QUOTE "... $(SUSUWU_SH_FUNCTION "SUSUWU_SH_USE_PUSH") ... $(SUSUWU_SH_FUNCTION "SUSUWU_SH_USE_POP") ..."). TODO: test should have ellipses ($(SUSUWU_SH_CODE_QUOTE "...")) brown."
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
 	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_CODE_QUOTE "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute $(SUSUWU_SH_CODE_QUOTE "export TERM=\"linux\"") to enable console code use."
