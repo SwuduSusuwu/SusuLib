@@ -12,7 +12,7 @@ SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes pa
 		CROSS_COMP=" --mingw"
 	fi
 }
-SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS ... */
 	if [ " --mingw" = "${CROSS_COMP}" ]; then
 		if command -v x86_64-w64-mingw32-clang++ >/dev/null; then
 			CXX="x86_64-w64-mingw32-clang++"
@@ -69,7 +69,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 		if ! SUSUWU_SH_HAS_PARAM "--debug" "$@"; then
 			SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "\`${0} $*\` defaults to \`${0} $* $(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "--debug")\`."
 		fi
-		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "\`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "--debug")\` is slow (use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "--release")\` to improve how fast \"\${BINDIR}/\${OUTPUT}\" executes)."
+		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "\`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "--debug")\` is slow (use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "--release")\` to improve how fast \`./\${BINDIR}/\${OUTPUT}\` executes)."
 		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
 		if [ true = ${USE_FSAN} ]; then
@@ -80,7 +80,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 		fi
 	fi
 }
-SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
+SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS ... */
 	LDFLAGS="${LDFLAGS}"
 	CFLAGS="${CFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
 	CXXFLAGS="${CXXFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
@@ -90,27 +90,27 @@ SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SET
 }
 
 SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
-	if [ -z ${OBJDIR} ]; then
+	if [ -z "${OBJDIR}" ]; then
 		OBJDIR="${1}"
-		SUSUWU_SETUP_OBJDIR_OLD="$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${OBJDIR}")"
-		SUSUWU_SETUP_OBJDIR_NEW="$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "./objnew/")"
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect \`${CXX} -c ... -o $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "\${OBJDIR}")\${OBJ}.o\` (which has \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")=\"${SUSUWU_SETUP_OBJDIR_OLD}\"\`), execute \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")=\"${SUSUWU_SETUP_OBJDIR_NEW}\"\` (where \"${SUSUWU_SETUP_OBJDIR_NEW}\" is a directory which you choose)."
+		SUSUWU_SETUP_OBJDIR_OLD() (echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${OBJDIR}")\"")
+		SUSUWU_SETUP_OBJDIR_NEW() (echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "./objnew/")\"")
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect \`${CXX} -c ... -o \"\${$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")}\${OBJ}.o\"\` (which has \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)\`), execute \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)\` (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)."
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "\`${CXX} -c ... -o $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "\${OBJDIR}")\` inherits local \`OBJDIR=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${OBJDIR}")\"\` until you execute \`unset OBJDIR\`."
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "\`${CXX} -c ... -o \"\${$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")}\"\` inherits local \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${OBJDIR}")\"\` until you execute \`unset OBJDIR\`."
 	fi
-	OBJDIR=$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}") #/* if inherit OBJDIR, perhaps it is without last '/' */
+	OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")" #/* if inherit OBJDIR, perhaps it is without last '/' */
 	mkdir -p "${OBJDIR}"
 }
 SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
-	if [ -z ${BINDIR} ]; then
+	if [ -z "${BINDIR}" ]; then
 		BINDIR="${1}"
-		SUSUWU_SETUP_BINDIR_OLD="$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")"
-		SUSUWU_SETUP_BINDIR_NEW="$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "./objnew/")"
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect \`${LD} ... -o $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "\${BINDIR}")\${OUTPUT}\` (which has \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=\"${SUSUWU_SETUP_BINDIR_OLD}\"\`), execute \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=\"${SUSUWU_SETUP_BINDIR_NEW}\"\` (where \"${SUSUWU_SETUP_BINDIR_NEW}\" is a directory which you choose)."
+		SUSUWU_SETUP_BINDIR_OLD() (echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")\"")
+		SUSUWU_SETUP_BINDIR_NEW() (echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "./binnew/")\"")
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect \`${LD} ... -o \"\${$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")}\${OUTPUT}\"\` (which has \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)\`), execute \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)\` (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)."
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "\`${LD} ... -o \${BINDIR}\${OUTPUT}\` inherits local \`BINDIR=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")\"\` until you execute \`unset BINDIR\`."
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "\`${LD} ... -o \"\${$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")}\${OUTPUT}\"\` inherits local \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")\"\` until you execute \`unset BINDIR\`."
 	fi
-	BINDIR=$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}") #/* if inherit BINDIR, perhaps it is without last '/' */
+	BINDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}")" #/* if inherit BINDIR, perhaps it is without last '/' */
 	mkdir -p "${BINDIR}"
 }
 SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
@@ -123,7 +123,7 @@ SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 	else
 		OUTPUT="${1}.exe"
 	fi
-	if [ -e ${BINDIR}${OUTPUT} ]; then
+	if [ -e "${BINDIR}${OUTPUT}" ]; then
 		BUILDNEW=false
 	else
 		BUILDNEW=true
@@ -151,7 +151,7 @@ SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [T
 	fi
 }
 
-SUSUWU_PROCESS_INCLUDES() ( #/* Usage: `SUSUWU_BUILD_SOURCES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
+SUSUWU_PROCESS_INCLUDES() ( #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
 #shellcheck disable=SC2068
 	for LOCAL_SOURCE in $@; do
 		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" .hxx).o" #/* `basename`'s second param removes suffix */
@@ -187,7 +187,7 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 	fi
 	return ${SUSUWU_STATUS};
 )
-SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES "[${CC} || ${CXX}]" "[${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
+SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
 	LOCAL_BUILD=${1}
 	LOCAL_BUILDFLAGS=${2} #`=$(echo ${2} | xargs)` strips quotes, which breaks `-DSUSUWU_DEFAULT_BRANCH="trunk"`.
 	LOCAL_SOURCE_SUFFIX=${3}
@@ -198,7 +198,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_SOURCES "[${CC} || ${CXX}]" "[
 #shellcheck disable=SC2068 #`"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'"
 	for LOCAL_SOURCE in $@; do
 		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
-#shellcheck disable=SC2166 #With `set -x`, the `[] || {}` form prints 2 commands
+#shellcheck disable=SC2166 #With `set -x`, the `[] || []` form prints 2 commands
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
 #shellcheck disable=SC2086 #`"${LOCAL_BUILDFLAGS}"` gives "clang++: error: language not recognized"
 			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}"
@@ -319,7 +319,7 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/us
 }
 SUSUWU_INSTALL() ( #/* Usage: `SUSUWU_INSTALL [USRBIN]`. Is analogous to `make install`. */
 	SUSUWU_PROCESS_USRBIN "SUSUWU_INSTALL()" "${1}" &&
-	cp --interactive ${BINDIR}${OUTPUT} "${USRBIN}/${OUTPUT}"
+	cp --interactive "${BINDIR}${OUTPUT}" "${USRBIN}/${OUTPUT}"
 ) #/* returns result of `cp`; thus `SUSUWU_INSTALL && SUSUWU_UNINSTALL` won't remove files unless the interactive `SUSUWU_INSTALL` has total success */
 SUSUWU_UNINSTALL() ( #/* Usage: `SUSUWU_UNINSTALL [USRBIN]`. Is analogous to `make uninstall`. */
 	SUSUWU_PROCESS_USRBIN "SUSUWU_UNINSTALL()" "${1}" &&
