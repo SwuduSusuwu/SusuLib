@@ -44,5 +44,5 @@ SUSUWU_BUILD_STATUS=${SUSUWU_STATUS}
 SUSUWU_TEST_OUTPUT #/* Analogous to `make test` or `make execute` */
 SUSUWU_STATUS=$?
 [ 0 -eq ${SUSUWU_BUILD_STATUS} ] && SUSUWU_INSTALL "${USRBIN}" && SUSUWU_UNINSTALL "${USRBIN}" #/* Analogous to `make install && make uninstall`. Won't clobber files which exist. */
-return ${SUSUWU_STATUS}
+exit ${SUSUWU_STATUS}
 
