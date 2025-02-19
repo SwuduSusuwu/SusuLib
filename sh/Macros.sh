@@ -79,7 +79,7 @@ SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN='$(SUSUWU_UNAMBIGUOUS_PATH 
 )
 SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<function>" "<path>" && cp "${0}" "<path>"` */
 	if [ -e "${2}" ]; then
-		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_PATH_QUOTE "${2}") exists. Use $(SUSUWU_SH_CODE_QUOTE "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_CODE_QUOTE "rm \"${2}\"")) and re-execute $(SUSUWU_SH_CODE_QUOTE "$(SUSUWU_SH_FUNCTION "${1}")") (perhaps with $(SUSUWU_SH_CODE_QUOTE "${0}")) to continue."
+		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "PATH" "${2}") exists. Use $(SUSUWU_SH_QUOTE "CODE" "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_QUOTE "CODE" "rm \"${2}\"")) and re-execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "FUNCTION" "${1}")") (perhaps with $(SUSUWU_SH_QUOTE "CODE" "${0}")) to continue."
 		exit 1
 	fi
 	return 0
@@ -262,16 +262,27 @@ SUSUWU_SH_SUCCESS() (SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: ")
 SUSUWU_SH_NOTICE() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: ")
 SUSUWU_SH_DEBUG() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: ")
 
-#/* `SUSUWU_SH_<type-of-code>`. Notice: update [`README.md#cc-source`](README.md#cc-source) if you update those.
-# * Usage: `SUSUWU_PRINT "$(SUSUWU_SH_<warn-level>)" "[<optional message>] $(SUSUWU_SH_<type-of-code> "<code>" ["<optional original color>"]) [<optional message>]"`. */
-SUSUWU_SH_CODE_QUOTE() { echo "\`$(SUSUWU_SH_USE2 "${SUSUWU_SH_BROWN}" "${1}" "${2}")\`"; } # Usage: `SUSUWU_SH_CODE_QUOTE "<script or source code>"`
-SUSUWU_SH_PATH_QUOTE() { echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}")\""; } # Usage: `SUSUWU_SH_PATH_QUOTE "<path>"`
-SUSUWU_SH_FUNCTION() { SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_FUNCTION "<script or source code>"`
-SUSUWU_SH_ERROR_MESSAGE() { SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_ERROR_MESSAGE "<error messages>"`
-SUSUWU_SH_STATUS_CODE() { SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_STATUS_CODE "<status codes (or return value)>"`
-SUSUWU_SH_VAR() { SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_VAR "<name of variable/constant>"`
-SUSUWU_SH_CURRENT_VALUE() { SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_CURRENT_VALUE "<current argument/value>"`
-SUSUWU_SH_PROPOSED_VALUE() { SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${1}" "${2}"; } # Usage: `SUSUWU_SH_PROPOSED_VALUE "<speculative replacement argument/value>"`
+SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote>" "<code | quote>" ["<optional original color>"])"`. */
+	case "${1}" in #/* Notice: update [`README.md#cc-source`](README.md#cc-source) if you update those. */
+		"CODE") #/* command / code quote */
+			echo "\`$(SUSUWU_SH_USE2 "${SUSUWU_SH_BROWN}" "${2}" "${3}")\`" ;;
+		"PATH") #/* path to file or directory */
+			echo "\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${2}" "${3}")\"" ;;
+		"FUNCTION") #/* name of function */
+			SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${2}" "${3}" ;;
+		"STDERR") #/* error message quote */
+			SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "${2}" "${3}" ;;
+		"STATUS") #/* status code / return value */
+			SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${2}" "${3}" ;;
+		"VAR") #/* name of variable / name of constant */
+			SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "${2}" "${3}" ;;
+		"CURRENT") #/* current value */
+			SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${2}" "${3}" ;;
+		"PROPOSED") #/* speculative / proposed value */
+			SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${2}" "${3}" ;;
+	esac
+	return $?
+}
 
 SUSUWU_S=false
 SUSUWU_VERBOSE=false
@@ -321,22 +332,22 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	NEW_MESSAGE="[${SUSUWU_SH_FILE:+"$0:"}${SUSUWU_SH_LINE:+"${LINENO}:"}${SUSUWU_SH_FILE_OR_LINE:+" "}${LEVEL}"
 	if [ "true" = "${SUSUWU_SH_FUNC}" ]; then
 		if [ -n "${CALLER_FUNC}" ]; then
-			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_FUNCTION "${CALLER_FUNC}: ")"
+			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${CALLER_FUNC}: ")"
 		elif [ "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" -eq 0 ] && [ "${#FUNCNAME}" -ge 2 ]; then
 #shellcheck disable=SC2039 #if `SUSUWU_SH_HAS_FUNCNAME`, console supports this
-			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_FUNCTION "${FUNCNAME[1]}(): ")"
+			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${FUNCNAME[1]}(): ")"
 		elif [ -n "${KSH_VERSION}" ]; then
-			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_FUNCTION "${.sh.fun}: ")"
+			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${.sh.fun}: ")"
 		fi
 	fi
 	NEW_MESSAGE="${NEW_MESSAGE}${MESSAGE}${SUSUWU_SH_CLOSE_}]"
 	printf '%b\n' "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
 	return $?
 )
-SUSUWU_PRINT "SUSUWU_PRINT()" "$(SUSUWU_SH_DEBUG)" "Test: $(SUSUWU_SH_CODE_QUOTE "... $(SUSUWU_SH_FUNCTION "SUSUWU_SH_USE_PUSH") ... $(SUSUWU_SH_FUNCTION "SUSUWU_SH_USE_POP") ..."). TODO: test should have ellipses ($(SUSUWU_SH_CODE_QUOTE "...")) brown."
+SUSUWU_PRINT "SUSUWU_PRINT()" "$(SUSUWU_SH_DEBUG)" "Test: $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_PUSH") ... $(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_POP")"). TODO: test should have ellipses ($(SUSUWU_SH_QUOTE "CODE" "...")) brown."
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
-	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_CODE_QUOTE "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute $(SUSUWU_SH_CODE_QUOTE "export TERM=\"linux\"") to enable console code use."
+	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_QUOTE "CODE" "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute $(SUSUWU_SH_QUOTE "CODE" "export TERM=\"linux\"") to enable console code use."
 fi
 
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
@@ -355,9 +366,9 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #detect default branch
 		fi
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_CODE_QUOTE "git branch") is \"$(SUSUWU_SH_CURRENT_VALUE "${THIS_BRANCH}")\"."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "${THIS_BRANCH}")\"."
 		else
-			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_CODE_QUOTE "git branch") is \"$(SUSUWU_SH_CURRENT_VALUE "${THIS_BRANCH}")\"; for production use, execute $(SUSUWU_SH_CODE_QUOTE "git switch $(SUSUWU_SH_PROPOSED_VALUE "${DEFAULT_BRANCH}")")."
+			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "${THIS_BRANCH}")\"; for production use, execute $(SUSUWU_SH_QUOTE "CODE" "git switch $(SUSUWU_SH_QUOTE "PROPOSED" "${DEFAULT_BRANCH}")")."
 		fi
 	fi
 )
@@ -366,7 +377,7 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then # If system has `bash`, && this is not an infinite loop;
 		BASH_PATH="${0}.bash" # , path for `bash` version of this.
 		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" # In case user wants to disable this (or this crashed on last execution).
-		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_CODE_QUOTE "${BASH_PATH}") to test $(SUSUWU_SH_CODE_QUOTE "/bin/bash"). Execute $(SUSUWU_SH_CODE_QUOTE "touch '${BASH_PATH}'") to disable this."
+		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") to test $(SUSUWU_SH_QUOTE "CODE" "/bin/bash"). Execute $(SUSUWU_SH_QUOTE "CODE" "touch '${BASH_PATH}'") to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
 		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then # If produced `/bin/bash` version;
 			#shellcheck disable=SC2016 # That's not supposed to expand
@@ -378,9 +389,9 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 		BASH_STATUS=$?
 		rm "${BASH_PATH}"
 		if [ 0 -eq ${BASH_STATUS} ]; then
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "$(SUSUWU_SH_CODE_QUOTE "${BASH_PATH}") returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "$(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${BASH_STATUS}")."
 		else
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_CODE_QUOTE "${BASH_PATH}") returned status code $(SUSUWU_SH_STATUS_CODE "${BASH_STATUS}")."
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${BASH_STATUS}")."
 		fi
 		return ${BASH_STATUS}
 	fi
