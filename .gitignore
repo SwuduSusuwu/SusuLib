@@ -64,6 +64,6 @@ Makefile
 *.o
 *.out
 *.exe
+build.sh.bash
 index.xhtml
 robots.txt
-
