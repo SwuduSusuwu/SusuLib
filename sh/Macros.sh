@@ -264,3 +264,28 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 	fi
 )
 
+SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?; exit ${STATUS}/` */
+	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then # If system has `bash`, && this is not an infinite loop;
+		BASH_PATH="${0}.bash" # , path for `bash` version of this.
+		if [ -e "${BASH_PATH}" ]; then # If user wants to disable this (or this crashed on last execution);
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "\"${BASH_PATH}\" exists. Use \`mv '${BASH_PATH}' '${BASH_PATH}.bak'\` (or \`rm '${BASH_PATH}'\` and re-execute \`SUSUWU_TEST_BASH()\` (perhaps with \`${0}\`) to continue."
+			exit 1
+		fi
+		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce \"${BASH_PATH}\" to test \`/bin/bash\`. Execute \`touch \"${BASH_PATH}\"\` to disable this."
+		cp "${0}" "${BASH_PATH}" || exit 1
+		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then # If produced `/bin/bash` version;
+			sed 's|^\s*SUSUWU_BUILD_OBJECTS[^#]*|\0 2>/dev/null |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_BUILD_OBJECTS()`.
+			sed 's|^\s*SUSUWU_TEST_OUTPUT[^#]*|\0 2>/dev/null 1>\&2 |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_TEST_OUTPUT()`.
+			("${BASH_PATH}") # Execute `/bin/bash` version.
+		fi
+		BASH_STATUS=$?
+		rm "${BASH_PATH}"
+		if [ 0 -eq ${BASH_STATUS} ]; then
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_SUCCESS)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${BASH_STATUS}")."
+		else
+			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "\`${BASH_PATH}\` returned status code $(SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "${BASH_STATUS}")."
+		fi
+		return ${BASH_STATUS}
+	fi
+)
+
