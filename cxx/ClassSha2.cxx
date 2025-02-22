@@ -3,7 +3,7 @@
 #define INCLUDES_cxx_ClassSha2_cxx
 #include "ClassFs.hxx" /* ClassFsBytecode ClassFsHash */
 #include "ClassSha2.hxx"
-#include "ClassSys.hxx" /* classSysHexStr classSysUSecondClock templateCatchAll */
+#include "ClassSys.hxx" /* classSysHexStr classSysUSecondClock SUSUWU_HEX_DOES_PREFIX templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
 #include <stdexcept> /* std::runtime_error */
@@ -49,7 +49,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
 	const ClassFsHash hash = classSha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
-	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
+	const std::string hashStrCompute = (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") + classSysHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {
 		SUSUWU_WARNING("0 ms (0 μs) to compute `classSha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = inf mbps");

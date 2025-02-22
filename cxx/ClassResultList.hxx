@@ -5,7 +5,7 @@
 #include "ClassFs.hxx" /* ClassFsPath ClassFsBytecode ClassFsHash */
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysHexOs */
+#include "ClassSys.hxx" /* classSysHexOs SUSUWU_HEX_DOES_PREFIX */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -68,7 +68,9 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 		if(pascalValues) {
 			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
 		} else {
+#if !SUSUWU_HEX_DOES_PREFIX
 			os << "0x";
+#endif /* !SUSUWU_HEX_DOES_PREFIX */
 			classSysHexOs(os, value);
 		}
 		++index_;

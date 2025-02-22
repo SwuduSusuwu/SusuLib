@@ -148,7 +148,7 @@ public:
 	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 #endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
 	virtual const std::string toString() const {
-		return getName() + '@' + classSysHexStr(hashCode());
+		return getName() + '@' + classSysHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
 	}
 	virtual void notify() {}
 	virtual void notifyAll() {}
