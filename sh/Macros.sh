@@ -54,6 +54,13 @@ SUSUWU_DIR_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_DIR_AFFIX_DOTSLASH "${
 	esac
 	echo "${DIR}" #/* return with "./" */
 )
+SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<function>" "<path>" && cp "${0}" "<path>"` */
+	if [ -e "${2}" ]; then
+		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "\"${2}\" exists. Use \`mv \"${2}\" \"${2}.bak\"\` (or \`rm \"${2}\"\`) and re-execute \`${1}\` (perhaps with \`${0}\`) to continue."
+		exit 1
+	fi
+	return 0
+}
 SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${OBJECT}"). */
 #	echo $(echo "$@" | sed 's/ /\\\ /') #/* Error: `sed not found`, although is installed. */
 #	echo "\"${@}\""; #/* Error: if `OBJECT="obj/main.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: '"obj/main.o"'`. */
@@ -269,10 +276,7 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?; exit ${STATUS}/` */
 	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then # If system has `bash`, && this is not an infinite loop;
 		BASH_PATH="${0}.bash" # , path for `bash` version of this.
-		if [ -e "${BASH_PATH}" ]; then # If user wants to disable this (or this crashed on last execution);
-			SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_ERROR)" "\"${BASH_PATH}\" exists. Use \`mv '${BASH_PATH}' '${BASH_PATH}.bak'\` (or \`rm '${BASH_PATH}'\` and re-execute \`SUSUWU_TEST_BASH()\` (perhaps with \`${0}\`) to continue."
-			exit 1
-		fi
+		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" # In case user wants to disable this (or this crashed on last execution).
 		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce \"${BASH_PATH}\" to test \`/bin/bash\`. Execute \`touch \"${BASH_PATH}\"\` to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
 		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then # If produced `/bin/bash` version;
