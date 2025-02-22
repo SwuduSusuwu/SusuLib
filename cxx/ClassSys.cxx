@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
 #include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_SH_WARNING SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
-#include "ClassSys.hxx" /* classSysHexStr classSysHexOs */
+#include "ClassSys.hxx" /* classSysHexStr classSysHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_HEX_PREFIX_SZ */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
@@ -286,12 +286,12 @@ namespace { /* [misc-use-anonymous-namespace] */
 static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
-	if(2 != ss) {
+	if(2 + SUSUWU_HEX_PREFIX_SZ != ss) {
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
 	}
 	classSysHexOs(os, value);
-	if(2 != os.str().size()) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+	if(ss != os.str().size()) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " /* value.size() */ != " + std::to_string(os.str().size()) + " /* os.str().size() */;"));
 	}
 }
 }; /* namespace */
@@ -305,7 +305,7 @@ const bool classSysTests() {
 	std::cout << "	execvex(): " << std::flush;
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
 #ifdef SUSUWU_EXPERIMENTAL
-	std::cout << "	classSysGetConsoleAttributes(): 0x" << classSysHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
+	std::cout << "	classSysGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classSysHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
 #endif /* def SUSUWU_EXPERIMENTAL */
 	return retval;
 }

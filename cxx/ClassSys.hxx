@@ -22,6 +22,10 @@ typedef int pid_t;
 #include <vector> /* std::vector */
 /* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
 namespace Susuwu {
+#ifndef SUSUWU_HEX_DOES_PREFIX
+#	define SUSUWU_HEX_DOES_PREFIX false
+#endif /* ndef SUSUWU_HEX_DOES_PREFIX */
+#define SUSUWU_HEX_PREFIX_SZ (SUSUWU_HEX_DOES_PREFIX ? 2 : 0)
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -84,6 +88,9 @@ const bool classSysConsoleHasAnsiColors();
 template<class Os, class Int,
 	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
 inline Os &classSysHexOs(Os &os, const Int &value) {
+#if SUSUWU_HEX_DOES_PREFIX
+	os << "0x";
+#endif /* SUSUWU_HEX_DOES_PREFIX */
 	const std::ios::fmtflags oldFlags = os.flags();
 	os << std::hex << value;
 	os.flags(oldFlags);
@@ -99,6 +106,9 @@ inline const std::string classSysHexStr(const Int &value) {
 template<class Os, class Str,
 	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 inline Os &classSysHexOs(Os &os, const Str &value) {
+#if SUSUWU_HEX_DOES_PREFIX
+	os << "0x";
+#endif /* SUSUWU_HEX_DOES_PREFIX */
 	const std::ios::fmtflags oldFlags = os.flags();
 	const char oldFill = os.fill();
 	os << std::hex;

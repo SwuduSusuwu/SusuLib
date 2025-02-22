@@ -558,7 +558,7 @@ public:
 	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 #endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
 	virtual const std::string toString() const {
-		return getName() + '@' + classSysHexStr(hashCode());
+		return getName() + '@' + classSysHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
 	}
 	virtual void notify() {}
 	virtual void notifyAll() {}
@@ -663,6 +663,10 @@ public:
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
 ```c++
 /* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
+#ifndef SUSUWU_HEX_DOES_PREFIX
+#	define SUSUWU_HEX_DOES_PREFIX false
+#endif /* ndef SUSUWU_HEX_DOES_PREFIX */
+#define SUSUWU_HEX_PREFIX_SZ (SUSUWU_HEX_DOES_PREFIX ? 2 : 0)
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -720,10 +724,14 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
 const unsigned char classSysGetConsoleAttributes(); /* if(_WIN32 || ) { return (background * 16) + foreground color; } else if(_POSIX_SOURCE) { return "\033[%1;%2m" -> (%1 * 16) + %2 ; } else { return 0; } */
+const bool classSysConsoleHasAnsiColors();
 
 template<class Os, class Int,
 	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
 inline Os &classSysHexOs(Os &os, const Int &value) {
+#if SUSUWU_HEX_DOES_PREFIX
+	os << "0x";
+#endif /* SUSUWU_HEX_DOES_PREFIX */
 	const std::ios::fmtflags oldFlags = os.flags();
 	os << std::hex << value;
 	os.flags(oldFlags);
@@ -739,6 +747,9 @@ inline const std::string classSysHexStr(const Int &value) {
 template<class Os, class Str,
 	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 inline Os &classSysHexOs(Os &os, const Str &value) {
+#if SUSUWU_HEX_DOES_PREFIX
+	os << "0x";
+#endif /* SUSUWU_HEX_DOES_PREFIX */
 	const std::ios::fmtflags oldFlags = os.flags();
 	const char oldFill = os.fill();
 	os << std::hex;
@@ -1065,12 +1076,12 @@ const bool classSysConsoleHasAnsiColors() {
 static void classSysHexTests(const std::string &value) {
 	const size_t ss = classSysHexStr(value).size();
 	std::stringstream os;
-	if(2 != ss) {
+	if(2 + SUSUWU_HEX_PREFIX_SZ != ss) {
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
 	}
 	classSysHexOs(os, value);
-	if(2 != os.str().size()) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
+	if(ss != os.str().size()) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " /* value.size() */ != " + std::to_string(os.str().size()) + " /* os.str().size() */;"));
 	}
 }
 const bool classSysTests() {
@@ -1083,7 +1094,7 @@ const bool classSysTests() {
 	std::cout << "	execvex(): " << std::flush;
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
 #ifdef SUSUWU_EXPERIMENTAL
-	std::cout << "	classSysGetConsoleAttributes(): 0x" << classSysHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
+	std::cout << "	classSysGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classSysHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
 #endif /* def SUSUWU_EXPERIMENTAL */
 	return retval;
 }
@@ -1140,7 +1151,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
 	const ClassFsHash hash = classSha2(nullStr);
 	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
-	const std::string hashStrCompute = "0x" + classSysHexStr(hash);
+	const std::string hashStrCompute = (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") + classSysHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {
 		SUSUWU_WARNING("0 ms (0 μs) to compute `classSha2(std::string(nulls, &nulls[65536])) == " + hashStrCompute + "` = inf mbps");
@@ -1151,9 +1162,9 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	if(0 == hash.size()) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`0 == classSha2(std::string()).size();"));
 	} else if(hashStrTrue.size() != hashStrCompute.size() && classSha256 == classSha2) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`"));
 	} else if(hashStrTrue.size() != hashStrCompute.size()) {
-		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`");
+		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`");
 	} else if(hashStrTrue != hashStrCompute) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
 	}
@@ -1213,7 +1224,9 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 		if(pascalValues) {
 			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
 		} else {
+#if !SUSUWU_HEX_DOES_PREFIX
 			os << "0x";
+#endif /* !SUSUWU_HEX_DOES_PREFIX */
 			classSysHexOs(os, value);
 		}
 		++index_;

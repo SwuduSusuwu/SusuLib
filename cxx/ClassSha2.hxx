@@ -10,7 +10,7 @@ namespace Susuwu {
 /* const */ ClassFsHash /* 256 bits, not null-terminated */ classSha256(const ClassFsBytecode &bytecode);
 /* const */ ClassFsHash /* 512 bits, not null-terminated */ classSha512(const ClassFsBytecode &bytecode);
 typedef ClassFsHash (*ClassSha2)(const ClassFsBytecode &bytecode);
-extern ClassSha2 classSha2/* = classSha256 */; /* To compress, apps can execute `sha2 = classSha1;`. To double hash sizes, execute `sha2 = classSha512;`. (Notice: this does not recompute hashes which exist) */
+extern ClassSha2 classSha2/* = classSha256 */; /* To compress, apps can execute `classSha2 = classSha1;`. To double hash sizes, execute `classSha2 = classSha512;`. (Notice: this does not recompute hashes which exist) */
 #if SUSUWU_UNIT_TESTS
 const bool classSha2Tests();
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
