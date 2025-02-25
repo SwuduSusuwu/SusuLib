@@ -79,7 +79,7 @@ SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN='$(SUSUWU_UNAMBIGUOUS_PATH 
 )
 SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<function>" "<path>" && cp "${0}" "<path>"` */
 	if [ -e "${2}" ]; then
-		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "PATH" "${2}") exists. Use $(SUSUWU_SH_QUOTE "CODE" "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_QUOTE "CODE" "rm \"${2}\"")) and re-execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "FUNCTION" "${1}")") (perhaps with $(SUSUWU_SH_QUOTE "CODE" "${0}")) to continue."
+		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "PATH" "${2}") exists. Use $(SUSUWU_SH_QUOTE "CODE" "mv \"${2}\" \"${2}.bak\"") (or $(SUSUWU_SH_QUOTE "CODE" "rm \"${2}\"")) and re-execute $(SUSUWU_SH_QUOTE "CODE FUNCTION" "${1}") (perhaps with $(SUSUWU_SH_QUOTE "CODE" "${0}")) to continue."
 		exit 1
 	fi
 	return 0
@@ -262,7 +262,20 @@ SUSUWU_SH_SUCCESS() (SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: ")
 SUSUWU_SH_NOTICE() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: ")
 SUSUWU_SH_DEBUG() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: ")
 
-SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote>" "<code | quote>" ["<optional original color>"])"`. */
+SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote ...>" "<code | quote>" ["<optional original color>"])"`. */
+#	if [ "${1% }" != "${1}" ]; then #if [ ${1} != "${1}" ]; then# if [ "${1#}" -gt 1 ]; then
+#		echo "SUSUWU_SH_QUOTE: multiple modes"
+#	fi #TODO: figure out why noneof those conditions work
+	SUSUWU_SH_QUOTE_Q="${2}"
+	for SUSUWU_SH_QUOTE_W in ${1}; do
+		if [ "${SUSUWU_SH_QUOTE_Q}" != "${2}" ]; then
+			SUSUWU_PRINT "SUSUWU_SH_QUOTE()" "$(SUSUWU_SH_DEBUG)" "Multiple modes: \${1}='$(SUSUWU_SH_QUOTE "CURRENT" "${1}")'"
+		fi
+		SUSUWU_SH_QUOTE_Q="$(SUSUWU_SH_QUOTE_SUB "${SUSUWU_SH_QUOTE_W}" "${SUSUWU_SH_QUOTE_Q}" "${3}")"
+	done
+	echo "${SUSUWU_SH_QUOTE_Q}"
+}
+SUSUWU_SH_QUOTE_SUB() { #/* Usage: `SUSUWU_SH_QUOTE_SUB "<type-of-quote>" "<code | quote>" ["<optional original color>"])"` */
 	case "${1}" in #/* Notice: update [`README.md#cc-source`](README.md#cc-source) if you update those. */
 		"CODE") #/* command / code quote */
 			echo "\`$(SUSUWU_SH_USE2 "${SUSUWU_SH_BROWN}" "${2}" "${3}")\`" ;;
