@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_AssistantCns_hxx
 #define INCLUDES_cxx_AssistantCns_hxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassFs.hxx" /* ClassFsPath ClassFsBytecode */
+#include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode */
 #include "ClassResultList.hxx" /* ResultList */
 #include "ClassSys.hxx" /* templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
@@ -29,18 +29,18 @@ static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCa
  * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )
  * Github is a special case; has compressed downloads of repositories ( https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github )
  */
-extern std::vector<ClassFsPath> assistantCnsDefaultHosts;
+extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
 
 /* @throw std::bad_alloc
  * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new message synthesis).
  * If no responses, `0 == responsesOrNull.bytecodes[x].size()` (ignore).
  * `questionsOrNull.signatures[x] = Universal Resource Locator`
  * @code sha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
-void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassFsPath> &hosts = assistantCnsDefaultHosts);
-void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassFsPath &localXhtml = "index.xhtml");
-const std::vector<ClassFsPath> assistantCnsProcessUrls(const ClassFsPath &localXhtml = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
-const ClassFsBytecode assistantCnsProcessQuestion(const ClassFsPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
-const std::vector<ClassFsBytecode> assistantCnsProcessResponses(const ClassFsPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
+void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts = assistantCnsDefaultHosts);
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml = "index.xhtml");
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
+const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
+const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 
 /* @pre `questionsOrNull` maps to `responsesOrNull`,
  * `0 == questionsOrNull.bytecodes[x].size()` for new assistant synthesis (empty question has responses),

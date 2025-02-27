@@ -2,14 +2,14 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSha2_hxx
 #define INCLUDES_cxx_ClassSha2_hxx
-#include "ClassFs.hxx" /* ClassFsBytecode ClassFsHash */
+#include "ClassIo.hxx" /* ClassIoBytecode ClassIoHash */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
 namespace Susuwu {
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
-/* const */ ClassFsHash /* 128 bits, not null-terminated */ classSha1(const ClassFsBytecode &bytecode);
-/* const */ ClassFsHash /* 256 bits, not null-terminated */ classSha256(const ClassFsBytecode &bytecode);
-/* const */ ClassFsHash /* 512 bits, not null-terminated */ classSha512(const ClassFsBytecode &bytecode);
-typedef ClassFsHash (*ClassSha2)(const ClassFsBytecode &bytecode);
+/* const */ ClassIoHash /* 128 bits, not null-terminated */ classSha1(const ClassIoBytecode &bytecode);
+/* const */ ClassIoHash /* 256 bits, not null-terminated */ classSha256(const ClassIoBytecode &bytecode);
+/* const */ ClassIoHash /* 512 bits, not null-terminated */ classSha512(const ClassIoBytecode &bytecode);
+typedef ClassIoHash (*ClassSha2)(const ClassIoBytecode &bytecode);
 extern ClassSha2 classSha2/* = classSha256 */; /* To compress, apps can execute `sha2 = classSha1;`. To double hash sizes, execute `sha2 = classSha512;`. (Notice: this does not recompute hashes which exist) */
 #if SUSUWU_UNIT_TESTS
 const bool classSha2Tests();

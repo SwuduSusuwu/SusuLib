@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassFs.hxx" /* ClassFsBytecode ClassFsPath classFsGetOwnPath */
+#include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath classIoGetOwnPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
@@ -78,8 +78,8 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	const ClassFsPath gotOwnPath = classFsGetOwnPath();
-	if(ClassFsPath() != gotOwnPath) {
+	const ClassIoPath gotOwnPath = classIoGetOwnPath();
+	if(ClassIoPath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
@@ -320,7 +320,7 @@ const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const 
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
-const VirusAnalysisResult straceOutputsAnalysis(const ClassFsPath &straceOutput) {
+const VirusAnalysisResult straceOutputsAnalysis(const ClassIoPath &straceOutput) {
 		auto straceDump = std::ifstream(straceOutput);
 		std::vector<std::string> straceOutputs /*= explodeToList(straceDump, "\n")*/;
 		for(std::string straceOutputIt; std::getline(straceDump, straceOutputIt); ) {
@@ -338,7 +338,7 @@ void produceAnalysisCns(const ResultList &pass, const ResultList &abort,
 const ResultList &unreviewed /* = ResultList(), WARNING! Possible danger to use unreviewed files */,
 Cns &cns /* = analysisCns */
 ) {
-	std::vector<std::tuple<ClassFsBytecode, float>> inputsToOutputs;
+	std::vector<std::tuple<ClassIoBytecode, float>> inputsToOutputs;
 	const size_t maxPassSize = listMaxSize(pass.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abort.bytecodes);
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
@@ -386,7 +386,7 @@ const VirusAnalysisResult cnsAnalysis(const PortableExecutable &file, const Resu
 }
 
 void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrNull, Cns &cns /* = virusFixCns */) {
-	std::vector<std::tuple<ClassFsBytecode, ClassFsBytecode>> inputsToOutputs;
+	std::vector<std::tuple<ClassIoBytecode, ClassIoBytecode>> inputsToOutputs;
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
 	const size_t maxPassSize = listMaxSize(passOrNull.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abortOrNull.bytecodes);
@@ -405,7 +405,7 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	cns.setupSynapses(inputsToOutputs);
 }
 
-const ClassFsBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /* = virusFixCns */) {
+const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /* = virusFixCns */) {
 	return cns.processToString(file.bytecode);
 }
 

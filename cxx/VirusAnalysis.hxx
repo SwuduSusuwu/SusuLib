@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_hxx
 #define INCLUDES_cxx_VirusAnalysis_hxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassFs.hxx" /* ClassFsPath */
+#include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* classSha2 */
@@ -77,7 +77,7 @@ const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const R
 /* Analysis sandbox */
 const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* `chroot(strace(file)) >> outputs; return straceOutputsAnalysis(outputs);` */
 extern std::vector<std::string> stracePotentialDangers;
-const VirusAnalysisResult straceOutputsAnalysis(const ClassFsPath &straceOutput); /* TODO: regex */
+const VirusAnalysisResult straceOutputsAnalysis(const ClassIoPath &straceOutput); /* TODO: regex */
 
 /* Analysis CNS */
 /* Setup analysis CNS; is slow to produce (requires access to huge file databases);
