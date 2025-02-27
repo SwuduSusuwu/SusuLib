@@ -1,18 +1,18 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_GREEN SUSUWU_SH_PURPLE SUSUWU_SH_RED SUSUWU_SH_WARNING SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
-#include "ClassSys.hxx" /* classSysHexStr classSysHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_HEX_PREFIX_SZ */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_SH_WARNING SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32 */
+#include "ClassIo.hxx" /* classIoColoredParamStr classIoHexStr SUSUWU_HEX_DOES_PREFIX */
+#include "ClassSys.hxx" /* classSysConsoleHasAnsiColors classSysGetConsoleInput execves execvex */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
-#include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
 #ifdef SUSUWU_POSIX
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* strcmp strlen */
 #endif /* def SUSUWU_POSIX */
 #include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
 #ifdef SUSUWU_POSIX
-#include <stdexcept> /* std::invalid_argument std::logic_error std::runtime_error */
+#include <stdexcept> /* std::invalid_argument */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
 #include <unistd.h> /* execve execv fork geteuid getuid setuid */
@@ -26,7 +26,6 @@ typedef int pid_t;
 #ifdef SUSUWU_CXX20
 #	include <span> /* std::span */
 #endif
-#include <sstream> /* std::stringstream */
 #include <string> /* std::string std::to_string */
 #include <vector> /* std::vector */
 namespace Susuwu {
@@ -108,11 +107,11 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 		&si,     /* Pointer to STARTUPINFO structure */
 		&pi)     /* Pointer to PROCESS_INFORMATION structure */
 	) {
-		SUSUWU_NOTICE("execvesFork(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, non-blocking }}}");
+		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, non-blocking }}}");
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	} else {
-		SUSUWU_NOTICE("execvesFork(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	}
 	return 0;
 #endif /* ndef SUSUWU_POSIX */
@@ -127,9 +126,9 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	waitpid(pid, &wstatus, 0);
 /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
-		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	} else if(WIFSIGNALED(wstatus)) {
-		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
@@ -138,9 +137,9 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	}
 	const int status = system(argvS[0].c_str());
 	if(status) {
-		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
 	} else {
-		SUSUWU_NOTICE("execves(" + classSysColoredParamStr(argvS) + ", " + classSysColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, blocking }}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, blocking }}}");
 	}
 	return status;
 #endif /* ndef SUSUWU_POSIX */
@@ -283,68 +282,14 @@ const bool classSysConsoleHasAnsiColors() {
 }
 
 #if SUSUWU_UNIT_TESTS
-namespace { /* [misc-use-anonymous-namespace] */
-static void classSysHexOsSzTest(const std::string &value, const size_t hexSz, const bool printable) {
-	const size_t ss = classSysHexStr(value).size();
-	const std::string escapedValue = (printable ? ('"' + value + '"') : "value");
-	if(hexSz + SUSUWU_HEX_PREFIX_SZ != ss) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexStr(" + escapedValue + ").size() == " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT "; classSysHexStr(" + escapedValue + ").size() != " SUSUWU_SH_GREEN + std::to_string(hexSz) + SUSUWU_SH_DEFAULT ";"));
-	}
-	std::stringstream os;
-	classSysHexOs(os, value);
-	if(ss != os.str().size()) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, " + escapedValue + "); " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT " /* value.size() */ != " SUSUWU_SH_GREEN + std::to_string(os.str().size()) + SUSUWU_SH_DEFAULT " /* os.str().size() */;"));
-	}
-}
-static void classSysHexSsNumTest(const long &num) {
-	std::stringstream os;
-	classSysHexOs(os, num);
-	long newNum = 0;
-	classSysHexIs(os, newNum);
-	if(num != newNum) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classSysHexOs(os, " SUSUWU_SH_GREEN) + std::to_string(num) + SUSUWU_SH_DEFAULT "\"); long newNum; classSysHexIs(os, newNum); newNum == " SUSUWU_SH_RED + std::to_string(newNum) + SUSUWU_SH_DEFAULT ";"));
-	}
-}
-static void classSysHexSsStrTest(const std::string &value, const bool printable) {
-	std::stringstream os;
-	classSysHexOs(os, value);
-	std::string newValue;
-	os << std::endl; /* TODO; fix segfault if this is removed */
-	classSysHexIs(os, newValue);
-	if(value != newValue) {
-		const std::string escapedValue = (printable ? ("\"" SUSUWU_SH_GREEN + value + SUSUWU_SH_DEFAULT "\"") : (SUSUWU_SH_GREEN + classSysHexStr(value) + SUSUWU_SH_DEFAULT));
-		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classSysHexStr(newValue) + SUSUWU_SH_DEFAULT));
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "std::string value = " + escapedValue + ", newValue; classSysHexOs(os, value); classSysHexIs(os, newValue); newValue != value; newValue == " + escapedNewValue + ';'));
-	}
-}
-}; /* namespace */
 const bool classSysTests() {
-	/* test `classSysHexStr()` and `classSysHexOs()`'s output lengths */
-	classSysHexOsSzTest("", 0, true /* test that `value.empty()` produces 0 hexits */);
-	classSysHexOsSzTest("22", 4, true /* test that 2 chars produces 4 hexits */);
-	classSysHexOsSzTest("uwu", 6, true /* test that 3 chars produces 6 hexits */);
-	classSysHexOsSzTest(std::string({'\0'}), 2, false /* test that char == 0x00 produces 2 hexits */);
-	classSysHexOsSzTest("\010", 2, false /* test that char <= 0x10 produces 2 hexits */);
-	classSysHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
-
-	/* test that `classSysHexIs()` undoes `classSysHexOs()` */
-	for(long q = 0; (1 << CHAR_BIT) >= q /* test all `char` + first `short` */; ++q) {
-		classSysHexSsNumTest(q);
-	}
-	classSysHexSsStrTest("", true);
-	classSysHexSsStrTest("2", true);
-	classSysHexSsStrTest("22", true);
-	classSysHexSsStrTest("\010", false);
-	classSysHexSsStrTest("\022", false);
-	classSysHexSsStrTest(std::string({'\0'}), false);
-
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
 	std::cout << "	execves(): " << std::flush;
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
 #ifdef SUSUWU_EXPERIMENTAL
-	std::cout << "	classSysGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classSysHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
+	std::cout << "	classSysGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classIoHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
 #endif /* def SUSUWU_EXPERIMENTAL */
 	return retval;
 }

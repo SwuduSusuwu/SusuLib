@@ -2,11 +2,11 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath classIoGetOwnPath */
+#include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath classIoGetOwnPath classIoHexStr */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListLoadFrom resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
+#include "ClassSys.hxx" /* classSysHasRoot classSysSetRoot classSysKernelSetHook execvex */
 #include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS */
 #include "VirusAnalysis.hxx" /* abortList passList *AnalyisCaches */
 #include <algorithm> /* std::sort */
@@ -276,7 +276,7 @@ const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const Res
 		if(listHasValue(passList.hashes, fileHash)) {
 			return hashAnalysisCaches[fileHash] = virusAnalysisPass;
 		} else if(listHasValue(abortList.hashes, fileHash)) {
-			SUSUWU_NOTICE("hashAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to hash 0x" + classSysHexStr(fileHash) + " (found in `abortList.hashes`). You should treat this as a virus detection if this was not a test. */");
+			SUSUWU_NOTICE("hashAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classIoHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to hash 0x" + classIoHexStr(fileHash) + " (found in `abortList.hashes`). You should treat this as a virus detection if this was not a test. */");
 			return hashAnalysisCaches[fileHash] = virusAnalysisAbort;
 		} else {
 			return hashAnalysisCaches[fileHash] = virusAnalysisContinue; /* continue to next tests */
@@ -291,7 +291,7 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 	} catch (...) {
 		auto match = listFindSignatureOfValue(abortList.signatures, file.bytecode);
 		if(-1 != match.fileOffset) {
-			SUSUWU_NOTICE("signatureAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classSysHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to signature 0x" + classSysHexStr(match.signature) + " found at offset=" + std::to_string(match.fileOffset) + ". You should treat this as a virus detection if this was not a test. */");
+			SUSUWU_NOTICE("signatureAnalysis(/*.file =*/ \"" + file.path + "\", /*.fileHash =*/ 0x" + classIoHexStr(fileHash) + ") {return virusAnalysisAbort;} /* due to signature 0x" + classIoHexStr(match.signature) + " found at offset=" + std::to_string(match.fileOffset) + ". You should treat this as a virus detection if this was not a test. */");
 			return signatureAnalysisCaches[fileHash] = virusAnalysisAbort;
 		}
 		return signatureAnalysisCaches[fileHash] = virusAnalysisContinue;

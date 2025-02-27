@@ -54,6 +54,7 @@
 - [`./cxx/ClassIo.hxx`](./cxx/ClassIo.hxx) is
   - `ClassIoPath` (`PortableExecutable`'s constructor argument), `ClassIoBytecode` (`classSha2`'s input argument), `ClassIoHash` (`classSha2`'s return value)
   - modular functions to interact with filesystems {`classIoGetOwnPath()`, `classIoFopenOwnPath()`}
+    - strings (or streams) {`classIoHexOs()`, `classIoHexStr()`, `classIoColoredParamOs()`, `classIoColoredParamStr()`, `classIoIsXdigit()`, `classIoHexitToNibble()`, `classIoHex2Char()`, `classIoDebugIs()`, `classIoHexIs()`, `classIoGetline()`, `classIoCheckChar()`, `classIoCheckSz()`, `classIoCheckStr()`}
 - [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
   - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
@@ -66,7 +67,6 @@
   - modular functions to interact with:
     - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`, `classSysConsoleHasAnsiColors()`}
     - own process (`$0`) {`classSysInit()`, `templateCatchAll()`}
-    - strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`, `classSysIsXdigit()`, `classSysHexitToNibble()`, `classSysHex2Char()`, `classSysDebugIs()`, `classSysHexIs()`, `classSysGetline()`, `classSysCheckChar()`, `classSysCheckSz()`, `classSysCheckStr()`}
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
     - TODO: internet (`socket`, `Winsock2`).
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
@@ -140,7 +140,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `export SUSUWU_SH_TPUT_COMMAND=<path>`; replaces calls to `tput` with `<path>` (for instance, with `no-such-command` to test that `SUSUWU_SH_COLOR_COUNT()` does not require `ncurses-utils`).
 - Macro flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
-  - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classSysHex*()` insert/remove "0x". Default is `=false` (caller must do).
+  - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classIoHex*()` insert/remove "0x". Default is `=false` (caller must do).
   - `-DSUSUWU_LIST_COUNT` to have `listDumpTo()` prefix the list count (which allows verification through `listLoadFrom()`. Default undefined.
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
@@ -160,8 +160,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_VPTRS=false`: [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Class::operator==(const Class &obj) { return this->hasLayoutOf(obj) && 0 == memcmp(sizeof(NULL) + (char *)this, sizeof(NULL) + (char *)&obj, this->getObjectSize() - sizeof(NULL)); }`, thus `Susuwu::Object() == Susuwu::Class()` but `CXX` output with nonstandard `vptr` layout crashes. Default `=true`; (`return typeid(this) == typeid(obj) && 0 == memcmp(this, *obj, this->getObjectSize());`).
     - `-DSUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES=false`: to use [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Object::equals(const Object &obj) { return this->operator==(obj); }`. Default is `=true` (`return this == &obj`). For now, just controls `Object::equals` (in future, perhaps `SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES` inherits this).
-    - `-DSUSUWU_HEX_TABLE=true` replaces [`classSysHexitToNibble()`](./cxx/ClassSys.hxx) (and future `classSysNibbleToHexit()`) computations with lookups through _ASCII_ maps. Replaces `isxdigit()` with `classSysHex2Nib[]`.
-    - `-DSUSUWU_USE_STD_HEX=true` replaces [`classSysHex2Char()`](./cxx/ClassSys.hxx) (and future `classSysChar2Hex()`) with `std::hex`.
+    - `-DSUSUWU_HEX_TABLE=true` replaces [`classIoHexitToNibble()`](./cxx/ClassIo.hxx) (and future `classIoNibbleToHexit()`) computations with lookups through _ASCII_ maps. Replaces `isxdigit()` with `classIoHex2Nib[]`.
+    - `-DSUSUWU_USE_STD_HEX=true` replaces [`classIoHex2Char()`](./cxx/ClassIo.hxx) (and future `classIoChar2Hex()`) with `std::hex`.
     - `-DSUSUWU_IO_THROW=true`; replaces `is.setstate(std::ios::failbit);` with `throw`. For now, just affects `std::istream` (and derivatives) params; don't know if `os` should have its own flag.
   - TODO (for now won't build, or has no effect):
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES=true`: No effect. If implemented, `Class::operator==(const Class &obj) { return &obj == this; }`. Default is `=false`.

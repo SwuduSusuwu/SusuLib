@@ -1,7 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
-#include "ClassSys.hxx" /* classSysHexStr */
+#include "ClassIo.hxx" /* classIoHexStr */
 #include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -148,7 +148,7 @@ public:
 	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
 #endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
 	virtual const std::string toString() const {
-		return getName() + '@' + classSysHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
+		return getName() + '@' + classIoHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
 	}
 	virtual void notify() {}
 	virtual void notifyAll() {}

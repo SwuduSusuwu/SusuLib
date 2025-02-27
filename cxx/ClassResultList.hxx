@@ -2,10 +2,10 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx
-#include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode ClassIoHash */
+#include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode ClassIoHash classIoCheckChar classIoCheckStr classIoCheckSz classIoGetline classIoHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_IO_WHITESPACE */
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysCheckChar classSysCheckStr classSysCheckSz classSysGetline classSysHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_IO_WHITESPACE */
+#include "ClassSys.hxx" /* templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -92,7 +92,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 #if !SUSUWU_HEX_DOES_PREFIX
 			os << "0x";
 #endif /* !SUSUWU_HEX_DOES_PREFIX */
-			classSysHexOs(os, value);
+			classIoHexOs(os, value);
 		}
 		if(quoteValues) {
 			os << '"';
@@ -152,11 +152,11 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 	is >> delim;
 	switch(listFormat) {
 		case listFormatInitializer:
-			classSysCheckChar(__func__, '{', delim);
+			classIoCheckChar(__func__, '{', delim);
 			terminator = '}';
 		break;
 		case listFormatJson:
-			classSysCheckChar(__func__, '[', delim);
+			classIoCheckChar(__func__, '[', delim);
 			terminator = ']';
 			quoteValues = true;
 		break;
@@ -168,7 +168,7 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 	size_t count = 0;
 	is >> count;
 	is >> delim;
-	classSysCheckChar(__func__, ':', delim);
+	classIoCheckChar(__func__, ':', delim);
 	list.reserve(count);
 #endif /* def SUSUWU_LIST_COUNT */
 	const std::string assignment = whitespaceFrom ? " = " : "=";
@@ -178,78 +178,78 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 		const std::streampos pos = is.tellg();
 		if(whitespaceFrom) {
 			is >> delim;
-			classSysCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
+			classIoCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
 		}
 		is >> delim;
 		if(terminator == delim) {
 #ifdef SUSUWU_LIST_COUNT
-			classSysCheckSz(__func__, count, index_);
+			classIoCheckSz(__func__, count, index_);
 #endif /* def SUSUWU_LIST_COUNT */
 			break;
 		}
 		if(0 == index_) {
 			is.seekg(pos);
 		} else {
-			classSysCheckChar(__func__, ',', delim);
+			classIoCheckChar(__func__, ',', delim);
 		}
 		if(whitespaceFrom) {
 			is >> delim;
-			classSysCheckChar(__func__, '\t', delim); /* is >> token; classSysCheckStr(__func__, "\n\t", token); */
+			classIoCheckChar(__func__, '\t', delim); /* is >> token; classIoCheckStr(__func__, "\n\t", token); */
 		}
 		if(index) {
 			is >> token;
-			classSysCheckStr(__func__, std::to_string(index_), token);
+			classIoCheckStr(__func__, std::to_string(index_), token);
 			is >> token;
-			classSysCheckStr(__func__, assignment, token);
+			classIoCheckStr(__func__, assignment, token);
 		}
 		typename List::value_type value;
 		if(quoteValues) {
 			is >> delim;
-			classSysCheckChar(__func__, '"', delim);
+			classIoCheckChar(__func__, '"', delim);
 		}
 		if(pascalValues) {
 			std::streamsize tokenSz = 0;
 			is >> tokenSz;
 			is >> delim;
-			classSysCheckChar(__func__, ':' /* TODO: replace "%Dec:" with "%Bin" */, delim);
+			classIoCheckChar(__func__, ':' /* TODO: replace "%Dec:" with "%Bin" */, delim);
 			value.resize(tokenSz);
 			if(0 < tokenSz) {
 				is.read(&value[0], tokenSz); /* `is >> value;` won't do binary code */
 				if(is.gcount() < tokenSz) {
 					value.resize(is.gcount());
 				}
-				classSysCheckSz(__func__, is.gcount(), tokenSz);
+				classIoCheckSz(__func__, is.gcount(), tokenSz);
 			}
 		} else {
 #if !SUSUWU_HEX_DOES_PREFIX
-//			is >> token; classSysCheckStr(__func__, "0x", token);
+//			is >> token; classIoCheckStr(__func__, "0x", token);
 			std::getline(is, token, 'x'); /* used `std::getline` so 'x' is swallowed */
-			classSysCheckStr(__func__, hexPrefix, token);
+			classIoCheckStr(__func__, hexPrefix, token);
 #endif /* !SUSUWU_HEX_DOES_PREFIX */
-			classSysHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
+			classIoHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
 		}
 		if(quoteValues) {
 			is >> delim;
-			classSysCheckChar(__func__, '"', delim);
+			classIoCheckChar(__func__, '"', delim);
 		}
 		list.insert(list.end(), value); /* list.push_back(value); */
 	}
-	classSysCheckChar(__func__, terminator, delim);
+	classIoCheckChar(__func__, terminator, delim);
 	switch(listFormat) {
 		case listFormatInitializer:
 			is >> delim;
-			classSysCheckChar(__func__, ';', delim);
+			classIoCheckChar(__func__, ';', delim);
 		break;
 		case listFormatJson:
 			if(!finalList) {
 				is >> delim;
-				classSysCheckChar(__func__, ',', delim);
+				classIoCheckChar(__func__, ',', delim);
 			}
 		break;
 	}
 	if(whitespaceFrom) {
 		is >> delim;
-		classSysCheckChar(__func__, '\n', delim);
+		classIoCheckChar(__func__, '\n', delim);
 	}
 } /* view `ClassResultList.cxx:classResultListTests()` for examples of input from `listLoadFrom()`+`resultListLoadFrom`. */
 template<class Is>
@@ -258,12 +258,12 @@ void resultListLoadFromAssignment(const std::string &listStr, Is &is, const bool
 	std::string token;
 	switch(listFormat) {
 		case listFormatInitializer:
-			classSysGetline(is, token, '{');
-			classSysCheckStr(__func__, listStr + (whitespaceFrom ? " = " : "="), token);
+			classIoGetline(is, token, '{');
+			classIoCheckStr(__func__, listStr + (whitespaceFrom ? " = " : "="), token);
 		break;
 		case listFormatJson:
-			classSysGetline(is, token, '[');
-			classSysCheckStr(__func__, '"' + listStr + '"' + (whitespaceFrom ? ": " : ":"), token);
+			classIoGetline(is, token, '[');
+			classIoCheckStr(__func__, '"' + listStr + '"' + (whitespaceFrom ? ": " : ":"), token);
 		break;
 	}
 }
@@ -273,10 +273,10 @@ void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitesp
 	char delim = '\0';
 	if(listFormatJson == listFormat) {
 		is >> delim;
-		classSysCheckChar(__func__, '{', delim);
+		classIoCheckChar(__func__, '{', delim);
 		if(whitespaceFrom) {
 			is >> delim;
-			classSysCheckChar(__func__, '\n', delim);
+			classIoCheckChar(__func__, '\n', delim);
 		}
 	}
 	resultListLoadFromAssignment("list.hashes", is, whitespace, listFormat);
@@ -287,7 +287,7 @@ void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitesp
 	listLoadFrom(list.bytecodes, is, index, whitespace, pascalValues, true, listFormat);
 	if(listFormatJson == listFormat) {
 		is >> delim;
-		classSysCheckChar(__func__, '}', delim);
+		classIoCheckChar(__func__, '}', delim);
 	}
 }
 
