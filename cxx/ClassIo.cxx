@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_ClassIo_cxx
 #define INCLUDES_cxx_ClassIo_cxx
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WIN32 */
-#include "ClassIo.hxx" /* ClassIoPath */
+#include "ClassIo.hxx" /* classIoHexStr classIoHexOs ClassIoPath SUSUWU_HEX_PREFIX_SZ */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
@@ -10,8 +10,9 @@
 #ifdef __linux__
 #	include <linux/limits.h> /* PATH_MAX */
 #endif /* def __linux__ */
-//#include <stdexcept> /* std::runtime_error */
-#include <string> /* std::to_string */
+#include <sstream> /* std::stringstream */
+#include <stdexcept> /* std::logic_error */
+#include <string> /* std::string std::to_string */
 #ifdef __linux__ /* `clang-tidy` wants ordered `#include`s */
 #	include <sys/types.h> /* ssize_t */
 #	include <unistd.h> /* readlink */
@@ -58,7 +59,23 @@ const ClassIoPath classIoGetOwnPath() {
 }
 
 #if SUSUWU_UNIT_TESTS
+namespace { /* [misc-use-anonymous-namespace] */
+static void classIoHexTests(const std::string &value) {
+	const size_t ss = classIoHexStr(value).size();
+	std::stringstream os;
+	if(2 + SUSUWU_HEX_PREFIX_SZ != ss) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classIoHexStr(value).size();"));
+	}
+	classIoHexOs(os, value);
+	if(ss != os.str().size()) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexOs(os, value); " + std::to_string(value.size()) + " /* value.size() */ != " + std::to_string(os.str().size()) + " /* os.str().size() */;"));
+	}
+}
+}; /* namespace */
 const bool classIoTests() {
+	classIoHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
+	classIoHexTests("\010" /* test that char <= 0x10 produces 2 hexits */);
+	classIoHexTests("\022" /* test that char >= 0x10 produces 2 hexits */);
 	return true;
 }
 const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }

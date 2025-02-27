@@ -2,10 +2,10 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx
-#include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode ClassIoHash */
+#include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode ClassIoHash classIoCheckChar classIoCheckStr classIoCheckSz classIoGetline classIoHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_IO_INPUT_WHITESPACE */
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* classSysCheckChar classSysCheckStr classSysCheckSz classSysGetline classSysHexOs SUSUWU_HEX_DOES_PREFIX */
+#include "ClassSys.hxx" /* templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -76,7 +76,7 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 #if !SUSUWU_HEX_DOES_PREFIX
 			os << "0x";
 #endif /* !SUSUWU_HEX_DOES_PREFIX */
-			classSysHexOs(os, value);
+			classIoHexOs(os, value);
 		}
 		++index_;
 	}
@@ -98,18 +98,18 @@ void resultListDumpTo(const List &list, Os &os, const bool index, const bool whi
 }
 template<class List, class Is>
 void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
-	const bool whitespaceFrom = SUSUWU_SYS_INPUT_WHITESPACE && whitespace;
+	const bool whitespaceFrom = SUSUWU_IO_INPUT_WHITESPACE && whitespace;
 	const std::string assignment = whitespaceFrom ? " = " : "=";
 	const std::string hexPrefix = whitespace ? " 0" : "0";
 	char delim;
 	is >> delim;
-	classSysCheckChar(__func__, '{', delim);
+	classIoCheckChar(__func__, '{', delim);
 //	decltype(list.front()) value;
 #ifdef SUSUWU_LIST_COUNT
 	size_t count = 0;
 	is >> count;
 	is >> delim;
-	classSysCheckChar(__func__, ':', delim);
+	classIoCheckChar(__func__, ':', delim);
 	list.reserve(count);
 #endif /* def SUSUWU_LIST_COUNT */
 	for(size_t index_ = 0; is.good(); ++index_) {
@@ -117,71 +117,71 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 		const std::streampos pos = is.tellg();
 		if(whitespaceFrom) {
 			is >> delim;
-			classSysCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
+			classIoCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
 		}
 		is >> delim;
 		if('}' == delim) {
 #ifdef SUSUWU_LIST_COUNT
-			classSysCheckSz(__func__, count, index_);
+			classIoCheckSz(__func__, count, index_);
 #endif /* def SUSUWU_LIST_COUNT */
 			break;
 		}
 		if(0 == index_) {
 			is.seekg(pos);
 		} else {
-			classSysCheckChar(__func__, ',', delim);
+			classIoCheckChar(__func__, ',', delim);
 		}
 		if(whitespaceFrom) {
 			is >> delim;
-			classSysCheckChar(__func__, '\t', delim); /* is >> token; classSysCheckStr(__func__, "\n\t", token); */
+			classIoCheckChar(__func__, '\t', delim); /* is >> token; classIoCheckStr(__func__, "\n\t", token); */
 		}
 		if(index) {
 			is >> token;
-			classSysCheckStr(__func__, std::to_string(index_), token);
+			classIoCheckStr(__func__, std::to_string(index_), token);
 			is >> token;
-			classSysCheckStr(__func__, assignment, token);
+			classIoCheckStr(__func__, assignment, token);
 		}
 		typename List::value_type value;
 		if(pascalValues) {
 			long tokenSz;
 			is >> tokenSz;
 			is >> delim;
-			classSysCheckChar(__func__, ':' /* TODO: replace "%Dec:" with "%Bin" */, delim);
+			classIoCheckChar(__func__, ':' /* TODO: replace "%Dec:" with "%Bin" */, delim);
 			value.resize(tokenSz);
 			if(0 < tokenSz) {
 				is.read(&value[0], tokenSz); /* `is >> value;` won't do binary code */
 				if(is.gcount() < tokenSz) {
 					value.resize(is.gcount());
 				}
-				classSysCheckSz(__func__, is.gcount(), tokenSz);
+				classIoCheckSz(__func__, is.gcount(), tokenSz);
 			}
 		} else {
 #if !SUSUWU_HEX_DOES_PREFIX
-//			is >> token; classSysCheckStr(__func__, "0x", token);
+//			is >> token; classIoCheckStr(__func__, "0x", token);
 			std::getline(is, token, 'x'); /* used `std::getline` so 'x' is swallowed */
-			classSysCheckStr(__func__, hexPrefix, token);
+			classIoCheckStr(__func__, hexPrefix, token);
 #endif /* !SUSUWU_HEX_DOES_PREFIX */
-			classSysHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
+			classIoHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
 		}
 		list.insert(list.end(), value); /* list.push_back(value); */
 	}
-	classSysCheckChar(__func__, '}', delim);
+	classIoCheckChar(__func__, '}', delim);
 	is >> delim;
-	classSysCheckChar(__func__, ';', delim);
+	classIoCheckChar(__func__, ';', delim);
 } /* view `ClassResultList.cxx`:`classResultListTests()` for examples of input from `listLoadFrom()`+`resultListLoadFrom`. */
 template<class List, class Is>
 void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
-	const bool whitespaceFrom = SUSUWU_SYS_INPUT_WHITESPACE && whitespace;
+	const bool whitespaceFrom = SUSUWU_IO_INPUT_WHITESPACE && whitespace;
 	const std::string assignment = whitespaceFrom ? " = " : "=";
 	std::string token;
-	classSysGetline(is, token, '{');
-	classSysCheckStr(__func__, std::string("list.hashes") + assignment, token);
+	classIoGetline(is, token, '{');
+	classIoCheckStr(__func__, std::string("list.hashes") + assignment, token);
 	listLoadFrom(list.hashes, is, index, whitespace, pascalValues);
-	classSysGetline(is, token, '{');
-	classSysCheckStr(__func__, std::string("list.signatures") + assignment, token);
+	classIoGetline(is, token, '{');
+	classIoCheckStr(__func__, std::string("list.signatures") + assignment, token);
 	listLoadFrom(list.signatures, is, index, whitespace, pascalValues);
-	classSysGetline(is, token, '{');
-	classSysCheckStr(__func__, std::string("list.bytecodes") + assignment, token);
+	classIoGetline(is, token, '{');
+	classIoCheckStr(__func__, std::string("list.bytecodes") + assignment, token);
 	listLoadFrom(list.bytecodes, is, index, whitespace, pascalValues);
 }
 

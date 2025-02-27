@@ -40,6 +40,7 @@
 - [`./cxx/ClassIo.hxx`](./cxx/ClassIo.hxx) is
   - `ClassIoPath` (`PortableExecutable`'s constructor argument), `ClassIoBytecode` (`classSha2`'s input argument), `ClassIoHash` (`classSha2`'s return value)
   - modular functions to interact with filesystems {`classIoGetOwnPath()`, `classIoFopenOwnPath()`}
+    - strings (or streams) {`classIoHexOs()`, `classIoHexStr()`, `classIoColoredParamOs()`, `classIoColoredParamStr()`, `classSysDebugIs()`, `classIoHexIs()`, `classIoGetline()`, `classIoCheckChar()`, `classIoCheckSz()`, `classIoCheckStr()`}
 - [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
   - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
@@ -52,7 +53,6 @@
   - modular functions to interact with:
     - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`, `classSysConsoleHasAnsiColors()`}
     - own process (`$0`) {`classSysInit()`, `templateCatchAll()`}
-    - strings (or streams) {`classSysHexOs()`, `classSysHexStr()`, `classSysColoredParamOs()`, `classSysColoredParamStr()`, `classSysDebugIs()`, `classSysHexIs()`, `classSysGetline()`, `classSysCheckChar()`, `classSysCheckSz()`, `classSysCheckStr()`}
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
     - TODO: internet (`socket`, `Winsock2`).
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
@@ -121,7 +121,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `./build.sh --abort-on-first-error` : if an object fails to load, `exit 1`. Default is to continue if possible.
 - Macro flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
-  - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classSysHex*()` insert/remove "0x". Default is `=false` (caller must do).
+  - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classIoHex*()` insert/remove "0x". Default is `=false` (caller must do).
   - `-DSUSUWU_LIST_COUNT` to have `listDumpTo()` prefix the list count (which allows verification through `listLoadFrom()`. Default undefined.
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
