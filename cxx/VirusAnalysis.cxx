@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassFs.hxx" /* ClassFsBytecode ClassFsPath classFsGetOwnPath */
+#include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath classIoGetOwnPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListLoadFrom resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
@@ -49,16 +49,16 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
 bool virusAnalysisResultListIndex = false, virusAnalysisResultListWhitespace = false, virusAnalysisResultListPascal = true;
-const bool virusAnalysisInit(const ClassFsPath &path, ResultList &passList, ResultList &abortList) {
+const bool virusAnalysisInit(const ClassIoPath &path, ResultList &passList, ResultList &abortList) {
 	virusAnalysisLoadFrom(path + ".passOrNull.config", passList);
 	virusAnalysisLoadFrom(path + ".abortOrNull.config", abortList);
 	return true;
 } /* TODO: handle exceptions in this? */
-void virusAnalysisDumpTo(const ClassFsPath &path, const ResultList &list) {
+void virusAnalysisDumpTo(const ClassIoPath &path, const ResultList &list) {
 	std::ofstream config(path);
 	resultListDumpTo(list, config, virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal);
 }
-void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list) {
+void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list) {
 #if IFSTREAM_HAS_IOS_BASE
 	std::ifstream config(path);
 #else
@@ -89,7 +89,7 @@ const bool virusAnalysisTests() {
 	resultListProduceHashes(passOrNull);
 	resultListProduceHashes(abortOrNull);
 	produceAbortListSignatures(passOrNull, abortOrNull);
-	const ClassFsPath gotOwnPath = classFsGetOwnPath(); /* replaced `argv[0]`, ["Uncontrolled data used in path expression"](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277) fix. */
+	const ClassIoPath gotOwnPath = classIoGetOwnPath(); /* replaced `argv[0]`, ["Uncontrolled data used in path expression"](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277) fix. */
 	virusAnalysisInitTests(gotOwnPath, passOrNull, abortOrNull);
 	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
 	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
@@ -102,7 +102,7 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	if(ClassFsPath() != gotOwnPath) {
+	if(ClassIoPath() != gotOwnPath) {
 		const PortableExecutableBytecode executable(gotOwnPath);
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
@@ -127,7 +127,7 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
-const bool virusAnalysisInitTests(const ClassFsPath path, ResultList &passList, ResultList &abortList) {
+const bool virusAnalysisInitTests(const ClassIoPath &path, ResultList &passList, ResultList &abortList) {
 	const std::string passPath = path + ".passList.config";
 	const std::string abortPath = path + ".abortList.config";
 	try {
@@ -360,7 +360,7 @@ const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const 
 #endif /* ndef SUSUWU_POSIX */
 	}
 }
-const VirusAnalysisResult straceOutputsAnalysis(const ClassFsPath &straceOutput) {
+const VirusAnalysisResult straceOutputsAnalysis(const ClassIoPath &straceOutput) {
 		auto straceDump = std::ifstream(straceOutput);
 		std::vector<std::string> straceOutputs /*= explodeToList(straceDump, "\n")*/;
 		for(std::string straceOutputIt; std::getline(straceDump, straceOutputIt); ) {
@@ -378,7 +378,7 @@ void produceAnalysisCns(const ResultList &pass, const ResultList &abort,
 const ResultList &unreviewed /* = ResultList(), WARNING! Possible danger to use unreviewed files */,
 Cns &cns /* = analysisCns */
 ) {
-	std::vector<std::tuple<ClassFsBytecode, float>> inputsToOutputs;
+	std::vector<std::tuple<ClassIoBytecode, float>> inputsToOutputs;
 	const size_t maxPassSize = listMaxSize(pass.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abort.bytecodes);
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
@@ -426,7 +426,7 @@ const VirusAnalysisResult cnsAnalysis(const PortableExecutable &file, const Resu
 }
 
 void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrNull, Cns &cns /* = virusFixCns */) {
-	std::vector<std::tuple<ClassFsBytecode, ClassFsBytecode>> inputsToOutputs;
+	std::vector<std::tuple<ClassIoBytecode, ClassIoBytecode>> inputsToOutputs;
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
 	const size_t maxPassSize = listMaxSize(passOrNull.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abortOrNull.bytecodes);
@@ -445,7 +445,7 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	cns.setupSynapses(inputsToOutputs);
 }
 
-const ClassFsBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /* = virusFixCns */) {
+const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /* = virusFixCns */) {
 	return cns.processToString(file.bytecode);
 }
 

@@ -11,8 +11,8 @@ static const int susuwuUnitTestsMacrosBit =
 	1 << 0; /*   1: `Macros.hxx:macrosTestsNoexcept()` */
 static const int susuwuUnitTestsClassObjectBit =
 	1 << 1; /*   2: `ClassObjects.hxx:classObjectsTestsNoexcept()` */
-static const int susuwuUnitTestsClassFsBit =
-	1 << 2; /*   4: `ClassFs.hxx:classFsTestsNoexcept()` */
+static const int susuwuUnitTestsClassIoBit =
+	1 << 2; /*   4: `ClassIo.hxx:classIoTestsNoexcept()` */
 static const int susuwuUnitTestsConsoleBit =
 	1 << 3; /*   8: `ClassSys.hxx:classSysSetConsoleInput()` */
 static const int susuwuUnitTestsClassSysBit =

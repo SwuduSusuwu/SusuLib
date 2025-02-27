@@ -3,7 +3,7 @@
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
-#include "ClassFs.hxx" /* classFsGetOwnPath classFsTestsNoexcept */
+#include "ClassIo.hxx" /* classIoGetOwnPath classIoTestsNoexcept */
 #include "ClassObject.hxx" /* classObjectTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
@@ -55,12 +55,12 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassObjectBit;
 	}
-	std::cout << "classFsTestsNoexcept(): " << std::flush;
-	if(true == classFsTestsNoexcept()) {
+	std::cout << "classIoTestsNoexcept(): " << std::flush;
+	if(true == classIoTestsNoexcept()) {
 		std::cout << "pass" << std::endl;
 	} else {
 		std::cout << "error" << std::endl;
-		susuwuUnitTestsErrno |= susuwuUnitTestsClassFsBit;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassIoBit;
 	}
 	std::cout << "classSysTestsNoexcept(): " << std::flush;
 	if(true != classSysTestsNoexcept()) {
@@ -98,7 +98,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
 #else /* else !SUSUWU_UNIT_TESTS */
-	SUSUWU_NOTICE('`' + std::string(Susuwu::classFsGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
+	SUSUWU_NOTICE('`' + std::string(Susuwu::classIoGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
 #endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
@@ -112,7 +112,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 		return susuwuUnitTestsClassSysBit;
 	}
 #ifdef SUSUWU_EXPERIMENTAL
-	SUSUWU_WARNING('`' + std::string(Susuwu::classFsGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
+	SUSUWU_WARNING('`' + std::string(Susuwu::classIoGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
 #endif
 	return Susuwu::unitTestsCxx();
 }

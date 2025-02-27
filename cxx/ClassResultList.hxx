@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx
-#include "ClassFs.hxx" /* ClassFsPath ClassFsBytecode ClassFsHash */
+#include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode ClassIoHash */
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysCheckChar classSysCheckStr classSysCheckSz classSysGetline classSysHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_IO_WHITESPACE */
@@ -19,9 +19,9 @@
 #include <unordered_set> /* std::unordered_set */
 #include <vector> /* std::vector */
 namespace Susuwu {
-typedef ClassFsHash ResultListHash;
-typedef ClassFsBytecode ResultListBytecode; /* Should have structure of ClassFsBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
-typedef ClassFsPath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
+typedef ClassIoHash ResultListHash;
+typedef ClassIoBytecode ResultListBytecode; /* Should have structure of ClassIoBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
+typedef ClassIoPath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
 typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */

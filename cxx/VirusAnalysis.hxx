@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_VirusAnalysis_hxx
 #define INCLUDES_cxx_VirusAnalysis_hxx
 #include "ClassCns.hxx" /* Cns CnsMode */
-#include "ClassFs.hxx" /* ClassFsPath */
+#include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* classSha2 */
@@ -41,13 +41,13 @@ extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, vir
 /* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
  * @pre @code std::istream(path) @endcode
  * @post @code passList.hashes.size() @endcode */
-const bool virusAnalysisInit(const ClassFsPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisLoadFrom(path + ".{pass, abort}OrNull.config", {pass, abort}list); */
+const bool virusAnalysisInit(const ClassIoPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisLoadFrom(path + ".{pass, abort}OrNull.config", {pass, abort}list); */
 /* @pre @code std::ostream(path) @endcode
  * @throw what `std::ostream` throws. */
-void virusAnalysisDumpTo(const ClassFsPath &path, const ResultList &list);
+void virusAnalysisDumpTo(const ClassIoPath &path, const ResultList &list);
 /* @pre @code std::istream(path) @endcode
  * @throw what `std::istream` throws. */
-void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list);
+void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list);
 
 #if SUSUWU_UNIT_TESTS
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
@@ -55,7 +55,7 @@ void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list);
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
 static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
-const bool virusAnalysisInitTests(const ClassFsPath path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
+const bool virusAnalysisInitTests(const ClassIoPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
 static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
 #endif /* SUSUWU_UNIT_TESTS */
@@ -90,7 +90,7 @@ const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const R
 /* Analysis sandbox */
 const VirusAnalysisResult sandboxAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* `chroot(strace(file)) >> outputs; return straceOutputsAnalysis(outputs);` */
 extern std::vector<std::string> stracePotentialDangers;
-const VirusAnalysisResult straceOutputsAnalysis(const ClassFsPath &straceOutput); /* TODO: regex */
+const VirusAnalysisResult straceOutputsAnalysis(const ClassIoPath &straceOutput); /* TODO: regex */
 
 /* Analysis CNS */
 /* Setup analysis CNS; is slow to produce (requires access to huge file databases);
