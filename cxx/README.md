@@ -12,6 +12,7 @@
 - [`./cxx/ClassIo.hxx`](./ClassIo.hxx) is
   - `ClassIoPath` (`PortableExecutable`'s constructor argument), `ClassIoBytecode` (`classSha2`'s input argument), `ClassIoHash` (`classSha2`'s return value)
   - modular functions to interact with filesystems {`classIoGetOwnPath()`, `classIoFopenOwnPath()`}
+    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classIoGetConsoleInput()`, `classIoSetConsoleInput()`, `classIoGetConsoleAttributes()`, `classIoConsoleHasAnsiColors()`}
     - strings (or streams) {`classIoHexOs()`, `classIoHexStr()`, `classIoColoredParamOs()`, `classIoColoredParamStr()`, `classIoIsXdigit()`, `classIoHexitToNibble()`, `classIoHex2Char()`, `classIoDebugIs()`, `classIoHexIs()`, `classIoGetline()`, `classIoCheckChar()`, `classIoCheckSz()`, `classIoCheckStr()`}
 - [`./cxx/ClassObject.hxx`](./ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
@@ -23,7 +24,6 @@
   - typedefs {ClassSysUSeconds}
   - globals {classSysArgc, classSysArgs}
   - modular functions to interact with:
-    - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classSysGetConsoleInput()`, `classSysSetConsoleInput()`, `classSysGetConsoleAttributes()`, `classSysConsoleHasAnsiColors()`}
     - own process (`$0`) {`classSysInit()`, `templateCatchAll()`}
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
     - TODO: internet (`socket`, `Winsock2`).

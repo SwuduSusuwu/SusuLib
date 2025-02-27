@@ -605,6 +605,11 @@ typedef ClassIoPath ClassIoHash; /* TODO: `std::unordered_set<std::basic_string<
 const ClassIoPath classIoGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<ClassIoPath>::value) */;
 const FILE *classIoFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classIoGetClassIoPath()>::value) */;
 
+static const bool classIoGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
+const bool classIoSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classIoGetConsoleInput();` */
+const unsigned char classIoGetConsoleAttributes(); /* if(_WIN32 || ) { return (background * 16) + foreground color; } else if(_POSIX_SOURCE) { return "\033[%1;%2m" -> (%1 * 16) + %2 ; } else { return 0; } */
+const bool classIoConsoleHasAnsiColors();
+
 template<class Os, class Int,
 	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
 inline Os &classIoHexOs(Os &os, const Int &value) {
@@ -941,6 +946,86 @@ const ClassIoPath classIoGetOwnPath() {
 #endif /* def SUSUWU_WIN32 else */
 }
 
+const bool classIoSetConsoleInput(bool input) {
+	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
+	return classIoGetConsoleInput();
+}
+const unsigned char classIoGetConsoleAttributes() {
+#ifdef SUSUWU_WIN32
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	if(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) {
+		SUSUWU_WARNING("classIoGetConsoleAttributes() {/* TODO: [decode response from `GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
+		return info.wAttributes;
+	} else {
+		SUSUWU_ERROR("classIoGetConsoleAttributes() {!GetConsoleScreenBufferInfo() && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+	}
+#elif defined SUSUWU_POSIX
+	std::cout << "\033[?6;1;1t" /* Request console attributes */ << std::flush;
+	char buffer[32];
+	std::cin.read/*non-blocking*/(buffer, sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
+	const size_t bytesRead = strlen(buffer);
+	if(0 < bytesRead) {
+		SUSUWU_WARNING("classIoGetConsoleAttributes() {/* TODO: [decode response from `\\033[?6;1;1t`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
+# ifdef SUSUWU_DEBUG2
+		std::cerr << "Current color settings: ";
+		for(size_t i = 0; i < bytesRead; ++i) {
+			std::cerr << buffer[i]; /* TODO: decode this response (Termux doesn't have this) */
+		}
+		std::cout << std::endl;
+# endif /* def SUSUWU_DEBUG2 */
+	} else {
+# ifndef NDEBUG
+		SUSUWU_WARNING("classIoGetConsoleAttributes() {std::cout << \"\\033[?6;1;1t\" << std::flush; char buffer[32]; (" + std::to_string(bytesRead) + " == std::cin.readsome(buffer, sizeof(buffer));)");
+# endif /* ndef NDEBUG */
+	}
+#else /* elif defined SUSUWU_POSIX else */
+	SUSUWU_NOTICE("classIoGetConsoleAttributes() { /* [TODO](https://github.com/SwuduSusuwu/SubStack/issues/17): `#if !defined(SUSUWU_WIN32) && !defined(SUSUWU_POSIX)`. Hardcoded to `errno = ENOTTY; return 0;`. */ }");
+#endif /* elif defined SUSUWU_POSIX else */
+	errno = ENOTTY;
+	return 0;
+}
+const bool classIoConsoleHasAnsiColors() {
+#if defined(SUSUWU_SH_SKIP_COLORS) && SUSUWU_SH_SKIP_COLORS
+	return false;
+#elif defined(__WIN32__)
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	if(INVALID_HANDLE_VALUE == hConsole) {
+		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classIoConsoleHasAnsiColors() {(!GetConsoleScreenBufferInfo()} && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+		return false;
+	}
+	DWORD mode;
+	if(!GetConsoleMode(hConsole, &mode)) {
+		return false;
+	}
+	if(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING /* virtual mode allows CSI colors */)) {
+		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classIoConsoleHasAnsiColors() {(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
+		return false;
+	}
+	return true;
+#elif defined _POSIX_VERSION
+	return true;
+#else /* ndef _POSIX_VERSION */
+	const char *term = getenv("TERM");
+#	if defined(SUSUWU_SH_SKIP_COLORS) && !SUSUWU_SH_SKIP_COLORS
+	static const char *uncolored[] = {"dumb", SUSUWU_NULLPTR}; /* blacklist */
+	for(const char **it = uncolored; SUSUWU_NULLPTR != *it; ++*it) {
+		if(0 == strcmp(term, *it)) {
+			return false;
+		}
+	}
+	return true;
+#	else /* ndef SUSUWU_SH_SKIP_COLORS */
+	static const char *colored[] = {"screen", "screen-256color", "vt100", "xterm", "xterm-256color", SUSUWU_NULLPTR}; /* whitelist */
+	for(const char **it = colored; SUSUWU_NULLPTR != *it; ++*it) {
+		if(0 == strcmp(term, *it)) {
+			return true;
+		}
+	}
+	return false;
+#	endif /* ndef SUSUWU_SH_SKIP_COLORS_BLACKLIST */
+#endif /* ndef _POSIX_VERSION */
+}
+
 #if SUSUWU_UNIT_TESTS
 static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printable) {
 	const size_t ss = classIoHexStr(value).size();
@@ -1021,7 +1106,6 @@ public:
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
 ```c++
 /* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
-namespace Susuwu {
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -1076,11 +1160,6 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 	return false;
 }
 
-static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
-const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
-const unsigned char classSysGetConsoleAttributes(); /* if(_WIN32 || ) { return (background * 16) + foreground color; } else if(_POSIX_SOURCE) { return "\033[%1;%2m" -> (%1 * 16) + %2 ; } else { return 0; } */
-const bool classSysConsoleHasAnsiColors();
-
 template<typename Func, typename... Args>
 auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> const decltype(func(args...)) {
 	try {
@@ -1092,7 +1171,6 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 }
 
 #if SUSUWU_UNIT_TESTS
-/* @throw std::runtime_error */
 const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
 #endif /* SUSUWU_UNIT_TESTS */
@@ -1118,8 +1196,8 @@ const bool classSysInit(int argc, const char **args) {
 		return true;
 	}
 #ifndef SUSUWU_SH_SKIP_COLORS
-	if(!classSysConsoleHasAnsiColors()) {
-		SUSUWU_WARNING("classSysInit() {(!classSysConsoleHasAnsiColors()) /* Command Sequence Introducers disabled */}");
+	if(!classIoConsoleHasAnsiColors()) {
+		SUSUWU_WARNING("classSysInit() {(!classIoConsoleHasAnsiColors()) /* Command Sequence Introducers disabled */}");
 	}
 #endif /* ndef SUSUWU_SH_SKIP_COLORS */
 	return false;
@@ -1270,86 +1348,6 @@ const bool classSysSetRoot(bool root) {
 	return classSysHasRoot();
 }
 
-const bool classSysSetConsoleInput(bool input) {
-	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
-	return classSysGetConsoleInput();
-}
-const unsigned char classSysGetConsoleAttributes() {
-#ifdef SUSUWU_WIN32
-	CONSOLE_SCREEN_BUFFER_INFO info;
-	if(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) {
-		SUSUWU_WARNING("classSysGetConsoleAttributes() {/* TODO: [decode response from `GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
-		return info.wAttributes;
-	} else {
-		SUSUWU_ERROR("classSysGetConsoleAttributes() {!GetConsoleScreenBufferInfo() && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
-	}
-#elif defined SUSUWU_POSIX
-	std::cout << "\033[?6;1;1t" /* Request console attributes */ << std::flush;
-	char buffer[32];
-	std::cin.read/*non-blocking*/(buffer, sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
-	const size_t bytesRead = strlen(buffer);
-	if(0 < bytesRead) {
-		SUSUWU_WARNING("classSysGetConsoleAttributes() {/* TODO: [decode response from `\\033[?6;1;1t`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
-# ifdef SUSUWU_DEBUG2
-		std::cerr << "Current color settings: ";
-		for(size_t i = 0; i < bytesRead; ++i) {
-			std::cerr << buffer[i]; /* TODO: decode this response (Termux doesn't have this) */
-		}
-		std::cout << std::endl;
-# endif /* def SUSUWU_DEBUG2 */
-	} else {
-# ifndef NDEBUG
-		SUSUWU_WARNING("classSysGetConsoleAttributes() {std::cout << \"\\033[?6;1;1t\" << std::flush; char buffer[32]; (" + std::to_string(bytesRead) + " == std::cin.readsome(buffer, sizeof(buffer));)");
-# endif /* ndef NDEBUG */
-	}
-#else /* elif defined SUSUWU_POSIX else */
-	SUSUWU_NOTICE("classSysGetConsoleAttributes() { /* [TODO](https://github.com/SwuduSusuwu/SubStack/issues/17): `#if !defined(SUSUWU_WIN32) && !defined(SUSUWU_POSIX)`. Hardcoded to `errno = ENOTTY; return 0;`. */ }");
-#endif /* elif defined SUSUWU_POSIX else */
-	errno = ENOTTY;
-	return 0;
-}
-const bool classSysConsoleHasAnsiColors() {
-#if defined(SUSUWU_SH_SKIP_COLORS) && SUSUWU_SH_SKIP_COLORS
-	return false;
-#elif defined(__WIN32__)
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	if(INVALID_HANDLE_VALUE == hConsole) {
-		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {(!GetConsoleScreenBufferInfo()} && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
-		return false;
-	}
-	DWORD mode;
-	if(!GetConsoleMode(hConsole, &mode)) {
-		return false;
-	}
-	if(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING /* virtual mode allows CSI colors */)) {
-		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {(!SetConsoleMode(hConsole, mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
-		return false;
-	}
-	return true;
-#elif defined _POSIX_VERSION
-	return true;
-#else /* ndef _POSIX_VERSION */
-	const char *term = getenv("TERM");
-#	if defined(SUSUWU_SH_SKIP_COLORS) && !SUSUWU_SH_SKIP_COLORS
-	static const char *uncolored[] = {"dumb", SUSUWU_NULLPTR}; /* blacklist */
-	for(const char **it = uncolored; SUSUWU_NULLPTR != *it; ++*it) {
-		if(0 == strcmp(term, *it)) {
-			return false;
-		}
-	}
-	return true;
-#	else /* ndef SUSUWU_SH_SKIP_COLORS */
-	static const char *colored[] = {"screen", "screen-256color", "vt100", "xterm", "xterm-256color", SUSUWU_NULLPTR}; /* whitelist */
-	for(const char **it = colored; SUSUWU_NULLPTR != *it; ++*it) {
-		if(0 == strcmp(term, *it)) {
-			return true;
-		}
-	}
-	return false;
-#	endif /* ndef SUSUWU_SH_SKIP_COLORS_BLACKLIST */
-#endif /* ndef _POSIX_VERSION */
-}
-
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
@@ -1357,9 +1355,6 @@ const bool classSysTests() {
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
-#ifdef SUSUWU_EXPERIMENTAL
-	std::cout << "	classSysGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classIoHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
-#endif /* def SUSUWU_EXPERIMENTAL */
 	return retval;
 }
 #endif /* SUSUWU_UNIT_TESTS */
@@ -2657,11 +2652,11 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
-#include "ClassIo.hxx" /* classIoGetOwnPath classIoTestsNoexcept */
+#include "ClassIo.hxx" /* classIoGetConsoleInput classIoGetOwnPath classIoSetConsoleInput classIoTestsNoexcept */
 #include "ClassObject.hxx" /* classObjectTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
+#include "ClassSys.hxx" /* classSysTestsNoexcept */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
@@ -2672,6 +2667,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #	include <type_traits> /* std::is_nothrow_invocable */
 #endif /* def SUSUWU_CXX17 */
 namespace Susuwu {
+namespace { /* [misc-use-anonymous-namespace] */
 /* `clang-tidy` off: NOLINTBEGIN(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
 static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good())
 #if SUSUWU_UNIT_TESTS
@@ -2686,11 +2682,11 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
-	const bool consoleHasInput = classSysGetConsoleInput();
+	const bool consoleHasInput = classIoGetConsoleInput();
 	if(consoleHasInput) {
-		classSysSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/ClassSys.hxx` fails. Notice: this move assumes that the tests above won't block on input */
+		classIoSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/ClassIo.hxx` fails. Notice: this move assumes that the tests above won't block on input */
 	}
-	if(true == classSysGetConsoleInput()) {
+	if(true == classIoGetConsoleInput()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
@@ -2740,7 +2736,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsVirusAnalysisBit;
 	}
-	if(consoleHasInput && false == classSysSetConsoleInput(true)) {
+	if(consoleHasInput && false == classIoSetConsoleInput(true)) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "assistantCnsTestsNoexcept(): " << std::flush;
@@ -2755,6 +2751,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 #endif /* else !SUSUWU_UNIT_TESTS */
 	return susuwuUnitTestsErrno;
 }
+}; /* anonymous namespace */ /* [misc-use-anonymous-namespace] */
 }; /* namespace Susuwu */
 const SusuwuUnitTestsBitmask susuwuUnitTests() {
 	return Susuwu::unitTestsCxx();

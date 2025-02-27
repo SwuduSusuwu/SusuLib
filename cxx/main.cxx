@@ -3,11 +3,11 @@
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
 #include "AssistantCns.hxx" /* assistantCnsTestsNoexcept */
-#include "ClassIo.hxx" /* classIoGetOwnPath classIoTestsNoexcept */
+#include "ClassIo.hxx" /* classIoGetConsoleInput classIoGetOwnPath classIoSetConsoleInput classIoTestsNoexcept */
 #include "ClassObject.hxx" /* classObjectTestsNoexcept */
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
-#include "ClassSys.hxx" /* classSysGetConsoleInput classSysSetConsoleInput classSysTestsNoexcept */
+#include "ClassSys.hxx" /* classSysTestsNoexcept */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
@@ -33,11 +33,11 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
-	const bool consoleHasInput = classSysGetConsoleInput();
+	const bool consoleHasInput = classIoGetConsoleInput();
 	if(consoleHasInput) {
-		classSysSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/ClassSys.hxx` fails. Notice: this move assumes that the tests above won't block on input */
+		classIoSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/Classio.hxx` fails. Notice: this move assumes that the tests above won't block on input */
 	}
-	if(true == classSysGetConsoleInput()) {
+	if(true == classIoGetConsoleInput()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
@@ -87,7 +87,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsVirusAnalysisBit;
 	}
-	if(consoleHasInput && false == classSysSetConsoleInput(true)) {
+	if(consoleHasInput && false == classIoSetConsoleInput(true)) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "assistantCnsTestsNoexcept(): " << std::flush;
