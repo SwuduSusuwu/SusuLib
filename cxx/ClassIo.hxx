@@ -6,6 +6,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE */
 #include <iomanip> /* std::setw */
 #include <ios> /* std::hex */
+#include <iostream> /* std::cin */
 #include <istream> /* std::basic_istream */
 #include <sstream> /* std::stringstream */
 #include <stdexcept> /* std::runtime_error */
@@ -28,6 +29,11 @@ typedef ClassIoPath ClassIoHash; /* TODO: `std::unordered_set<std::basic_string<
  * Error values: `return ClassIoPath();` */
 const ClassIoPath classIoGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<ClassIoPath>::value) */;
 const FILE *classIoFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classIoGetClassIoPath()>::value) */;
+
+static const bool classIoGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
+const bool classIoSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classIoGetConsoleInput();` */
+const unsigned char classIoGetConsoleAttributes(); /* if(_WIN32 || ) { return (background * 16) + foreground color; } else if(_POSIX_SOURCE) { return "\033[%1;%2m" -> (%1 * 16) + %2 ; } else { return 0; } */
+const bool classIoConsoleHasAnsiColors();
 
 template<class Os, class Int,
 	typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>

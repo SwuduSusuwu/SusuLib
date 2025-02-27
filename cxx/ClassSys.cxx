@@ -2,15 +2,14 @@
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
 #include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_SH_DEFAULT SUSUWU_SH_PURPLE SUSUWU_SH_WARNING SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32*/
-#include "ClassIo.hxx" /* classIoColoredParamStr classIoHexStr SUSUWU_HEX_DOES_PREFIX */
-#include "ClassSys.hxx" /* classSysConsoleHasAnsiColors classSysGetConsoleInput execves execvex */
+#include "ClassIo.hxx" /* classIoColoredParamStr classIoConsoleHasAnsiColors classIoHexStr SUSUWU_HEX_DOES_PREFIX */
+#include "ClassSys.hxx" /* execves execvex */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
 #ifdef SUSUWU_POSIX
-#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* strlen */
 #endif /* def SUSUWU_POSIX */
-#include <iostream> /* std::cerr std::cout std::endl std::flush std::ios::eofbit std::ios::goodbit */
+#include <iostream> /* std::cout std::endl std::flush */
 #ifdef SUSUWU_POSIX
 #include <stdexcept> /* std::invalid_argument std::runtime_error */
 #include <sys/types.h> /* pid_t */
@@ -19,7 +18,7 @@
 #else
 #	ifdef SUSUWU_WIN32
 #		include <shlobj.h> /* IsUserAnAdmin */
-#		include <windows.h> /* CloseHandle CONSOLE_SCREEN_BUFFER_INFO CreateProcess DWORD GetConsoleMode GetConsoleScreenBufferInfo GetLastError GetStdHandle PROCESS_INFORMATION SetConsoleMode STARTUPINFO STD_OUTPUT_HANDLE ZeroMemory */
+#		include <windows.h> /* CloseHandle CreateProcess GetLastError PROCESS_INFORMATION STARTUPINFO ZeroMemory */
 #	endif /* def SUSUWU_WIN32 */
 typedef int pid_t;
 #endif /* def SUSUWU_POSIX */
@@ -48,8 +47,8 @@ const bool classSysInit(int argc, const char **args) {
 		return true;
 	}
 #ifndef SUSUWU_SH_SKIP_COLORS
-	if(!classSysConsoleHasAnsiColors()) {
-		SUSUWU_WARNING("classSysInit() {(!classSysConsoleHasAnsiColors()) /* Command Sequence Introducers disabled */}");
+	if(!classIoConsoleHasAnsiColors()) {
+		SUSUWU_WARNING("classSysInit() {(!classIoConsoleHasAnsiColors()) /* Command Sequence Introducers disabled */}");
 	}
 #endif /* ndef SUSUWU_SH_SKIP_COLORS */
 	return false;
@@ -201,75 +200,6 @@ const bool classSysSetRoot(bool root) {
 	return classSysHasRoot();
 }
 
-const bool classSysSetConsoleInput(bool input) {
-	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
-	return classSysGetConsoleInput();
-}
-const unsigned char classSysGetConsoleAttributes() {
-#ifdef SUSUWU_WIN32
-	CONSOLE_SCREEN_BUFFER_INFO info;
-	if(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) {
-		SUSUWU_WARNING("classSysGetConsoleAttributes() {/* TODO: [decode response from `GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
-		return info.wAttributes;
-	} else {
-		SUSUWU_ERROR("classSysGetConsoleAttributes() {!GetConsoleScreenBufferInfo() && GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "}");
-	}
-#elif defined SUSUWU_POSIX
-	std::cout << "\033[?6;1;1t" /* Request console attributes */ << std::flush;
-	char buffer[32];
-	std::cin.read/*non-blocking*/(buffer, sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
-	size_t bytesRead = strlen(buffer);
-	if(0 < bytesRead) {
-		SUSUWU_WARNING("classSysGetConsoleAttributes() {/* TODO: [decode response from `\\033[?6;1;1t`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
-# ifdef SUSUWU_DEBUG2
-		std::cerr << "Current color settings: ";
-		for(size_t i = 0; i < bytesRead; ++i) {
-			std::cerr << buffer[i]; /* TODO: decode this response (Termux doesn't have this) */
-		}
-		std::cout << std::endl;
-# endif /* def SUSUWU_DEBUG2 */
-	} else {
-# ifndef NDEBUG
-		SUSUWU_WARNING("classSysGetConsoleAttributes() {std::cout << \"\\033[?6;1;1t\" << std::flush; char buffer[32]; (" + std::to_string(bytesRead) + " == std::cin.readsome(buffer, sizeof(buffer));)");
-# endif /* ndef NDEBUG */
-	}
-#else /* elif defined SUSUWU_POSIX else */
-	SUSUWU_NOTICE("classSysGetConsoleAttributes() { /* [TODO](https://github.com/SwuduSusuwu/SubStack/issues/17): `#if !defined(SUSUWU_WIN32) && !defined(SUSUWU_POSIX)`. Hardcoded to `errno = ENOTTY; return 0;`. */ }");
-#endif /* elif defined SUSUWU_POSIX else */
-	errno = ENOTTY;
-	return 0;
-}
-const bool classSysConsoleHasAnsiColors() {
-#ifdef __WIN32__
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	if(INVALID_HANDLE_VALUE == hConsole) {
-		SUSUWU_PRINT(SUSUWU_SH_WARNING, "classSysConsoleHasAnsiColors() {!GetConsoleScreenBufferInfo()}, GetLastError(): " SUSUWU_SH_PURPLE + std::to_string(GetLastError()));
-		return false;
-	}
-	DWORD mode;
-	if(!GetConsoleMode(hConsole, &mode)) {
-		return false;
-	}
-	SetConsoleMode(hConsole, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING); /* virtual mode allows CSI colors */
-	return true;
-#elif defined _POSIX_VERSION
-	return true;
-#else
-	const char *term = getenv("TERM");
-	switch(std::string(term)) {
-		case "screen":
-		case "screen-256color":
-		case "vt100":
-		case "xterm":
-		case "xterm-256color":
-			return true;
-		/* case "dumb": */
-		default:
-			return false
-	}
-#endif
-}
-
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
@@ -277,9 +207,6 @@ const bool classSysTests() {
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
 	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
-#ifdef SUSUWU_EXPERIMENTAL
-	std::cout << "	classSysGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classIoHexStr(std::to_string(classSysGetConsoleAttributes())) << std::endl;
-#endif /* def SUSUWU_EXPERIMENTAL */
 	return retval;
 }
 #endif /* SUSUWU_UNIT_TESTS */

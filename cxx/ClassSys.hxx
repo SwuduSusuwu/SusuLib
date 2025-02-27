@@ -5,7 +5,6 @@
 #include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_GREEN SUSUWU_SH_RED SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include <chrono> /* std::chrono */
 #include <exception> /* std::exception */
-#include <iostream> /* std::cin */
 #ifdef SUSUWU_CXX20
 #	include <span> /* std::span */
 #endif
@@ -72,11 +71,6 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 	return false;
 }
 
-static const bool classSysGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
-const bool classSysSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classSysGetConsoleInput();` */
-const unsigned char classSysGetConsoleAttributes(); /* if(_WIN32 || ) { return (background * 16) + foreground color; } else if(_POSIX_SOURCE) { return "\033[%1;%2m" -> (%1 * 16) + %2 ; } else { return 0; } */
-const bool classSysConsoleHasAnsiColors();
-
 template<typename Func, typename... Args>
 auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> const decltype(func(args...)) {
 	try {
@@ -88,7 +82,6 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> c
 }
 
 #if SUSUWU_UNIT_TESTS
-/* @throw std::runtime_error */
 const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
 #endif /* SUSUWU_UNIT_TESTS */
