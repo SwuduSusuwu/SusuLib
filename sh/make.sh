@@ -4,7 +4,7 @@
 #/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
-. ./sh/Macros.sh #/* SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<warn-level> SUSUWU_SH_USE2() SUSUWU_VERBOSE */
+. ./sh/Macros.sh #/* SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<warn-level> SUSUWU_SH_USE2() SUSUWU_VERBOSE */
 
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
 	CROSS_COMP=""
@@ -67,7 +67,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 		if ! SUSUWU_SH_HAS_PARAM "--debug" "$@"; then
 			SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "\`${0} $*\` defaults to \`${0} $* $(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "--debug")\`."
 		fi
-		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "\`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "--debug")\` is slow (use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "--release")\` to improve how fast \`./\${BINDIR}/\${OUTPUT}\` executes)."
+		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "\`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "--debug")\` is slow (use \`${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "--release")\` to improve how fast \`$(SUSUWU_PATH_UNAMBIGUOUS "\${BINDIR}/\${OUTPUT}")\` executes)."
 		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
 		if [ true = ${USE_FSAN} ]; then
@@ -97,6 +97,7 @@ SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "\`${CXX} -c ... -o \"\${$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")}\"\` inherits local \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "OBJDIR")=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${OBJDIR}")\"\` until you execute \`unset OBJDIR\`."
 	fi
 	OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")" #/* if inherit OBJDIR, perhaps it is without last '/' */
+	OBJDIR="$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
 	mkdir -p "${OBJDIR}"
 }
 SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
@@ -109,6 +110,7 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "\`${LD} ... -o \"\${$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")}\${OUTPUT}\"\` inherits local \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "BINDIR")=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${BINDIR}")\"\` until you execute \`unset BINDIR\`."
 	fi
 	BINDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}")" #/* if inherit BINDIR, perhaps it is without last '/' */
+	BINDIR="$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
 	mkdir -p "${BINDIR}"
 }
 SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
@@ -292,6 +294,7 @@ SUSUWU_FIRST_PATH() ( #/* Usage: `USRBIN="$(SUSUWU_FIRST_PATH)"`. Is just for in
 SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/usr/bin"...]`. Is just for internal use. */
 	if [ -n "${2}" ]; then #/* function `${1}` was passed USRBIN as its first param (our second param) */
 		USRBIN="${2}"
+		USRBIN="$(SUSUWU_PATH_UNAMBIGUOUS "${USRBIN}")"
 		if [ -d "${USRBIN}" ]; then
 			return 0
 		else
@@ -308,6 +311,7 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/us
 		SUSUWU_PRINT "SUSUWU_PROCESS_USRBIN()" "$(SUSUWU_SH_NOTICE)" "None of the usual paths for \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "USRBIN")\` suitable to use; will use the first directory from \`\${PATH}\` which exists."
 		USRBIN="$(SUSUWU_FIRST_PATH)"
 	fi
+	USRBIN="$(SUSUWU_PATH_UNAMBIGUOUS "${USRBIN}")"
 	if [ -d "${USRBIN}" ]; then
 		SUSUWU_PRINT "SUSUWU_PROCESS_USRBIN()" "$(SUSUWU_SH_NOTICE)" "Have set \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "USRBIN")=\"$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${USRBIN}")\"\`, since \`${1}\` was not passed \`$(SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_CYAN}" "USRBIN")\`."
 		return 0

@@ -54,6 +54,13 @@ SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_PATH_AFFIX_DOTSLASH "
 	esac
 	echo "${DIR}" #/* return with "./" */
 )
+SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN='$(SUSUWU_UNAMBIGUOUS_PATH "USRBIN")` */
+	if [ "$(realpath -q "${1}")" != "${1}" ]; then #/* If relative path,
+		SUSUWU_PATH_AFFIX_DOTSLASH "${1}"            # * ensure path starts with "./" */
+	else
+		echo "${1}"
+	fi
+)
 SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<function>" "<path>" && cp "${0}" "<path>"` */
 	if [ -e "${2}" ]; then
 		SUSUWU_PRINT "${1}: SUSUWU_PATH_SHOULD_NOT_EXIST()" "$(SUSUWU_SH_ERROR)" "\"${2}\" exists. Use \`mv \"${2}\" \"${2}.bak\"\` (or \`rm \"${2}\"\`) and re-execute \`${1}\` (perhaps with \`${0}\`) to continue."
