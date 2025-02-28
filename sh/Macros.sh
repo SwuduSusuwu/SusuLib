@@ -36,6 +36,22 @@ SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwante
 	echo "${NEW_PARAMS}"
 	return ${SUSUWU_SH_REMOVE_PARAM_FOUND}
 )
+SUSUWU_STATIC_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW_CONSTANT; then EXPERIMENTAL_CODE(); fi`. Is fast (versus `SUSUWU_IS_PREVIEW()`, but must hardcode for production (or release) versus "experimental" (or "preview") branches. */
+	return 1 #/* TODO: for "experimental" (or "preview") branches, `return 0` */
+)
+SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; then EXPERIMENTAL_CODE(); fi` */
+	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
+		THIS_BRANCH="$(git rev-parse --abbrev-ref HEAD)" #/* Compute current branch */
+		if [ ! "HEAD" = "${THIS_BRANCH}" ]; then #/* If `git rebase` (or "detached HEAD"); unknown branch, skip */
+			if [ "$(SUSUWU_DEFAULT_BRANCH "${1}")" = "${THIS_BRANCH}" ]; then #/* If production (or release) branch */
+				return 1
+			else #/* else is "experimental" (or "preview") branch. */
+				return 0
+			fi
+		fi
+	fi
+	SUSUWU_STATIC_IS_PREVIEW #/* Use hardcoded value. */
+)
 SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}")` */
 	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
