@@ -36,6 +36,25 @@ SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwante
 	echo "${NEW_PARAMS}"
 	return ${SUSUWU_SH_REMOVE_PARAM_FOUND}
 )
+SUSUWU_FAST_IS_PREVIEW() ( #/* Usage; `if SUSUWU_FAST_IS_PREVIEW; then EXPERIMENTAL_CODE(); fi` */
+	return 1 #TODO: for experimental / preview branches, `return 0`; `SUSUWU_FAST_IS_PREVIEW()` Is fast (versus `SUSUWU_IS_PREVIEW()`, but can not auto-detect production / release versus experimental / preview branches.
+)
+SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; then EXPERIMENTAL_CODE(); fi` */
+	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
+		THIS_BRANCH="$(git rev-parse --abbrev-ref HEAD)" #detect current branch
+		DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #detect default branch
+		if [ "HEAD" = "${THIS_BRANCH}" ]; then # `git rebase` / "detached HEAD"; unknown branch
+			SUSUWU_FAST_IS_PREVIEW
+			return $?
+		elif [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then # production / release branch
+			return 1
+		else # experimental / preview branch
+			return 0
+		fi
+	fi
+	#shellcheck disable=SC2046 #If quoted, gives "return: Illegal number:"
+	return $(SUSUWU_FAST_IS_PREVIEW)
+)
 SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}")` */
 	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
