@@ -274,8 +274,10 @@ SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH 
 		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce \"${BASH_PATH}\" to test \`/bin/bash\`. Execute \`touch \"${BASH_PATH}\"\` to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
 		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then # If produced `/bin/bash` version;
-			sed 's|^\s*SUSUWU_BUILD_OBJECTS[^#]*|\0 2>/dev/null |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_BUILD_OBJECTS()`.
-			sed 's|^\s*SUSUWU_TEST_OUTPUT[^#]*|\0 2>/dev/null 1>\&2 |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_TEST_OUTPUT()`.
+			#shellcheck disable=SC2016 # That's not supposed to expand
+			sed 's|^\s*SUSUWU_BUILD_OBJECTS[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_BUILD_OBJECTS()`.
+			#shellcheck disable=SC2016 # That's not supposed to expand
+			sed 's|^\s*SUSUWU_TEST_OUTPUT[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_TEST_OUTPUT()`.
 			("${BASH_PATH}") # Execute `/bin/bash` version.
 		fi
 		BASH_STATUS=$?
