@@ -225,16 +225,23 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	return ${SUSUWU_STATUS}
 }
 
-SUSUWU_TEST_OUTPUT() {
+SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-execution>]; exit $?` */
 	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${BUILDNEW} ]; then
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
-			"${BINDIR}${OUTPUT}"
-		else #/* if `--mingw` */
-			if command -v wine >/dev/null; then
-				wine "${BINDIR}${OUTPUT}"
+			if [ true = ${SUSUWU_S} ]; then
+				"${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
 			else
+				"${BINDIR}${OUTPUT}"
+			fi
+		else #/* if `--mingw` */
+			if ! command -v wine >/dev/null; then
 				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "\`wine not found\`. do \`apt install wine\`."
 				return 1
+			fi
+			if [ true = ${SUSUWU_S} ]; then
+				wine "${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
+			else
+				wine "${BINDIR}${OUTPUT}"
 			fi
 		fi
 		SUSUWU_STATUS=$?
