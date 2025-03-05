@@ -37,6 +37,17 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
 
+extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
+/*
+ * @throw std::bad_alloc, std::runtime_error
+ * @pre @code std::istream(path) @endcode
+ * @post @code passList.hashes.size() @endcode */
+//const bool virusAnalysisInit(ClassIoPath path, ResultList &passList, ResultList &abortList);
+/* throws; what `std::ostream` throws. */
+void virusAnalysisDumpTo(const ClassIoPath &path, const ResultList &list);
+/* throws; what `std::istream` throws. */
+void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list);
+
 #if SUSUWU_UNIT_TESTS
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
  * @throw std::bad_alloc, std::runtime_error

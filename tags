@@ -1105,6 +1105,7 @@ virusAnalyses	cxx/VirusAnalysis.cxx	/^std::vector<VirusAnalysisFun> virusAnalyse
 virusAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {$/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 virusAnalysisAbort	cxx/VirusAnalysis.hxx	/^	virusAnalysisAbort = static_cast<char>(false), \/* do not launch *\/$/;"	e	enum:Susuwu::VirusAnalysisResult
 virusAnalysisContinue	cxx/VirusAnalysis.hxx	/^	virusAnalysisContinue \/* continue to next tests (is normal; most analyses can not prove a file/;"	e	enum:Susuwu::VirusAnalysisResult
+virusAnalysisDumpTo	cxx/VirusAnalysis.cxx	/^void virusAnalysisDumpTo(const ClassIoPath &path, const ResultList &list) {$/;"	f	namespace:Susuwu	typeref:typename:void
 virusAnalysisGetHook	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook virusAnalysisGetHook() {return virusAnalysisHook(virusAnalysisHoo/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 virusAnalysisHook	cxx/VirusAnalysis.cxx	/^const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { \/* Ignore depth-of-1 /;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 virusAnalysisHookClear	cxx/VirusAnalysis.hxx	/^	virusAnalysisHookClear   = 1 << 0, \/* unhook (remove present hooks), then parse rest of bits */;"	e	enum:Susuwu::VirusAnalysisHook
@@ -1116,6 +1117,7 @@ virusAnalysisHookTests	cxx/VirusAnalysis.cxx	/^const bool virusAnalysisHookTests
 virusAnalysisHookTestsNoexcept	cxx/VirusAnalysis.hxx	/^static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(viru/;"	f	namespace:Susuwu	typeref:typename:const bool
 virusAnalysisImpl	cxx/VirusAnalysis.cxx	/^static const bool virusAnalysisImpl(const PortableExecutable &file) {$/;"	f	namespace:Susuwu::__anon73fa30250111	typeref:typename:const bool	file:
 virusAnalysisInteractive	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisResult virusAnalysisInteractive(const PortableExecutable &file) { auto/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
+virusAnalysisLoadFrom	cxx/VirusAnalysis.cxx	/^void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list) {$/;"	f	namespace:Susuwu	typeref:typename:void
 virusAnalysisManualReview	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file) { ret/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 virusAnalysisManualReview	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisResult virusAnalysisManualReview(const PortableExecutable &file, const/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 virusAnalysisManualReviewCacheless	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult virusAnalysisManualReviewCacheless(const PortableExecutable &file, con/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
@@ -1123,6 +1125,9 @@ virusAnalysisPass	cxx/VirusAnalysis.hxx	/^	virusAnalysisPass = static_cast<char>
 virusAnalysisRemoteAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult virusAnalysisRemoteAnalysis(const PortableExecutable &file, const Resu/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 virusAnalysisRequiresReview	cxx/VirusAnalysis.hxx	/^	virusAnalysisRequiresReview, \/* submit to hosts to do analysis (infection is difficult to prov/;"	e	enum:Susuwu::VirusAnalysisResult
 virusAnalysisResetCaches	cxx/VirusAnalysis.cxx	/^void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {$/;"	f	namespace:Susuwu	typeref:typename:void
+virusAnalysisResultListIndex	cxx/VirusAnalysis.cxx	/^bool virusAnalysisResultListIndex = false, virusAnalysisResultListWhitespace = false, virusAnaly/;"	v	namespace:Susuwu	typeref:typename:bool
+virusAnalysisResultListPascal	cxx/VirusAnalysis.cxx	/^bool virusAnalysisResultListIndex = false, virusAnalysisResultListWhitespace = false, virusAnaly/;"	v	namespace:Susuwu	typeref:typename:bool
+virusAnalysisResultListWhitespace	cxx/VirusAnalysis.cxx	/^bool virusAnalysisResultListIndex = false, virusAnalysisResultListWhitespace = false, virusAnaly/;"	v	namespace:Susuwu	typeref:typename:bool
 virusAnalysisTests	cxx/VirusAnalysis.cxx	/^const bool virusAnalysisTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 virusAnalysisTestsNoexcept	cxx/VirusAnalysis.hxx	/^static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAna/;"	f	namespace:Susuwu	typeref:typename:const bool
 virusFixCns	cxx/VirusAnalysis.cxx	/^Cns analysisCns, virusFixCns; \/* hosts produce, clients initialize shared clones of this from d/;"	v	namespace:Susuwu	typeref:typename:Cns
