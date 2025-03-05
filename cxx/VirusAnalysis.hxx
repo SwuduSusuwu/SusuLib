@@ -12,7 +12,7 @@
 #include <map> /* std::map */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
-/* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
 namespace Susuwu {
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
@@ -36,6 +36,18 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+
+extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
+/* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
+ * @pre @code std::istream(path) @endcode
+ * @post @code passList.hashes.size() @endcode */
+const bool virusAnalysisInit(const ClassFsPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisLoadFrom(path + ".{pass, abort}OrNull.config", {pass, abort}list); */
+/* @pre @code std::ostream(path) @endcode
+ * @throw what `std::ostream` throws. */
+void virusAnalysisDumpTo(const ClassFsPath &path, const ResultList &list);
+/* @pre @code std::istream(path) @endcode
+ * @throw what `std::istream` throws. */
+void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list);
 
 #if SUSUWU_UNIT_TESTS
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`

@@ -4,7 +4,7 @@
 #include "ClassCns.hxx" /* Cns CnsMode */
 #include "ClassFs.hxx" /* ClassFsBytecode ClassFsPath classFsGetOwnPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
-#include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListProduceHashes */
+#include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListLoadFrom resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
 #include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS */
@@ -13,11 +13,12 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cmath>, <math.h>) /* round */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
-#include <fstream> /* std::ifstream */
+#include <fstream> /* std::ifstream std::ofstream */
 #include <ios> /* std::streamsize */
 #include <iostream> /* std::cin std::cout std::endl */
 #include <limits> /* std::numeric_limits */
 #include <map> /* std::map */
+#include <sstream> /* std::stringstream */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string std::to_string */
 #include <tuple> /* std::tuple std::get */
@@ -46,6 +47,26 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 }
 std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
+bool virusAnalysisResultListIndex = false, virusAnalysisResultListWhitespace = false, virusAnalysisResultListPascal = true;
+const bool virusAnalysisInit(const ClassFsPath &path, ResultList &passList, ResultList &abortList) {
+	virusAnalysisLoadFrom(path + ".passOrNull.config", passList);
+	virusAnalysisLoadFrom(path + ".abortOrNull.config", abortList);
+	return true;
+} /* TODO: handle exceptions in this? */
+void virusAnalysisDumpTo(const ClassFsPath &path, const ResultList &list) {
+	std::ofstream config(path);
+	resultListDumpTo(list, config, virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal);
+}
+void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list) {
+#if IFSTREAM_HAS_IOS_BASE
+	std::ifstream config(path);
+#else
+	const PortableExecutableBytecode configPE(path);
+	std::stringstream config(configPE.bytecode);
+#endif /* ! IFSTREAM_HAS_IOS_BASE */
+	list.hashes.clear(); list.signatures.clear(); list.bytecodes.clear(); /* TODO: have `listLoadFrom()` do? */
+	resultListLoadFrom(list, config, virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal);
+}
 #if SUSUWU_UNIT_TESTS
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
@@ -67,6 +88,14 @@ const bool virusAnalysisTests() {
 	resultListProduceHashes(passOrNull);
 	resultListProduceHashes(abortOrNull);
 	produceAbortListSignatures(passOrNull, abortOrNull);
+	const ClassFsPath gotOwnPath = classFsGetOwnPath(); /* replaced `argv[0]`; ["Uncontrolled data used in path expression"](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277) fix. */
+	virusAnalysisDumpTo(gotOwnPath + ".passOrNull.config", passOrNull);
+	virusAnalysisDumpTo(gotOwnPath + ".abortOrNull.config", abortOrNull);
+	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
+	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
+	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
+	virusAnalysisLoadFrom(gotOwnPath + ".passOrNull.config", passOrNull);
+	virusAnalysisLoadFrom(gotOwnPath + ".abortOrNull.config", abortOrNull);
 	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
 	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
 	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
@@ -78,9 +107,8 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	const ClassFsPath gotOwnPath = classFsGetOwnPath();
 	if(ClassFsPath() != gotOwnPath) {
-		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
+		const PortableExecutableBytecode executable(gotOwnPath);
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
@@ -178,8 +206,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookNewFile);
 	}
 	return virusAnalysisGetHook();
-}
-/* `clang-tidy` on: NOLINTEND(readability-implicit-bool-conversion) */
+} /* `clang-tidy` on: NOLINTEND(readability-implicit-bool-conversion) */
 
 const VirusAnalysisResult virusAnalysis(const PortableExecutable &file) {
 	const auto fileHash = classSha2(file.bytecode);

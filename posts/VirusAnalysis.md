@@ -2057,7 +2057,7 @@ typedef class ApxrCns : Cns {
 ```
 `less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
 ```c++
-/* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
 	virusAnalysisHookQuery   = 0,      /* return present hooks (as enum) */
@@ -2078,6 +2078,18 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+
+extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
+/* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
+ * @pre @code std::istream(path) @endcode
+ * @post @code passList.hashes.size() @endcode */
+const bool virusAnalysisInit(const ClassFsPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisLoadFrom(path + ".{pass, abort}OrNull.config", {pass, abort}list); */
+/* @pre @code std::ostream(path) @endcode
+ * @throw what `std::ostream` throws. */
+void virusAnalysisDumpTo(const ClassFsPath &path, const ResultList &list);
+/* @pre @code std::istream(path) @endcode
+ * @throw what `std::istream` throws. */
+void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list);
 
 #if SUSUWU_UNIT_TESTS
 /* `return (produceAbortListSignatures(EXAMPLES) && produceAnalysisCns(EXAMPLES) && produceVirusFixCns(EXAMPLES)) && virusAnalysisHookTests();`
@@ -2197,6 +2209,26 @@ void virusAnalysisResetCaches() SUSUWU_NOEXCEPT {
 }
 std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, cnsAnalysis, sandboxAnalysis /* sandbox is slow, so put last*/};
 
+bool virusAnalysisResultListIndex = false, virusAnalysisResultListWhitespace = false, virusAnalysisResultListPascal = true;
+const bool virusAnalysisInit(const ClassFsPath &path, ResultList &passList, ResultList &abortList) {
+	virusAnalysisLoadFrom(path + ".passOrNull.config", passList);
+	virusAnalysisLoadFrom(path + ".abortOrNull.config", abortList);
+	return true;
+} /* TODO: handle exceptions in this? */
+void virusAnalysisDumpTo(const ClassFsPath &path, const ResultList &list) {
+	std::ofstream config(path);
+	resultListDumpTo(list, config, virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal);
+}
+void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list) {
+#if IFSTREAM_HAS_IOS_BASE
+	std::ifstream config(path);
+#else
+	const PortableExecutableBytecode configPE(path);
+	std::stringstream config(configPE.bytecode);
+#endif /* ! IFSTREAM_HAS_IOS_BASE */
+	list.hashes.clear(); list.signatures.clear(); list.bytecodes.clear(); /* TODO: have `listLoadFrom()` do? */
+	resultListLoadFrom(list, config, virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal);
+}
 #if SUSUWU_UNIT_TESTS
 const bool virusAnalysisTests() {
 	ResultList abortOrNull; {
@@ -2218,6 +2250,14 @@ const bool virusAnalysisTests() {
 	resultListProduceHashes(passOrNull);
 	resultListProduceHashes(abortOrNull);
 	produceAbortListSignatures(passOrNull, abortOrNull);
+	const ClassFsPath gotOwnPath = classFsGetOwnPath(); /* replaced `argv[0]`; ["Uncontrolled data used in path expression"](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277) fix. */
+	virusAnalysisDumpTo(gotOwnPath + ".passOrNull.config", passOrNull);
+	virusAnalysisDumpTo(gotOwnPath + ".abortOrNull.config", abortOrNull);
+	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
+	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
+	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
+	virusAnalysisLoadFrom(gotOwnPath + ".passOrNull.config", passOrNull);
+	virusAnalysisLoadFrom(gotOwnPath + ".abortOrNull.config", abortOrNull);
 	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
 	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
 	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
@@ -2229,9 +2269,8 @@ const bool virusAnalysisTests() {
 	assert(abortOrNull.bytecodes.size() - 1 /* discount empty substr */ == abortOrNull.signatures.size());
 	produceAnalysisCns(passOrNull, abortOrNull, ResultList(), analysisCns);
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
-	const ClassFsPath gotOwnPath = classFsGetOwnPath();
 	if(ClassFsPath() != gotOwnPath) {
-		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
+		const PortableExecutableBytecode executable(gotOwnPath);
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
