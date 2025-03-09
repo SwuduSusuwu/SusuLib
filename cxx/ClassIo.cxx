@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_ClassIo_cxx
 #define INCLUDES_cxx_ClassIo_cxx
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_GREEN SUSUWU_SH_DEFAULT SUSUWU_SH_RED SUSUWU_UNIT_TESTS SUSUWU_WIN32 */
-#include "ClassIo.hxx" /* classIoHexStr classIoHexOs ClassIoPath SUSUWU_HEX_PREFIX_SZ */
+#include "ClassIo.hxx" /* classIoHexStr classIoHexIs classIoHexOs ClassIoPath SUSUWU_HEX_PREFIX_SZ */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
@@ -143,6 +143,25 @@ static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, con
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexOs(os, " + escapedValue + "); " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT " /* value.size() */ != " SUSUWU_SH_GREEN + std::to_string(os.str().size()) + SUSUWU_SH_DEFAULT " /* os.str().size() */;"));
 	}
 }
+static void classIoHexSsNumTest(const long &num) {
+	std::stringstream os;
+	classIoHexOs(os, num);
+	long newNum = 0;
+	classIoHexIs(os, newNum);
+	if(num != newNum) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classIoHexOs(os, " SUSUWU_SH_GREEN) + std::to_string(num) + SUSUWU_SH_DEFAULT "\"); long newNum; classIoHexIs(os, newNum); newNum == " SUSUWU_SH_RED + std::to_string(newNum) + SUSUWU_SH_DEFAULT ";"));
+	}
+}
+static void classIoHexSsStrTest(const std::string &value) {
+	std::stringstream os;
+	classIoHexOs(os, value);
+	std::string newValue;
+	os << std::endl; /* TODO; fix segfault if this is removed */
+	classIoHexIs(os, newValue);
+	if(value != newValue) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classIoHexOs(os, \"" SUSUWU_SH_GREEN) + value + SUSUWU_SH_DEFAULT "\"); std::string newValue; classIoHexIs(os, newValue); newValue == \"" + (newValue.size() ? (SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT) : "") + "\";"));
+	}
+}
 }; /* namespace */
 const bool classIoTests() {
 	/* test `classIoHexStr()` and `classIoHexOs()`'s output lengths */
@@ -152,6 +171,19 @@ const bool classIoTests() {
 	classIoHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
 	classIoHexOsSzTest("22", 4, true /* test that 2 chars produces 4 hexits */);
 	classIoHexOsSzTest("uwu", 6, true /* test that 3 chars produces 6 hexits */);
+
+	/* test that `classIoHexIs()` undoes `classIoHexOs()` */
+	classIoHexSsNumTest(0);
+	classIoHexSsNumTest(2);
+	classIoHexSsNumTest(02);
+	classIoHexSsNumTest(20);
+	classIoHexSsNumTest(262);
+	classIoHexSsNumTest(2642);
+	classIoHexSsStrTest(std::string({0}));
+	classIoHexSsStrTest("\010");
+	classIoHexSsStrTest("\022");
+	classIoHexSsStrTest("22");
+	classIoHexSsStrTest("2");
 
 #ifdef SUSUWU_EXPERIMENTAL
 	std::cout << "	classIoGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classIoHexStr(std::to_string(classIoGetConsoleAttributes())) << std::endl;

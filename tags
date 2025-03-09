@@ -806,6 +806,8 @@ classIoHexIs	cxx/ClassIo.hxx	/^inline const Value classIoHexIs(Is &is) {$/;"	f	n
 classIoHexOs	cxx/ClassIo.hxx	/^inline Os &classIoHexOs(Os &os, const Int &value) {$/;"	f	namespace:Susuwu	typeref:typename:Os &
 classIoHexOs	cxx/ClassIo.hxx	/^inline Os &classIoHexOs(Os &os, const Str &value) {$/;"	f	namespace:Susuwu	typeref:typename:Os &
 classIoHexOsSzTest	cxx/ClassIo.cxx	/^static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printabl/;"	f	namespace:Susuwu::__anondc31cc360111	typeref:typename:void	file:
+classIoHexSsNumTest	cxx/ClassIo.cxx	/^static void classIoHexSsNumTest(const long &num) {$/;"	f	namespace:Susuwu::__anondc31cc360111	typeref:typename:void	file:
+classIoHexSsStrTest	cxx/ClassIo.cxx	/^static void classIoHexSsStrTest(const std::string &value) {$/;"	f	namespace:Susuwu::__anondc31cc360111	typeref:typename:void	file:
 classIoHexStr	cxx/ClassIo.hxx	/^inline const Str classIoHexStr(const Str &value) {$/;"	f	namespace:Susuwu	typeref:typename:const Str
 classIoHexStr	cxx/ClassIo.hxx	/^inline const std::string classIoHexStr(const Int &value) {$/;"	f	namespace:Susuwu	typeref:typename:const std::string
 classIoHexitToNibble	cxx/ClassIo.hxx	/^inline unsigned char classIoHexitToNibble(const unsigned char hexit) {$/;"	f	namespace:Susuwu	typeref:typename:unsigned char
