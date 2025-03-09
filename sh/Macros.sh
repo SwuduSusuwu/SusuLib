@@ -227,7 +227,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	if [ "true" = "${SUSUWU_SH_FUNC}" ]; then
 		if [ -n "${CALLER_FUNC}" ]; then
 			NEW_MESSAGE="${NEW_MESSAGE}${CALLER_FUNC}: "
-		elif [ "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" -eq 0 ]; then
+		elif [ "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" -eq 0 ] && [ "${#FUNCNAME}" -ge 2 ]; then
 #shellcheck disable=SC2039 #if `SUSUWU_SH_HAS_FUNCNAME`, console supports this
 			NEW_MESSAGE="${NEW_MESSAGE}${FUNCNAME[1]}(): "
 		elif [ -n "$KSH_VERSION" ]; then
