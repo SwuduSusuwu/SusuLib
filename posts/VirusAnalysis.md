@@ -1073,22 +1073,28 @@ const bool classSysConsoleHasAnsiColors() {
 }
 
 #if SUSUWU_UNIT_TESTS
-static void classSysHexTests(const std::string &value) {
+static void classSysHexOsSzTest(const std::string &value, const size_t hexSz, const bool printable) {
 	const size_t ss = classSysHexStr(value).size();
-	std::stringstream os;
-	if(2 + SUSUWU_HEX_PREFIX_SZ != ss) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classSysHexStr(value).size();"));
+	const std::string escapedValue = (printable ? ('"' + value + '"') : "value");
+	if(hexSz + SUSUWU_HEX_PREFIX_SZ != ss) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexStr(" + escapedValue + ").size() == " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT "; classSysHexStr(" + escapedValue + ").size() != " SUSUWU_SH_GREEN + std::to_string(hexSz) + SUSUWU_SH_DEFAULT ";"));
 	}
+	std::stringstream os;
 	classSysHexOs(os, value);
 	if(ss != os.str().size()) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " /* value.size() */ != " + std::to_string(os.str().size()) + " /* os.str().size() */;"));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, " + escapedValue + "); " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT " /* value.size() */ != " SUSUWU_SH_GREEN + std::to_string(os.str().size()) + SUSUWU_SH_DEFAULT " /* os.str().size() */;"));
 	}
 }
 const bool classSysTests() {
+	/* test `classSysHexStr()` and `classSysHexOs()`'s output lengths */
+	classSysHexOsSzTest("", 0, true /* test that `value.empty()` produces 0 hexits */);
+	classSysHexOsSzTest("22", 4, true /* test that 2 chars produces 4 hexits */);
+	classSysHexOsSzTest("uwu", 6, true /* test that 3 chars produces 6 hexits */);
+	classSysHexOsSzTest(std::string({'\0'}), 2, false /* test that char == 0x00 produces 2 hexits */);
+	classSysHexOsSzTest("\010", 2, false /* test that char <= 0x10 produces 2 hexits */);
+	classSysHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
+
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
-	classSysHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
-	classSysHexTests("\010" /* test that char <= 0x10 produces 2 hexits */);
-	classSysHexTests("\022" /* test that char >= 0x10 produces 2 hexits */);
 	std::cout << "	execves(): " << std::flush;
 	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
 	std::cout << "	execvex(): " << std::flush;
