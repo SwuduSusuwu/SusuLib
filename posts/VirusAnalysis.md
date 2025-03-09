@@ -1303,6 +1303,27 @@ static void classSysHexOsSzTest(const std::string &value, const size_t hexSz, co
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, " + escapedValue + "); " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT " /* value.size() */ != " SUSUWU_SH_GREEN + std::to_string(os.str().size()) + SUSUWU_SH_DEFAULT " /* os.str().size() */;"));
 	}
 }
+static void classSysHexSsNumTest(const long &num) {
+	std::stringstream os;
+	classSysHexOs(os, num);
+	long newNum = 0;
+	classSysHexIs(os, newNum);
+	if(num != newNum) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::string("classSysHexOs(os, " SUSUWU_SH_GREEN) + std::to_string(num) + SUSUWU_SH_DEFAULT "\"); long newNum; classSysHexIs(os, newNum); newNum == " SUSUWU_SH_RED + std::to_string(newNum) + SUSUWU_SH_DEFAULT ";"));
+	}
+}
+static void classSysHexSsStrTest(const std::string &value, const bool printable) {
+	std::stringstream os;
+	classSysHexOs(os, value);
+	std::string newValue;
+	os << std::endl; /* TODO; fix segfault if this is removed */
+	classSysHexIs(os, newValue);
+	if(value != newValue) {
+		const std::string escapedValue = (printable ? ("\"" SUSUWU_SH_GREEN + value + SUSUWU_SH_DEFAULT "\"") : (SUSUWU_SH_GREEN + classSysHexStr(value) + SUSUWU_SH_DEFAULT));
+		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classSysHexStr(newValue) + SUSUWU_SH_DEFAULT));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "std::string value = " + escapedValue + ", newValue; classSysHexOs(os, value); classSysHexIs(os, newValue); newValue != value; newValue == " + escapedNewValue + ';'));
+	}
+}
 const bool classSysTests() {
 	/* test `classSysHexStr()` and `classSysHexOs()`'s output lengths */
 	classSysHexOsSzTest("", 0, true /* test that `value.empty()` produces 0 hexits */);
@@ -1311,6 +1332,17 @@ const bool classSysTests() {
 	classSysHexOsSzTest(std::string({'\0'}), 2, false /* test that char == 0x00 produces 2 hexits */);
 	classSysHexOsSzTest("\010", 2, false /* test that char <= 0x10 produces 2 hexits */);
 	classSysHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
+
+	/* test that `classSysHexIs()` undoes `classSysHexOs()` */
+	for(long q = 0; (1 << CHAR_BIT) >= q /* test all `char` + first `short` */; ++q) {
+		classSysHexSsNumTest(q);
+	}
+	classSysHexSsStrTest("", true);
+	classSysHexSsStrTest("2", true);
+	classSysHexSsStrTest("22", true);
+	classSysHexSsStrTest("\010", false);
+	classSysHexSsStrTest("\022", false);
+	classSysHexSsStrTest(std::string({'\0'}), false);
 
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
 	std::cout << "	execves(): " << std::flush;
