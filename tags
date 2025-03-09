@@ -803,9 +803,9 @@ classIoHexIs	cxx/ClassIo.hxx	/^inline Is &classIoHexIs(Is &is, Str &value) {$/;"
 classIoHexIs	cxx/ClassIo.hxx	/^inline const Value classIoHexIs(Is &is) {$/;"	f	namespace:Susuwu	typeref:typename:const Value
 classIoHexOs	cxx/ClassIo.hxx	/^inline Os &classIoHexOs(Os &os, const Int &value) {$/;"	f	namespace:Susuwu	typeref:typename:Os &
 classIoHexOs	cxx/ClassIo.hxx	/^inline Os &classIoHexOs(Os &os, const Str &value) {$/;"	f	namespace:Susuwu	typeref:typename:Os &
+classIoHexOsSzTest	cxx/ClassIo.cxx	/^static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printabl/;"	f	namespace:Susuwu::__anondc31cc360111	typeref:typename:void	file:
 classIoHexStr	cxx/ClassIo.hxx	/^inline const Str classIoHexStr(const Str &value) {$/;"	f	namespace:Susuwu	typeref:typename:const Str
 classIoHexStr	cxx/ClassIo.hxx	/^inline const std::string classIoHexStr(const Int &value) {$/;"	f	namespace:Susuwu	typeref:typename:const std::string
-classIoHexTests	cxx/ClassIo.cxx	/^static void classIoHexTests(const std::string &value) {$/;"	f	namespace:Susuwu::__anondc31cc360111	typeref:typename:void	file:
 classIoSetConsoleInput	cxx/ClassIo.cxx	/^const bool classIoSetConsoleInput(bool input) {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIoTests	cxx/ClassIo.cxx	/^const bool classIoTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIoTestsNoexcept	cxx/ClassIo.cxx	/^const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "class/;"	f	namespace:Susuwu	typeref:typename:const bool

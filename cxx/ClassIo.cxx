@@ -1,7 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassIo_cxx
 #define INCLUDES_cxx_ClassIo_cxx
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_WIN32 */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_GREEN SUSUWU_SH_DEFAULT SUSUWU_SH_RED SUSUWU_UNIT_TESTS SUSUWU_WIN32 */
 #include "ClassIo.hxx" /* classIoHexStr classIoHexOs ClassIoPath SUSUWU_HEX_PREFIX_SZ */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -131,22 +131,28 @@ const bool classIoConsoleHasAnsiColors() {
 
 #if SUSUWU_UNIT_TESTS
 namespace { /* [misc-use-anonymous-namespace] */
-static void classIoHexTests(const std::string &value) {
+static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printable) {
 	const size_t ss = classIoHexStr(value).size();
-	std::stringstream os;
-	if(2 + SUSUWU_HEX_PREFIX_SZ != ss) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, std::to_string(value.size()) + " == value.size(); " + std::to_string(ss) + " == classIoHexStr(value).size();"));
+	const std::string escapedValue = (printable ? ('"' + value + '"') : "value");
+	if(hexSz + SUSUWU_HEX_PREFIX_SZ != ss) {
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexStr(" + escapedValue + ").size() == " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT "; classIoHexStr(" + escapedValue + ").size() != " SUSUWU_SH_GREEN + std::to_string(hexSz) + SUSUWU_SH_DEFAULT ";"));
 	}
+	std::stringstream os;
 	classIoHexOs(os, value);
 	if(ss != os.str().size()) {
-		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexOs(os, value); " + std::to_string(value.size()) + " /* value.size() */ != " + std::to_string(os.str().size()) + " /* os.str().size() */;"));
+		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexOs(os, " + escapedValue + "); " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT " /* value.size() */ != " SUSUWU_SH_GREEN + std::to_string(os.str().size()) + SUSUWU_SH_DEFAULT " /* os.str().size() */;"));
 	}
 }
 }; /* namespace */
 const bool classIoTests() {
-	classIoHexTests(std::string({0}) /* test that char == 0x00 produces 2 hexits */);
-	classIoHexTests("\010" /* test that char <= 0x10 produces 2 hexits */);
-	classIoHexTests("\022" /* test that char >= 0x10 produces 2 hexits */);
+	/* test `classIoHexStr()` and `classIoHexOs()`'s output lengths */
+	classIoHexOsSzTest("", 0, true /* test that `value.empty()` produces 0 hexits */);
+	classIoHexOsSzTest(std::string({0}), 2, false /* test that char == 0x00 produces 2 hexits */);
+	classIoHexOsSzTest("\010", 2, false /* test that char <= 0x10 produces 2 hexits */);
+	classIoHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
+	classIoHexOsSzTest("22", 4, true /* test that 2 chars produces 4 hexits */);
+	classIoHexOsSzTest("uwu", 6, true /* test that 3 chars produces 6 hexits */);
+
 #ifdef SUSUWU_EXPERIMENTAL
 	std::cout << "	classIoGetConsoleAttributes(): " << (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") << classIoHexStr(std::to_string(classIoGetConsoleAttributes())) << std::endl;
 #endif /* def SUSUWU_EXPERIMENTAL */
