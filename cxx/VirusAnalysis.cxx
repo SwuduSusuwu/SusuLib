@@ -7,7 +7,7 @@
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysGetOwnPath classSysHasRoot classSysHexStr classSysSetRoot classSysKernelSetHook execvex */
 #include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_SH_ERROR SUSUWU_SH_VERBOSE SUSUWU_UNIT_TESTS */
-#include "VirusAnalysis.hxx" /* passList abortList *AnalyisCaches */
+#include "VirusAnalysis.hxx" /* abortList passList *AnalyisCaches */
 #include <algorithm> /* std::sort */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cmath>, <math.h>) /* round */
