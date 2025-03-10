@@ -175,6 +175,14 @@
 #	define SUSUWU_OVERRIDE /* No-op */
 #	define SUSUWU_ATOMIC(U) U /* TODO: warn? Abort? */
 #endif /* SUSUWU_CXX11 else */
+#if defined(SUSUWU_POSIX)
+#	include <sys/types.h> /* ssize_t */ /* NOLINT(misc-include-cleaner): used if SUSUWU_SSIZE_T is used */
+#	define SUSUWU_SSIZE_T ssize_t
+#else /* else !defined(SUSUWU_POSIX) */
+# include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* ptrdiff_t */ /* NOLINT(misc-include-cleaner): used if SUSUWU_SSIZE_T is used */
+#	define SUSUWU_SSIZE_T ptrdiff_t
+/* [The most important difference of `ssize_t` versus `ptrdiff_t` is semantics](https://stackoverflow.com/questions/8649018/what-is-the-difference-between-ssize-t-and-ptrdiff-t) */
+#endif /* else !defined(SUSUWU_POSIX) */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
