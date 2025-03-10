@@ -597,6 +597,7 @@ SUSUWU_SH_WHITE	cxx/Macros.hxx	/^#	define SUSUWU_SH_WHITE	/;"	d
 SUSUWU_SH_WHITE	cxx/Macros.hxx	/^#	define SUSUWU_SH_WHITE /;"	d
 SUSUWU_SH_YELLOW	cxx/Macros.hxx	/^#	define SUSUWU_SH_YELLOW	/;"	d
 SUSUWU_SH_YELLOW	cxx/Macros.hxx	/^#	define SUSUWU_SH_YELLOW /;"	d
+SUSUWU_SSIZE_T	cxx/Macros.hxx	/^#	define SUSUWU_SSIZE_T /;"	d
 SUSUWU_STATIC	cxx/Macros.hxx	/^#define SUSUWU_STATIC /;"	d
 SUSUWU_STATIC_ASSERT	cxx/Macros.hxx	/^#	define SUSUWU_STATIC_ASSERT(/;"	d
 SUSUWU_STDERR	cxx/Macros.hxx	/^#define SUSUWU_STDERR(WARN_LEVEL, x) SUSUWU_STDERR_/;"	d
