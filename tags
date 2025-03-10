@@ -640,6 +640,7 @@ SUSUWU_SH_WHITE	cxx/Macros.hxx	/^#	define SUSUWU_SH_WHITE	/;"	d
 SUSUWU_SH_WHITE	cxx/Macros.hxx	/^#	define SUSUWU_SH_WHITE /;"	d
 SUSUWU_SH_YELLOW	cxx/Macros.hxx	/^#	define SUSUWU_SH_YELLOW	/;"	d
 SUSUWU_SH_YELLOW	cxx/Macros.hxx	/^#	define SUSUWU_SH_YELLOW /;"	d
+SUSUWU_SSIZE_T	cxx/Macros.hxx	/^#	define SUSUWU_SSIZE_T /;"	d
 SUSUWU_STATIC	cxx/Macros.hxx	/^#define SUSUWU_STATIC /;"	d
 SUSUWU_STATIC_ASSERT	cxx/Macros.hxx	/^#	define SUSUWU_STATIC_ASSERT(/;"	d
 SUSUWU_STATIC_IS_PREVIEW	sh/Macros.sh	/^SUSUWU_STATIC_IS_PREVIEW() ( #\/* Usage; `if SUSUWU_IS_PREVIEW_CONSTANT; then EXPERIMENTAL_CODE(/;"	f
