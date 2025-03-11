@@ -667,6 +667,9 @@ public:
 #	define SUSUWU_HEX_DOES_PREFIX false
 #endif /* ndef SUSUWU_HEX_DOES_PREFIX */
 #define SUSUWU_HEX_PREFIX_SZ (SUSUWU_HEX_DOES_PREFIX ? 2 : 0)
+#ifndef SUSUWU_DASHOS
+#	define SUSUWU_DASHOS false /* `-Os` param */
+#endif /* ndef SUSUWU_DASHOS */
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -801,7 +804,60 @@ inline const typename List::value_type classSysColoredParamStr(const List &argvS
 		str += '}';
 	}
 	return str;
-}
+} /* TODO: move into `ClassStr.hxx`? */
+
+static const size_t classSysAscii7Bit = (1 << 7);
+SUSUWU_STATIC_ASSERT(0x80 == classSysAscii7Bit); /* ASCII, 7bit*/
+#if SUSUWU_HEX_TABLE
+static const std::array<signed char,
+#	if SUSUWU_DASHOS
+						 classSysAscii7Bit
+#	else /* SUSUWU_DASHOS else */
+						 1 << CHAR_BIT
+#	endif /* SUSUWU_DASHOS else */
+						 > classSysHex2Nib = {
+	/* memset(&classSysHex2Nib[0x00], -1, 48) */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* [0x30] = '0' */ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, /* memset(&classSysHex2Nib[0x3A], -1, 7) */ -1, -1, -1, -1, -1, -1, -1, /* [0x41] = 'A' */ 10, 11, 12, 13, 14, 15, /* memset(&classSysHex2Nib[0x48], -1, 26) */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* [0x61] = 'a' */ 10, 11, 12, 13, 14, 15, /* memset(&classSysHex2Nib[0x67], -1, 25) */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+#	if 8 < CHAR_BIT
+#		error "TODO: 8 < CHAR_BIT"
+#	elif 7 < CHAR_BIT && !SUSUWU_DASHOS
+	, /* memset(&classSysHex2Nib[classSysAscii7Bit], -1, (1 << CHAR_BIT) - classSysAscii7Bit) */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+#	endif /* 7 < CHAR_BIT */
+}; /* TODO: move into `ClassStr.hxx`? */
+#endif /* SUSUWU_HEX_TABLE */
+inline const bool classSysIsXdigit(const unsigned char char_) {
+#if SUSUWU_HEX_TABLE
+#	if SUSUWU_DASHOS
+	return (-1 != classSysHex2Nib.at(char_));
+#	else /* SUSUWU_DASHOS else */
+	return (-1 != classSysHex2Nib[char_]); /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
+#	endif /* SUSUWU_DASHOS else */
+#else /* SUSUWU_HEX_TABLE else */
+	return (0 != isxdigit(char_));
+#endif /* SUSUWU_HEX_TABLE */
+} /* TODO: move into `ClassStr.hxx`? */
+inline unsigned char classSysHexitToNibble(const unsigned char hexit) {
+#if SUSUWU_HEX_TABLE
+	assert(-1 != classSysHex2Nib.at(hexit)); /* Min valid = 0x30, max valid = 0x66 */
+#	if SUSUWU_DASHOS
+	return classSysHex2Nib.at(hexit);
+#	else /* SUSUWU_DASHOS else */
+	return classSysHex2Nib[hexit]; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
+#	endif /* SUSUWU_DASHOS else */
+#else /* SUSUWU_HEX_TABLE else */
+	static const size_t aToHex = 10;
+	assert(0 != isxdigit(hexit));
+	if(0 == isupper(hexit)) {
+		return hexit - '0';
+	} else {
+		return hexit - 'A' + aToHex;
+	}
+#endif /* SUSUWU_HEX_TABLE else */
+} /* TODO: move into `ClassStr.hxx`? */
+inline unsigned char classSysHex2Char(unsigned char hexit1, unsigned char hexit2) {
+		hexit1 = classSysHexitToNibble(hexit1);
+		hexit2 = classSysHexitToNibble(hexit2);
+		return static_cast<unsigned char>((hexit1 << 4) | hexit2);
+} /* TODO: move into `ClassStr.hxx`? */
 
 template<typename Func, typename... Args>
 auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> const decltype(func(args...)) {
