@@ -181,18 +181,19 @@ template<class Is, class Str,
 	typename std::enable_if<!std::is_integral<Str>::value, int>::type = 0>
 /* @pre @code is.good(); @endcode */
 inline Is &classIoHexIs(Is &is, Str &value) {
-	const std::ios::fmtflags oldFlags = is.flags();
-	const char oldFill = is.fill();
-	value.clear(); /* TODO; move after `if(!is.good()) { ... return is; }`? */
-	is << std::hex;
-	is.fill('0');
-	/* classSysDebugIs(std::string(__func__) + "(pre)", is); */
+	value.clear(); /* TODO; move after `if(!is.good()) { ... return is; }` (to preserve `value` if precondition fails)? */
 	if(!is.good()) {
-		SUSUWU_NOTICE("(!is.good())");
+		SUSUWU_DEBUG("(!is.good())"); /* TODO; remove (since caller should check `is.good()`)? */
 		return is;
 	} /* auto isState = is.getstate(); */
 	std::streampos pos = is.tellg();
-	for(unsigned int ch; /* NOLINT(cppcoreguidelines-init-variables): is unitialized so that accidental removal of `is >> ch;` will warn when `ch` is used */ is >> std::hex >> std::setw(2)/* `setw` is unset after each use */ >> ch; ) {
+#if SUSUWU_CXX_CLASS_IO_HEX_IS /* TODO: fix or remove this code path */
+	const std::ios::fmtflags oldFlags = is.flags();
+	const char oldFill = is.fill();
+	is << std::hex;
+	is.fill('0');
+	/* classSysDebugIs(std::string(__func__) + "(pre)", is); */
+	for(unsigned int ch; is.good() && is >> std::hex >> std::setw(2)/* `setw` is unset after each use */ >> ch; ) {
 		const std::streampos newPos = is.tellg();
 		/* SUSUWU_DEBUG("ch == 0x" + classIoHexStr(ch) + ", pos += " + std::to_string(newPos - pos)); */
 		for(auto i = ((newPos - pos) >> 1) - (SUSUWU_HEX_DOES_PREFIX ? 1 : 0); i--; ) {
@@ -200,12 +201,48 @@ inline Is &classIoHexIs(Is &is, Str &value) {
 		}
 		pos = newPos;
 	}
-	if(is.fail() && !(is.bad() || is.eof())) {
-		is.seekg(pos); /* TODO: prove if this can be removed for all flags*/
-		is.clear(std::ios::goodbit); /* is.setstate(isState); */
-	}
 	is.fill(oldFill);
 	is.flags(oldFlags);
+	if(is.fail() && !(is.bad() || is.eof())) { /* If stopped due to non-hex input, */
+		is.seekg(pos); /* restore non-hex input (which was consumed). */
+		is.clear(std::ios::goodbit); /* `is.setstate(isState);` */
+	}
+#else /* SUSUWU_CXX_CLASS_IO_HEX_IS else */
+#	if SUSUWU_HEX_DOES_PREFIX
+#		if SUSUWU_PREFER_GETLINE
+	std::string prefix;
+	std::getline(is, prefix, 'x'); /* used `std::getline` so 'x' is swallowed */
+	if("0" != prefix) {
+#		else /* SUSUWU_PREFER_GETLINE else */
+	char prefix[2] = {'\0', '\0'};
+	is >> prefix[0];
+	if(!('0' == prefix[0] && is >> prefix[1] && 'x' == prefix[1])) {
+#		endif /* SUSUWU_PREFER_GETLINE else */
+		is.seekg(pos);
+#		if SUSUWU_CLASS_IO_THROW
+		classIoCheckStr(__func__, "0x", prefix); /* TODO: choose `std::ios::failbit` or `throw` */
+#		else /* SUSUWU_CLASS_IO_THROW else */
+		SUSUWU_DEBUG("(SUSUWU_HEX_DOES_PREFIX && (prefix != \"" SUSUWU_SH_GREEN "0x" SUSUWU_SH_DEFAULT "\") && (prefix == \"" SUSUWU_SH_RED + std::string(prefix) + SUSUWU_SH_DEFAULT "\"))");
+		is.setstate(std::ios::failbit);
+#		endif /* SUSUWU_CLASS_IO_THROW else */
+		return is;
+	}
+	pos = is.tellg();
+#	endif /* SUSUWU_HEX_DOES_PREFIX */
+//for(unsigned char hexit1, hexit2; is.good() && is >> hexit1 && isxdigit(hexit1) && is >> hexit2 && isxdigit(hexit1); ) {
+	for(unsigned char hexit1, hexit2; is.good() && is >> hexit1; ) {
+		if(!isxdigit(hexit1) || (is >> hexit2 && !isxdigit(hexit2))) {
+			if(!is.bad()) {
+				is.seekg(pos);
+				is.clear(std::ios::goodbit); /* is.setstate(isState); */
+			}
+			break;
+		}
+		pos = is.tellg();
+		/* SUSUWU_DEBUG("hexit1 == \"" + classIoHexStr(hexit1) + "\", hexit2 == \"" + classIoHexStr(hexit2) + '"'); */
+		value += classIoHex2Char(hexit1, hexit2);
+	}
+#endif /* SUSUWU_CXX_CLASS_IO_HEX_IS else */
 	/* classSysDebugIs(std::string(__func__) + "(post)", is); */
 	return is;
 }
