@@ -3,6 +3,7 @@
 #ifndef INCLUDES_cxx_ClassIo_hxx
 #define INCLUDES_cxx_ClassIo_hxx
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_GREEN SUSUWU_SH_RED SUSUWU_UNIT_TESTS */
+#include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* isupper isxdigit */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE */
 #include <iomanip> /* std::setw */
 #include <ios> /* std::hex */
@@ -19,6 +20,7 @@ namespace Susuwu {
 #endif /* ndef SUSUWU_HEX_DOES_PREFIX */
 #define SUSUWU_HEX_PREFIX_SZ (SUSUWU_HEX_DOES_PREFIX ? 2 : 0)
 #define SUSUWU_IO_INPUT_WHITESPACE false /* true if `getline` includes characters such as '\n' */
+#define SUSUWU_CLASS_IO_THROW false /* `if(SUSUWU_CLASS_IO_THROW) { classIoCheckStr(__func__, expectedValue, value); } else { if(expectedValue != value) { is.setstate(std::ios::failbit); } }` */
 typedef std::string ClassIoPath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
 typedef ClassIoPath ClassIoBytecode; /* Uses `std::string` for bytecode (versus `std::vector`) because:
  * "If you are going to use the data in a string like fashon then you should opt for std::string as using a std::vector may confuse subsequent maintainers. If on the other hand most of the data manipulation looks like plain maths or vector like then a std::vector is more appropriate." -- https://stackoverflow.com/a/1556294/24473928
@@ -110,7 +112,24 @@ inline const typename List::value_type classIoColoredParamStr(const List &argvS,
 		str += '}';
 	}
 	return str;
-}
+} /* TODO: move into `ClassStr.hxx`? */
+inline unsigned char classIoHexitToNibble(const unsigned char hexit) {
+#if SUSUWU_CLASS_IO_HEX_TABLE
+	static const unsigned char hex2bin[] = {/* TODO: ASCII map */};
+	return hex2bin[hexit];
+#else /* SUSUWU_CLASS_IO_HEX_TABLE else */
+	if(isupper(hexit)) {
+		return hexit - 'A' + 10;
+	} else {
+		return hexit - '0';
+	}
+#endif /* SUSUWU_CLASS_IO_HEX_TABLE else */
+} /* TODO: move into `ClassStr.hxx`? */
+inline unsigned char classIoHex2Char(unsigned char hexit1, unsigned char hexit2) {
+		hexit1 = classIoHexitToNibble(hexit1);
+		hexit2 = classIoHexitToNibble(hexit2);
+		return static_cast<unsigned char>((hexit1 << 4) | hexit2);
+} /* TODO: move into `ClassStr.hxx`? */
 template<class Is>
 /* Usage: @code classSysDebugIs(__func__, is); @endcode */
 static void classSysDebugIs(const std::string &func, Is &is) {

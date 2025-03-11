@@ -390,6 +390,7 @@ SUSUWU_CERR_IMP	cxx/Macros.hxx	/^#define SUSUWU_CERR_IMP(/;"	d
 SUSUWU_CLASS_DEFAULTS	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_DEFAULTS(SUBCLASS) \/* Usage: `class SubClass : public Class { SUSUWU_CLASS/;"	d
 SUSUWU_CLASS_GETNAME	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_GETNAME(/;"	d
 SUSUWU_CLASS_GETOBJECTSIZE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_GETOBJECTSIZE(/;"	d
+SUSUWU_CLASS_IO_THROW	cxx/ClassIo.hxx	/^#define SUSUWU_CLASS_IO_THROW false \/* `if(SUSUWU_CLASS_IO_THROW)/;"	d
 SUSUWU_CLASS_ISINSTANCE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_ISINSTANCE(/;"	d
 SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassObject.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OVERRIDE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_OVERRIDE /;"	d
@@ -798,6 +799,7 @@ classIoGetConsoleAttributes	cxx/ClassIo.cxx	/^const unsigned char classIoGetCons
 classIoGetConsoleInput	cxx/ClassIo.hxx	/^static const bool classIoGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIoGetOwnPath	cxx/ClassIo.cxx	/^const ClassIoPath classIoGetOwnPath() {$/;"	f	namespace:Susuwu	typeref:typename:const ClassIoPath
 classIoGetline	cxx/ClassIo.hxx	/^static std::basic_istream<CharT, Traits>& classIoGetline(std::basic_istream<CharT, Traits>& is, /;"	f	namespace:Susuwu	typeref:typename:std::basic_istream<CharT,Traits> &
+classIoHex2Char	cxx/ClassIo.hxx	/^inline unsigned char classIoHex2Char(unsigned char hexit1, unsigned char hexit2) {$/;"	f	namespace:Susuwu	typeref:typename:unsigned char
 classIoHexIs	cxx/ClassIo.hxx	/^inline Is &classIoHexIs(Is &is, Int &value) {$/;"	f	namespace:Susuwu	typeref:typename:Is &
 classIoHexIs	cxx/ClassIo.hxx	/^inline Is &classIoHexIs(Is &is, Str &value) {$/;"	f	namespace:Susuwu	typeref:typename:Is &
 classIoHexIs	cxx/ClassIo.hxx	/^inline const Value classIoHexIs(Is &is) {$/;"	f	namespace:Susuwu	typeref:typename:const Value
@@ -806,6 +808,7 @@ classIoHexOs	cxx/ClassIo.hxx	/^inline Os &classIoHexOs(Os &os, const Str &value)
 classIoHexOsSzTest	cxx/ClassIo.cxx	/^static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printabl/;"	f	namespace:Susuwu::__anondc31cc360111	typeref:typename:void	file:
 classIoHexStr	cxx/ClassIo.hxx	/^inline const Str classIoHexStr(const Str &value) {$/;"	f	namespace:Susuwu	typeref:typename:const Str
 classIoHexStr	cxx/ClassIo.hxx	/^inline const std::string classIoHexStr(const Int &value) {$/;"	f	namespace:Susuwu	typeref:typename:const std::string
+classIoHexitToNibble	cxx/ClassIo.hxx	/^inline unsigned char classIoHexitToNibble(const unsigned char hexit) {$/;"	f	namespace:Susuwu	typeref:typename:unsigned char
 classIoSetConsoleInput	cxx/ClassIo.cxx	/^const bool classIoSetConsoleInput(bool input) {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIoTests	cxx/ClassIo.cxx	/^const bool classIoTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIoTestsNoexcept	cxx/ClassIo.cxx	/^const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "class/;"	f	namespace:Susuwu	typeref:typename:const bool
