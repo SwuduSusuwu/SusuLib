@@ -65,6 +65,8 @@ Makefile
 *.out
 *.exe
 build.sh.bash
+bin/
+obj/
 index.xhtml
 robots.txt
 compile_commands.json
