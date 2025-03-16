@@ -14,6 +14,8 @@
   - [**IMU** as kinematic collision detection](#imu-as-kinematic-collision-detection)
 - [Howto produce point clouds](#howto-produce-point-clouds)
   - [Howto use point clouds to route](#howto-use-point-clouds-to-route)
+- [Howto produce distortion coefficients](#howto-produce-distortion-coefficients)
+  - [Howto use coefficients for distortion correction](#howto-use-coefficients-for-distortion-correction)
 - [Synopsis + resources](#synopsis--resources)
 
 # Licenses
@@ -1045,6 +1047,106 @@ function main():
 		wait(SIMULATION_TIME_STEP)  // Control loop frequency
 ```
 , plus make [_Howto use point clouds to route_](#howto-use-point-clouds-to-route) continuous — such as how (opposed to the [_A\*_ path formula](https://wikipedia.org/wiki/A*_search_algorithm), which must restart if sensor input is new,) the [_D\*_ path formula](https://wikipedia.org/wiki/D*) allows continuous sensor use — the example code uses stored (not continuous) visuals to produce point clouds.
+
+# Howto produce distortion coefficients
+[_Assistant_ lists how actual autonomous tools post-process the visuals to do distortion correction.](https://poe.com/s/Sj0OyJq1EGBgSZuV4lgV)
+```python
+// Pseudocode for Estimating Lens Distortion Coefficients
+
+// Step 1: Capture known points and observed points
+known_points = loadKnownPoints()  // Load known accurate points (e.g., from a calibration pattern)
+observed_points = captureObservedPoints()  // Capture points from the new sensor
+
+// Step 2: Initialize coefficients
+k1, k2, k3 = 0.0, 0.0, 0.0
+p1, p2 = 0.0, 0.0
+
+// Step 3: Compute error for each point
+errors = []
+for i from 0 to length(known_points):
+	expected_x, expected_y = known_points[i]
+	observed_x, observed_y = observed_points[i]
+
+	// Compute radius
+	r = sqrt(observed_x^2 + observed_y^2)
+
+	// Compute radial distortion
+	radial_distortion = observed_x * (1 + k1 * r^2 + k2 * r^4 + k3 * r^6)
+	tangential_distortion_x = observed_x + (2 * p1 * observed_x * observed_y + p2 * (r^2 + 2 * observed_x^2))
+	tangential_distortion_y = observed_y + (p1 * (r^2 + 2 * observed_y^2) + 2 * p2 * observed_x * observed_y)
+
+	// Calculate error
+	error_x = expected_x - tangential_distortion_x
+	error_y = expected_y - tangential_distortion_y
+	errors.append((error_x, error_y))
+
+// Step 4: Optimize coefficients based on errors
+k1, k2, k3, p1, p2 = optimizeCoefficients(errors)
+
+// Function to optimize coefficients (simplified)
+function optimizeCoefficients(errors):
+	// Implement optimization algorithm (e.g., least squares)
+	// This is where you would use an optimization technique to minimize
+	// the total error based on the initial guesses of k1, k2, k3, p1, p2
+	return optimized_k1, optimized_k2, optimized_k3, optimized_p1, optimized_p2
+
+// Step 5: Use the coefficients for correction
+distortion_coefficients = [k1, k2, p1, p2, k3]
+
+// Now these coefficients can be used in the distortion correction functions
+```
+
+## Howto use coefficients for distortion correction
+Those coefficients are from [Howto produce distortion coefficients](#howto-produce-distortion-coefficients).
+[_Assistant_ lists how actual autonomous tools post-process the visuals to do distortion correction.](https://poe.com/s/Sj0OyJq1EGBgSZuV4lgV)
+```python
+// Pseudocode for Camera Distortion Correction
+
+// Step 1: Capture an image
+image = captureImage()
+
+// Step 2: Define camera intrinsic parameters
+fx, fy = focal_lengths  // Focal lengths in x and y
+cx, cy = optical_center  // Optical center coordinates
+distortion_coefficients = [k1, k2, p1, p2, k3]  // Radial and tangential coefficients
+
+// Step 3: Detect corners or features in the image
+features = detectFeatures(image)
+
+// Step 4: Apply distortion correction
+corrected_image = correctDistortion(image, distortion_coefficients, fx, fy, cx, cy)
+
+// Function to correct distortion
+function correctDistortion(image, distortion_coefficients, fx, fy, cx, cy):
+	for each pixel (x, y) in image:
+		// Normalize pixel coordinates
+		x_normalized = (x - cx) / fx
+		y_normalized = (y - cy) / fy
+
+		// Compute radial distortion
+		r2 = x_normalized^2 + y_normalized^2
+		radial_distortion = 1 + distortion_coefficients[0] * r2 + distortion_coefficients[1] * r2^2
+
+		// Compute tangential distortion
+		dx = 2 * distortion_coefficients[2] * x_normalized * y_normalized + distortion_coefficients[3] * (r2 + 2 * x_normalized^2)
+		dy = distortion_coefficients[2] * (r2 + 2 * y_normalized^2) + 2 * distortion_coefficients[3] * x_normalized * y_normalized
+
+		// Apply distortion correction
+		x_corrected = x_normalized * radial_distortion + dx
+		y_corrected = y_normalized * radial_distortion + dy
+
+		// Convert back to pixel coordinates
+		new_x = x_corrected * fx + cx
+		new_y = y_corrected * fy + cy
+
+		// Set pixel in corrected image
+		corrected_image[new_x, new_y] = image[x, y]
+
+	return corrected_image
+
+// Step 5: Validate the correction
+validateCorrection(corrected_image)
+```
 
 # Synopsis + resources
 - [_Assistant_ suggests to replace _Ardunio Uno_'s _ATmega328P_ 16MHz 2KB (or _Arduino Mega_'s 16MHz 8KB _ATmega2560_) with 240MHz 4MB _ESP32_ for $6](https://poe.com/s/0E2w6XDUf6Aw5hUpOA68)
