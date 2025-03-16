@@ -139,6 +139,7 @@ Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corrupt
 Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corruption code *\/$/;"	m	struct:HMACContext	typeref:typename:int
 DataTypeToEnum	ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
 DataTypeToEnum	cxx/ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
+Depth-image to point cloud	posts/ArduinoElegooTools.md	/^## Depth-image to point cloud$/;"	s	chapter:Howto produce point clouds
 DimSz	ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
 DimSz	cxx/ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
 Disclaimer	posts/ArduinoElegooTools.md	/^## Disclaimer$/;"	s	chapter:Licenses
@@ -159,7 +160,11 @@ Hashes	cxx/ClassResultList.hxx	/^	typedef std::unordered_set<ResultListHash> Has
 How to contribute	README.md	/^# How to contribute$/;"	c
 How to use this	README.md	/^# How to use this$/;"	c
 Howto	posts/TranscodeMuxHowto.md	/^# Howto$/;"	c
+Howto produce distortion coefficients	posts/ArduinoElegooTools.md	/^# Howto produce distortion coefficients$/;"	c
+Howto produce point clouds	posts/ArduinoElegooTools.md	/^# Howto produce point clouds$/;"	c
 Howto route	posts/ArduinoElegooTools.md	/^# Howto route$/;"	c
+Howto use coefficients for distortion correction	posts/ArduinoElegooTools.md	/^## Howto use coefficients for distortion correction$/;"	s	chapter:Howto produce distortion coefficients
+Howto use point clouds to route	posts/ArduinoElegooTools.md	/^## Howto use point clouds to route$/;"	s	chapter:Howto produce point clouds
 HsomCns	cxx/ClassCns.cxx	/^typedef class HsomCns : Cns { \/* TODO. ( https:\/\/stackoverflow.com\/questions\/3286448\/calli/;"	c	namespace:Susuwu	file:
 HsomCns	cxx/ClassCns.cxx	/^} HsomCns;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::HsomCns	file:
 HsomCns	cxx/ClassCns.hxx	/^typedef class HsomCns : public Cns {$/;"	c	namespace:Susuwu
@@ -234,6 +239,8 @@ Object	cxx/ClassObject.hxx	/^typedef class Object : public Class { \/* Port of `
 Object	cxx/ClassObject.hxx	/^} Object;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Object
 ObjectCloneAs	cxx/ClassObject.hxx	/^typedef enum ObjectCloneAs : unsigned char { \/* Is extra (not part of Java); accomodates the nu/;"	g	namespace:Susuwu	typeref:typename:unsigned char
 ObjectCloneAs	cxx/ClassObject.hxx	/^} ObjectCloneAs;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ObjectCloneAs
+Optical flow processing of visuals into point cloud (computes z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (computes z-axis)$/;"	s	chapter:Howto produce point clouds
+Optical flow processing of visuals into point cloud (limited; static z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (limited; static z-axis)$/;"	s	chapter:Howto produce point clouds
 Options/setup	README.md	/^## Options\/setup$/;"	s	chapter:How to use this
 PRINTBASE64	c/rfc6234/shatest.c	/^#define PRINTBASE64 /;"	d	file:
 PRINTFAIL	c/rfc6234/shatest.c	/^#define PRINTFAIL /;"	d	file:
@@ -796,6 +803,7 @@ _Markdown_	README.md	/^## _Markdown_$/;"	s	chapter:Contributor conventions/rules
 _SHA_H_	c/rfc6234/sha.h	/^#define _SHA_H_$/;"	d
 _SHA_PRIVATE__H	c/rfc6234/sha-private.h	/^#define _SHA_PRIVATE__H$/;"	d
 _SHA_enum_	c/rfc6234/sha.h	/^#define _SHA_enum_$/;"	d
+_TensorFlow_: static image to point clouds	posts/ArduinoElegooTools.md	/^## _TensorFlow_: static image to point clouds$/;"	s	chapter:Howto produce point clouds
 __anon73fa30250111	cxx/VirusAnalysis.cxx	/^namespace { \/* [misc-use-anonymouse-namespace] *\/$/;"	n	namespace:Susuwu	file:
 __anon73fa30250202	cxx/VirusAnalysis.cxx	/^		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { \/* NOLINT(cppcoreguidel/;"	f	function:Susuwu::virusAnalysisHook	file:
 __anon8f7309390111	cxx/ClassResultList.cxx	/^namespace { \/* [misc-use-anonymouse-namespace] *\/$/;"	n	namespace:Susuwu	file:
