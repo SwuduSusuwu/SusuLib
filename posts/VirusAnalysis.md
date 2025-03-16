@@ -2097,6 +2097,7 @@ void virusAnalysisLoadFrom(const ClassFsPath &path, ResultList &list);
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
 static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+const bool virusAnalysisInitTests(const ClassFsPath path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
 static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
 #endif /* SUSUWU_UNIT_TESTS */
@@ -2250,14 +2251,8 @@ const bool virusAnalysisTests() {
 	resultListProduceHashes(passOrNull);
 	resultListProduceHashes(abortOrNull);
 	produceAbortListSignatures(passOrNull, abortOrNull);
-	const ClassFsPath gotOwnPath = classFsGetOwnPath(); /* replaced `argv[0]`; ["Uncontrolled data used in path expression"](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277) fix. */
-	virusAnalysisDumpTo(gotOwnPath + ".passOrNull.config", passOrNull);
-	virusAnalysisDumpTo(gotOwnPath + ".abortOrNull.config", abortOrNull);
-	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
-	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
-	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
-	virusAnalysisLoadFrom(gotOwnPath + ".passOrNull.config", passOrNull);
-	virusAnalysisLoadFrom(gotOwnPath + ".abortOrNull.config", abortOrNull);
+	const ClassFsPath gotOwnPath = classFsGetOwnPath(); /* replaced `argv[0]`, ["Uncontrolled data used in path expression"](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277) fix. */
+	virusAnalysisInitTests(gotOwnPath, passOrNull, abortOrNull);
 	SUSUWU_NOTICE("resultListDumpTo(.list = passOrNull, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
 	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passOrNull, std::cout, true, true, false));
 	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortOrNull, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
@@ -2294,6 +2289,24 @@ const bool virusAnalysisTests() {
 	return true;
 }
 
+const bool virusAnalysisInitTests(const ClassFsPath path, ResultList &passList, ResultList &abortList) {
+	const std::string passPath = path + ".passList.config";
+	const std::string abortPath = path + ".abortList.config";
+	try {
+		std::ifstream config(passPath);
+	} catch (std::exception &w) {
+		SUSUWU_WARNING("`std::ifstream config(\"" + passPath + "\");` threw \" " + w.what() + "\"; will skip `virusAnalysisDumpTo()` and `virusAnalysisLoadFrom()` tests.");
+		return false;
+	}
+	virusAnalysisDumpTo(passPath, passList);
+	virusAnalysisDumpTo(abortPath, abortList);
+	SUSUWU_NOTICE("resultListDumpTo(.list = passList, .os = std::cout, .index = true, .whitespace = true, .pascalValues = false);");
+	SUSUWU_EXECUTEVERBOSE(resultListDumpTo(passList, std::cout, true, true, false));
+	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(/*.list = */abortList, /*.os = */std::cout, /*.index = */false, /*.whitespace = */false, /*.pascalValues = */false), std::cout << std::endl));
+	virusAnalysisLoadFrom(passPath, passList);
+	virusAnalysisLoadFrom(abortPath, abortList);
+	return true;
+}
 const bool virusAnalysisHookTests() {
 	const VirusAnalysisHook originalHookStatus = virusAnalysisGetHook();
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
