@@ -6,7 +6,7 @@
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysCheckChar classSysCheckStr classSysCheckSz classSysGetline classSysHexOs SUSUWU_HEX_DOES_PREFIX SUSUWU_IO_WHITESPACE */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::endl std::getline std::streamsize */
@@ -52,14 +52,27 @@ const size_t listMaxSize(const List &list) {
 #endif /* SUSUWU_PREFER_CSTR else */
 }
 
+typedef enum ListFormat {
+	listFormatInitializer, /* style: C or C++ */
+	listFormatJson /* style: Java or JavaScript */
+} ListFormat;
 template<class List, class Os>
-void listDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
-	const std::string assignment = whitespace ? " = " : "=";
+void listDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues, const bool finalList = true, const ListFormat listFormat = listFormatInitializer) {
+	bool quoteValues = false;
 	size_t index_ = 0;
-	os << '{';
+	switch(listFormat) {
+		case listFormatInitializer:
+			os << '{';
+		break;
+		case listFormatJson:
+			os << '[';
+			quoteValues = true;
+		break;
+	}
 #ifdef SUSUWU_LIST_COUNT
 	os << list.size() << ':';
 #endif /* def SUSUWU_LIST_COUNT */
+	const std::string assignment = whitespace ? " = " : "=";
 	for(const auto &value : list) {
 		if(0 != index_) {
 			os << ',';
@@ -70,6 +83,9 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 		if(index) {
 			os << index_ << assignment;
 		}
+		if(quoteValues) {
+			os << '"';
+		}
 		if(pascalValues) {
 			os << value.size() << ':' /* TODO: replace "%Dec:" with "%Bin" */ << value;
 		} else {
@@ -78,32 +94,75 @@ void listDumpTo(const List &list, Os &os, const bool index, const bool whitespac
 #endif /* !SUSUWU_HEX_DOES_PREFIX */
 			classSysHexOs(os, value);
 		}
+		if(quoteValues) {
+			os << '"';
+		}
 		++index_;
 	}
 	if(whitespace) {
-		os << "\n};" << std::endl;
-	} else {
-		os << "};";
+		os << '\n';
+	}
+	switch(listFormat) {
+		case listFormatInitializer:
+			os << "};";
+		break;
+		case listFormatJson:
+			os << (finalList ? "]" : "],");
+		break;
+	}
+	if(whitespace) {
+		os << std::endl;
 	}
 } /* view `ClassResultList.cxx:classResultListTests()` for examples of output from `listDumpTo()`+`resultListDumpTo()`. */
+template<class Os>
+void resultListDumpToAssignment(const std::string &listStr, Os &os, const bool whitespace, const ListFormat listFormat = listFormatInitializer) {
+	switch(listFormat) {
+		case listFormatInitializer:
+			os << listStr << (whitespace ? " = " : "=");
+		break;
+		case listFormatJson:
+			os << '"' << listStr << '"' << (whitespace ? ": " : ":");
+		break;
+	}
+}
 template<class List, class Os>
-void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues) {
-	const std::string assignment = whitespace ? " = " : "=";
-	os << "list.hashes" << assignment;
-	listDumpTo(list.hashes, os, index, whitespace, pascalValues);
-	os << "list.signatures" << assignment;
-	listDumpTo(list.signatures, os, index, whitespace, pascalValues);
-	os << "list.bytecodes" << assignment;
-	listDumpTo(list.bytecodes, os, index, whitespace, pascalValues);
+void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pascalValues, const ListFormat listFormat = listFormatInitializer) {
+	if(listFormatJson == listFormat) {
+		os << '{';
+		if(whitespace) {
+			os << '\n';
+		}
+	}
+	resultListDumpToAssignment("list.hashes", os, whitespace, listFormat);
+	listDumpTo(list.hashes, os, index, whitespace, pascalValues, false, listFormat);
+	resultListDumpToAssignment("list.signatures", os, whitespace, listFormat);
+	listDumpTo(list.signatures, os, index, whitespace, pascalValues, false, listFormat);
+	resultListDumpToAssignment("list.bytecodes", os, whitespace, listFormat);
+	listDumpTo(list.bytecodes, os, index, whitespace, pascalValues, true, listFormat);
+	if(listFormatJson == listFormat) {
+		os << '}';
+	}
 }
 template<class List, class Is>
-void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
+void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues, const bool finalList = true, const ListFormat listFormat = listFormatInitializer) {
 	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
-	const std::string assignment = whitespaceFrom ? " = " : "=";
-	const std::string hexPrefix = whitespace ? " 0" : "0";
+	bool quoteValues = false;
 	char delim = '\0';
+	char terminator = '\0';
 	is >> delim;
-	classSysCheckChar(__func__, '{', delim);
+	switch(listFormat) {
+		case listFormatInitializer:
+			classSysCheckChar(__func__, '{', delim);
+			terminator = '}';
+		break;
+		case listFormatJson:
+			classSysCheckChar(__func__, '[', delim);
+			terminator = ']';
+			quoteValues = true;
+		break;
+		default:
+			SUSUWU_UNREACHABLE;
+	}
 //	decltype(list.front()) value;
 #ifdef SUSUWU_LIST_COUNT
 	size_t count = 0;
@@ -112,6 +171,8 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 	classSysCheckChar(__func__, ':', delim);
 	list.reserve(count);
 #endif /* def SUSUWU_LIST_COUNT */
+	const std::string assignment = whitespaceFrom ? " = " : "=";
+	const std::string hexPrefix = (whitespace && !quoteValues) ? " 0" : "0";
 	for(size_t index_ = 0; is.good(); ++index_) {
 		std::string token;
 		const std::streampos pos = is.tellg();
@@ -120,7 +181,7 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 			classSysCheckChar(__func__, '\n' /* TODO: support '\r'? */, delim);
 		}
 		is >> delim;
-		if('}' == delim) {
+		if(terminator == delim) {
 #ifdef SUSUWU_LIST_COUNT
 			classSysCheckSz(__func__, count, index_);
 #endif /* def SUSUWU_LIST_COUNT */
@@ -142,6 +203,10 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 			classSysCheckStr(__func__, assignment, token);
 		}
 		typename List::value_type value;
+		if(quoteValues) {
+			is >> delim;
+			classSysCheckChar(__func__, '"', delim);
+		}
 		if(pascalValues) {
 			std::streamsize tokenSz = 0;
 			is >> tokenSz;
@@ -163,26 +228,67 @@ void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, c
 #endif /* !SUSUWU_HEX_DOES_PREFIX */
 			classSysHexIs(is, value); /* can do `is >> std::hex >> tokenSz;` but not `>> token` (or `>> value`) */
 		}
+		if(quoteValues) {
+			is >> delim;
+			classSysCheckChar(__func__, '"', delim);
+		}
 		list.insert(list.end(), value); /* list.push_back(value); */
 	}
-	classSysCheckChar(__func__, '}', delim);
-	is >> delim;
-	classSysCheckChar(__func__, ';', delim);
+	classSysCheckChar(__func__, terminator, delim);
+	switch(listFormat) {
+		case listFormatInitializer:
+			is >> delim;
+			classSysCheckChar(__func__, ';', delim);
+		break;
+		case listFormatJson:
+			if(!finalList) {
+				is >> delim;
+				classSysCheckChar(__func__, ',', delim);
+			}
+		break;
+	}
+	if(whitespaceFrom) {
+		is >> delim;
+		classSysCheckChar(__func__, '\n', delim);
+	}
 } /* view `ClassResultList.cxx:classResultListTests()` for examples of input from `listLoadFrom()`+`resultListLoadFrom`. */
-template<class List, class Is>
-void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues) {
+template<class Is>
+void resultListLoadFromAssignment(const std::string &listStr, Is &is, const bool whitespace, const ListFormat listFormat = listFormatInitializer) {
 	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
-	const std::string assignment = whitespaceFrom ? " = " : "=";
 	std::string token;
-	classSysGetline(is, token, '{');
-	classSysCheckStr(__func__, std::string("list.hashes") + assignment, token);
-	listLoadFrom(list.hashes, is, index, whitespace, pascalValues);
-	classSysGetline(is, token, '{');
-	classSysCheckStr(__func__, std::string("list.signatures") + assignment, token);
-	listLoadFrom(list.signatures, is, index, whitespace, pascalValues);
-	classSysGetline(is, token, '{');
-	classSysCheckStr(__func__, std::string("list.bytecodes") + assignment, token);
-	listLoadFrom(list.bytecodes, is, index, whitespace, pascalValues);
+	switch(listFormat) {
+		case listFormatInitializer:
+			classSysGetline(is, token, '{');
+			classSysCheckStr(__func__, listStr + (whitespaceFrom ? " = " : "="), token);
+		break;
+		case listFormatJson:
+			classSysGetline(is, token, '[');
+			classSysCheckStr(__func__, '"' + listStr + '"' + (whitespaceFrom ? ": " : ":"), token);
+		break;
+	}
+}
+template<class List, class Is>
+void resultListLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues, const ListFormat listFormat = listFormatInitializer) {
+	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
+	char delim = '\0';
+	if(listFormatJson == listFormat) {
+		is >> delim;
+		classSysCheckChar(__func__, '{', delim);
+		if(whitespaceFrom) {
+			is >> delim;
+			classSysCheckChar(__func__, '\n', delim);
+		}
+	}
+	resultListLoadFromAssignment("list.hashes", is, whitespace, listFormat);
+	listLoadFrom(list.hashes, is, index, whitespace, pascalValues, false, listFormat);
+	resultListLoadFromAssignment("list.signatures", is, whitespace, listFormat);
+	listLoadFrom(list.signatures, is, index, whitespace, pascalValues, false, listFormat);
+	resultListLoadFromAssignment("list.bytecodes", is, whitespace, listFormat);
+	listLoadFrom(list.bytecodes, is, index, whitespace, pascalValues, true, listFormat);
+	if(listFormatJson == listFormat) {
+		is >> delim;
+		classSysCheckChar(__func__, '}', delim);
+	}
 }
 
 template<class List, class List2>
