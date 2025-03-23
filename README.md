@@ -98,7 +98,8 @@ Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If
 ## Options/setup
 Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/Susuwu.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `Susuwu.out`'s return values.
-- Environment flags: as [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/make.html#Implicit-Variables).
+- Environment flags: as [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/make.html#Implicit-Variables), plus;
+  - `export SUSUWU_SH_TPUT_COMMAND=<path>`; replaces calls to `tput` with `<path>` (for instance, with `no-such-command` to test that `SUSUWU_SH_COLOR_COUNT()` does not require `ncurses-utils`).
 - Console flags:
   - `./build.sh` : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
   - `./build.sh --clean` : removes intermediate object files + exits; to reduce disc use.

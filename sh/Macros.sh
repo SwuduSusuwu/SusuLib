@@ -106,6 +106,8 @@ export SUSUWU_SH_BG_LIGHT_CYAN="\033[1;46m" #xterm256 "\033[48;5;14m"
 export SUSUWU_SH_BG_LIGHT_GRAY="\033[47m" #xterm256 "\033[48;5;7m"
 export SUSUWU_SH_BG_WHITE="\033[1;47m" #xterm256 "\033[48;5;15m"
 export SUSUWU_SH_CLOSE_="${SUSUWU_SH_DEFAULT}"
+
+export SUSUWU_SH_TPUT_COMMAND="${SUSUWU_SH_TPUT_COMMAND:-tput}" #/* Usage: override with `export SUSUWU_SH_TPUT_COMMAND=<executable>` */
 SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` */
 	SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS=8
 	if [ -n "${SUSUWU_SH_COLOR_COUNT_CACHE}" ]; then
@@ -118,13 +120,13 @@ SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` *
 		echo 8 #/* [_GitHub_ Autobuild](https://github.com/SwuduSusuwu/SubStack/actions/runs/13209802112/job/36880995224) workaround. */
 		return 0 #/* TODO: include other tests (`return 1` if the console does not allow color codes) */
 	fi
-	if command -v "tput" >/dev/null; then #if installed `ncurses-utils`
-		COLOR_COUNT="$(tput colors 2>/dev/null)" || COLOR_COUNT="-1"
+	if command -v "${SUSUWU_SH_TPUT_COMMAND}" >/dev/null; then #if installed `ncurses-utils`
+		COLOR_COUNT="$(${SUSUWU_SH_TPUT_COMMAND} colors 2>/dev/null)" || COLOR_COUNT="-1"
 		echo "${COLOR_COUNT}"
 		test "${COLOR_COUNT}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
 		return $? #return `test`'s return value
 	else
-		echo "[$0: ${SUSUWU_SH_DEBUG}SUSUWU_SH_COLOR_COUNT(): The program \`tput\` was not found; use \`apt install ncurses-utils\` to have \`SUSUWU_SH_*()\` compatible with all consoles."
+		echo "[$0: Notice: SUSUWU_SH_COLOR_COUNT(): The program \`${SUSUWU_SH_TPUT_COMMAND}\` was not found; use \`apt install ncurses-utils\` to have \`SUSUWU_SH_*()\` compatible with all consoles.]" >&2
 	fi
 	for CONSOLE in "xterm-256color" "screen-256color" "tmux-256color" "rxvt-256color"; do
 		if [ "${TERM}" = "${CONSOLE}" ]; then
