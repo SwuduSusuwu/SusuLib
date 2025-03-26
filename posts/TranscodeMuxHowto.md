@@ -35,11 +35,11 @@ To demux sounds, pass `-ss 4` to skip *4* seconds, pass `-t 2:00` to output *2* 
 ```sh
 ffmpeg -i "/storage/emulated/0/Download/sounds.mp4 -ss 4 -t 2:00 -map 0:a:0 -c copy "/storage/emulated/0/Sounds/demux.m4a"
 ```
-Now `sounds.m4a` is *2* minutes, but `visuals.m4a` is much longer; pass `-stream_loop -1` to mux sounds as loop  to match `visuals.mp4`:
+Now `demux.m4a` is *2* minutes, but `visuals.m4a` is much longer; pass `-stream_loop -1` to mux sounds as loop  to match `visuals.mp4`:
 ```sh
-ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux.mp4" 
+ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux.mp4"
 ```
-Suppose you want the mix the sounds from `visuals.mp4` with the loop from `sounds.mp4`:
+Suppose you want the mix the sounds from `visuals.mp4` with the loop from `mux.mp4`:
 ```sh
 ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:a:0 -map 1:a:0 -filter_complex amix=inputs=2:duration=shortest "/storage/emulated/0/Sounds/demux2.m4a"
 ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -i "/storage/emulated/0/Sounds/demux2.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux2.mp4"
@@ -48,7 +48,7 @@ ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -i "/storage/emulated/0/Soun
 
 Suppose you wish to produce a *10fps* HD `.gif` from the first *24* seconds of `visual.mp4`:
 ```sh
-ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -pix_fmt rgb24 -r 10 -s 1920x1080 -t 24 "/storage/emulated/0/Visuals/visual.gif"
+ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920x1080 -t 24 "/storage/emulated/0/Visuals/visual.gif"
 ```
 # External resources
 Lists of commands&options which `ffmpeg` can use:
