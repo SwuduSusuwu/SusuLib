@@ -17,6 +17,7 @@ Tools compatible with this howto:
   - [Produce `.gif`](#produce-gif)
 - [External resources](#external-resources)
 # Howto
+You can use [`../sh/Transcode.sh`](../sh/Transcode.sh) to do all of this for you; what follows is the manual route.
 \[*Notice*: versus stock _Android_, have moved default paths `/Music/` to `/Sounds/`, `/Movies/` to `/Visuals/`.\]
 
 \[*Notice*: if `/storage/emulated/0/` (directory root) is not found, replace with `/sdcard/`.\]
