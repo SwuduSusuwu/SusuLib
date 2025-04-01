@@ -12,7 +12,7 @@ TRANSCODE_MISC_FLAGS="-hide_banner" #Flags for all modes
 TRANSCODE_MP4_ENABLED="true" #Produce "{1%.*}${TRANSCODE_MP4_CONTAINER}"
 TRANSCODE_MP4_CONTAINER=".out.mp4" #Best for YouTube and personal use.
 TRANSCODE_MP4_SKIP="00:00:00.000" #Seconds to skip from start of input.
-TRANSCODE_MP4_DURATION="-1" #Count of seconds to output.
+TRANSCODE_MP4_DURATION="" #Count of seconds to output, or "" for auto.
 TRANSCODE_MP4_CODEC="libx264" #MPEG-4 Part 10, Advanced Video Coding (MPEG-4 AVC). Best for YouTube and personal use.
 TRANSCODE_MP4_PROFILE="high" #{"baseline", "main", "high"}; ["high" is best for YouTube.](https://superuser.com/questions/489087/what-are-the-differences-between-h-264-profiles)
 TRANSCODE_MP4_BF="2" #max consecutive B-frames. Default is "16", YouTube uses "2".
@@ -25,7 +25,7 @@ TRANSCODE_MP4_MOVFLAGS="+faststart" #Best for YouTube; moves metadata to start (
 #TRANSCODE_MP4_THREADS="-threads 4" #`ffmpeg`'s default is to use all cores for `.gif`. If it does not for `.mp4`, it must have reasons not to.
 #TRANSCODE_MP4_CPUUSED="-cpu-used 0" #["Most CPU intensive, but best fastest. Uses all cores."](https://scribbleghost.net/2018/10/26/recommended-encoding-settings-for-youtube-in-ffmpeg/) #Not sure how this differs from `-threads`.
 TRANSCODE_MP4_CRF="32" #Amount of compression; https://scribbleghost.net/2018/10/26/recommended-encoding-settings-for-youtube-in-ffmpeg/ says to use "18". Size is reduced with "32".
-TRANSCODE_MP4_PIX_FMT_COMMAND="-pix_fmt yuv420p" #Subsample to 4:2:0 (chroma 1/4, luma whole); best for YouTube.
+TRANSCODE_MP4_PIX_FMT="yuv420p" #Subsample to 4:2:0 (chroma 1/4, luma whole); best for YouTube.
 TRANSCODE_MP4_SOUND_ENABLED="true" #Produce "$(basename "${TRANSCODE_SOUND_IN}") {1%.*}${TRANSCODE_MP4_CONTAINER}"
 TRANSCODE_SOUND_FORMAT="234" #`yt-dlp` format for `TRANSCODE_SOUND_DEFAULT`. "234" has best sound, "233" is smaller
 TRANSCODE_SOUND_CODEC_COMMAND="-c:a aac -profile:a aac_low -ac 2" #Advanced Audio Codec - Low Complexity (AAC-LC) with 2 channels; best for YouTube. # -filter_complex \"[1:0] apad\"
@@ -33,8 +33,9 @@ TRANSCODE_SOUND_CODEC_COMMAND="-c:a aac -profile:a aac_low -ac 2" #Advanced Audi
 #TRANSCODE_SOUND_BITS="-b:a 128k" #If source is lossless, use "320k".
 TRANSCODE_GIF_ENABLED="true" #Produce "{1%.*}.gif"
 TRANSCODE_GIF_CONTAINER=".out.gif" #Best for YouTube and personal use.
+TRANSCODE_GIF_PIX_FMT="rgb8" #TODO; figure out what happened to "rgb24". Produce per-video palette (or per-frame palettes). "" for auto.
 TRANSCODE_GIF_SKIP="00:00:00.000" #${TRANSCODE_MP4_SKIP}" #Seconds to skip from start of input.
-TRANSCODE_GIF_DURATION="-1" #${TRANSCODE_MP4_DURATION}" #Count of seconds to output.
+TRANSCODE_GIF_DURATION="" #${TRANSCODE_MP4_DURATION}" #Count of seconds to output, or "" for auto.
 TRANSCODE_GIF_FPS="10" #Suits most uses. Slower looks worse, higher increases filesize.
 #TRANSCODE_GIF_FILTER_FPS="${TRANSCODE_GIF_FPS:+"fps=${TRANSCODE_GIF_FPS};"}"
 #TRANSCODE_GIF_COMPLEX="-filter_complex \"${TRANSCODE_GIF_FILTER_FPS}scale=500:-1:flags=lanczos,split[v1][v2]; [v1]palettegen=stats_mode=full [palette];[v2]palette]paletteuse=dither=sierra2_4a\"" #Palettes&dithering improved
@@ -73,12 +74,6 @@ else
 fi
 TRANSCODE_MP4_OUT="$(VISUAL_IN_EXTENSIONLESS)${TRANSCODE_MP4_CONTAINER}"
 TRANSCODE_MP4_SOUND_OUT_PATH="$(VISUAL_IN_EXTENSIONLESS)_$(basename "$(SOUND_IN_EXTENSIONLESS)")${TRANSCODE_MP4_CONTAINER}"
-if ${TRANSCODE_USE_GIFSICLE}; then
-	command -v "gifsicle" || echo "${0}: Error: \`gifsicle\` not found. Execute \`pkg install gifsicle\`"
-fi
-if ${TRANSCODE_USE_IMAGEMAGICK}; then
-	command -v "convert" || echo "${0}: Error: \`convert\` not found. Execute \`pkg install imagemagick\`"
-fi
 if [ -z "${1}" ] || [ "-h" = "${1}" ] || [ "--help" = "${1}" ]; then
 	echo "Usage: ${0} \"<path-to-input-visuals>\" \"[<optional-path-to-input-sounds>]\""
 	exit 1
@@ -86,11 +81,20 @@ fi
 
 TRANSCODE_MP4_OUT_PATH="${TRANSCODE_OUT_VISUALS}${TRANSCODE_MP4_OUT}"
 if ${TRANSCODE_MP4_ENABLED}; then
+	TRANSCODE_GIF_PIX_FMT_COMMAND="${TRANSCODE_GIF_PIX_FMT:+"-pix_fmt ${TRANSCODE_GIF_PIX_FMT}"}"
+	TRANSCODE_MP4_DURATION_COMMAND="${TRANSCODE_MP4_DURATION:+"-t ${TRANSCODE_MP4_DURATION}"}"
+	TRANSCODE_MP4_FPS_COMMAND="${TRANSCODE_MP4_FPS:+"-r ${TRANSCODE_MP4_FPS} -g $((TRANSCODE_MP4_FPS * TRANSCODE_MP4_G_FACTOR))"}"
+	TRANSCODE_MP4_CODEC_COMMAND="${TRANSCODE_MP4_CODEC:+"-c:v ${TRANSCODE_MP4_CODEC}"}"
+	TRANSCODE_MP4_CRF_COMMAND="${TRANSCODE_MP4_CRF:+"-crf ${TRANSCODE_MP4_CRF}"}"
+	TRANSCODE_MP4_PRESET_COMMAND="${TRANSCODE_MP4_PRESET:+"-preset ${TRANSCODE_MP4_PRESET}"}"
+	TRANSCODE_MP4_MOVFLAGS_COMMAND="${TRANSCODE_MP4_MOVFLAGS:+"-movflags ${TRANSCODE_MP4_MOVFLAGS}"}"
+	export TRANSCODE_MP4_PROFILE_COMMAND="${TRANSCODE_MP4_PROFILE:+"-profile:v ${TRANSCODE_MP4_PROFILE}"}"
+	export TRANSCODE_MP4_BF_COMMAND="${TRANSCODE_MP4_BF:+"-bf ${TRANSCODE_MP4_BF}"}"
 	if [ -e "${TRANSCODE_MP4_OUT_PATH}" ]; then
 		echo "$0: Notice: \"${TRANSCODE_MP4_OUT_PATH}\" exists, execute \`rm \"${TRANSCODE_MP4_OUT_PATH}\"\` to redo."
 	else
 #shellcheck disable=SC2086 #Those `_COMMAND`s are supposed to expand into arguments.
-		nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -r "${TRANSCODE_MP4_FPS}" -g "$((TRANSCODE_MP4_FPS * TRANSCODE_MP4_G_FACTOR))" ${TRANSCODE_MP4_RESOLUTION_COMMAND} -c:v "${TRANSCODE_MP4_CODEC}" -crf "${TRANSCODE_MP4_CRF}" ${TRANSCODE_MP4_PIX_FMT_COMMAND} -profile:v "${TRANSCODE_MP4_PROFILE}" -bf "${TRANSCODE_MP4_BF}" -preset "${TRANSCODE_MP4_PRESET}" -movflags "${TRANSCODE_MP4_MOVFLAGS}" -ss "${TRANSCODE_MP4_SKIP}" -t "${TRANSCODE_MP4_DURATION}" "${TRANSCODE_MP4_OUT_PATH}"
+		nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" ${TRANSCODE_MP4_FPS_COMMAND} ${TRANSCODE_MP4_RESOLUTION_COMMAND} ${TRANSCODE_MP4_CODEC_COMMAND} ${TRANSCODE_MP4_CRF_COMMAND} ${TRANSCODE_MP4_PIX_FMT} ${TRANSCODE_MP4_PROFILE_COMMAND} ${TRANSCODE_MP4_BF_COMMAND} ${TRANSCODE_MP4_PRESET_COMMAND} ${TRANSCODE_MP4_MOVFLAGS_COMMAND} -ss ${TRANSCODE_MP4_SKIP} ${TRANSCODE_MP4_DURATION_COMMAND} "${TRANSCODE_MP4_OUT_PATH}"
 	fi
 fi
 
@@ -113,16 +117,20 @@ fi
 
 TRANSCODE_GIF_OUT_PATH="${TRANSCODE_OUT_GIF}$(VISUAL_IN_EXTENSIONLESS)${TRANSCODE_GIF_CONTAINER}"
 if ${TRANSCODE_GIF_ENABLED}; then
+	export TRANSCODE_GIF_PIX_FMT_COMMAND="${TRANSCODE_GIF_PIX_FMT:+"-pix_fmt ${TRANSCODE_GIF_PIX_FMT}"}"
+	TRANSCODE_GIF_DURATION_COMMAND="${TRANSCODE_GIF_DURATION:+"-t ${TRANSCODE_GIF_DURATION}"}"
+	TRANSCODE_GIF_FPS_COMMAND="${TRANSCODE_GIF_FPS:+"-r ${TRANSCODE_GIF_FPS}"}"
 	if [ -e "${TRANSCODE_GIF_OUT_PATH}" ]; then
 		echo "$0: Notice: \"${TRANSCODE_GIF_OUT_PATH}\" exists, execute \`rm \"${TRANSCODE_GIF_OUT_PATH}\"\` to redo."
 	else
-	TRANSCODE_GIF_FMT="rgb8" #TODO; figure out what happened to "rgb24". Produce per-video palette (or per-frame palettes).
 #shellcheck disable=SC2086 #Those `_COMMAND`s are supposed to expand into arguments.
 		if ${TRANSCODE_USE_IMAGEMAGICK}; then
-			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 -r "${TRANSCODE_GIF_FPS}" ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" -t "${TRANSCODE_GIF_DURATION}" -f image2pipe -vcodec ppm - | convert -delay $((100 / TRANSCODE_GIF_FPS)) - "${TRANSCODE_GIF_OUT_PATH}"
+#shellcheck disable=SC2046 #Can't quote variables with arguments.
+			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 ${TRANSCODE_GIF_FPS_COMMAND} ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" ${TRANSCODE_GIF_DURATION_COMMAND} -f image2pipe -vcodec ppm - | convert -delay $((100 / TRANSCODE_GIF_FPS)) - "${TRANSCODE_GIF_OUT_PATH}"
+			command -v "convert" || echo "${0}: Error: \`convert\` not found. Execute \`pkg install imagemagick\`"
 		else
-			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 ${TRANSCODE_GIF_COMPLEX} -pix_fmt "${TRANSCODE_GIF_FMT}" -r "${TRANSCODE_GIF_FPS}" ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" -t "${TRANSCODE_GIF_DURATION}" "${TRANSCODE_GIF_OUT_PATH}"
-#			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -filter_complex "${TRANSCODE_GIF_FILTER_FPS}scale=500:-1:flags=lanczos,split[v1][v2]; [v1]palettegen=stats_mode=full [palette];[v2]palette]paletteuse=dither=sierra2_4a" -map 0:v:0 -pix_fmt "${TRANSCODE_GIF_FMT}" -r "${TRANSCODE_GIF_FPS}" ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss ${TRANSCODE_GIF_SKIP} -t "${TRANSCODE_GIF_DURATION}" "${TRANSCODE_GIF_OUT_PATH}"
+			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 ${TRANSCODE_GIF_COMPLEX} ${TRANSCODE_GIF_PIX_FMT_COMMAND} ${TRANSCODE_GIF_FPS_COMMAND} ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" ${TRANSCODE_GIF_DURATION_COMMAND} "${TRANSCODE_GIF_OUT_PATH}"
+#			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -filter_complex "${TRANSCODE_GIF_FILTER_FPS}scale=500:-1:flags=lanczos,split[v1][v2]; [v1]palettegen=stats_mode=full [palette];[v2]palette]paletteuse=dither=sierra2_4a" -map 0:v:0 ${TRANSCODE_GIF_PIX_FMT_COMMAND} ${TRANSCODE_GIF_FPS_COMMAND} ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss ${TRANSCODE_GIF_SKIP} ${TRANSCODE_GIF_DURATION_COMMAND} "${TRANSCODE_GIF_OUT_PATH}"
 		fi
 		if ${TRANSCODE_USE_GIFSICLE}; then
 #			TRANSCODE_GIFSICLE_COMMAND="nice gifsicle -O2 \"${TRANSCODE_GIF_OUT_PATH}\""
@@ -133,6 +141,7 @@ if ${TRANSCODE_GIF_ENABLED}; then
 				nice gifsicle -O2 "${TRANSCODE_GIF_OUT_PATH}" -o "${TRANSCODE_GIF_OUT_PATH%${TRANSCODE_GIF_CONTAINER}}${TRANSCODE_GIFSICLE_CONTAINER}${TRANSCODE_GIF_CONTAINER}"
 #				"${TRANSCODE_GIFSICLE_COMMAND} -o \"${TRANSCODE_GIF_OUT_PATH%${TRANSCODE_GIF_CONTAINER}}${TRANSCODE_GIFSICLE_CONTAINER}${TRANSCODE_GIF_CONTAINER}\""
 			fi
+			command -v "gifsicle" || echo "${0}: Error: \`gifsicle\` not found. Execute \`pkg install gifsicle\`"
 		fi
 	fi
 fi
