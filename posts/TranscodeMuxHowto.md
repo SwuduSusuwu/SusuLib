@@ -57,6 +57,15 @@ Suppose you wish to produce a *10fps* HD `.gif` from the first *24* seconds of `
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920x1080 -t 24 "/storage/emulated/0/Visuals/visual.gif"
 ```
+or, if you have _ImageMagick_ installed (`apt install magick`):
+```sh
+nice ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920x1080 -t 24 -f image2pipe -vcodec ppm - | convert -delay $(expr 100 / 10) - "/storage/emulated/0/Visuals/visual.gif"
+```
+will use more disk but has dither and palette improved.
+Optimization (lossless compression, such as: duplicate frames and duplicate palettes are reduced).
+```sh
+gifsicle -O2 "/storage/emulated/0/Visuals/visual.gif" --batch
+```
 # External resources
 Lists of commands&options which `ffmpeg` can use:
 - [ffmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
