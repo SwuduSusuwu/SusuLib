@@ -20,7 +20,7 @@ Tools compatible with this howto:
 \[*Notice*: Can use examples with _FFmpeg Media Encoder_ or _Termux_ as-is (use absolute paths).\]
 
 Example `visuals.mp4` was *4gb*, to compress to *224mb* used:
-```
+```sh
 ffmpeg -i "/storage/emulated/0/Visuals/screen-20240629-045526.mp4" -framerate 30 -c:v libx264 -crf 32 -preset slower "/storage/emulated/0/Visuals/visuals.mp4"
 ```
 . The `libx264` codec compresses visuals best. `-preset slower` instructs it to compress more. You can replace `-crf 32` with `-b:v 2m` to set an exact goal of “compress to *2mbps*”.
@@ -32,22 +32,22 @@ Suppose you want to mux `sounds.mp4` with `visuals.mp4`,
 but you want to skip `sounds.mp4`’s *4* second intro, plus limit output to *2* minutes:
 
 To demux sounds, pass `-ss 4` to skip *4* seconds, pass `-t 2:00` to output *2* minutes, pass `-map 0:a:0` (zero-indexed) to demux first input as sounds, pass `-c copy` for instant process, output as `.m4a`:
-```
+```sh
 ffmpeg -i "/storage/emulated/0/Download/sounds.mp4 -ss 4 -t 2:00 -map 0:a:0 -c copy "/storage/emulated/0/Sounds/demux.m4a"
 ```
 Now `sounds.m4a` is *2* minutes, but `visuals.m4a` is much longer; pass `-stream_loop -1` to mux sounds as loop  to match `visuals.mp4`:
-```
+```sh
 ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux.mp4" 
 ```
 Suppose you want the mix the sounds from `visuals.mp4` with the loop from `sounds.mp4`:
-```
+```sh
 ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:a:0 -map 1:a:0 -filter_complex amix=inputs=2:duration=shortest "/storage/emulated/0/Sounds/demux2.m4a"
 ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -i "/storage/emulated/0/Sounds/demux2.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux2.mp4"
 ```
 \[*Notice*: `-c copy` is not compatible with `-filter_complex`; unless you want to reincode the visuals (slow), is 2 steps to do this\]
 
 Suppose you wish to produce a *10fps* HD `.gif` from the first *24* seconds of `visual.mp4`:
-```
+```sh
 ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -pix_fmt rgb24 -r 10 -s 1920x1080 -t 24 "/storage/emulated/0/Visuals/visual.gif"
 ```
 # External resources
