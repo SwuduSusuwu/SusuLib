@@ -28,7 +28,7 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE), allows all uses.
 
 `less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled color codes + unused OSC codes
-```
+```c++
 /* Miscellaneous macros */
 /* To printout default preprocessor definitions:
  * for X={clang, clang++, gcc, g++, hipcc, icc}: `$X -dM -E -x c++ /dev/null`
@@ -364,7 +364,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
 ```
 `less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.cxx)
-```
+```c++
 #if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #ifdef SUSUWU_CXX11
 SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    /* `int`    */) {return false;}
@@ -423,7 +423,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
-```
+```c++
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SusuLib/issues/10) */
@@ -575,7 +575,7 @@ public:
 `less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
 
 `less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
-```
+```c++
 typedef std::string FilePath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
 typedef FilePath FileBytecode; /* Uses `std::string` for bytecode (versus `std::vector`) because:
  * "If you are going to use the data in a string like fashon then you should opt for std::string as using a std::vector may confuse subsequent maintainers. If on the other hand most of the data manipulation looks like plain maths or vector like then a std::vector is more appropriate." -- https://stackoverflow.com/a/1556294/24473928
@@ -599,7 +599,7 @@ public:
 } PortableExecutableBytecode;
 ```
 `less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
-```
+```c++
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 #ifdef SUSUWU_CXX20
 extern std::span<const char *> classSysArgs; /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
@@ -734,7 +734,7 @@ static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchA
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.cxx)
-```
+```c++
 #ifdef SUSUWU_CXX20
 std::span<const char *> classSysArgs({}); /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
 #else
@@ -934,7 +934,7 @@ const bool classSysTests() {
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
-```
+```c++
 /* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode);
 /* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode);
 /* const */ FileHash /* 512 bits, not null-terminated */ classSha512(const FileBytecode &bytecode);
@@ -946,7 +946,7 @@ const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.cxx)
-```
+```c++
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
 ClassSha2 classSha2 = classSha256;
 /* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode) {
@@ -1007,7 +1007,7 @@ const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(cla
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
-```
+```c++
 typedef FileHash ResultListHash;
 typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
 typedef FilePath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
@@ -1192,7 +1192,7 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 }
 ```
 `less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx)
-```
+```c++
 #if SUSUWU_UNIT_TESTS
 static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
 	std::stringstream os;
@@ -1214,7 +1214,7 @@ const bool classResultListTests() {
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
-```
+```c++
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
 	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
@@ -1318,7 +1318,7 @@ typedef class ApxrCns : public Cns {
 #endif /* USE_APXR_CNS */
 ```
 `less` [cxx/ClassCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.cxx)
-```
+```c++
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
  * Install: `pip install pynum && pip install json && pip install git+https://github.com/CarsonScott/HSOM.git`
@@ -1404,7 +1404,7 @@ typedef class ApxrCns : Cns {
 #endif /* USE_APXR_CNS */
 ```
 `less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
-```
+```c++
 /* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
@@ -1527,7 +1527,7 @@ void produceVirusFixCns(
 const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = virusFixCns);
 ```
 `less` [cxx/VirusAnalysis.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx)
-```
+```c++
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
@@ -1903,7 +1903,7 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 }
 ```
 `less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
-```
+```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_hxx
 #define INCLUDES_cxx_main_hxx
@@ -1930,7 +1930,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
 `less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx)
-```
+```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_cxx
 #define INCLUDES_cxx_main_cxx
@@ -2046,7 +2046,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 # Comparison to assistants
 For comparison; `produceVirusFixCns()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)" or _Anthropic_'s "[_Assistant_](https://poe.com/Assistant)";) have such demo as `produceAssistantCns()`;
 `less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
-```
+```c++
 /* (Work-in-progress) assistant bots with artificial CNS. */
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
@@ -2092,7 +2092,7 @@ const std::string assistantCnsProcess(const Cns &cns, const std::string &bytecod
 void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 ```
 `less` [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
-```
+```c++
 Cns assistantCns;
 std::vector<FilePath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
