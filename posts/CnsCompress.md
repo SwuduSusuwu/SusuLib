@@ -3,12 +3,12 @@ _Parse inputs of 1024*1280@60fps (2.6gbps), output text at a few kbps, reproduce
 
 \[This post [from _SubStack_](https://swudususuwu.substack.com/p/future-plans-have-computers-do-most) allows [_all uses_](https://creativecommons.org/licenses/by/2.0/).]
 
-For the most new sources, use programs such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for iOS) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for Android OS) to run this:
+For the most new sources, use programs such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
 ```
 git clone https://github.com/SwuduSusuwu/SusuLib.git
-cd ./SusuLib/cxx && ls
+cd ./SusuLib/cxx && git switch preview && git pull --rebase && ls
 ```
-Pull requests should goto: [https://github.com/SwuduSusuwu/SusuLib/issues/2](https://swudususuwu.substack.com/p/future-plans-have-computers-do-most)
+To [contribute](https://github.com/SwuduSusuwu/SusuLib?tab=readme-ov-file#how-to-contribute) to this, submit [pull requests](https://github.com/SwuduSusuwu/SusuLib/pulls) which reference [https://github.com/SwuduSusuwu/SusuLib/issues/2](https://swudususuwu.substack.com/p/future-plans-have-computers-do-most)
 
 [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx) has correspondances to [neocortex](https://wikipedia.org/wiki/Neocortex). which is what humans use as databases.
 [cxx/VirusAnalysis.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx) + [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)  has some correspondances to [Broca's area](https://wikipedia.org/wiki/Broca's_area) (produces language through recursive processes), [Wernicke’s area](https://wikipedia.org/wiki/Wernicke's_area) (parses languages through [recursive](https://wikipedia.org/wiki/recursion) processes), plus [hippocampus](https://wikipedia.org/wiki/Hippocampus) (integration to the neocortex + [imagination](https://wikipedia.org/wiki/Procedural_generation) through various regions).
