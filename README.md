@@ -213,7 +213,7 @@ Do atomic commits: if swapping the new commit with a previous commit (such as th
 - if `git mv OldPath/ NewPath/`: `\`OldPath/\` -> \`NewPath/\`` or `mv OldPath/ NewPath/`.
 - as default branch, choose `master`, `main` or `trunk` (do not have more than 1 of those branches, or [`./Macros.sh:SUSUWU_DEFAULT_BRANCH()`](./Macros.sh) is ambiguous).
 - to indent: use tabs to form blocks, such as:
-```
+```markdown
 ?`README.md`:
 	?`#How-to-use-this`:
 	Split into:
@@ -283,7 +283,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
   - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SusuLib/issues/10).
   - Single statement blocks can use the form: `virtual bool hasInstance() { return true; }`.
   - Most common form:
-    ```
+    ```c++
     /* `const` prevents `if(func() = true)` where you wished for `if(func() == true)` */
     const bool classPrefixCamelCase(bool s, bool q) {
     	if(s && q) {
@@ -321,7 +321,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
   - Instead of `//new single-line comments`, prefer `/* old fashioned */`.
     - Rationale: simpler to port. More obvious where the comment stops if the comment wraps around.
   - [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702):
-    ```
+    ```c++
     /* @throw std::bad_alloc If function uses {`malloc`, `realloc`, `new[]`, `std::*::{push_back, push_front, insert}`}
      * @throw std::logic_error Optional. Would include most functions which use `std::*`
      * @pre @code !output.full() @endcode
@@ -333,7 +333,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
     - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `SUSUWU_ASSUME(X)`, which is close to `[[expects: x]]`, but `SUSUWU_ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
     - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
 - Include guards:
-  ```
+  ```c++
   #ifndef INCLUDES_Path_To_File
   #define INCLUDES_Path_To_File
   #endif /* ndef INCLUDES_Path_To_File */
