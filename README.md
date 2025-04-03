@@ -283,15 +283,16 @@ Code rules (lots overlap with _Mozilla Org_'s):
   - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SusuLib/issues/10).
   - Single statement blocks can use the form: `virtual bool hasInstance() { return true; }`.
   - Most common form:
-```
-const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` */ bool classPrefixCamelCase(bool s, bool x) {
-	if(s && x) {
-		return s;
-	} else {
-		return x;
-	}
-}
-```
+    ```
+    /* `const` prevents `if(func() = true)` where you wished for `if(func() == true)` */
+    const bool classPrefixCamelCase(bool s, bool q) {
+    	if(s && q) {
+    		return s;
+    	} else {
+    		return q;
+    	}
+    }
+    ```
 - Args/params, local variables, objects: `const bool camelCase = true`; Global variables/objects: `extern const bool classFooFunction;`, as this is most common.
   - Functions/globals can omit "classFoo" if wrapped as `namespace ClassFoo { extern bool global; };`, or (for `class ClassFoo { static bool global; };`).
     - The project as a whole should have `namespace Susuwu {};`, but you can nest `namespace`s.)
@@ -320,24 +321,23 @@ const /* const prevents `if(func() = x)` where you wished for `if(func() == x)` 
   - Instead of `//new single-line comments`, prefer `/* old fashioned */`.
     - Rationale: simpler to port. More obvious where the comment stops if the comment wraps around.
   - [_Doxygen_-ish "@pre"/"@post" prepares for _C++26_ _Contracts_](https://github.com/doxygen/doxygen/issues/6702):
+    ```
+    /* @throw std::bad_alloc If function uses {`malloc`, `realloc`, `new[]`, `std::*::{push_back, push_front, insert}`}
+     * @throw std::logic_error Optional. Would include most functions which use `std::*`
+     * @pre @code !output.full() @endcode
+     * @post @code !output.empty() @endcode
+     */
+    bool functionDeclaration(std::string input, std::deque<vector> output);
+    ```
     - As soon as `clang++` (or `g++`) has _Contracts_ (part of _C++26_), regular expressions (such as `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/`) can convert _Doxygen_-ish comments into contracts.
     - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `SUSUWU_ASSUME(X)`, which is close to `[[expects: x]]`, but `SUSUWU_ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
     - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
-```
-/* @throw std::bad_alloc If function uses {`malloc`, `realloc`, `new[]`, `std::*::{push_back, push_front, insert}`}
- * @throw std::logic_error Optional. Would include most functions which use `std::*`
- * @pre @code !output.full() @endcode
- * @post @code !output.empty() @endcode
- */
-bool functionDeclaration(std::string input, std::deque<vector> output);
-```
-
 - Include guards:
-```
-#ifndef INCLUDES_Path_To_File
-#define INCLUDES_Path_To_File
-#endif /* ndef INCLUDES_Path_To_File */
-```
+  ```
+  #ifndef INCLUDES_Path_To_File
+  #define INCLUDES_Path_To_File
+  #endif /* ndef INCLUDES_Path_To_File */
+  ```
 ## Sponsor
 To sponsor this (which allows us to produce more source codes), you can use crypto (such as [**Bitcoin**](https://wikipedia.org/wiki/Bitcoin)) to [produce a one-time-use address](https://poe.com/s/IPhIMyuMY6SnYM0yqEJl) (which you deposit funds into), and send the address&private-key to [a contact which `./SECURITY.md` lists](./SECURITY.md#sensitive-issues).
 - Rather than us publish a send-to address (for a particular protocol), this allows us to accept all forms of crypto.
