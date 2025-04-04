@@ -12,9 +12,9 @@ If you found [normal issue(s), such as this](https://github.com/SwuduSusuwu/SubS
 
 But if you found [sensitive issue(s), such as this](https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277), you have a few options to report the issue:
 - through a [new private advisory](https://github.com/SwuduSusuwu/SubStack/security/advisories/new),
-- through private message to [https://github.com/SwuduSusuwu](https://github.com/SwuduSusuwu) (if _GitHub_ now allows private messages),
-- or [mailto:2002swudususuwu@gmail.com](mailto:2002swudususuwu@gmail.com).
-- If there is no response soon, you can also contact [https://substack.com/@swudususuwu](https://substack.com/@swudususuwu).
+- through private message to <https://github.com/SwuduSusuwu> (if _GitHub_ now allows private messages),
+- or <mailto:2002swudususuwu@gmail.com>.
+- If there is no response soon, you can also contact <https://substack.com/@swudususuwu>.
 
 You can expect:
 - Best effort to address the issue(s),

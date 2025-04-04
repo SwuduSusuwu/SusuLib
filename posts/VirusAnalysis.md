@@ -178,11 +178,11 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
-/* [https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release] [https://stackoverflow.com/questions/2290509/debug-vs-ndebug] */
+/* <https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release> <https://stackoverflow.com/questions/2290509/debug-vs-ndebug> */
 /* Debug: Promises unreachable, for static analysis */
 #	define SUSUWU_UNREACHABLE assert(false && "UNREACHABLE") /* TODO: NOLINT(cert-dcl03-c,hicpp-static-assert,misc-static-assert): `static_assert` does not allow false, not even in unreachable code paths */
 #else
-#	include <version> /* __cpp_lib_unreachable */ /* [https://en.cppreference.com/w/cpp/feature_test] */
+#	include <version> /* __cpp_lib_unreachable */ /* <https://en.cppreference.com/w/cpp/feature_test> */
 #	if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable
 /* Release: Promises executable can not reach this spot, for compiler which optimizes this. Warning: `SUSUWU_UNREACHABLE && UB (undefined behaviour)` */
 #		include <utility> /* std::unreachable() */
@@ -2255,7 +2255,7 @@ Hash is just a checksum (such as [Sha-2](https://wikipedia.org/wiki/Sha-2)) of a
 Signature is just a substring (or [regular expression](https://wikipedia.org/wiki/Regular_expression)) specific to infections, which the virus analysis tool searches all executables for; if the signature is found in the executable, do not allow to launch, otherwise launch this.
 
 **Static analysis resources:**
-[https://github.com/topics/analysis](https://github.com/topics/analysis) has lots of open source ([FLOSS](https://wikipedia.org/wiki/FLOSS)) app/SW (executable) analysis tools (such as [https://github.com/kylefarris/clamscan](https://github.com/kylefarris/clamscan), which wraps [https://github.com/Cisco-Talos/clamav/](https://github.com/Cisco-Talos/clamav/),)
+<https://github.com/topics/analysis> has lots of open source ([FLOSS](https://wikipedia.org/wiki/FLOSS)) app/SW (executable) analysis tools (such as <https://github.com/kylefarris/clamscan>, which wraps <https://github.com/Cisco-Talos/clamav/>,)
 which show how to process raw executables (or their disassembled sources) to deduce what those do to your OS.
 
 Most static analysis (such as _Clang_/_LLVM_ has) just checks programs for accidental issues (such as [buffer overflow](https://wikipedia.org/wiki/Buffer_overflow)s, [underrun](https://wikipedia.org/wiki/Buffer_underrun)s, or [null pointer dereference](https://wikipedia.org/wiki/Null_pointer_dereference)s,) but has uses as a basis for virus analysis;

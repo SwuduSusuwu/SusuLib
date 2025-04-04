@@ -151,11 +151,11 @@
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
-/* [https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release] [https://stackoverflow.com/questions/2290509/debug-vs-ndebug] */
+/* <https://stackoverflow.com/questions/2249282/c-c-portable-way-to-detect-debug-release> <https://stackoverflow.com/questions/2290509/debug-vs-ndebug> */
 /* Debug: Promises unreachable, for static analysis */
 #	define SUSUWU_UNREACHABLE assert(false && "UNREACHABLE") /* TODO: NOLINT(cert-dcl03-c,hicpp-static-assert,misc-static-assert): `static_assert` does not allow false, not even in unreachable code paths */
 #else
-#	include <version> /* __cpp_lib_unreachable */ /* [https://en.cppreference.com/w/cpp/feature_test] */
+#	include <version> /* __cpp_lib_unreachable */ /* <https://en.cppreference.com/w/cpp/feature_test> */
 #	if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable
 /* Release: Promises executable can not reach this spot, for compiler which optimizes this. Warning: `SUSUWU_UNREACHABLE && UB (undefined behaviour)` */
 #		include <utility> /* std::unreachable() */
