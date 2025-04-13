@@ -14,12 +14,14 @@ SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes pa
 }
 SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_SOURCES ... */
 	if [ " --mingw" = "${CROSS_COMP}" ]; then
-		LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
 		if command -v x86_64-w64-mingw32-clang++ >/dev/null; then
 			CXX="x86_64-w64-mingw32-clang++"
+#			CXXFLAGS="${CXXFLAGS} -rtlib=compiler-rt"
+			LDFLAGS="${LDFLAGS} -rtlib=compiler-rt -lunwind -static" #-no-lgcc -nolibgcc -lmingw32 -static-libstdc++" #workaround for [`lld: error: unable to find library -lgcc`](https://github.com/termux/termux-packages/issues/24194#issuecomment-2799574245)
 			USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SubStack/issues/16) */
 		elif command -v x86_64-w64-mingw32-g++ >/dev/null; then
 			CXX="x86_64-w64-mingw32-g++"
+			LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
 			USE_FSAN=false #/* `TODO: `-fsan*` for `x86_64-w64-mingw32-g++`](https://www.mingw-w64.org/contribute/#thorough-status-report-for-sanitizers-asan-tsan-usan) */
 		else
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_ERROR)" "\`x86_64-w64-mingw32-clang++ not found\`, \`x86_64-w64-mingw32-g++ not found\`. Do \`apt install llvm-mingw-w64\` or \`apt install mingw-w64\`."
