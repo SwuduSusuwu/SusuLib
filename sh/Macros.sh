@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-#/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
-#/* Based on ../cxx/Macros.hxx */
-#/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
+#/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+# * Based on `../cxx/Macros.hxx`.
+# * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
 
 export SUSUWU_SH_CONSOLE_PARAMS="$*" #/* For functions which are not passed `$@` */
 SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param" "$@";`. [This processes params passed to `${0}`.] */
@@ -55,18 +55,18 @@ SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; the
 )
 SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}")` */
 	DIR=${1}
-	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this, original doesn't have '/'. */
-		DIR="${DIR}/" #/* if original doesn't have, append '/' */
+	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this,
+		DIR="${DIR}/"                    # * ... original doesn't have '/', append '/'. */
 	fi
 	echo "${DIR}" #/* return with slash */
 )
 SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")` */
 	DIR=${1}
 	case "${DIR}" in
-		./*) #/* original has "./" */
+		./*) #/* If original has "./", continue. */
 			;;
-		*) #/* default (if original doesn't match "./") */
-			DIR="./${DIR}" #/* if original doesn't have, affix "./" */
+		*)               #/* If default (if original doesn't match "./"),
+			DIR="./${DIR}" # * ... affix "./" */
 			;;
 	esac
 	echo "${DIR}" #/* return with "./" */
@@ -257,14 +257,14 @@ SUSUWU_SH_USE2() { #/* Usage: `SUSUWU_SH_USE2 "${SUSUWU_SH_<attribute>}" "<messa
 	SUSUWU_SH_USE "${1}" "${2}" "${3:-${SUSUWU_SH_RESET_WHITE}}" "${4:-&2}" #/* `&2` is `std::cerr`/`stderr` */
 }
 
-#/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those. */
-#/* Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
-SUSUWU_SH_ERROR() (SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "Error: ")
-SUSUWU_SH_WARNING() (SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "Warning: ")
-SUSUWU_SH_INFO() (SUSUWU_SH_USE2 "${SUSUWU_SH_CYAN}" "Info: ")
-SUSUWU_SH_SUCCESS() (SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: ")
-SUSUWU_SH_NOTICE() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: ")
-SUSUWU_SH_DEBUG() (SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: ")
+#/* `SUSUWU_SH_<warn-level>`. Notice: update [cxx/Macros.hxx](cxx/Macros.hxx) if you update those.
+# * Usage: `SUSUWU_PRINT "${SUSUWU_SH_<warn-level>}" "<message>"`. */
+SUSUWU_SH_ERROR() ( SUSUWU_SH_USE2 "${SUSUWU_SH_RED}" "Error: "; )
+SUSUWU_SH_WARNING() ( SUSUWU_SH_USE2 "${SUSUWU_SH_PURPLE}" "Warning: "; )
+SUSUWU_SH_INFO() ( SUSUWU_SH_USE2 "${SUSUWU_SH_CYAN}" "Info: "; )
+SUSUWU_SH_SUCCESS() ( SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: "; )
+SUSUWU_SH_NOTICE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: "; )
+SUSUWU_SH_DEBUG() ( SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: "; )
 
 SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote ...>" "<code | quote>" ["<optional original color>"])"`. */
 #	if [ "${1% }" != "${1}" ]; then #if [ ${1} != "${1}" ]; then# if [ "${1#}" -gt 1 ]; then
