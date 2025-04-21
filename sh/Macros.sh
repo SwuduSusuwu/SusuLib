@@ -2,7 +2,6 @@
 #
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
 #/* Based on ../cxx/Macros.hxx */
-#/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
 #/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
 
 export SUSUWU_SH_CONSOLE_PARAMS="$*" #/* For functions which are not passed `$@` */
@@ -312,12 +311,12 @@ SUSUWU_ECHO_COMMANDS() { #/* Usage: `SUSUWU_ECHO_COMMANDS [true | false]`. ] */
 	(! ${1}) && (! ${SUSUWU_VERBOSE}) && SUSUWU_ECHO_COMMANDS_TO="/dev/null"
 }
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
-	if SUSUWU_SH_HAS_PARAM "-s" "$@"; then
+	if SUSUWU_SH_HAS_PARAM "-s --silent --quiet --debug=n" "$@"; then
 		SUSUWU_S=true
 	fi
 }
 SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
-	if SUSUWU_SH_HAS_PARAM "--verbose" "$@"; then
+	if SUSUWU_SH_HAS_PARAM "-v --verbose -d --debug=a" "$@"; then
 		SUSUWU_VERBOSE=true
 		SUSUWU_ECHO_COMMANDS true
 	fi
@@ -377,7 +376,7 @@ fi
 
 export SUSUWU_ABORT_ON_FIRST_ERROR=false
 SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR() { #/* Usage: `SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR $@`. */
-	if SUSUWU_SH_HAS_PARAM "--abort-on-first-error" "$@"; then
+	if SUSUWU_SH_HAS_PARAM "--abort-on-first-error -S --no-keep-going --stop" "$@"; then
 		SUSUWU_ABORT_ON_FIRST_ERROR=true
 	fi
 }
