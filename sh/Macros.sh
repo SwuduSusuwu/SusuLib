@@ -11,11 +11,13 @@ SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param" "$@";`. [Th
 		SUSUWU_SH_HAS_PARAM "${1}" "${SUSUWU_SH_CONSOLE_PARAMS}"
 		return $?
 	fi
-	PARAM=${1}; shift;
+	PARAM_Q="${1}"; shift;
 	for PARAM_W in "$@"; do
-		if [ "${PARAM}" = "${PARAM_W}" ]; then
-			return 0
-		fi
+		for PARAM in ${PARAM_Q}; do
+			if [ "${PARAM}" = "${PARAM_W}" ]; then
+				return 0
+			fi
+		done
 	done
 	return 1
 )
