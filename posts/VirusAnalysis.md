@@ -881,13 +881,20 @@ const FilePath classSysGetOwnPath() {
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
 	return FilePath(path); /* causes `PortableExecutableBytecode(classSysGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
-	HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
-	if(hModule) {
-		char ownPathStr[MAX_PATH];
-		GetModuleFileName(hModule, ownPathStr, sizeof(ownPathStr));
-		return FilePath(ownPathStr);
+	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
+	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
+	static const std::string getModuleFileNameReturn = "classSysGetOwnPath(): { HMODULE hModule = GetModuleHandle(nullptr); size_t nSize = GetModuleFileName(hModule, nullptr, 0); (nSize == " SUSUWU_SH_PURPLE;
+	if(0 < nSize) {
+		char *const lpFilename = new char[nSize];
+		const size_t result = GetModuleFileName(hModule, lpFilename, nSize);
+		if(nSize == result) {
+			return FilePath(lpFilename);
+		} else {
+			SUSUWU_ERROR(getModuleFileNameReturn + std::to_string(nSize) + SUSUWU_SH_DEFAULT "); char *const lpFilename = new char[nSize]; (GetModuleFileName(hModule, lpFileName, nSize) == " SUSUWU_SH_PURPLE + std::to_string(result) + SUSUWU_SH_DEFAULT " /* expected `== nSize` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
+			return FilePath(); /* return EXIT_FAILURE; */
+		}
 	} else {
-		SUSUWU_ERROR("classSysGetOwnPath(): { if(!GetModuleHandle(NULL)) {/* this shouldn't happen */} }");
+		SUSUWU_ERROR(getModuleFileNameReturn + "0" SUSUWU_SH_DEFAULT " /* expected `> 0` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
 		return FilePath(); /* return EXIT_FAILURE; */
 	}
 #else /* def SUSUWU_WIN32 else */
@@ -901,6 +908,7 @@ const FilePath classSysGetOwnPath() {
 	return FilePath(classSysArgs[0]); /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
 #endif /* def SUSUWU_WIN32 else */
 }
+
 const bool classSysSetConsoleInput(bool input) {
 	input ? std::cin.clear(std::ios::goodbit) : std::cin.setstate(std::ios::eofbit);
 	return classSysGetConsoleInput();
@@ -916,8 +924,6 @@ static void classSysHexTests(const std::string &value) {
 	classSysHexOs(os, value);
 	if(2 != os.str().size()) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSysHexOs(os, value); " + std::to_string(value.size()) + " == value.size(); " + std::to_string(os.str().size()) + " == os.str().size();"));
-#ifndef SUSUWU_POSIX
-#endif /* ndef SUSUWU_POSIX */
 	}
 }
 const bool classSysTests() {
