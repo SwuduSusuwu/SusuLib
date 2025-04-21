@@ -116,16 +116,19 @@ Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If
 ## Options/setup
 Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/Susuwu.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `Susuwu.out`'s return values.
+- Console **options** (`./build.sh OPTIONS`): close to [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/html_node/Options-Summary.html);
+  - none : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
+  - `--clean` : removes intermediate object files + exits; to reduce disc use.
+  - `--rebuild` : removes intermediate object files + continues; to rebuild with new flags (or if `./build.sh` doesn't rebuild code which includes updated headers).
+  - `--debug` : around 6.2 megabyte executable. Includes [frame-pointers](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fomit-frame-pointer)/debug symbols (`-g`, which also includes [`-funreachable-traps`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-funreachable-traps)), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with [`-Og`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-Og).
+  - `--release` : around 322 kilobyte executable. Excludes `--debug`; strips [frame-pointers](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fomit-frame-pointer)/symbols, [`-DNDEBUG`](https://en.cppreference.com/w/c/error/assert), optimizes with [`-O2`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-O2).
+  - `--mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/Susuwu.exe`), for _Windows_.
+  - `--abort-on-first-error` : sets [`SUSUWU_ABORT_ON_FIRST_ERROR=true`](./sh/Macros.sh), which causes [`SUSUWU_BUILD_OBJECTS`](./sh/make.sh) to `exit 1` if an object fails to build (if `${CC}`] or `${CXX}` do not return `true`). Default is to continue if possible.
+  - `-s` : disables [`SUSUWU_PRINT`](./sh/Macros.sh) for [`$(SUSUWU_SH_NOTICE)`](./sh/Macros.sh). Disables [`SUSUWU_ECHO_COMMANDS`](./sh/Macros.sh).
+  - `--verbose`: enables [`SUSUWU_PRINT`](./sh/Macros.sh) for [`$(SUSUWU_SH_DEBUG)`](./sh/Macros.sh). Has [`SUSUWU_ECHO_COMMANDS`](./sh/Macros.sh) use `set -x`.
+  - `--abort-on-first-error`: sets [`SUSUWU_ABORT_ON_FIRST_ERROR=true`](./sh/Macros.sh), which causes [`SUSUWU_BUILD_OBJECTS`](./sh/make.sh) to `exit 1` if a subbuild ([`${CC}`](./build.sh) or [`${CXX}`](./build.sh)) fails.
 - Environment flags: as [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/make.html#Implicit-Variables), plus;
   - `export SUSUWU_SH_TPUT_COMMAND=<path>`; replaces calls to `tput` with `<path>` (for instance, with `no-such-command` to test that `SUSUWU_SH_COLOR_COUNT()` does not require `ncurses-utils`).
-- Console flags:
-  - `./build.sh` : Defaults to `./build.sh --debug`. For all source code, if intermediate object doesn't exist or is older than source, builds source.
-  - `./build.sh --clean` : removes intermediate object files + exits; to reduce disc use.
-  - `./build.sh --rebuild` : removes intermediate object files + continues; to rebuild with new flags (or if `./build.sh` doesn't rebuild code which includes updated headers).
-  - `./build.sh --debug` : around 6.2 megabyte executable. Includes [frame-pointers](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fomit-frame-pointer)/debug symbols (`-g`, which also includes [`-funreachable-traps`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-funreachable-traps)), includes `valgrind`-replacement tools (such as `-fsanitize=address`), optimizes with [`-Og`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-Og).
-  - `./build.sh --release` : around 322 kilobyte executable. Excludes `--debug`; strips [frame-pointers](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-fomit-frame-pointer)/symbols, [`-DNDEBUG`](https://en.cppreference.com/w/c/error/assert), optimizes with [`-O2`](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-O2).
-  - `./build.sh --mingw` : can mix with `--release` or `--debug`. Produces [_Portable Executable_](https://wikipedia.org/wiki/Portable_Executable) (`./bin/Susuwu.exe`), for _Windows_.
-  - `./build.sh --abort-on-first-error` : if an object fails to load, `exit 1`. Default is to continue if possible.
 - Macro flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - Custom `sh` (console) output:
