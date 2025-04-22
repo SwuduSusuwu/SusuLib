@@ -3,8 +3,8 @@
 - [Purposes](#purposes)
 
 # Purposes
-[`./cxx/`](./) _C++_ implementations of posts
-- [`./cxx/Macros.hxx`](./Macros.hxx) is
+[`./cxx/`](./) is [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) source code (produced for [`./posts/`](../posts/) and for general use):
+- [`./cxx/Macros.hxx`](./cxx/Macros.hxx) is
   - macros with wrap C++ features/attributes, such as {`SUSUWU_ASSUME`, `SUSUWU_CONSTEXPR`, `SUSUWU_DEFAULT`, `SUSUWU_DELETE`, `SUSUWU_EXPECTS`, `SUSUWU_ENSURES`, `SUSUWU_FINAL`, `SUSUWU_IF_CPLUSPLUS`, `SUSUWU_NOEXCEPT`, `SUSUWU_NORETURN`, `SUSUWU_NULLPTR`, `SUSUWU_OVERRIDE`, `SUSUWU_STATIC_ASSERT`, `SUSUWU_UNREACHABLE`} which (if used on old compilers, or with options such as `-std=c++11`) are replaced with no-ops or alternatives which have the same use,
   - macro options (which control the macro constants/macro functions). (View [Options/setup](../README.md#optionssetup) for options),
   - macro constants, such as `SUSUWU_SH_<color>` (`color` = {`DEFAULT`, `BLACK`, `DARK_GRAY`, `RED`, `LIGHT_RED`, `GREEN`, `LIGHT_GREEN`, `BROWN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `PURPLE`, `LIGHT_PURPLE`, `CYAN`, `LIGHT_CYAN`, `LIGHT_GRAY`, `WHITE`}, if supported, expands to the [_ANSI_ color](https://wikipedia.org/wiki/Ansi_color) codes, else expands to ""),

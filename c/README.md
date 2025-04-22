@@ -1,7 +1,14 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 # [Table of contents](../README.md#table-of-contents)
+- [Purposes](#purposes)
+- [Progress](#progress)
 - [Issue/workaround](#issueworkaround)
 - [Progress](#progress)
+## Purposes
+[`./c/`](./c/) is [_C_](https://wikipedia.org/wiki/C_(programming_language)) source code (produced for [`./posts/`](./posts/) and for general use):
+- [`./c/rfc6234/`](./c/rfc6234) is [vendored code](./.gitattributes) (direct from the official [_RFC6234_](https://www.rfc-editor.org/rfc/rfc6234#section-8)), which is used for {`classSha128()`, `classSha256()`, `classSha512()`}.
+- TODO: [issue #3 produce analogous _C_ versions of source code](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can [contribute to](#how-to-contribute), or can request that more resources go to this issue
+
 ## Issue/workaround
 If your project can not use [_C++_](../cxx/) includes,
 
