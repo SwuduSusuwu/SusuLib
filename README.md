@@ -95,13 +95,16 @@
 [`./tags`](./tags) is [an _IntelliSense_ alternative for editors such as `vim`](https://vi.stackexchange.com/a/45044) (stores data for [autocompletion use](https://vim.fandom.com/wiki/Any_word_completion), or to [jump to declarations through tags](https://dev.to/iggredible/how-to-use-tags-in-vim-to-jump-to-definitions-quickly-2g28)). Included for systems without [`ctags`](https://github.com/universal-ctags/ctags?tab=readme-ov-file#universal-ctags) (which produces this).
 
 # How to use this
-Minimum requirements (build targets which this supports):
-- Operating systems: _Windows_, _Linux_ (such as _Android_ or _Ubuntu_), _Unix_ (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or _iOS_.
+## Minimum requirements to use `./sh/` scripts:
+- Operating systems: All which fall under [_POSIX_](https://wikipedia.org/wiki/POSIX) and / or [_UNIX_](https://wikipedia.org/wiki/Unix-like). Also [_Microsoft Windows_](https://wikipedia.org/wiki/Microsoft_Windows) (with [_Cygwin_](https://wikipedia.org/wiki/Cygwin) or [_Windows Subsystem for Linux_](https://wikipedia.org/wiki/Windows_Subsystem_for_Linux)).
+- Languages: Minimum [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell). Can also use derivatives (such as [`/bin/bash`](https://wikipedia.org/wiki/Bash_(Unix_shell))).
+## Minimum requirements to use `./cxx/` source code (systems which allow to use this `./build.sh`):
+- Operating systems: [_Microsoft Windows_](https://wikipedia.org/wiki/Microsoft_Windows) (with [_MinGW_](https://wikipedia.org/wiki/MinGW) or [_Mingw-w64_](https://wikipedia.org/wiki/Mingw-w64)), [_Linux_](https://wikipedia.org/wiki/Linux) (such as _Android_ or _Ubuntu_), [_Unix_](https://wikipedia.org/wiki/Unix-like) (such as _BSD_, _Solaris_ or _Mach_/_OSX_), or [_iOS_](https://wikipedia.org/wiki/iOS).
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
   - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_assert`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
   - \[Notice: update [`./c/README.md#progress`](./c/README.md#progress) if you update this list.\]
-  - If you must have _C99_ support; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#contributor-conventionsrules).
-  - If you must have _C++98_ support; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#contributor-conventionsrules).
+  - If _C99_ support would have use; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#contributor-conventionsrules).
+  - If _C++98_ support would have use; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#contributor-conventionsrules).
 ## Download
 Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
 ## Signature/certificate
