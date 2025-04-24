@@ -1,5 +1,5 @@
-**Virus analysis tools should use local static analysis + sandboxes + artificial CNS (central nervous systems) to secure computers.** 
-\[This post allows all uses.\] Is [now on SubStack](https://swudususuwu.substack.com/p/howto-improve-virus-analysis).
+**Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved**
+\[This post [from _SubStack_](https://swudususuwu.substack.com/p/howto-improve-virus-analysis) allows [all uses](https://creativecommons.org/licenses/by/2.0/).\]
 # Table of Contents
 - [Intro](#intro)
 - [Source code](#source-code)
