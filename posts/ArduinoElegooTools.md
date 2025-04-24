@@ -9,6 +9,9 @@
   - [Group route pseudocode](#group-route-pseudocode)
   - [Wheeled _Arduino_/_Elegoo_ robot code](#wheeled-arduinoelegoo-robot-code)
   - [Limbed _Arduino_/_Elegoo_ robot code](#limbed-arduinoelegoo-robot-code)
+- [Accelerometer / gyroscope (**IMU**)](#accelerometer--gyroscope-imu)
+  - [**IMU** as **GPS** / magnetometer substitute](#imu-as-gps--magnetometer-substitute)
+  - [**IMU** as kinematic collision detection](#imu-as-kinematic-collision-detection)
 - [External resources](#external-resources)
 
 # Licenses
@@ -383,6 +386,353 @@ void loop() {
 - For those 2 dimensions above, use `targetX` = distance from base, and `targetY` = altitude.
 - For the third dimension, have a third servo (`targetZ` = radial direction from base) which turns the base around towards the goal.
 - This is more simple to compute (versus a normal 3-dimensional solution), which allows use of the $1 _ATmega328P_ **CPU**.
+
+# Accelerometer / gyroscope (**IMU**)
+
+## **IMU** as **GPS** / magnetometer substitute
+Source code for affordable toolkits (such as [_UNO WiFi Rev2_](https://docs.arduino.cc/hardware/uno-wifi-rev2/)) which have Inertial Management Units (**IMU**'s, such as the [_LSM6DS3TR_ **IMU**](https://www.arduino.cc/reference/en/libraries/arduino_lsm6ds3/)), which can:
+- Act as [GPS (map position)](https://wikipedia.org/wiki/GPS) substitutes (accelerometer is sufficient to act as relative GPS, and if the position at startup is known, gyroscopes give exact lattitude / longitude / altitude).
+- Act as [magnetometer (compass)](https://wikipedia.org/wiki/Magnetometer) substitutes (gyroscope is sufficient to act as relative compass, and if the orientation at startup is known, gyroscopes can substitute true compasses).
+
+As with the other source code in this document, due to lack of personal experience with robotics [this is from a digital assistant (but is not a blind reuse of _Assistant_'s first answer; the discussion shows numerous iterative improvements)](https://poe.com/s/0ZfEWQWdEg6368kfIoTN).
+```c++
+// Include necessary libraries
+#include <Wire.h>
+#include <Adafruit_MPU6050.h>
+
+// Create an instance of the MPU6050 sensor
+Adafruit_MPU6050 mpu;
+
+// Variables to store the total accumulated rotation, velocity, and position
+float totalRotation = 0.0;
+float relativeVelocityX = 0.0;
+float relativeVelocityY = 0.0;
+float relativeVelocityZ = 0.0;
+float relativePositionX = 0.0;
+float relativePositionY = 0.0;
+float relativePositionZ = 0.0;
+
+// Variable to store the previous timestamp
+unsigned long previousTimestamp = 0;
+
+void setup() {
+	// Initialize serial communication
+	Serial.begin(9600);
+
+	// Initialize the MPU6050 sensor
+	if (!mpu.begin()) {
+		Serial.println("Failed to initialize MPU6050 sensor!");
+		while (1);
+	}
+
+	// Configure the sensor settings
+	mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+	mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+	mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+	// Get the initial timestamp
+	previousTimestamp = millis();
+}
+
+void loop() {
+	// Read the sensor data
+	sensors_event_t a, g, temp;
+	mpu.getEvent(&a, &g, &temp);
+
+	// Calculate the change in heading (in radians)
+	float headingChange = atan2(g.gyro.y, g.gyro.x);
+
+	// Accumulate the total rotation
+	totalRotation += headingChange;
+
+	// Calculate the time elapsed since the previous update
+	unsigned long currentTimestamp = millis();
+	float elapsedTime = (currentTimestamp - previousTimestamp) / 1000.0; // in seconds
+	previousTimestamp = currentTimestamp;
+
+	// Update the relative velocity and position
+	relativeVelocityX += a.acceleration.x * elapsedTime;
+	relativeVelocityY += a.acceleration.y * elapsedTime;
+	relativeVelocityZ += a.acceleration.z * elapsedTime;
+
+	relativePositionX += relativeVelocityX * elapsedTime;
+	relativePositionY += relativeVelocityY * elapsedTime;
+	relativePositionZ += relativeVelocityZ * elapsedTime;
+
+	// Convert the total rotation to degrees
+	float absoluteDirection = (totalRotation * 180.0) / M_PI;
+
+	// Normalize the absolute direction to be between 0 and 360 degrees
+	if (absoluteDirection < 0) {
+		absoluteDirection += 360.0;
+	}
+
+	// Print the absolute compass direction, relative position, and relative velocity
+	Serial.print("Absolute Compass Direction: ");
+	Serial.print(absoluteDirection);
+	Serial.println(" degrees");
+
+	Serial.print("Relative Position: (");
+	Serial.print(relativePositionX);
+	Serial.print(", ");
+	Serial.print(relativePositionY);
+	Serial.print(", ");
+	Serial.print(relativePositionZ);
+	Serial.println(") units");
+
+	Serial.print("Relative Velocity: (");
+	Serial.print(relativeVelocityX);
+	Serial.print(", ");
+	Serial.print(relativeVelocityY);
+	Serial.print(", ");
+	Serial.print(relativeVelocityZ);
+	Serial.println(") units/s");
+
+	// Delay for a short time
+	delay(100);
+}
+```
+
+## **IMU** as kinematic collision detection
+Accelerometer / gyroscope output which does not match expected values for the current servo mode, must cause the robot to reverse or power down.
+This is my version of [_Assistant_'s code for **IMU**-based collision detection](https://poe.com/s/auXNL8T44ofo3YRekdlv) (after close to 42 iterative improvements through prompts to _Assistant_, rewrote some of the functions on own).
+- The referenced discussion also has code (not included below, as the simple `expected{Reverse, Forward}{Acceleration, Gyroscope}` matrices reduce resource use) to produce full kinematics models (positions and orientations of all joints and segments) through calibration with **IMU**s.
+```python
+"""
+This code assumes that `Servo` elements of `servos` represent actuators (such as stepper motors or servos) which have some distal order (sequential -- from most anterior ergo proximal, to most posterior ergo distal -- which the code can use IMU measurements to compute):
+The `anchorPointAcceleration` and `anchorPointGyroscope` variables store the cumulative motion of the previous servos, which is then subtracted from the current servo's IMU. This corrected IMU value is used to detect deviation of the current servo's IMU from reference values (such deviation should trigger autonomous stops, or slowdown).
+TODO: compute distal sequences for numerous limbs (allow multiple branches of servos).
+"""
+class ServoDirection(Enum):
+	REVERSE = -1 # Set when `servo.write(angle)` with `angle < currentAngle(servo)`.
+	HALT = 0 # Set when `servo.write(angle)` has finished (when servo stops).
+	FORWARD = 1 # Set when `servo.write(angle)` with `angle > currentAngle(servo)`.
+
+class Servo:
+	def __init__(self, pin, minAngle, maxAngle, segmentRadius = 0.0, segmentLength = 0.0, direction = ServoDirection.HALT):
+		self.pin = pin # First value to `pinMode` value`.
+		self.minAngle = minAngle # Minimum `servo.write` value.
+		self.maxAngle = maxAngle # Maximum `servo.write` value.
+		self.segmentRadius = segmentLength # Optional (unused for now). Radius on segment which attaches `self` to to posterior `Servo` (or, if `self` is the last of the limb's `Servo`s, distance to end of limb). Boards with good CPUs can use this to compute collision avoidance.
+		self.segmentLength = segmentLength # Optional (can compute). Distance from `self` to posterior `Servo` (or, if `self` is the last of the limb's `Servo`s, distance to end of limb). Used for inverse kinematics (to compute angles to
+		self.direction = direction # Set to `ServoDirection` when `servo` moves or stops.
+kinematicDependence = false # Whether or not `servos` (as passed to `detectDeviationsLoop`) has members whose IMUs are affected by other member's IMUs.
+
+def getServoByPin(servos, servoPin)
+	return next((servo for servo in servos if servo.pin == servoPin), None)
+
+def moveServoThroughRangeAndCaptureImu(servo):
+	"""
+	Moves the servo through its full range of motion and captures the IMU data.
+
+	Args:
+		servo (Servo): The servo object to be moved.
+
+	Returns:
+		list: A list of dictionaries, where each dictionary contains the IMU data (acceleration and gyroscope) at a specific servo position.
+	"""
+	imuSamples = []
+
+	# Move the servo from minimum to maximum position
+	servo.write(0)
+	servo.direction = ServoDirection.REVERSE
+	imuSamples.append(readImuData(servo.pin))
+
+	servo.write(180)
+	servo.direction = ServoDirection.FORWARD
+	imuSamples.append(readImuData(servo.pin))
+
+	# Move the servo from maximum to minimum position
+	servo.write(180)
+	servo.direction = ServoDirection.HALT
+	imuSamples.append(readImuData(servo.pin))
+
+	servo.write(0)
+	servo.direction = ServoDirection.REVERSE
+	imuSamples.append(readImuData(servo.pin))
+
+	servo.direction = ServoDirection.HALT
+	return imuSamples
+
+def detectAffectedImus(imuSamples, accelerometerThreshold, gyroscopeThreshold):
+	"""
+	Detects which other IMUs are affected by the motion of the current servo.
+
+	Args:
+#		servos (list): A list of Servo objects, representing the servos in the robot.
+		imuSamples (list): The IMU data captured during the servo's range of motion.
+		accelerometerThreshold (float): The threshold for the accelerometer data.
+		gyroscopeThreshold (float): The threshold for the gyroscope data.
+
+	Returns:
+		list: A list of pin numbers for the IMUs that were affected by the motion of the current servo.
+	"""
+	affectedImuPins = []
+	for i, sample in enumerate(imuSamples):
+		if isAccelerationOutOfRange(sample["acceleration"], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], ServoDirection.HALT, anchorPointAcceleration, accelerometerThreshold):
+			affectedImuPins.append(i)
+ #			servos[i].mobileAnchorPoint = true # Alternative to global `kinematicDependence` variable
+		if isGyroscopeOutOfRange(sample["gyroscope"], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], ServoDirection.HALT, anchorPointGyroscope, gyroscopeThreshold):
+			affectedImuPins.append(i)
+ #			servos[i].mobileAnchorPoint = true
+	return affectedImuPins
+
+def calibrateRobotKinematics(servos, accelerometerThreshold=0.02, gyroscopeThreshold=0.02):
+	"""
+	Calibrates the robot kinematics by capturing IMU data as the servos move through their full range of motion.
+	The function also detects the order of the servos by observing which IMUs are affected by the motion of each servo.
+
+	Args:
+		servos (list): A list of Servo objects, representing the servos in the robot.
+		accelerometerThreshold (float): The threshold for the accelerometer data (default is 2%).
+		gyroscopeThreshold (float): The threshold for the gyroscope data (default is 2%).
+
+	Returns:
+		imuLookupTable (dict): A dictionary that maps servo pin numbers to their expected IMU outputs.
+		servoOrder (list): A list of servo pin numbers in the order they are connected (from base to tip).
+	"""
+	imuLookupTable = {}
+	servoOrder = []
+
+	for servo in servos:
+		# Setup board pinout
+		pinMode(servo.pin, OUTPUT);
+
+		# Move the servo through its full range of motion and capture the IMU data
+		imuSamples = moveServoThroughRangeAndCaptureImu(servo)
+
+		# Compute the expected acceleration and gyroscope values
+		expectedForwardAcceleration = computeExpectedAcceleration(imuSamples, True)
+		expectedReverseAcceleration = computeExpectedAcceleration(imuSamples, False)
+		expectedForwardGyroscope = computeExpectedGyroscope(imuSamples, True)
+		expectedReverseGyroscope = computeExpectedGyroscope(imuSamples, False)
+
+		# Store the expected IMU outputs in the lookup table
+		imuLookupTable[servo.pin] = {
+			"forwardAcceleration": expectedForwardAcceleration,
+			"reverseAcceleration": expectedReverseAcceleration,
+			"forwardGyroscope": expectedForwardGyroscope,
+			"reverseGyroscope": expectedReverseGyroscope,
+			"accelerometerThreshold": accelerometerThreshold,
+			"gyroscopeThreshold": gyroscopeThreshold
+		}
+		# Detect which other IMUs are affected by the motion of this servo, and update the servo order
+		anchorPointAcceleration = [0.0, 0.0, 0.0] # Do not subtract this servo's acceleration
+		anchorPointGyroscope = [0.0, 0.0, 0.0] # Do not subtract this servo's gyroscope
+		affectedImuPins = detectAffectedImus(imuSamples, anchorPointAcceleration, anchorPointGyroscope, accelerometerThreshold, gyroscopeThreshold)
+		if 0 != len(affectedImuPins:
+			kinematicDependence = true # Enables extra processing in `is*OutOfRange()`.
+		servoOrder.insert(servoOrder.index(servo.pin) + 1, *affectedImuPins) # If `servoOrder` has `affectedImuPins`, this should preserve their relative order but move them past the current servo.
+
+	return imuLookupTable, servoOrder
+
+def detectDeviations(servo, imuLookupTable, currentImuData, anchorPointAcceleration, anchorPointGyroscope):
+	"""
+	Detects deviations in the current IMU data by comparing it to the expected values in the lookup table.
+
+	Args:
+		servo (Servo): The instance of the servo being controlled.
+		imuLookupTable (dict): The lookup table generated by the `calibrateRobotKinematics` function.
+		currentImuData (dict): The current IMU data, containing the acceleration and gyroscope values.
+		anchorPointAcceleration (list): The total instant acceleration of the previous servos.
+		anchorPointGyroscope (list): The total instant gyroscope of the previous servos.
+
+	Returns:
+		bool: True if an deviation is detected, False otherwise.
+	"""
+	# Check if the current IMU data matches the expected values in the lookup table
+	expectedImu = imuLookupTable[servo.pin]
+	if servoDirection == ServoDirection.FORWARD:
+		expectedAcceleration = expectedImu["forwardAcceleration"]
+		expectedGyroscope = expectedImu["forwardGyroscope"]
+	elif servoDirection == ServoDirection.REVERSE:
+		expectedAcceleration = expectedImu["reverseAcceleration"]
+		expectedGyroscope = expectedImu["reverseGyroscope"]
+	else: # servoDirection == ServoDirection.HALT:
+		expectedAcceleration = [0.0, 0.0, 0.0]
+		expectedGyroscope = [0.0, 0.0, 0.0]
+	accelerometerThreshold = expectedImu["accelerometerThreshold"]
+	gyroscopeThreshold = expectedImu["gyroscopeThreshold"]
+
+	# Implement your deviation detection logic here
+	if isAccelerationOutOfRange(currentImuData["acceleration"], expectedAcceleration, anchorPointAcceleration, accelerometerThreshold):
+		return True  # Acceleration deviation detected
+
+	if isGyroscopeOutOfRange(currentImuData["gyroscope"], expectedGyroscope, anchorPointGyroscope, gyroscopeThreshold):
+		return True  # Gyroscope deviation detected
+
+	return False
+
+def detectDeviationsLoop(servos, servoOrder, imuLookupTable, currentImuData, kinematicDependence):
+	"""
+	Computes total motion from IMUs and uses `detectDeviations()` on all servos.
+
+	Args:
+		servos (list): The list of attached servos.
+		servoOrder (list): The order of the servos, from base to tip.
+		imuLookupTable (dict): The lookup table generated by the `calibrateRobotKinematics` function.
+		currentImuData (dict): The current IMU data, containing the acceleration and gyroscope values.
+
+	Returns:
+		list: if deviations detected returns `[Servo.pin ...]`, if none returns `[]`.
+	"""
+	anchorPointAcceleration = [0.0, 0.0, 0.0] # The total instant acceleration of the previous servos.
+	anchorPointGyroscope = [0.0, 0.0, 0.0] # The total instant gyroscope of the previous servos.
+	anomalousServos = []
+	for i in range(len(servoOrder)):
+		servoPin = servoOrder[i]
+		servo = getServoByPin(servos, servoPin)
+		imuData = readImuData(servoPin)
+		if detectDeviations(servo, imuLookupTable, currentImuData, anchorPointAcceleration, anchorPointGyroscope)
+			anomalousServos.append(servo.pin) # Deviation detected
+		anchorPointAcceleration = currentImuData["acceleration"]
+		anchorPointGyroscope = currentImuData["gyroscope"]
+	return anomalousServose
+
+def isAccelerationOutOfRange(currentAcceleration, expectedAcceleration, servoDirection, anchorPointAcceleration, accelerometerThreshold):
+	"""
+	Checks if the current acceleration is out of the expected range.
+
+	Args:
+		currentAcceleration (list): The current acceleration values in the X, Y, and Z axes.
+		expectedAcceleration (list): The expected acceleration values in the X, Y, and Z axes for ServoDirection motion.
+		servoDirection (ServoDirection): The current direction of the servo (reverse, halt, or forward).
+		anchorPointAcceleration (list): The instant acceleration of the anchor point.
+		accelerometerThreshold (float): The threshold for the accelerometer data.
+
+	Returns:
+		bool: True if the acceleration is out of the expected range, False otherwise.
+	"""
+	if kinematicDependence:
+		for i in range(3):
+			currentAcceleration[i] -= anchorPointAcceleration[i]
+	if sqrt(currentAcceleration[0] ** 2 + currentAcceleration[1] ** 2 + currentAcceleration[2] ** 2) > accelerometerThreshold:
+		return True
+	return False
+
+def isGyroscopeOutOfRange(currentGyroscope, expectedGyroscope, anchorPointGyroscope, gyroscopeThreshold):
+	"""
+	Checks if the current gyroscope is out of the expected range.
+
+	Args:
+		currentGyroscope (list): The current gyroscope values in the X, Y, and Z axes.
+		expectedGyroscope (list): The expected gyroscope values in the X, Y, and Z axes for ServoDirection motion.
+		anchorPointGyroscope (list): The instant gyroscope of the anchor point.
+		gyroscopeThreshold (float): The threshold for the gyroscope data.
+
+	Returns:
+		bool: True if the gyroscope is out of the expected range, False otherwise.
+	"""
+	if kinematicDependence:
+		for i in range(3):
+			currentGyroscope[i] -= anchorPointGyroscope[i]
+	if sqrt(currentGyroscope[0] ** 2 + currentGyroscope[1] ** 2 + currentGyroscope[2] ** 2) > gyroscopeThreshold:
+		return True
+	return False
+```
+**Errata**
+- `anchorPointAcceleration` (and `anchorPointGyroscope`) assume that the anchor-point IMU is close to current servor (thus, IMU at distal tip of segment). If this assumption does not hold, use a new kinematic model (such as the more compute-intensive realistic kinematics model from the referenced discussion with _Assistant_) to compute those.
+  - If there is just 1 servo (or if the servos are independent), then `kinematicsDependence = false` and the kinematics models (such as the code which uses `anchor*Acceleration`) are redundant (the program will skip those).
 
 # External resources
 - [_Assistant_ suggests to replace _Ardunio Uno_'s _ATmega328P_ 16MHz 2KB (or _Arduino Mega_'s 16MHz 8KB _ATmega2560_) with 240MHz 4MB _ESP32_ for $6](https://poe.com/s/0E2w6XDUf6Aw5hUpOA68)
