@@ -16,7 +16,7 @@ Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executable
 (Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.*xx`; follow URLs for whole sources.)
 
 For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
-`git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./Substack/ && ./build.sh`
+`git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./SubStack/ && ./build.sh`
 
 To test certificates, view [this post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).
 

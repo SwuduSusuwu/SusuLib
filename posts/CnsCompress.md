@@ -6,7 +6,7 @@ _Parse inputs of 1024*1280@60fps (2.6gbps), output text at a few kbps, reproduce
 For the most new sources, use programs such as [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) (for iOS) or [Termux](https://play.google.com/store/apps/details?id=com.termux) (for Android OS) to run this:
 ```
 git clone https://github.com/SwuduSusuwu/SubStack.git
-cd SubStack/cxx && ls
+cd ./SubStack/cxx && ls
 ```
 Pull requests should goto: [https://github.com/SwuduSusuwu/SubStack/issues/2](https://swudususuwu.substack.com/p/future-plans-have-computers-do-most)
 

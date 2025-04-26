@@ -11,6 +11,7 @@
   - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SubStack/contribute)
   - [Sensitive issues](./SECURITY.md#sensitive-issues)
   - [Contributor conventions/rules](#contributor-conventionsrules)
+    - [_Markdown_](#markdown)
     - [`git`](#git)
     - [`sh` source](#sh-source)
     - [_C_/_C++_ source](#cc-source)
@@ -165,9 +166,31 @@ View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for i
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
+
 # Contributor conventions/rules
 General comment/message syntax rules: `<>` goes around type of option/argument (such as `<commit-hash>`, `[]` goes around optional comments/options/arguments (such as `[<optional fallback value>]`, `...` is affixed to allow multiple options/arguments (such as `[; optional extra arguments]...`). This rule is used to document function arguments (such as `sh`, `C` or `C++` use), plus to document `git` uses.
 To ensure consistent code, submissions of code (such as through [pull requests](https://github.com/SwuduSusuwu/SubStack/pulls)) have language-specific syntax rules:
+## _Markdown_
+`` *.md `` shall use:
+- [_GitHub flavored Markdown_](https://github.github.com/gfm/), which is not just compatible with [_GitHub_](https://github.com) but also:
+  - Has lots of [unit tests](https://wikipedia.org/wiki/Unit_test#Agile). Most of the differences from the original _Markdown_ are just so rules are less ambiguous.
+  - Is close to the original _Markdown_ (thus compatible with most _Markdown_ tools, such as [`glow`](https://github.com/charmbracelet/glow?tab=readme-ov-file#glow)).
+- [ISO 8601](https://wikipedia.org/wiki/ISO_8601), which
+  - Is the most popular national standard format.
+  - Versus formats which use locale-dependent names of months, is more portable and less ambiguous.
+  - Versus formats which use backslashes, is more portable (filesystem paths can include).
+- [_Unix_](https://wikipedia.org/wiki/Unix) paths start with `./` (if relative) or `/` (if absolute), so that [`sed`](https://manpages.org/sed) (and [`grep`](https://manpages.org/grep)) [performance is improved](https://poe.com/s/NX7kVKtCL9k04WIqieoh).
+  - That is, paths shall match the [Regular Expression](https://wikipedia.org/wiki/Regular_expression) `^\.*\/[\w]*` (more than 1 `.` is allowed).
+  - [_Microsoft Windows_](https://wikipedia.org/wiki/Microsoft_Windows) can use _Unix_ paths, except that absolute paths must start with the drive prefix (`[A-Z]:/` versus `/`).
+  - [_HTTP_](https://wikipedia.org/wiki/HTTP) can use _Unix_ paths, except that absolute paths must start with the protocol (`http[s]*://` versus `/`).
+
+## `sh` source
+Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
+- Act as if all functions/variables are macros (which use `CONSTANT_CASE`).
+- Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
+  - Rationales:
+    - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
+    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2250).
 ## `git`
 If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
 Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) -- or if `git revert` of a previous commit -- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
@@ -200,6 +223,7 @@ Do atomic commits: if swapping the new commit with a previous commit (such as th
 	?[Good first issues to contribute to]: (moved into `#How-to-contribute`)
 ```
 /[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code/paths.\]
+
 ## `sh` source
 Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
 - Act as if all functions/variables are macros (which use `CONSTANT_CASE`).
