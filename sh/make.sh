@@ -1,8 +1,8 @@
 #!/bin/sh
 #
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
-#/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SubStack/issues/23) */
-#/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
+#/* TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SusuLib/issues/23) */
+#/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
 . ./sh/Macros.sh #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
 
@@ -61,7 +61,7 @@ SUSUWU_GITHUB_WORKSPACE_JSON() ( #/* Usage: `echo "SUSUWU_GITHUB_WORKSPACE_JSON"
 	JSON_BACKUP_SUFFIX=".bak" #TODO; remove, since this is restored with `SUSUWU_LOCAL_WORKSPACE_PATH`?
 	JSON_BACKUP_PATH="${SUSUWU_COMPILE_JSON_PATH_}${JSON_BACKUP_SUFFIX}"
 	if SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_GITHUB_WORKSPACE_JSON()" "${JSON_BACKUP_PATH}"; then
-		sed 's|"directory": "\([^"]\+\)"|"directory": "/home/runner/work/SubStack/SubStack"|g' -i"${JSON_BACKUP_SUFFIX}" "${SUSUWU_COMPILE_JSON_PATH_}" && {
+		sed 's|"directory": "\([^"]\+\)"|"directory": "/home/runner/work/SusuLib/SusuLib"|g' -i"${JSON_BACKUP_SUFFIX}" "${SUSUWU_COMPILE_JSON_PATH_}" && {
 			git add -f "${SUSUWU_COMPILE_JSON_PATH_}"
 			rm "${JSON_BACKUP_PATH}" # `mv "${JSON_BACKUP_PATH}" "${SUSUWU_COMPILE_JSON_PATH_}"` causes "error: cannot rebase: You have unstaged changes."
 		}
@@ -80,7 +80,7 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 			CXX="x86_64-w64-mingw32-clang++"
 #			CXXFLAGS="${CXXFLAGS} -rtlib=compiler-rt"
 			LDFLAGS="${LDFLAGS} -rtlib=compiler-rt -lunwind -static" #-no-lgcc -nolibgcc -lmingw32 -static-libstdc++" #workaround for [`lld: error: unable to find library -lgcc`](https://github.com/termux/termux-packages/issues/24194#issuecomment-2799574245)
-			USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SubStack/issues/16) */
+			USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SusuLib/issues/16) */
 		elif command -v x86_64-w64-mingw32-g++ >/dev/null; then
 			CXX="x86_64-w64-mingw32-g++"
 			LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
@@ -334,7 +334,7 @@ SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OU
 }
 
 SUSUWU_TODO_LIST() ( #/* Usage: `SUSUWU_TODO_LIST "NameOfTool" "what to expect from future versions"` */
-	SUSUWU_PRINT "SUSUWU_TODO_LIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${1}") ${2} is on a long \"TODO\" list. If you want this soon; you can [contribute](https://github.com/SwuduSusuwu/SubStack/#Contributor-conventionsrules), or [ask for this](https://github.com/SwuduSusuwu/SubStack/issues/new)."
+	SUSUWU_PRINT "SUSUWU_TODO_LIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${1}") ${2} is on a long \"TODO\" list. If you want this soon; you can [contribute](https://github.com/SwuduSusuwu/SusuLib/#Contributor-conventionsrules), or [ask for this](https://github.com/SwuduSusuwu/SusuLib/issues/new)."
 	exit 1
 )
 SUSUWU_FORMAT() ( #/* Is analogous to `make format`. */

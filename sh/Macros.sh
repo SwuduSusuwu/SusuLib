@@ -2,7 +2,7 @@
 #
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses). */
 #/* Based on ../cxx/Macros.hxx */
-#/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SubStack/issues/24) */
+#/* TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
 
 export SUSUWU_SH_CONSOLE_PARAMS="$*" #/* For functions which are not passed `$@` */
 SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param" "$@";`. [This processes params passed to `${0}`.] */
@@ -172,7 +172,7 @@ SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` *
 	fi
 	if [ "${TERM}" = "" ]; then
 		echo "[$0: Warning: SUSUWU_SH_COLOR_COUNT(): If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`, which _GitHub_ uses) lacks colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (shows glitches, or literal codes such as \"\\\033[0;34m\"), execute \`export TERM=\"dumb\"\` to disable those.]" >&2
-		echo 8 #/* [_GitHub_ Autobuild](https://github.com/SwuduSusuwu/SubStack/actions/runs/13209802112/job/36880995224) workaround. */
+		echo 8 #/* [_GitHub_ Autobuild](https://github.com/SwuduSusuwu/SusuLib/actions/runs/13209802112/job/36880995224) workaround. */
 		return 0 #/* TODO: include other tests (`return 1` if the console does not allow color codes) */
 	fi
 	if command -v "${SUSUWU_SH_TPUT_COMMAND}" >/dev/null; then #if installed `ncurses-utils`
@@ -373,7 +373,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 SUSUWU_PRINT "SUSUWU_PRINT()" "$(SUSUWU_SH_DEBUG)" "Test: $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_PUSH") ... $(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_POP")"). TODO: test should have ellipses ($(SUSUWU_SH_QUOTE "CODE" "...")) brown."
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
-	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_QUOTE "CODE" "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SubStack/issues/new) about this, or execute $(SUSUWU_SH_QUOTE "CODE" "export TERM=\"linux\"") to enable console code use."
+	SUSUWU_PRINT "SUSUWU_SH_HAS_UNIX_CONSOLE()" "$(SUSUWU_SH_WARNING)" "failed. TODO: support systems without UNIX console codes. If your console ($(SUSUWU_SH_QUOTE "CODE" "[ \"\${TERM}\" = \"${TERM}\" ]")) shows colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (not glitches or literal codes such as \"\\\033[0;34m\"), you can [post an issue](https://github.com/SwuduSusuwu/SusuLib/issues/new) about this, or execute $(SUSUWU_SH_QUOTE "CODE" "export TERM=\"linux\"") to enable console code use."
 fi
 
 export SUSUWU_ABORT_ON_FIRST_ERROR=false
@@ -392,7 +392,7 @@ SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>
 	if [ -z "${DEFAULT_BRANCH}" ]; then #if `git remote` not found
 		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #local branch; if you update this, update `README.md#git`.
 	fi
-	echo "${DEFAULT_BRANCH:-${1}}" #https://github.com/SwuduSusuwu/SubStack/actions/runs/<number>/job/<number> has bare repos, which use <fallback>.
+	echo "${DEFAULT_BRANCH:-${1}}" #https://github.com/SwuduSusuwu/SusuLib/actions/runs/<number>/job/<number> has bare repos, which use <fallback>.
 )
 SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]` */
 	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then

@@ -168,7 +168,7 @@ const bool classObjectTests() {
 	result &=	classTestsMismatch(newSubObject, newSubClassWithMemberObject) /* `getObjectSize()` mismatch */;
 	result &=	classTestsMismatch(newSubObject, newSubObjectWithMemberObject) /* `getObjectSize()` mismatch */;
 #if SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match" for `operator==`. */
-	SUSUWU_PRAGMA(message("TODO: `SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES`. [Ask if you want this](https://github.com/SwuduSusuwu/SubStack/issues/10 if you want this.)"))
+	SUSUWU_PRAGMA(message("TODO: `SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES`. [Ask if you want this](https://github.com/SwuduSusuwu/SusuLib/issues/10 if you want this.)"))
 	result &=	classTestsMismatch(newClass, &class2);
 	result &=	classTestsMismatch(newObject, &object2);
 #else /* SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES else */

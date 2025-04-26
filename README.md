@@ -1,5 +1,4 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
-
 # Table of Contents
 - [Purposes](#purposes)
 - [How to use this](#how-to-use-this)
@@ -8,7 +7,7 @@
   - [Options/setup](#optionssetup)
 - [How to contribute](#how-to-contribute)
   - [Beta test/experimental builds](#beta-testexperimental-builds)
-  - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SubStack/contribute)
+  - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SusuLib/contribute)
   - [Sensitive issues](./SECURITY.md#sensitive-issues)
   - [Contributor conventions/rules](#contributor-conventionsrules)
     - [_Markdown_](#markdown)
@@ -20,16 +19,16 @@
     - [Affiliates](#affiliates)
 
 # Purposes
-<https://github.com/SwuduSusuwu/SubStack/> as a whole is: [computer-related blog posts](./posts/) and modular {[`Susuwu::*`, `susuwu*`](./cxx/), [`SUSUWU_*`](./sh/)} code about those posts.
-- \[Notice\] Moved this repo to <https://github.com/SwuduSusuwu/SusuLib/> ([since the focus shifted from blog posts to source code](https://github.com/SwuduSusuwu/SubStack/discussions/58).)
+<https://github.com/SwuduSusuwu/SusuLib/> as a whole is: [computer-related blog posts](./posts/) and modular {[`Susuwu::*`, `susuwu*`](./cxx/), [`SUSUWU_*`](./sh/)} code about those posts.
+- \[Notice\] Moved this repo to <https://github.com/SwuduSusuwu/SusuLib/> ([since the focus shifted from blog posts to source code](https://github.com/SwuduSusuwu/SusuLib/discussions/58).)
 - \[Notice\] Plan to move {`Susuwu::*`, `susuwu*`, `SUSUWU_*`} to {`SusuLib::*`, `susulib*`, `SUSULIB_*`}.
 
 [`./.ssh/`](./.ssh/) is to [use signatures / certificates](#signaturecertificate).
 
 [`./posts/`](./posts/) stages posts (virtual schools) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about: artificial neural tissue, antiviruses, assistants, plus autonomous tools.
-- [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SubStack/issues/2#issuecomment-2110726542)).
-- [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
-- [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SubStack/issues/8).
+- [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)).
+- [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
+- [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
 
 [`./build.sh`](./build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). \[View [Options/setup](#optionssetup) for options.\]
 
@@ -39,10 +38,11 @@
   - Exports variables: {`SUSUWU_ABORT_ON_FIRST_ERROR`, `SUSUWU_ECHO_COMMANDS_TO`, `SUSUWU_S`, `SUSUWU_SH_CONSOLE_PARAMS`, `SUSUWU_SH_<color>`, `SUSUWU_VERBOSE`}
 - [`./sh/make.sh`](./sh/make.sh) is a standalone (just imports `./sh/Macros.sh`) port of [`make`](https://wikipedia.org/wiki/Make_(software)) to `/bin/sh`. `./build.sh` uses this.
   - Exports functions: {`SUSUWU_BUILD_CTAGS()`, `SUSUWU_BUILD_OBJECTS()`, `SUSUWU_BUILD_EXECUTABLE()`, `SUSUWU_INSTALL()`, `SUSUWU_PROCESS_CLEAN_REBUILD()`, `SUSUWU_PROCESS_MINGW()`, `SUSUWU_PROCESS_RELEASE_DEBUG()`, `SUSUWU_SETUP_BUILD_FLAGS()`, `SUSUWU_SETUP_CXX()`, `SUSUWU_SETUP_BINDIR()`, `SUSUWU_SETUP_OBJDIR()`, `SUSUWU_SETUP_OUTPUT()`, `SUSUWU_TEST_BASH()`, `SUSUWU_TEST_OUTPUT()`, `SUSUWU_UNINSTALL()`}
+- [`./sh/Transcode.sh`](./sh/Transcode.sh) is a standalone [`ffmpeg`](https://github.com/FFmpeg/FFmpeg)-based tool which goes with [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md).
 
 [`./c/`](./c/) is [_C_](https://wikipedia.org/wiki/C_(programming_language)) source code (produced for [`./posts/`](./posts/) and for general use):
 - [`./c/rfc6234/`](./c/rfc6234) is [vendored code](./.gitattributes) (direct from the official [_RFC6234_](https://www.rfc-editor.org/rfc/rfc6234#section-8)), which is used for {`classSha128()`, `classSha256()`, `classSha512()`}.
-- TODO: [issue #3 produce analogous _C_ versions of source code](https://github.com/SwuduSusuwu/SubStack/issues/3) which you can [contribute to](#how-to-contribute), or can request that more resources go to this issue
+- TODO: [issue #3 produce analogous _C_ versions of source code](https://github.com/SwuduSusuwu/SusuLib/issues/3) which you can [contribute to](#how-to-contribute), or can request that more resources go to this issue
 
 [`./cxx/`](./cxx/) is [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) source code (produced for [`./posts/`](./posts/) and for general use):
 - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) is
@@ -71,7 +71,7 @@
 - [`./cxx/ClassSha2.hxx`](./cxx/ClassSha2.hxx) is
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
   - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
-- [`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6) is to implement this class.
+- [`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) is to implement this class.
 - [`./cxx/ClassResultList.hxx`](./cxx/ClassResultList.hxx) is
   - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
   - modular template (can use on all containers such as `std::vector`, `std::map` or `std::list`) `list*()` functions (such as `listMaxSize()`, `listDumpTo()`, `listToHashes()`, `listIntersections()`, `listsIntersect()`, `listFindValue()`, `listHasValue()`, `listFindSubstr()`, `listHasSubstr()`, `listProduceSignature()` (`produceAbortListSignatures` uses this), `listFindSignatureOfValue()`, `listHasSignatureOfValue()` (`signatureAnalysis()` uses this), `explodeToList` (`./cxx/AssistantCns.cxx` uses this), 
@@ -86,7 +86,7 @@
   - modular functions {`assistantCnsDownloadHosts()` (uses `wget` on `assistantCnsDefaultHosts`), `assistantCnsProcessXhtml()` (uses the next 2 functions to process `wget`'s downloads: `assistantCnsProcessUrls` (uses `boost/property_tree/xml_parser.hpp` to extract new URLs), `assistantCnsProcessQuestion` (work-in-progress, extracts question), `assistantCnsProcessResponses()` (work-in-progress, extracts answers)), `produceAssistantCns()` (uses datasets for backpropagation), `assistantCnsProcess` (uses forwardpropagation to answer new questions)} which form an assistant.
   - `assistantCnsTests()`, or `assistantCnsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/main.hxx`](./cxx/main.hxx) is `SusuwuUnitTestsBitmask main()` (executes all of those `*TestsNoexcept()` unit tests into a bitmask return value.)
-- All have [issues](https://github.com/SwuduSusuwu/SubStack/issues) which you can [contribute to](#how-to-contribute), or can request that more resources go to).
+- All have [issues](https://github.com/SwuduSusuwu/SusuLib/issues) which you can [contribute to](#how-to-contribute), or can request that more resources go to).
 
 [`./hooks/`](./hooks) is `git` scripts ([`man githooks`](https://git-scm.com/docs/githooks)) which assist you; install with `cp -ra ./hooks/* ./.git/hooks/`.
 - [`./hooks/post-checkout`](./hooks/post-checkout) is custom `post-checkout` (produces `./tags`.)
@@ -108,13 +108,13 @@
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
   - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_assert`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
   - \[Notice: update [`./c/README.md#progress`](./c/README.md#progress) if you update this list.\]
-  - If _C99_ support would have use; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SubStack/issues/3)), or [contribute](#contributor-conventionsrules).
-  - If _C++98_ support would have use; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SubStack/issues/20)), or [contribute](#contributor-conventionsrules).
+  - If _C99_ support would have use; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SusuLib/issues/3)), or [contribute](#contributor-conventionsrules).
+  - If _C++98_ support would have use; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SusuLib/issues/20)), or [contribute](#contributor-conventionsrules).
 ## Download
-Download source with `git clone https://github.com/SwuduSusuwu/SubStack.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
+Download source with `git clone https://github.com/SwuduSusuwu/SusuLib.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
 ## Signature/certificate
 [`./.ssh/setup.sh`](./setup.sh) is to setup `gpg.ssh.allowedSignersFile` (allows to use `git verify <ref>` or `git log --show-signature`).
-- `git verify <ref>` or `git log —show-signatures` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SubStack/commit/3efe601f15ae0fdfd05cfbc1a75a0e6a4a08124b)
+- `git verify <ref>` or `git log —show-signatures` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SusuLib/commit/3efe601f15ae0fdfd05cfbc1a75a0e6a4a08124b)
 - You can compare those certificates to [our blog post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).)
 
 \[Notice: This [public crypto](https://docs.gitlab.com/ee/user/project/repository/signed_commits/ssh.html#verify-commits-locally) "signature", is not related to "signature analysis" ([Substr scans](#purposes)).\]
@@ -145,7 +145,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
     - `-DSUSUWU_SH_FUNC=true` sets output format to `[__func__: WARN_LEVEL: message]`; default is `=false`.
     - `-DSUSUWU_SH_SKIP_COLORS=true` to omit _VT100_ (_ANSI_) colors; default is `=defined(SUSUWU_SH_COLORS_UNSUPPORTED)`).
     - `-DSUSUWU_SH_SKIP_COLORS=false` to force (even if unsupported) _VT100_ ([_ANSI_ color](https://wikipedia.org/wiki/Ansi_color)) use.
-    - TODO (for now, no effect; once [issue #17](https://github.com/SwuduSusuwu/SubStack/issues/17) is closed, you can use):
+    - TODO (for now, no effect; once [issue #17](https://github.com/SwuduSusuwu/SusuLib/issues/17) is closed, you can use):
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
@@ -157,19 +157,19 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - TODO (for now won't build, or has no effect):
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES=true`: No effect. If implemented, `Class::operator==(const Class &obj) { return &obj == this; }`. Default is `=false`.
     - `-DSUSUWU_PREFER_CSTR=true` to replace `std::string` with `char *` (more compatible with non-C++ projects); default is `=SUSUWU_PREFER_C`.
-    - `-DSUSUWU_PREFER_C=true` sets `SUSUWU_PREFER_CSTR` + `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SubStack/issues/3); default is `=!defined(__plusplus)`).
+    - `-DSUSUWU_PREFER_C=true` sets `SUSUWU_PREFER_CSTR` + `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SusuLib/issues/3); default is `=!defined(__plusplus)`).
 
 # How to contribute
-View [documented issues](https://github.com/SwuduSusuwu/SubStack/issues/) (for ideas on code to contribute, plus so you do not report documented issues.)
+View [documented issues](https://github.com/SwuduSusuwu/SusuLib/issues/) (for ideas on code to contribute, plus so you do not report documented issues.)
 ## Beta test/`experimental` builds
 - `git switch experimental && ./build.sh`
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
-  - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SubStack/issues/new).
+  - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SusuLib/issues/new).
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
 
 # Contributor conventions/rules
 General comment/message syntax rules: `<>` goes around type of option/argument (such as `<commit-hash>`, `[]` goes around optional comments/options/arguments (such as `[<optional fallback value>]`, `...` is affixed to allow multiple options/arguments (such as `[; optional extra arguments]...`). This rule is used to document function arguments (such as `sh`, `C` or `C++` use), plus to document `git` uses.
-To ensure consistent code, submissions of code (such as through [pull requests](https://github.com/SwuduSusuwu/SubStack/pulls)) have language-specific syntax rules:
+To ensure consistent code, submissions of code (such as through [pull requests](https://github.com/SwuduSusuwu/SusuLib/pulls)) have language-specific syntax rules:
 ## _Markdown_
 `` *.md `` shall use:
 - [_GitHub flavored Markdown_](https://github.github.com/gfm/), which is not just compatible with [_GitHub_](https://github.com) but also:
@@ -190,7 +190,7 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
 - Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
   - Rationales:
     - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
-    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2250).
+    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2250).
 ## `git`
 If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
 Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) -- or if `git revert` of a previous commit -- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
@@ -198,7 +198,7 @@ Do atomic commits: if swapping the new commit with a previous commit (such as th
 
 - This shows the temporal order of commits required for `./build.sh` to pass.
 - `<commit-message>` is so that `git rebase` (which changes `<commit-hash>`) does not make it impossible to follow (plus, so comments are reduced), thus you should use the exact message. You can use ellipsis (`...`) to omit extra lines, but it is best if the first line is exact (left as-is).
-- Notice: [commit 9eda0ed5ed2abcdcec92c5b265f6e950e1196558 (+`sh/Macros.sh:SUSUWU_SH_{FILE, LINE, FUNC}`)](https://github.com/SwuduSusuwu/SubStack/commit/9eda0ed5ed2abcdcec92c5b265f6e950e1196558/), and older, used `,` (as opposed to `;`) to delimit the list of commits; those extra `<ref | commit-hash>`'s are not extra comments, but are extra commits. The new format allows comments to include `<commit-hash>`'s and `,`'s (just not `;`'s).
+- Notice: [commit 9eda0ed5ed2abcdcec92c5b265f6e950e1196558 (+`sh/Macros.sh:SUSUWU_SH_{FILE, LINE, FUNC}`)](https://github.com/SwuduSusuwu/SusuLib/commit/9eda0ed5ed2abcdcec92c5b265f6e950e1196558/), and older, used `,` (as opposed to `;`) to delimit the list of commits; those extra `<ref | commit-hash>`'s are not extra comments, but are extra commits. The new format allows comments to include `<commit-hash>`'s and `,`'s (just not `;`'s).
 
 `git commit` message format/syntax:
 - affix "()" onto functions (regardless of number of arguments), such as `function()`, or use the function name (such as `function`) alone.
@@ -230,19 +230,19 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
 - Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
   - Rationales:
     - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
-    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2250).
+    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2250).
   - Exceptions: [**language limits**](https://www.shellcheck.net/wiki/SC3030).
     - To support `/bin/sh`: do not use `${@}`, but `$@`.
 - Str variable access: uses `"$..."` (thus not `ls ${STR}`, but `ls "${STR}"`).
   - Rationales:
     - So if `STR="/bin/"` is replaced with `STR="/path with/spaces/"` ([without `IFS=""`](https://tldp.org/LDP/abs/html/internalvariables.html#IFSREF) \[[2](https://www.commandlinux.com/man-page/man1/sh.1.html#lbBK)\]), that 1 parameter [won't expand into 2](https://tldp.org/LDP/abs/html/special-chars.html#FIELDREF).
     - So if `STR="/bin/"` is replaced with `STR="*"` ([without `set -f`](https://www.commandlinux.com/man-page/man1/sh.1.html#lbBL)), the glob is passed to `ls` (which [expands this into numerous paths](https://tldp.org/LDP/abs/html/globbingref.html), rather than expanded in your script.
-    - Avoids [SC2086](https://www.shellcheck.net/wiki/SC2086) ["Double quote to prevent globbing and word splitting." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2086).
+    - Avoids [SC2086](https://www.shellcheck.net/wiki/SC2086) ["Double quote to prevent globbing and word splitting." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2086).
   - Exceptions: specifics of command use.
     - Do not use `ctags "${FLAGS}" "${PATH}"`, but `ctags ${FLAGS} "${PATH}"`.
 - Str variable access: uses `"${...}"` (thus not `if [ "-q" = ${PARAM} ]`, but `if [ "-q" = "${PARAM}" ]`).
   - Rationales: in case `${PARAM}` has spaces.
-    - Avoids [SC2068](https://www.shellcheck.net/wiki/SC2068) ["Double quote array expansions to avoid re-splitting elements." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2068).
+    - Avoids [SC2068](https://www.shellcheck.net/wiki/SC2068) ["Double quote array expansions to avoid re-splitting elements." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2068).
   - Exceptions: to split (on spaces) is the purpose of the `for` loop.
     - To parse numerous params: do not use `for VALUE in "$@"`; do`, but `for VALUE in $@; do`.
 - Restrict temp variables:
@@ -253,11 +253,11 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
       - If you require code which is consistant across platforms ([`local` has inconsistant dynamic versus static scope, plus inconsistant inheritance](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493743#493743)), use **subshells** for this.
   - If your project supports _POSIX_ (`/bin/sh`): do not use `local` (such as `f2() { local VALUE=false; }`), but [use **subshells** for this](https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script/64946874#64946874) (such as `f2() ( VALUE=false; )`.)
     - Rationales (other than `local`'s **language limits**):
-      - Avoids [SC3034](https://www.shellcheck.net/wiki/SC3043) ["In POSIX sh, local is undefined." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC3043).
+      - Avoids [SC3034](https://www.shellcheck.net/wiki/SC3043) ["In POSIX sh, local is undefined." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC3043).
 - Command variables: uses `$(...)` (thus not `` stat `pwd` `` , but `stat $(pwd)`).
   - Rationales:
     - Most simple to nest (`echo $(stat $(pwd))`). Common (much known) **subshell** syntax is reused.
-    - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SubStack/security/code-scanning?query=rule%3Ashellcheck_SC2006).
+    - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2006).
 ## _C_/_C++_ source
 Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](./.clang-tidy) options).
 
@@ -280,7 +280,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
   - Do not perform tasks within `assert()`, due to: the standard says "\[`#if NDEBUG\n#define assert(x) (0)\n#endif`\]".
 
 - Braces, functions:
-  - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SubStack/issues/10).
+  - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SusuLib/issues/10).
   - Single statement blocks can use the form: `virtual bool hasInstance() { return true; }`.
   - Most common form:
 ```
@@ -343,10 +343,10 @@ To sponsor this (which allows us to produce more source codes), you can use cryp
 - Rather than us publish a send-to address (for a particular protocol), this allows us to accept all forms of crypto.
 - If amount is more than $100 and you don't trust the contact platforms, use [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub) to [secure those](https://superuser.com/questions/576506/how-to-use-ssh-rsa-public-key-to-encrypt-a-text/1850928#1850928).
 ### Escrow
-If you want proof that your crypto/cash will go to produce specific systems, use [**escrow** services](https://wikipedia.org/wiki/Escrow) (what you send the **escrow** is: crypto/cash, plus contract which references an [open issue which you choose](https://github.com/SwuduSusuwu/SubStack/issues/)).
-- If none of those issues match what you want, you can [post your own issue](https://github.com/SwuduSusuwu/SubStack/issues/new) for this.
+If you want proof that your crypto/cash will go to produce specific systems, use [**escrow** services](https://wikipedia.org/wiki/Escrow) (what you send the **escrow** is: crypto/cash, plus contract which references an [open issue which you choose](https://github.com/SwuduSusuwu/SusuLib/issues/)).
+- If none of those issues match what you want, you can [post your own issue](https://github.com/SwuduSusuwu/SusuLib/issues/new) for this.
 - Ensure that the **escrow** contract includes specifics as to what will count as "issue closed" [to the **escrow** service (so you do not have to trust the author),](https://wikipedia.org/wiki/Online_dispute_resolution) which will release the crypto/cash (once the **escrow** service considers your issue as closed).
-  - For example; "The **source code** (through `./build.sh`), must produce a **system** (a **shared object** or **executable**) which uses just half of the training data to [setup its neural network, which must produce virtual synapses](https://wikipedia.org/wiki/Backpropagation) which the **system** [uses to produce **accurate** results](https://wikipedia.org/wiki/Residual_neural_network#Forward_propagation) on the other half, where **accurate** (for [classifiers](https://wikipedia.org/wiki/Learning_classifier_system)) is less than 2% false negatives and less than 2% false positives, and **accurate** (for [generators](https://wikipedia.org/wiki/Generative_artificial_intelligence)) is [divergence](https://wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) of less than 2%." is a contract which an **escrow** can use for [issue #6](https://github.com/SwuduSusuwu/SubStack/issues/6).
+  - For example; "The **source code** (through `./build.sh`), must produce a **system** (a **shared object** or **executable**) which uses just half of the training data to [setup its neural network, which must produce virtual synapses](https://wikipedia.org/wiki/Backpropagation) which the **system** [uses to produce **accurate** results](https://wikipedia.org/wiki/Residual_neural_network#Forward_propagation) on the other half, where **accurate** (for [classifiers](https://wikipedia.org/wiki/Learning_classifier_system)) is less than 2% false negatives and less than 2% false positives, and **accurate** (for [generators](https://wikipedia.org/wiki/Generative_artificial_intelligence)) is [divergence](https://wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) of less than 2%." is a contract which an **escrow** can use for [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 ### Affiliates
 You can use [_Capital 1_'s affiliate program](https://i.capitalone.com/JgR02Y4pE) to allow us to produce more source codes.
 

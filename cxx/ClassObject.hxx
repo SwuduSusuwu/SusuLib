@@ -15,7 +15,7 @@
 #include <string> /* std::string */
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
-* to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
+* to [assist future Java ports](https://github.com/SwuduSusuwu/SusuLib/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
 namespace Susuwu {
 #if SUSUWU_UNIT_TESTS

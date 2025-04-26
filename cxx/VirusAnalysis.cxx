@@ -79,7 +79,7 @@ const bool virusAnalysisTests() {
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
 	const FilePath gotOwnPath = classSysGetOwnPath();
 	if(FilePath() != gotOwnPath) {
-		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
+		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive((args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
@@ -168,7 +168,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 		};
 		classSysKernelSetHook(CreateProcessA, lambdaScanCreateProcessA);
 #else /* defined(SUSUWU_WIN32) else */
-		SUSUWU_ERROR("virusAnalysisHook(virusAnalysisHookExec) { if(!SUSUWU_POSIX && !SUSUWU_WIN32) { /* TODO: you can contribute or post to https://github.com/SwuduSusuwu/SubStack/issues/new */ } }");
+		SUSUWU_ERROR("virusAnalysisHook(virusAnalysisHookExec) { if(!SUSUWU_POSIX && !SUSUWU_WIN32) { /* TODO: you can contribute or post to https://github.com/SwuduSusuwu/SusuLib/issues/new */ } }");
 #endif /* defined(SUSUWU_WIN32) else */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookExec);
 	}

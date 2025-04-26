@@ -16,7 +16,7 @@ Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executable
 (Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.*xx`; follow URLs for whole sources.)
 
 For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
-`git clone https://github.com/SwuduSusuwu/SubStack.git && cd ./SubStack/ && ./build.sh`
+`git clone https://github.com/SwuduSusuwu/SusuLib.git && cd ./SusuLib/ && ./build.sh`
 
 To test certificates, view [this post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).
 
@@ -25,9 +25,9 @@ To improve how fast the whole program executes; `CXXFLAGS` should include auto-v
 To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]
 [^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
 # Source code
-(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SubStack/blob/trunk/LICENSE), allows all uses.
+(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE), allows all uses.
 
-`less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.hxx) #Removed: disabled color codes + unused OSC codes
+`less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled color codes + unused OSC codes
 ```
 /* Miscellaneous macros */
 /* To printout default preprocessor definitions:
@@ -70,7 +70,7 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	define SUSUWU_DEFAULT_BRANCH "trunk"
 #endif /* ndef SUSUWU_DEFAULT_BRANCH */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SusuLib/issues/new"
 #else /* def SUSUWU_EXPERIMENTAL else */
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
@@ -102,7 +102,7 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	endif /* if (202002 <= __cplusplus) */
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
-#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) FALSE /* [Issue #3 (`CC` support) uses this](https://github.com/SwuduSusuwu/SubStack/issues/3) */
+#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) FALSE /* [Issue #3 (`CC` support) uses this](https://github.com/SwuduSusuwu/SusuLib/issues/3) */
 #	if (199901 <= __STDC_VERSION__)
 #		define SUSUWU_C99
 #	endif /* (199901 <= __STDC_VERSION__) */
@@ -273,7 +273,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U) /* don't printout */
 #endif
 #ifdef SUSUWU_SH_RUNTIME_COLORS
-#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
+#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SusuLib/issues/17 to contribute]")
 #endif /* #elif !defined(SUSUWU_POSIX) TODO */
 
 #define SUSUWU_SH_ESC "\033" /* Escape */
@@ -363,7 +363,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
 ```
-`less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/Macros.cxx)
+`less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.cxx)
 ```
 #if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #ifdef SUSUWU_CXX11
@@ -422,11 +422,11 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassObject.hxx)
+`less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
 ```
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
-* to [assist future Java ports](https://github.com/SwuduSusuwu/SubStack/issues/10) */
+* to [assist future Java ports](https://github.com/SwuduSusuwu/SusuLib/issues/10) */
 /* Susuwu::Instrumentation` is somewhat analogous to [`java.lang.instrument.Instrumentation` interface](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html). */
 namespace Susuwu {
 #if SUSUWU_UNIT_TESTS
@@ -572,9 +572,9 @@ public:
  * [`-devirtualize` is improved if functions use `final` (which requires C++11)](https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754]. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
 }; /* namespace Susuwu */
 ```
-`less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
+`less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
 
-`less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassPortableExecutable.hxx)
+`less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```
 typedef std::string FilePath; /* TODO: `std::char_traits<unsigned char>`, `std::basic_string<unsigned char>("string literal")` */
 typedef FilePath FileBytecode; /* Uses `std::string` for bytecode (versus `std::vector`) because:
@@ -598,7 +598,7 @@ public:
 	explicit PortableExecutableBytecode(FilePath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 ```
-`less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.hxx)
+`less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
 ```
 /* Abstractions to do with: `sh` scripts (such as: exec*, sudo), sockets (TODO), filesystems (TODO) */
 #ifdef SUSUWU_CXX20
@@ -733,7 +733,7 @@ const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSys.cxx)
+`less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.cxx)
 ```
 #ifdef SUSUWU_CXX20
 std::span<const char *> classSysArgs({}); /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
@@ -933,7 +933,7 @@ const bool classSysTests() {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.hxx)
+`less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
 ```
 /* const */ FileHash /* 128 bits, not null-terminated */ classSha1(const FileBytecode &bytecode);
 /* const */ FileHash /* 256 bits, not null-terminated */ classSha256(const FileBytecode &bytecode);
@@ -945,7 +945,7 @@ const bool classSha2Tests();
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassSha2.cxx)
+`less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.cxx)
 ```
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
 ClassSha2 classSha2 = classSha256;
@@ -1006,7 +1006,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.hxx)
+`less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
 ```
 typedef FileHash ResultListHash;
 typedef FileBytecode ResultListBytecode; /* Should have structure of FileBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
@@ -1191,7 +1191,7 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 	return list;
 }
 ```
-`less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassResultList.cxx)
+`less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx)
 ```
 #if SUSUWU_UNIT_TESTS
 static void classResultListDumpToTest(const ResultList &resultList, bool index, bool whitespace, bool pascalValues, const std::string &expectedValue) {
@@ -1213,7 +1213,7 @@ const bool classResultListTests() {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassCns.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassCns.hxx)
+`less` [cxx/ClassCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
 ```
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
@@ -1317,7 +1317,7 @@ typedef class ApxrCns : public Cns {
 } ApxrCns;
 #endif /* USE_APXR_CNS */
 ```
-`less` [cxx/ClassCns.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassCns.cxx)
+`less` [cxx/ClassCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.cxx)
 ```
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
@@ -1403,7 +1403,7 @@ typedef class ApxrCns : Cns {
 } ApxrCns;
 #endif /* USE_APXR_CNS */
 ```
-`less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.hxx)
+`less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
 ```
 /* (Work-in-progress) virus analysis (can use hashes, signatures, static analysis, sandboxes, and artificial CNS (central nervous systems */
 typedef enum VirusAnalysisHook : unsigned char {
@@ -1526,7 +1526,7 @@ void produceVirusFixCns(
  * @pre @code cns.isInitialized() @endcode */
 const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = virusFixCns);
 ```
-`less` [cxx/VirusAnalysis.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/VirusAnalysis.cxx)
+`less` [cxx/VirusAnalysis.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx)
 ```
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
@@ -1579,7 +1579,7 @@ const bool virusAnalysisTests() {
 	produceVirusFixCns(passOrNull, abortOrNull, virusFixCns);
 	const FilePath gotOwnPath = classSysGetOwnPath();
 	if(FilePath() != gotOwnPath) {
-		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SubStack/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
+		const PortableExecutableBytecode executable(gotOwnPath); /* https://github.com/SwuduSusuwu/SusuLib/security/code-scanning/1277 ("Uncontrolled data used in path expression ") fix. */
 		if(virusAnalysisAbort == virusAnalysisInteractive(executable)) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "{virusAnalysisAbort == virusAnalysisInteractive(args[0]);} /* With such false positives, shouldn't hook kernel modules (next test is to hook+unhook `exec*` to scan programs on launch). */"));
 		}
@@ -1668,7 +1668,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 		};
 		classSysKernelSetHook(CreateProcessA, lambdaScanCreateProcessA);
 #else /* defined(SUSUWU_WIN32) else */
-		SUSUWU_ERROR("virusAnalysisHook(virusAnalysisHookExec) { if(!SUSUWU_POSIX && !SUSUWU_WIN32) { /* TODO: you can contribute or post to https://github.com/SwuduSusuwu/SubStack/issues/new */ } }");
+		SUSUWU_ERROR("virusAnalysisHook(virusAnalysisHookExec) { if(!SUSUWU_POSIX && !SUSUWU_WIN32) { /* TODO: you can contribute or post to https://github.com/SwuduSusuwu/SusuLib/issues/new */ } }");
 #endif /* defined(SUSUWU_WIN32) else */
 		globalVirusAnalysisHook = (globalVirusAnalysisHook | virusAnalysisHookExec);
 	}
@@ -1902,13 +1902,13 @@ const FileBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns /*
 	return cns.processToString(file.bytecode);
 }
 ```
-`less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.hxx) #With boilerplate
+`less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
 ```
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_hxx
 #define INCLUDES_cxx_main_hxx
 #ifdef __cplusplus
-extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , such that other languages can execute unit tests */
+extern "C" { /* progress to https://github.com/SwuduSusuwu/SusuLib/issues/3 , such that other languages can execute unit tests */
 #endif /* def __cplusplus */
 /* `clang-tidy` on: NOLINTBEGIN(hicpp-signed-bitwise) */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
@@ -1929,7 +1929,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* def __cplusplus */
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
-`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/main.cxx)
+`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx)
 ```
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_cxx
@@ -2045,7 +2045,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 ```
 # Comparison to assistants
 For comparison; `produceVirusFixCns()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)" or _Anthropic_'s "[_Assistant_](https://poe.com/Assistant)";) have such demo as `produceAssistantCns()`;
-`less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.hxx)
+`less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```
 /* (Work-in-progress) assistant bots with artificial CNS. */
 extern Cns assistantCns;
@@ -2091,7 +2091,7 @@ const std::string assistantCnsProcess(const Cns &cns, const std::string &bytecod
  * @pre @code cns.isInitialized() @encode */
 void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 ```
-`less` [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/AssistantCns.cxx)
+`less` [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
 ```
 Cns assistantCns;
 std::vector<FilePath> assistantCnsDefaultHosts = {
@@ -2265,7 +2265,7 @@ you can expand such so that checks for deliberate vulnerabilities/signs of infec
 [clang/lib/StaticAnalyzer](https://github.com/llvm/llvm-project/blob/main/clang/lib/StaticAnalyzer)
 is part of Clang/LLVM (license is FLOSS,) does static analysis (emulation produces inputs to functions, formulas do analysis of stacktraces (+ heap/stack uses) to produce lists of possible unwanted side effects to warn you of).
 
-Versus instrumentation such as [`-fsanitize`](https://github.com/SwuduSusuwu/SubStack/issues/5#issuecomment-2169117084), you do not have to recompile to do static analysis. `-fsanitize` requires you to produce inputs, static analysis tests all/most possible inputs for you.
+Versus instrumentation such as [`-fsanitize`](https://github.com/SwuduSusuwu/SusuLib/issues/5#issuecomment-2169117084), you do not have to recompile to do static analysis. `-fsanitize` requires you to produce inputs, static analysis tests all/most possible inputs for you.
 
 _LLVM_/_Clang_ is lots of files; you can clone [Phasar](https://github.com/secure-software-engineering/phasar) if you want just it’s static analysis.
 

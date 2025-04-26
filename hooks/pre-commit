@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# This is [custom `pre-commit`](https://github.com/SwuduSusuwu/SubStack/blob/preview/hooks/pre-commit):
+# This is [custom `pre-commit`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/hooks/pre-commit):
 # Produces `./tags` [for `vim`](../README.md#purposes), updates `./compile_commands.json` [for `clang-tidy`](../README.md#purposes), calls [sample `pre-commit` (which scans for non-ASCII filenames, conflict markers or whitespace errors)](../.git/hooks/pre-commit.sample)
 GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" # `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
 . "${GIT_ROOT}/sh/make.sh" || exit $? #/* SUSUWU_BUILD_CTAGS() SUSUWU_COMPILE_JSON_PATH_ SUSUWU_GITHUB_WORKSPACE_JSON() SUSUWU_IS_PREVIEW() */

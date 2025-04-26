@@ -11,7 +11,7 @@
  * to `clang`/`clang++`/`gcc`/`g++`/Intel(`icc`): `-DUSE_CONTRACTS=true`
  * to MSVC(`cl`): `\DUSE_CONTRACTS=true`
  */
-/* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SubStack/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
+/* `clang-tidy` off: NOLINTBEGIN(cppcoreguidelines-macro-usage); https://github.com/SwuduSusuwu/SusuLib/issues/3 is more simple with macros, plus some of the `constexpr` versions require `202002 <= __cplusplus` */
 #ifndef SUSUWU_PREFER_C
 #	ifdef __cplusplus
 #		define SUSUWU_PREFER_C false
@@ -43,7 +43,7 @@
 #	define SUSUWU_DEFAULT_BRANCH "trunk"
 #endif /* ndef SUSUWU_DEFAULT_BRANCH */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SubStack/issues/new"
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SusuLib/issues/new"
 #else /* def SUSUWU_EXPERIMENTAL else */
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
@@ -75,7 +75,7 @@
 #	endif /* if (202002 <= __cplusplus) */
 #else /* def __cplusplus */
 #	include <assert.h> /* assert static_assert */
-#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) FALSE /* [Issue #3 (`CC` support) uses this](https://github.com/SwuduSusuwu/SubStack/issues/3) */
+#	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) FALSE /* [Issue #3 (`CC` support) uses this](https://github.com/SwuduSusuwu/SusuLib/issues/3) */
 #	if (199901 <= __STDC_VERSION__)
 #		define SUSUWU_C99
 #	endif /* (199901 <= __STDC_VERSION__) */
@@ -246,10 +246,10 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(U) /* don't printout */
 #endif
 #ifdef SUSUWU_SH_RUNTIME_COLORS
-#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
+#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_COLORS` is TODO; https://github.com/SwuduSusuwu/SusuLib/issues/17 to contribute]")
 #endif /* #elif !defined(SUSUWU_POSIX) TODO */
 #ifdef SUSUWU_SH_RUNTIME_OSC
-#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_OSC` is TODO; https://github.com/SwuduSusuwu/SubStack/issues/17 to contribute]")
+#	pragma message("[Info: `-DSUSUWU_SH_RUNTIME_OSC` is TODO; https://github.com/SwuduSusuwu/SusuLib/issues/17 to contribute]")
 #endif /* #elif !defined(SUSUWU_POSIX) TODO */
 #if !defined(SUSUWU_POSIX)
 #	define SUSUWU_SH_COLORS_UNSUPPORTED /* assume "dumb terminals" (such as SUSUWU_WIN32 often has) if built without runtime tests for color attributes, on non-POSIX systems */

@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_main_hxx
 #define INCLUDES_cxx_main_hxx
 #ifdef __cplusplus
-extern "C" { /* progress to https://github.com/SwuduSusuwu/SubStack/issues/3 , such that other languages can execute unit tests */
+extern "C" { /* progress to https://github.com/SwuduSusuwu/SusuLib/issues/3 , such that other languages can execute unit tests */
 #endif /* def __cplusplus */
 /* `clang-tidy` on: NOLINTBEGIN(hicpp-signed-bitwise) */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
