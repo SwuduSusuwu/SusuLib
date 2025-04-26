@@ -25,7 +25,7 @@
 
 [`./.ssh/`](./.ssh/) is to [use signatures / certificates](#signaturecertificate).
 
-[`./posts/`](./posts/) stages posts (virtual schools) for [https://SwuduSusuwu.SubStack.com/](https://SwuduSusuwu.SubStack.com/) about: artificial neural tissue, antiviruses, assistants, plus autonomous tools.
+[`./posts/`](./posts/) stages posts (virtual schools) for <https://SwuduSusuwu.SubStack.com/> about: artificial neural tissue, antiviruses, assistants, plus autonomous tools.
 - [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)).
 - [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
