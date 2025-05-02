@@ -236,6 +236,7 @@ Do atomic commits: if swapping the new commit with a previous commit (such as th
 	?`#How-to-contribute`,
 	?[Good first issues to contribute to]: (moved into `#How-to-contribute`)
 ```
+
 /[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code/paths.\]
 
 ## `sh` source
@@ -244,19 +245,19 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
 - Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
   - Rationales:
     - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
-    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2250).
+    - Avoids [_SC2250_ "Prefer putting braces around variable references even when not strictly required."](https://www.shellcheck.net/wiki/SC2250) notices.
   - Exceptions: [**language limits**](https://www.shellcheck.net/wiki/SC3030).
     - To support `/bin/sh`: do not use `${@}`, but `$@`.
 - Str variable access: uses `"$..."` (thus not `ls ${STR}`, but `ls "${STR}"`).
   - Rationales:
     - So if `STR="/bin/"` is replaced with `STR="/path with/spaces/"` ([without `IFS=""`](https://tldp.org/LDP/abs/html/internalvariables.html#IFSREF) \[[2](https://www.commandlinux.com/man-page/man1/sh.1.html#lbBK)\]), that 1 parameter [won't expand into 2](https://tldp.org/LDP/abs/html/special-chars.html#FIELDREF).
     - So if `STR="/bin/"` is replaced with `STR="*"` ([without `set -f`](https://www.commandlinux.com/man-page/man1/sh.1.html#lbBL)), the glob is passed to `ls` (which [expands this into numerous paths](https://tldp.org/LDP/abs/html/globbingref.html), rather than expanded in your script.
-    - Avoids [SC2086](https://www.shellcheck.net/wiki/SC2086) ["Double quote to prevent globbing and word splitting." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2086).
+    - Avoids [_SC2086_ "Double quote to prevent globbing and word splitting."](https://www.shellcheck.net/wiki/SC2086) notices,
   - Exceptions: specifics of command use.
     - Do not use `ctags "${FLAGS}" "${PATH}"`, but `ctags ${FLAGS} "${PATH}"`.
 - Str variable access: uses `"${...}"` (thus not `if [ "-q" = ${PARAM} ]`, but `if [ "-q" = "${PARAM}" ]`).
   - Rationales: in case `${PARAM}` has spaces.
-    - Avoids [SC2068](https://www.shellcheck.net/wiki/SC2068) ["Double quote array expansions to avoid re-splitting elements." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2068).
+    - Avoids [_SC2068_ "Double quote array expansions to avoid re-splitting elements."](https://www.shellcheck.net/wiki/SC2068) notices.
   - Exceptions: to split (on spaces) is the purpose of the `for` loop.
     - To parse numerous params: do not use `for VALUE in "$@"`; do`, but `for VALUE in $@; do`.
 - Restrict temp variables:
@@ -267,11 +268,11 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
       - If you require code which is consistant across platforms ([`local` has inconsistant dynamic versus static scope, plus inconsistant inheritance](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493743#493743)), use **subshells** for this.
   - If your project supports _POSIX_ (`/bin/sh`): do not use `local` (such as `f2() { local VALUE=false; }`), but [use **subshells** for this](https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script/64946874#64946874) (such as `f2() ( VALUE=false; )`.)
     - Rationales (other than `local`'s **language limits**):
-      - Avoids [SC3034](https://www.shellcheck.net/wiki/SC3043) ["In POSIX sh, local is undefined." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC3043).
+      - Avoids [_SC3034_ "In POSIX sh, local is undefined."](https://www.shellcheck.net/wiki/SC3043) notices.
 - Command variables: uses `$(...)` (thus not `` stat `pwd` `` , but `stat $(pwd)`).
   - Rationales:
     - Most simple to nest (`echo $(stat $(pwd))`). Common (much known) **subshell** syntax is reused.
-    - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2006).
+    - Avoids [_SC2006_ "Use $(...) notation instead of legacy backticked ...."](https://www.shellcheck.net/wiki/SC2006) notices.
 - Document unintuitive quirks
   - Most languages group `&&` before `||`, but in `/bin/sh` (plus derivatives, such as `/bin/bash`) `&&` is grouped similar to `||`, [which requires to restructure the code to use the fact that `/bin/sh` is left-associative](https://unix.stackexchange.com/questions/88850/precedence-of-the-shell-logical-operators/88851#88851).
 
