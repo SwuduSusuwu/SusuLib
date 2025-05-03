@@ -313,7 +313,7 @@ SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OU
 			fi
 		else #/* if `--mingw` */
 			if ! command -v wine >/dev/null; then
-				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). do $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
+				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). Do $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
 				return 1
 			fi
 			if [ true = ${SUSUWU_S} ]; then
