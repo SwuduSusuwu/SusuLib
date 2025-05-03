@@ -1,7 +1,6 @@
 #!/bin/sh
 #
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
-# * TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SusuLib/issues/23)
 # * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
 [ -e "./sh/Macros.sh" ] || echo "[Error: \`./sh/$(basename "$0")\` was not executed from this repo's root.]"
 . ./sh/Macros.sh #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
