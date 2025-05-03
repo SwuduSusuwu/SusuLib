@@ -2,8 +2,18 @@
 #
 # This is [custom `post-checkout`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/hooks/post-checkout):
 # Produces `./tags` [for `vim`](../README.md#purposes), uses `SUSUWU_LOCAL_WORKSPACE_JSON` [for local `compile_commands.json` tools](../README.md#purposes).
-GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
-. "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() SUSUWU_LOCAL_WORKSPACE_JSON() */
+GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`. */
+SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
+		echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
+}
+SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
+	if [ ! -e "${GIT_ROOT}${1}" ]; then
+		SUSUWU_INCLUDE_ERROR "${1}" "not found"
+	elif [ ! -x "${GIT_ROOT}${1}" ] || ! . "${GIT_ROOT}${1}"; then
+		SUSUWU_INCLUDE_ERROR "${1}" "not executable"
+	fi
+}
+SUSUWU_INCLUDE "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() SUSUWU_LOCAL_WORKSPACE_JSON() */
 STATUS_CODE=$?
 SUSUWU_LOCAL_WORKSPACE_JSON #/* Replace `${{ github.workspace }}` with `$(pwd)` */
 SUSUWU_BUILD_CTAGS 2>/dev/null #/* Produce `./tags` */

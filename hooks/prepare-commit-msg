@@ -3,8 +3,18 @@
 # This is [custom `prepare-commit-msg`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/hooks/prepare-commit-msg):
 # Produces `./tags` [for `vim`](../README.md#purposes), restores metadata to prevent "error: cannot rebase: You have unstaged changes.".
 # TODO: to prevent [race conditions](https://wikipedia.org/wiki/Race_condition), execute more soon.
-GIT_ROOT="$(dirname $(git rev-parse --git-dir))/" # `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
-. "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() SUSUWU_GITHUB_WORKSPACE_JSON() */ # . "${GIT_ROOT}/sh/Macros.sh" #/* SUSUWU_IS_PREVIEW() */
+GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" # `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
+SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
+		echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
+}
+SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
+	if [ ! -e "${GIT_ROOT}${1}" ]; then
+		SUSUWU_INCLUDE_ERROR "${1}" "not found"
+	elif [ ! -x "${GIT_ROOT}${1}" ] || ! . "${GIT_ROOT}${1}"; then
+		SUSUWU_INCLUDE_ERROR "${1}" "not executable"
+	fi
+}
+SUSUWU_INCLUDE "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() SUSUWU_GITHUB_WORKSPACE_JSON() */ # . "${GIT_ROOT}/sh/Macros.sh" #/* SUSUWU_IS_PREVIEW() */
 STATUS_CODE=$?
 #git restore "${GIT_ROOT}/compile_commands.json" 2>/dev/null
 SUSUWU_GITHUB_WORKSPACE_JSON #/* Replace `$(pwd)` with `${{ github.workspace }}` for `compile_commands.json` */
