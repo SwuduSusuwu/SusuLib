@@ -123,7 +123,7 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 
 SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "--release" "$@"; then
-		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--release")") does not support profilers/debuggers (use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") $(SUSUWU_SH_QUOTE "PROPOSED" "--debug")") for this)."
+		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--release")") does not support \`gdb\` / \`lldb\` (use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") $(SUSUWU_SH_QUOTE "PROPOSED" "--debug")") for such tools)."
 		CFLAGS="${CFLAGS} ${FLAGS_RELEASE} ${CFLAGS_RELEASE}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_RELEASE} ${CXXFLAGS_RELEASE}"
 	else
