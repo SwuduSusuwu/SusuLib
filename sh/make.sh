@@ -3,14 +3,17 @@
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 # * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
 GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #`git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
+if [ ! "$(realpath -q ./)" = "$(realpath -q "${GIT_ROOT}")" ]; then
+	GIT_ROOT_USE="${GIT_ROOT}" #/* If current path is not root, add root path */
+fi
 SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
 		echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
 }
 #shellcheck source=./sh/Macros.sh
 SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
-	if [ ! -e "${GIT_ROOT}${1}" ]; then
+	if [ ! -e "${GIT_ROOT_USE}${1}" ]; then
 		SUSUWU_INCLUDE_ERROR "${1}" "not found"
-	elif [ ! -x "${GIT_ROOT}${1}" ] || ! . "${GIT_ROOT}${1}"; then
+	elif [ ! -x "${GIT_ROOT_USE}${1}" ] || ! . "${GIT_ROOT_USE}${1}"; then
 		SUSUWU_INCLUDE_ERROR "${1}" "not executable"
 	fi
 }
@@ -156,8 +159,8 @@ SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SET
 	LDFLAGS="${LDFLAGS}"
 	CFLAGS="${CFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
 	CXXFLAGS="${CXXFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
-	C_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
-	CXX_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
+	C_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
+	CXX_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
 	SUSUWU_OBJECTLIST=""
 }
 
@@ -171,7 +174,7 @@ SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"${OBJDIR}\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
 	fi
 	OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")" #/* if inherit OBJDIR, perhaps it is without last '/' */
-	OBJDIR="$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
+	OBJDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
 	mkdir -p "${OBJDIR}"
 }
 SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
@@ -184,7 +187,7 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR")}\${OUTPUT}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
 	fi
 	BINDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}")" #/* if inherit BINDIR, perhaps it is without last '/' */
-	BINDIR="$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
+	BINDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
 	mkdir -p "${BINDIR}"
 }
 SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
