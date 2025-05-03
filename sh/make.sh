@@ -82,86 +82,86 @@ SUSUWU_GITHUB_WORKSPACE_JSON() ( #/* Usage: `echo "SUSUWU_GITHUB_WORKSPACE_JSON"
 )
 
 SUSUWU_PROCESS_MINGW() { #/* Usage: `SUSUWU_PROCESS_MINGW $@` [This processes params passed to `${0}`.] */
-	CROSS_COMP=""
+	export CROSS_COMP=""
 	if SUSUWU_SH_HAS_PARAM "--mingw" "$@"; then
-		CROSS_COMP=" --mingw"
+		export CROSS_COMP=" --mingw"
 	fi
 }
 SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS ... */
 	if [ " --mingw" = "${CROSS_COMP}" ]; then
 		if command -v x86_64-w64-mingw32-clang++ >/dev/null; then
-			CXX="x86_64-w64-mingw32-clang++"
-#			CXXFLAGS="${CXXFLAGS} -rtlib=compiler-rt"
-			LDFLAGS="${LDFLAGS} -rtlib=compiler-rt -lunwind -static" #-no-lgcc -nolibgcc -lmingw32 -static-libstdc++" #workaround for [`lld: error: unable to find library -lgcc`](https://github.com/termux/termux-packages/issues/24194#issuecomment-2799574245)
-			USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SusuLib/issues/16) */
+			export CXX="x86_64-w64-mingw32-clang++"
+#			export CXXFLAGS="${CXXFLAGS} -rtlib=compiler-rt"
+			export LDFLAGS="${LDFLAGS} -rtlib=compiler-rt -lunwind -static" #-no-lgcc -nolibgcc -lmingw32 -static-libstdc++" #workaround for [`lld: error: unable to find library -lgcc`](https://github.com/termux/termux-packages/issues/24194#issuecomment-2799574245)
+			export USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SusuLib/issues/16) */
 		elif command -v x86_64-w64-mingw32-g++ >/dev/null; then
-			CXX="x86_64-w64-mingw32-g++"
-			LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
-			USE_FSAN=false #/* `TODO: `-fsan*` for `x86_64-w64-mingw32-g++`](https://www.mingw-w64.org/contribute/#thorough-status-report-for-sanitizers-asan-tsan-usan) */
+			export CXX="x86_64-w64-mingw32-g++"
+			export LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
+			export USE_FSAN=false #/* `TODO: `-fsan*` for `x86_64-w64-mingw32-g++`](https://www.mingw-w64.org/contribute/#thorough-status-report-for-sanitizers-asan-tsan-usan) */
 		else
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "x86_64-w64-mingw32-clang++ not found"), $(SUSUWU_SH_QUOTE "CODE" "x86_64-w64-mingw32-g++ not found"). Do $(SUSUWU_SH_QUOTE "CODE" "apt install llvm-mingw-w64") or $(SUSUWU_SH_QUOTE "CODE" "apt install mingw-w64")."
 			exit 1
 		fi
 	elif command -v clang++ >/dev/null; then
-		CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
-		USE_FSAN=true #/* [`-fsan*` supports `g++`/`clang++`](https://developers.redhat.com/blog/2021/05/05/memory-error-checking-in-c-and-c-comparing-sanitizers-and-valgrind#tldr) */
+		export CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
+		export USE_FSAN=true #/* [`-fsan*` supports `g++`/`clang++`](https://developers.redhat.com/blog/2021/05/05/memory-error-checking-in-c-and-c-comparing-sanitizers-and-valgrind#tldr) */
 	elif command -v g++ >/dev/null; then
-		CXX="g++"
-		USE_FSAN=true
+		export CXX="g++"
+		export USE_FSAN=true
 	elif command -v "${CXX}" >/dev/null; then #/* TODO: if our flags are compatible with all `${CXX}`, move this to top */
 		SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "clang++ not found"), $(SUSUWU_SH_QUOTE "CODE" "g++ not found"). $(SUSUWU_SH_QUOTE "CODE" "CXX=${CXX}") found, will use."
 		if command -v "${CC}" >/dev/null; then
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "CC=${CC}") found, will use."
 		else
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "CC=${CC}") not found, will use $(SUSUWU_SH_QUOTE "CODE" "CC=\"\${CXX} -x -c\"")"
-			CC="${CXX}"
-			CFLAGS="${CFLAGS} -x c"
+			export CC="${CXX}"
+			export CFLAGS="${CFLAGS} -x c"
 		fi
 		if command -v "${LD}" >/dev/null; then
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "LD=${LD}") found, will use."
 		else
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "LD=${LD}") not found, will use $(SUSUWU_SH_QUOTE "CODE" "LD=\"\${CXX}\"")"
-			LD="${CXX}"
+			export LD="${CXX}"
 		fi
-		USE_FSAN=false #/* `TODO: test unknown compilers for `-fsan*` support */
+		export USE_FSAN=false #/* `TODO: test unknown compilers for `-fsan*` support */
 		return 0
 	else
 		SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "clang++ not found"), $(SUSUWU_SH_QUOTE "CODE" "g++ not found"). $(SUSUWU_SH_QUOTE "CODE" "CXX=${CXX}") not found. Do $(SUSUWU_SH_QUOTE "CODE" "apt install clang") or $(SUSUWU_SH_QUOTE "CODE" "apt install gcc")."
 		exit 1
 	fi
-	LD="${CXX}"
-	CC="${CXX}"
-	CFLAGS="${CFLAGS} -x c"
+	export LD="${CXX}"
+	export CC="${CXX}"
+	export CFLAGS="${CFLAGS} -x c"
 	return 0
 }
 
 SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "--release" "$@"; then
 		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--release")") does not support \`gdb\` / \`lldb\` (use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--release" "$@") $(SUSUWU_SH_QUOTE "PROPOSED" "--debug")") for such tools)."
-		CFLAGS="${CFLAGS} ${FLAGS_RELEASE} ${CFLAGS_RELEASE}"
-		CXXFLAGS="${CXXFLAGS} ${FLAGS_RELEASE} ${CXXFLAGS_RELEASE}"
+		export CFLAGS="${CFLAGS} ${FLAGS_RELEASE} ${CFLAGS_RELEASE}"
+		export CXXFLAGS="${CXXFLAGS} ${FLAGS_RELEASE} ${CXXFLAGS_RELEASE}"
 	else
 		if ! SUSUWU_SH_HAS_PARAM "--debug" "$@"; then
 			SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $*") defaults to $(SUSUWU_SH_QUOTE "CODE" "${0} $* $(SUSUWU_SH_QUOTE "CURRENT" "--debug")")."
 		fi
 		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--debug")") is slow (use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_QUOTE "PROPOSED" "--release")") to improve how fast $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_PATH_UNAMBIGUOUS "\${BINDIR}/\${OUTPUT}")") executes)."
-		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
-		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
+		export CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
+		export CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
 		if [ true = ${USE_FSAN} ]; then
-			CFLAGS="${CFLAGS} ${FLAGS_FSAN}"
-			CXXFLAGS="${CXXFLAGS} ${FLAGS_FSAN}"
-			LDFLAGS="${LDFLAGS} ${FLAGS_FSAN}"
+			export CFLAGS="${CFLAGS} ${FLAGS_FSAN}"
+			export CXXFLAGS="${CXXFLAGS} ${FLAGS_FSAN}"
+			export LDFLAGS="${LDFLAGS} ${FLAGS_FSAN}"
 			export ASAN_OPTIONS=abort_on_error=1:fast_unwind_on_malloc=0:detect_leaks=0 UBSAN_OPTIONS=print_stacktrace=1 #/* "For LLDB/GDB and to prevent very short stack traces and usually false leaks detection" */
 		fi
 	fi
 }
 SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS ... */
-	LDFLAGS="${LDFLAGS}"
-	CFLAGS="${CFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
-	CXXFLAGS="${CXXFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
-	C_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
-	CXX_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
-	SUSUWU_OBJECTLIST=""
+	export LDFLAGS="${LDFLAGS}"
+	export CFLAGS="${CFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
+	export CXXFLAGS="${CXXFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
+	export C_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
+	export CXX_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${CXX_SOURCE_PATH}") #/* if inherit CXX_SOURCE_PATH, perhaps it lacks '/' */
+	export SUSUWU_OBJECTLIST=""
 }
 
 SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
@@ -174,7 +174,7 @@ SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"${OBJDIR}\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
 	fi
 	OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")" #/* if inherit OBJDIR, perhaps it is without last '/' */
-	OBJDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
+	export OBJDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
 	mkdir -p "${OBJDIR}"
 }
 SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
@@ -187,7 +187,7 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR")}\${OUTPUT}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
 	fi
 	BINDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}")" #/* if inherit BINDIR, perhaps it is without last '/' */
-	BINDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
+	export BINDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
 	mkdir -p "${BINDIR}"
 }
 SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
@@ -196,14 +196,14 @@ SUSUWU_SETUP_OUTPUT() { #/* Usage: `SUSUWU_SETUP_OUTPUT "YourProgram"` */
 		exit 1 #/* `if("/" == BINDIR || "" == BINDIR)`, can't use `${BINDIR}${OUTPUT}` */
 	fi
 	if [ -z "${CROSS_COMP}" ]; then
-		OUTPUT="${1}.out"
+		export OUTPUT="${1}.out"
 	else
-		OUTPUT="${1}.exe"
+		export OUTPUT="${1}.exe"
 	fi
 	if [ -e "${BINDIR}${OUTPUT}" ]; then
-		SUSUWU_RELINK=false
+		export SUSUWU_RELINK=false
 	else
-		SUSUWU_RELINK=true
+		export SUSUWU_RELINK=true
 	fi
 }
 SUSUWU_CLEAN_OUTPUT_IMPL() ( #/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript" */
