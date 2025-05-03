@@ -16,6 +16,11 @@
   - [Howto use point clouds to route](#howto-use-point-clouds-to-route)
 - [Howto produce distortion coefficients](#howto-produce-distortion-coefficients)
   - [Howto use coefficients for distortion correction](#howto-use-coefficients-for-distortion-correction)
+- [Individual components, whole tools](#individual-components-whole-tools)
+  - [Stepper motors versus servos](#stepper-motors-versus-servos)
+  - [Different types / uses of servos](#different-types--uses-of-servos)
+  - [Gear reducers](#gear-reducers)
+  - [Circuitboard / CPU lists](#circuitboard--CPU-lists)
 - [Synopsis + resources](#synopsis--resources)
 
 # Licenses
@@ -1148,12 +1153,76 @@ function correctDistortion(image, distortion_coefficients, fx, fy, cx, cy):
 validateCorrection(corrected_image)
 ```
 
-# Synopsis + resources
+# Individual components, whole tools
+From [this discussion with *Claude-3-Haiku*](https://poe.com/s/B2OqwJmkSc4Pah39cKNm) which is about:
+- Manufacturer-assembled tools versus "kits" versus individual components (such as servos or screws).
+- Cost + performance attributes of numerous kits (plus individual parts such as Vision Processor Units).
+- Proprioception (without gyroscopes and accelerometers which require kinematics formulas).
+  - Electrical versus magnetic versus optical encoders (gives simple, absolute values).
+  - Back-EMF (electro-motive-force) through thermistors or current sensor modules (requires calibration to compute, but has lower cost).
+- Issues of responsible use:
+  - Without consent, optical devices must not record humans. Protocols are discussed so that computer vision is anonymous for humans, such as to have invasive optical cameras replaced with depth sensors which produce low-resolution point clouds.
+  - Autonomous tools must ensure that collisions are harmless, plus cause such tools to stop. Protocols are discussed to use numerous (redundant) mechanisms to notice possible future collisions (plus alter routes to maneuver around those), also to notice if collision has occured (which must cause such tools to stop).
+
+\[_Notice_: *Claude-3-Haiku* does not give references to documents, so used search engines to convert some of the text into references to documents.\]
+\[_Notice_: Am not connected any of the referenced parts. Can not vouch for any of those parts. Produced the parts lists just so that more will know that affordable robot parts are available to use, due to personal wish that more autonomous tools are produced.\]
+
+## Lists from *Claude-3-Haiku*
+> - [*Lynxmotion* **AL5D** Robotic Arm Kit](https://www.robotshop.com/products/lynxmotion-al5d-pltw-robotic-arm-kit): This is a 5-axis robotic arm kit that can be controlled using an Arduino board. It has 5 servo motors and a simple human-like design. The kit costs around $200-$300 and can be a good starting point for learning about robotic kinematics and programming.
+> - [*Feetech* Humanoid Robot Kit](https://www.rcgroups.com/forums/showthread.php?2406963-Feetech-17-DOF-humanoid-robot-ready-to-play-for-education-DIY): This is a 22-servo humanoid robot kit that is compatible with Arduino and Raspberry Pi boards. It has a torso, arms, and legs, allowing you to experiment with human-like kinematics. The kit costs around $300-$400.
+> - [*Robotis* Bioloid Premium Kit](https://www.robotis.us/robotis-premium/) [\[2\]](https://www.robotshop.com/products/robotis-bioloid-premium-humanoid-robot-kit): This is a more advanced humanoid robot kit that uses the Dynamixel servos. It has around 18-20 degrees of freedom and can be programmed using an Arduino or a Robotis controller board. The kit costs around $500-$600.
+> - *Elegoo* Humanoid Robot Kit \[Source not found: most close was [**Elegoo Penguin Robot**](https://us.elegoo.com/products/elegoo-penguin-bot)\]: Elegoo, the company that makes affordable Arduino-compatible boards, also offers a humanoid robot kit specifically designed for their boards. This kit has around 16-18 servos and a basic human-like design. The cost is around $200-$250.
+> - *DIY* Humanoid Robot Kits: If you're feeling more adventurous, you can consider building your own humanoid robot from scratch using 3D printed parts and off-the-shelf servos. This allows for more customization but requires more technical skills. There are several online resources and tutorials available for DIY humanoid robot projects.
+
+## Own lists
+- [*Lynxmotion* **SES-V2** Robot Arms](https://www.lynxmotion.com/ses-v2-robot-arms/): Numerous robotic arm kits. This document gives more specifics and uses than the specific **Lynxmotion** kit above.
+- [*Lynxmotion* **SES-V2** Legged Robot**](https://www.lynxmotion.com/ses-v2-legged-robot/): Numerous quadrupedal robot kits
+- [*ROBOTZONE* **SKU** 3020-0040-0300](https://www.servocity.com/12-stroke-180-lb-thrust-linear-servo/): "Heavy-Duty Linear Servo (Position Control, 12-24V, 225lb Thrust, 0.3"/sec, 12" Stroke)". Cost $299. [Description says compatible with **Arduino**](https://www.servocity.com/12-stroke-180-lb-thrust-linear-servo/#:~:text=wireless,Arduino).
+- [`https://www.amazon.com/s?k=1000w+servo`](https://www.amazon.com/s?k=1000w+servo&rh=n%3A16310091) lists numerous 1000w servos, but most cost around $200. Since most of those give around 3.2[**N·m**](https://onlineunitconverters.com/unit/torque/newton_meters/) (with 1**m** armature, can just lift 10 pounds) at 3000[**RPM**](https://calculatorshub.net/physics-calculators/servo-speed-calculator/): to lift large loads (ergo a hundred pounds), [couple gearboxes (reducers) onto the servo motor's lead screws](#gear-reducers)
+- [*YIDOFENG* Model: **M864S** Without Brake 1000W](https://www.amazon.com/dp/B0DK1KR4FS/?pd_rd_i=B0DK1KR4FS): 1**KW** 220volt servo motor, which costs around $162. The [version which includes brakes costs around $200](https://www.amazon.com/dp/B0DK1NVB9K/ref=twister_B0DK1QW4G2). `Z800 Driver manual.pdf` says model [*DN80-03230A6-TJA(B)*](https://www.google.com/search?q=%22DN80-03230A6-TJA%22) has 3.2[**N·m**] at 3000**RPM**. Notice: the manual's text uses broken *English*, plus the images do not use *English* (just *Asian* symbols), thus, if you can afford to, purchase servos from local sources.
+- [*AzureaFlow* **ASIN**: **B0F29P7BXV** **CW** and **CCW**, Energy-Saving Mute, with Instruction Manual](https://www.amazon.com/Industrial-Sewing-Machine-Motor-Energy-Saving/dp/B0F29P7BXV/): 1**HP** 110volt servo motor, which costs around $72. Since this servo motor's purpose is to produce clothes, guess is that the torque is less than 3.2**N·m**; must couple gear reducers on the lead screws.
+
+## Stepper-motors versus servos
+<https://grandadventureballoon.com/circuit/stepper-vs-servo-motors-the-real-differences-that-matter-for-your-build/> lists differences, such as:
+- Stepper motors have lower cost (due to less parts), but do not have encoders / resolvers.
+- Stepper motor control is limited to single steps clockwise or counterclockwise (**CW** or **CCW**).
+- Servos have encoders / resolver (position sensors used used for proprioceptive loops).
+- Servos have circuits which compute **PID** (*Proportional-Integral-Derivative*) to convert **PWM** (*Pulse-Width-Modulation* signals) into absolute positions.
+
+## Different types / uses of servos
+This [discussion with *Claude-3-Haiku*](https://poe.com/s/F75Cvv7D6keiR9e1qrNH) is about:
+- Types; structural attributes of single-shaft versus "dual-shaft" (1 continuous shaft, but 2 (opposite) protrusions) servos.
+- Uses; structural attributes of base-mounted versus joint-hub servos.
+
+Supplemental resources (which have use for all structural support formulas):
+- <https://www.structuralbasics.com/internal-forces/>
+- <https://www.structuralbasics.com/bending-moment/>
+- <https://www.structuralbasics.com/polar-moment-of-inertia-formulas/>
+- <https://onlineunitconverters.com/unit/torque/newton_meters/>
+- <https://calculatorshub.net/physics-calculators/servo-speed-calculator/>
+
+Manufacturers can reduce total costs, through purchase of consumer servo motors.
+Issues + solutions:
+- Those offer less support to businesses (consumer servo motors do not include contracts which allow you to call for assistance with setup / use). Solution: webpages give you sufficient accumulated info (in the form of tutorials, documents, manuals, unit converters, simulators) that the simplest included reference manuals (which ship with consumer servo motors) can now suit business use.
+- Most of those have lower maximum torque (consumer servo motors tend to have gear ratios which favor RPM, thus can not lift huge loads). Solution: numerous howto's show how to improve torque with [gear reducers](#gear-reducers).
+
+## Gear reducers
+To improve torque (allow servo motors to lift more pounds of load), you can [couple {Planetory, Spur/Worm, Harmonic, Right-Angle}-Gearboxes onto the servo motor's lead screw](https://poe.com/s/F31GQNAZCvkfaOgpcoXq). Such improvements can require recalibration of inertial sensors, plus systems to ensure that temperature of servo motors is still low enough for continuous use. How to couple those:
+- <https://www.surecontrols.com/blog/pairing-gearheads-with-servo-motors/>
+- <https://us.sumitomodrive.com/sites/default/files/2023-07/mastering-servo-gearboxes-white-paper_2.pdf>
+- <https://blog.ever-power.net/integrating-servo-reducers-with-existing-motor-setups/>
+- <https://www.machinedesign.com/motors-drives/article/21833764/how-to-specify-and-apply-precision-gearboxes-with-servosystems>
+- <https://www.gearkodrive.com/wp-content/uploads/2025/01/GearKo-Connecting-Gearboxes-With-Motors.pdf>
+- <https://www.delinggearbox.com/info/servo-motor-and-gearbox-matching-and-applicati-103042299.html>
+
+## Circuitboard / CPU lists
 - [_Assistant_ suggests to replace _Ardunio Uno_'s _ATmega328P_ 16MHz 2KB (or _Arduino Mega_'s 16MHz 8KB _ATmega2560_) with 240MHz 4MB _ESP32_ for $6](https://poe.com/s/0E2w6XDUf6Aw5hUpOA68)
   - [_Arduino_ _UNO R3_](https://docs.arduino.cc/hardware/uno-rev3/) circuitboard
   - [_Arduino_ _Mega 2560 Rev3_](https://docs.arduino.cc/hardware/mega-2560/) circuitboard
   - [_Arduino_ _Nano ESP32_](https://docs.arduino.cc/hardware/nano-esp32/) circuitboard
   - [_Espressif_ _ESP32_](https://www.espressif.com/en/products/socs/esp32) **CPU**
+
+# Synopsis + resources
 - [_Assistant_ lists consensus formulas (plus efficient synchronization protocols) for obstacle avoidance through broadcasted routes](https://poe.com/s/7ro9aNEONpb3GiQ9SyWE)
   - [_Solar-Pro-2_ produces pseudocode for fallover-prevention (tilt-correction) of autonomous tools on single limbs, plus code for tools with limbs similar to human](https://poe.com/s/PtIQjpoIVuODTL59TEHH).
   - [`../SusuPosts/blob/preview/posts/Ultrasound_Pointclouds.md`](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Ultrasound_Pointclouds.md#q-2) is "**Ultrasound acoustic tools (+ source code which measures echos of numerous transducers to produce volumetric pointclouds of surfaces)**".
