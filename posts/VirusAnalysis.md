@@ -480,7 +480,7 @@ public:
 #endif /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
 #define SUSUWU_CLASS_GETNAME(SUBCLASS) SUSUWU_VIRTUAL_ const std::string /* returns as value so subclasses can return dynamic values */ getName() const SUSUWU_CLASS_OVERRIDE { return #SUBCLASS; }
 #define SUSUWU_CLASS_GETOBJECTSIZE(SUBCLASS) SUSUWU_VIRTUAL_ const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(SUBCLASS); } /* Run-time type information */
-#define SUSUWU_CLASS_ISINSTANCE(SUBCLASS) SUSUWU_VIRTUAL_ const bool isInstance(const Class &obj) const SUSUWU_CLASS_OVERRIDE { return dynamic_cast<const SUBCLASS *>(&obj); } /* port of Java's */
+#define SUSUWU_CLASS_ISINSTANCE(SUBCLASS) SUSUWU_VIRTUAL_ const bool isInstance(const Class &obj) const SUSUWU_CLASS_OVERRIDE { auto ptr = dynamic_cast<const SUBCLASS *>(&obj); return SUSUWU_NULLPTR != ptr; } /* port of Java's */
 #define SUSUWU_CLASS_DEFAULTS(SUBCLASS) /* Usage: `class SubClass : public Class { SUSUWU_CLASS_DEFAULTS(SubClass) };` */ \
 	SUSUWU_CLASS_GETNAME(SUBCLASS) \
 	SUSUWU_CLASS_GETOBJECTSIZE(SUBCLASS)\
