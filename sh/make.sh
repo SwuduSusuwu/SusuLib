@@ -336,11 +336,11 @@ SUSUWU_TODO_LIST() ( #/* Usage: `SUSUWU_TODO_LIST "NameOfTool" "what to expect f
 	SUSUWU_PRINT "SUSUWU_TODO_LIST()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${1}") ${2} is on a long \"TODO\" list. If you want this soon; you can [contribute](https://github.com/SwuduSusuwu/SusuLib/#Contributor-conventionsrules), or [ask for this](https://github.com/SwuduSusuwu/SusuLib/issues/new)."
 	exit 1
 )
-SUSUWU_FORMAT() ( #/* Is analogous to `make format`. */
-	SUSUWU_TODO_LIST "SUSUWU_FORMAT()" "(which will use tools such as $(SUSUWU_SH_QUOTE "CODE" "prettier") or $(SUSUWU_SH_QUOTE "CODE" "clang-format"))"
+SUSUWU_FORMAT() ( #/* TODO */
+	SUSUWU_TODO_LIST "SUSUWU_FORMAT()" "(which is analogous to \`make format\`, and will use tools such as $(SUSUWU_SH_QUOTE "CODE" "prettier") or $(SUSUWU_SH_QUOTE "CODE" "clang-format"))"
 )
-SUSUWU_DOCS() ( #/* Is analogous to `make docs`. */
-	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which will use tools such as $(SUSUWU_SH_QUOTE "CODE" "sphinx") or $(SUSUWU_SH_QUOTE "CODE" "doxygen"))"
+SUSUWU_DOCS() ( #/* TODO */
+	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which is analogous to \`make docs\`, and will use tools such as $(SUSUWU_SH_QUOTE "CODE" "sphinx") or $(SUSUWU_SH_QUOTE "CODE" "doxygen"))"
 )
 SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}")) ]`. Is just for internal use. */
 	if [ ! -d "${1}" ]; then
