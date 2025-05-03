@@ -75,6 +75,7 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
 
+#define SUSUWU_NOOP /* No-op. Skip. */
 #ifndef SUSUWU_UNIT_TESTS /* if not set with `-DSUSUWU_UNIT_TESTS=true` (or `=false`) */
 #	define SUSUWU_UNIT_TESTS true /* more stable future version could have default = `!defined(NDEBUG)` */
 #endif /* ndef SUSUWU_UNIT_TESTS */
@@ -346,9 +347,9 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #	define SUSUWU_DEBUG(x) SUSUWU_PRINT(SUSUWU_SH_DEBUG, x)
 #	define SUSUWU_EXECUTEVERBOSE(x) x /* about side-effects; do not assume that `--debug` was used. `--release -DSUSUWU_SH_VERBOSE=true` will execute this. */
 #else /* else SUSUWU_SH_VERBOSE */
-#	define SUSUWU_NOTICE(x) (true)/* skip. */
-#	define SUSUWU_DEBUG(x) (true)/* skip. */
-#	define SUSUWU_EXECUTEVERBOSE(x) (true)/*skip*/ /* about side-effects; do not assume that just `--release` was used. `--debug -DSUSUWU_SH_VERBOSE=false` will skip. */
+#	define SUSUWU_NOTICE(x) SUSUWU_NOOP
+#	define SUSUWU_DEBUG(x) SUSUWU_NOOP
+#	define SUSUWU_EXECUTEVERBOSE(x) SUSUWU_NOOP /* about side-effects; do not assume that just `--release` reaches this; `--debug -DSUSUWU_SH_VERBOSE=false` uses this too. */
 #endif /* else SUSUWU_SH_VERBOSE */
 
 /* Use this to reduce print (NOTICE/DEBUG is conditional) + (unconditional) execute into single statement. */
