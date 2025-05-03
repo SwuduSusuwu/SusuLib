@@ -16,6 +16,7 @@
   - [Howto use point clouds to route](#howto-use-point-clouds-to-route)
 - [Howto produce distortion coefficients](#howto-produce-distortion-coefficients)
   - [Howto use coefficients for distortion correction](#howto-use-coefficients-for-distortion-correction)
+- [Parts & kits lists](#parts--kits-lists)
 - [External resources](#external-resources)
 
 # Licenses
@@ -1148,12 +1149,50 @@ function correctDistortion(image, distortion_coefficients, fx, fy, cx, cy):
 validateCorrection(corrected_image)
 ```
 
-# External resources
+# Parts & kits lists
+From [this discussion with **Claude-3-Haiku**](https://poe.com/s/B2OqwJmkSc4Pah39cKNm) which is about:
+- "Pre-fab" versus "do-it-yourself" kits to produce small humanish robotic tools
+- Cost + performance attributes of numerous kits (plus individual parts such as Vision Processor Units).
+- Proprioception (without gyroscopes and accelerometers which require kinematics formulas)
+  - Electrical versus magnetic versus optical encoders (gives simple, absolute values)
+  - Back-EMF (electro-motive-force) through thermistors or current sensor modules (requires calibration to compute, but has lower cost)
+- Possible regulatory (related to safety and privacy) hurdles for huge autonomous tools
+  - Numerous possible solutions, based off of protocols which exist now
+- Have not asked such **Anthropic**'s assistants (since a few posts back) if those still allow to publish discussions with them, so asked again (and was told am still allowed to)
+
+\[_Notice_: **Claude-3-Haiku** does not link to documents, so used search engines to convert some of the text into references to documents.\]
+\[_Notice_: Am not connected any of the referenced parts. Can not vouch for any of those parts. Produced the parts lists just so that more will know that affordable robot parts are available to use, due to personal wish that more autonomous tools are produced.\]
+
+## Lists from **Claude-3-Haiku**
+> - [**Lynxmotion AL5D Robotic Arm Kit**](https://www.robotshop.com/products/lynxmotion-al5d-pltw-robotic-arm-kit): This is a 5-axis robotic arm kit that can be controlled using an Arduino board. It has 5 servo motors and a simple human-like design. The kit costs around $200-$300 and can be a good starting point for learning about robotic kinematics and programming.
+> - [**Feetech Humanoid Robot Kit**](https://www.rcgroups.com/forums/showthread.php?2406963-Feetech-17-DOF-humanoid-robot-ready-to-play-for-education-DIY): This is a 22-servo humanoid robot kit that is compatible with Arduino and Raspberry Pi boards. It has a torso, arms, and legs, allowing you to experiment with human-like kinematics. The kit costs around $300-$400.
+> - [**Robotis Bioloid Premium Kit**](https://www.robotis.us/robotis-premium/) [\[2\]](https://www.robotshop.com/products/robotis-bioloid-premium-humanoid-robot-kit): This is a more advanced humanoid robot kit that uses the Dynamixel servos. It has around 18-20 degrees of freedom and can be programmed using an Arduino or a Robotis controller board. The kit costs around $500-$600.
+> - **Elegoo Humanoid Robot Kit** \[Source not found: most close was [**Elegoo Penguin Robot**](https://us.elegoo.com/products/elegoo-penguin-bot)\]: Elegoo, the company that makes affordable Arduino-compatible boards, also offers a humanoid robot kit specifically designed for their boards. This kit has around 16-18 servos and a basic human-like design. The cost is around $200-$250.
+> - _DIY_ Humanoid Robot Kits: If you're feeling more adventurous, you can consider building your own humanoid robot from scratch using 3D printed parts and off-the-shelf servos. This allows for more customization but requires more technical skills. There are several online resources and tutorials available for DIY humanoid robot projects.
+
+## Own lists
+- [**Lynxmotion SES-V2 Robot Arms**](https://www.lynxmotion.com/ses-v2-robot-arms/): Numerous robotic arm kits. This document gives more specifics and uses than the specific **Lynxmotion** kit above.
+- [**Lynxmotion SES-V2 Legged Robot**](https://www.lynxmotion.com/ses-v2-legged-robot/): Numerous quadrupedal robot kits
+- [**ROBOTZONE** SKU 3020-0040-0300](https://www.servocity.com/12-stroke-180-lb-thrust-linear-servo/): "Heavy-Duty Linear Servo (Position Control, 12-24V, 225lb Thrust, 0.3"/sec, 12" Stroke)". Cost $299. [Description says compatible with **Arduino**](https://www.servocity.com/12-stroke-180-lb-thrust-linear-servo/#:~:text=wireless,Arduino).
+
+## Different forms (and placements) of servos
+This [discussion with **Claude-3-Haiku**](https://poe.com/s/F75Cvv7D6keiR9e1qrNH) is about:
+- Structural attributes of single-shaft versus "dual-shaft" (1 continuous shaft, but 2 (opposite) protrusions) servos.
+- Structural attributes of base-mounted versus joint-hub servos.
+
+Supplemental resources (which have use for all structural support formulas):
+- <https://www.structuralbasics.com/internal-forces/>
+- <https://www.structuralbasics.com/bending-moment/>
+- <https://www.structuralbasics.com/polar-moment-of-inertia-formulas/>
+
+## Circuitboard / CPU lists
 - [_Assistant_ suggests to replace _Ardunio Uno_'s _ATmega328P_ 16MHz 2KB (or _Arduino Mega_'s 16MHz 8KB _ATmega2560_) with 240MHz 4MB _ESP32_ for $6](https://poe.com/s/0E2w6XDUf6Aw5hUpOA68)
   - [_Arduino_ _UNO R3_](https://docs.arduino.cc/hardware/uno-rev3/) circuitboard
   - [_Arduino_ _Mega 2560 Rev3_](https://docs.arduino.cc/hardware/mega-2560/) circuitboard
   - [_Arduino_ _Nano ESP32_](https://docs.arduino.cc/hardware/nano-esp32/) circuitboard
   - [_Espressif_ _ESP32_](https://www.espressif.com/en/products/socs/esp32) **CPU**
+
+# External resources
 - [_Assistant_ lists consensus formulas and efficient synchronization protocols for obstacle avoidance through planned routes](https://poe.com/s/7ro9aNEONpb3GiQ9SyWE)
 - [\[Preview\] Have computers do most of central nervous system, such as thalamus, auditory cortex, visual cortices, homunculus](./CnsCompress.md)
 - [SubStack post which has list of related posts at bottom](https://swudususuwu.substack.com/p/how-to-mix-blender-with-robotics)
