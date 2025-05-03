@@ -53,6 +53,13 @@
 #	define SUSUWU_UNIT_TESTS true /* more stable future version could have default = `!defined(NDEBUG)` */
 #endif /* ndef SUSUWU_UNIT_TESTS */
 
+#ifndef SUSUWU_OPENMP /* if no environment flag to use */
+#	if defined(_OPENMP /* `-fopenmp` */) || (defined(__has_include) && __has_include(<omp.h>) /* `clang++` */)
+#		define SUSUWU_OPENMP true /* supports `#pragma omp <directive>` */
+#	else /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
+#		define SUSUWU_OPENMP false /* `#pragma omp <directive>` can trigger `[-Wunknown-pragma]` */
+#	endif /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
+#endif /* ndef SUSUWU_OPENMP */
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE

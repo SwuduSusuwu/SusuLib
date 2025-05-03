@@ -6,7 +6,7 @@
 #include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OPENMP SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::endl std::getline std::streamsize */
@@ -331,7 +331,9 @@ template<class List>
 /* return `list`'s `const_iterator` to first instance of `std::string(itBegin, itEndSubstr)`, or default iterator (if not found)
  * @pre @code itBegin < itEnd @endcode */
 const typename List::value_type::const_iterator listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
-#pragma unroll
+#if SUSUWU_OPENMP
+#	pragma omp simd
+#endif /* SUSUWU_OPENMP */
 	for(const auto &value : list) {
 		auto result = std::search(value.cbegin(), value.cend(), itBegin, itEnd, [](char chValue, char chIt) { return chValue == chIt; });
 		if(value.cend() != result) {

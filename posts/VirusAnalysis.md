@@ -80,6 +80,13 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	define SUSUWU_UNIT_TESTS true /* more stable future version could have default = `!defined(NDEBUG)` */
 #endif /* ndef SUSUWU_UNIT_TESTS */
 
+#ifndef SUSUWU_OPENMP /* if no environment flag to use */
+#	if defined(_OPENMP /* `-fopenmp` */) || (defined(__has_include) && __has_include(<omp.h>) /* `clang++` */)
+#		define SUSUWU_OPENMP true /* supports `#pragma omp <directive>` */
+#	else /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
+#		define SUSUWU_OPENMP false /* `#pragma omp <directive>` can trigger `[-Wunknown-pragma]` */
+#	endif /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
+#endif /* ndef SUSUWU_OPENMP */
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
@@ -1745,7 +1752,9 @@ template<class List>
 /* return `list`'s `const_iterator` to first instance of `std::string(itBegin, itEndSubstr)`, or default iterator (if not found)
  * @pre @code itBegin < itEnd @endcode */
 const typename List::value_type::const_iterator listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
-#pragma unroll
+#if SUSUWU_OPENMP
+#	pragma omp simd
+#endif /* SUSUWU_OPENMP */
 	for(const auto &value : list) {
 		auto result = std::search(value.cbegin(), value.cend(), itBegin, itEnd, [](char chValue, char chIt) { return chValue == chIt; });
 		if(value.cend() != result) {
