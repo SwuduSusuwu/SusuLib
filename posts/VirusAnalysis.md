@@ -1989,39 +1989,39 @@ PyRun_SimpleString("import sys; sys.path.append('./HSOM/')");
 /* Based off of https://github.com/CarsonScott/HSOM/blob/master/examples/self_organizing_network.py
  * Not sure if `input_size` is "Inputs from each layer to next layer" and `node_count` is "Inputs to HSOM" (process(input.length())) or vice versa, assumed vice versa */
 
-PyRun_SimpleString("import hsom
-from hsom import SelfOrganizingNetwork
-from random import sample
-
-input_size = " + inputNeurons + "
-layer_sizes = []
-for x in range(" + layersOfNeurons + "):
-	layer_sizes.append(" + neuronsPerLayer + ");
-layer_sizes.append(" + outputNeurons + ");
-input_percents = [0.2, 0.2, 0.2, 0.2, 0.75, 1.0]
-learning_rate = 0.05
-boost_factor = 1
-node_count = 5
-winner_count = 1
-initial_range = (-0.5, 0.5)
-
-# Create layersOfNeurons+1 hierarchical layers of sizes = neuronsPerLayer, and outputNeurons for last
-self_organizing_network = SelfOrganizingNetwork(
-	input_size=input_size,
-	layer_sizes=layer_sizes,
-	input_percents=input_percents,
-	learning_rates=learning_rate,
-	boost_factors=boost_factor,
-	node_counts=node_count,
-	winner_counts=winner_count,
-	initial_ranges=initial_range)
-
-# Create a set of sparse samples
+PyRun_SimpleString("import hsom\n\
+from hsom import SelfOrganizingNetwork\n\
+from random import sample\n\
+\
+input_size = " + inputNeurons + "\n\
+layer_sizes = []\n\
+for x in range(" + layersOfNeurons + "):\n\
+	layer_sizes.append(" + neuronsPerLayer + ");\n\
+layer_sizes.append(" + outputNeurons + ");\n\
+input_percents = [0.2, 0.2, 0.2, 0.2, 0.75, 1.0]\n\
+learning_rate = 0.05\n\
+boost_factor = 1\n\
+node_count = 5\n\
+winner_count = 1\n\
+initial_range = (-0.5, 0.5)\n\
+\
+# Create layersOfNeurons+1 hierarchical layers of sizes = neuronsPerLayer, and outputNeurons for last\n\
+self_organizing_network = SelfOrganizingNetwork(\
+	input_size=input_size,\
+	layer_sizes=layer_sizes,\
+	input_percents=input_percents,\
+	learning_rates=learning_rate,\
+	boost_factors=boost_factor,\
+	node_counts=node_count,\
+	winner_counts=winner_count,\
+	initial_ranges=initial_range)\n\
+\
+# Create a set of sparse samples\n\
 samples = []");
 	foreach(inputsToOutputs as sample) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
 		PyRun_SimpleString("samples.append(" + sample.first() +" -> " + sample.last() + ")");
 	}
-	PyRun_SimpleString("for i in range(200):
+	PyRun_SimpleString("for i in range(200):\n\
 	self_organizing_network.train(samples)");
 #else /* else !USE_PYRUN */
 	PyObject *module = PyImport_ImportModule("hsom")
