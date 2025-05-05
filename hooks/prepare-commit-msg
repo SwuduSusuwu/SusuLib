@@ -20,8 +20,8 @@ STATUS_CODE=$?
 #git restore "${GIT_ROOT}/compile_commands.json" 2>/dev/null
 SUSUWU_GITHUB_WORKSPACE_JSON #/* Replace `$(pwd)` with `${{ github.workspace }}` for `compile_commands.json` */
 if SUSUWU_IS_PREVIEW; then #/* If `./tags` is tracked; */
-	(SUSUWU_BUILD_CTAGS 2>/dev/null && git add "${GIT_ROOT}/tags") || (#/* produce&add `./tags`. */
-		echo "$0: [Error]: Could not update \"${GIT_ROOT}/tags\"."
+	(SUSUWU_BUILD_CTAGS2 2>/dev/null && git add "${GIT_ROOT}/tags") || (#/* produce&add `./tags`. */
+		SUSUWU_PRINT "$0" "${SUSUWU_SH_ERROR}" "$(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_BUILD_CTAGS") could not update $(SUSUWU_SH_QUOTE "PATH" "${GIT_ROOT}/tags")."
 	)
 fi
 return ${STATUS_CODE}
