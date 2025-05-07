@@ -2301,7 +2301,7 @@ const bool virusAnalysisInitTests(const ClassIoPath path, ResultList &passList, 
 	const std::string passPath = path + ".passList.config";
 	const std::string abortPath = path + ".abortList.config";
 	try {
-		std::ifstream config(passPath);
+		const std::ifstream config(passPath);
 	} catch (std::exception &w) {
 		SUSUWU_WARNING("`std::ifstream config(\"" + passPath + "\");` threw \" " + w.what() + "\"; will skip `virusAnalysisDumpTo()` and `virusAnalysisLoadFrom()` tests.");
 		return false;
@@ -2367,7 +2367,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 	}
 	if(virusAnalysisHookExec & hookStatus) {
 #ifdef SUSUWU_POSIX
-		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) {
+		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */
 			return static_cast<int>(virusAnalysisImpl(PortableExecutable(pathname)));
 		};
 		classSysKernelSetHook(execv, lambdaScanExecv);
