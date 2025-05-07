@@ -70,7 +70,8 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #	define SUSUWU_DEFAULT_BRANCH "trunk"
 #endif /* ndef SUSUWU_DEFAULT_BRANCH */
 #ifdef SUSUWU_EXPERIMENTAL
-#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch " SUSUWU_DEFAULT_BRANCH " && ./build.sh` (as possible fixup), or report the issue through https://github.com/SwuduSusuwu/SusuLib/issues/new"
+#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `-DSUSUWU_EXPERIMENTAL`; if you experience issues, execute `git switch trunk && ./build.sh` (as possible fixup), or [post the issue](https://github.com/SwuduSusuwu/SusuLib/issues/new)"
+//#	define SUSUWU_EXPERIMENTAL_ISSUES "was built with `" SUSUWU_SH_GREEN " -DSUSUWU_EXPERIMENTAL " SUSUWU_SH_WHITE " `; if you experience issues, execute `" SUSUWU_SH_LIGHT_BROWN " git switch " SUSUWU_SH_LIGHT_PURPLE SUSUWU_DEFAULT_BRANCH SUSUWU_SH_WHITE " && ./build.sh" SUSUWU_SH_WHITE "` (as possible fixup), or [post the issue](https://github.com/SwuduSusuwu/SusuLib/issues/new)" /* TODO: fix `clang-tidy`'s "error: expected ')'" (which triggers on all text macros). */
 #else /* def SUSUWU_EXPERIMENTAL else */
 #	define SUSUWU_EXPERIMENTAL_ISSUES ""
 #endif /* def SUSUWU_EXPERIMENTAL else */
