@@ -3,6 +3,7 @@
 #define INCLUDES_cxx_ClassResultList_cxx
 #include "ClassResultList.hxx" /* ListFormat resultList resultListDumpTo ResultListHash */
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_SH_GREEN SUSUWU_NOEXCEPT SUSUWU_SH_ERROR SUSUWU_SH_RED SUSUWU_SH_WHITE SUSUWU_UNIT_TESTS */
+#include <exception> /* std::exception */
 #include <sstream> /* std::stringstream */
 #include <stdexcept> /* std::logic_error */
 #include <string> /* std::string */
@@ -42,6 +43,7 @@ const bool classResultListTests() {
 #else /* def SUSUWU_LIST_COUNT else */
 	const std::string listHashesSz = "", listSignaturesSz = "", listBytecodesSz = ""; /* NOLINT(readability-redundant-string-init): define that those are "". */
 #endif /* ndef SUSUWU_LIST_COUNT */
+/* NOLINTBEGIN(modernize-raw-string-literal); the `R"(str)"` format is not compatible with [issue #3 (produce analogous _C_ versions of source code)](https://github.com/SwuduSusuwu/SusuLib/issues/3) nor [issue #20 (_C++98_ support)](https://github.com/SwuduSusuwu/SusuLib/issues/20) */
 	classResultListDumpToTest(resultList, false, false, false, listFormatInitializer, "list.hashes={" + listHashesSz + "0x32};list.signatures={" + listSignaturesSz + "0x,0x32};list.bytecodes={" + listBytecodesSz + "0x,0x3032};");
 	classResultListDumpToTest(resultList, false, false, false, listFormatJson, "{\"list.hashes\":[" + listHashesSz + "\"0x32\"],\"list.signatures\":[" + listSignaturesSz + "\"0x\",\"0x32\"],\"list.bytecodes\":[" + listBytecodesSz + "\"0x\",\"0x3032\"]}");
 	classResultListDumpToTest(resultList, true, true, false, listFormatInitializer, "list.hashes = {" + listHashesSz + "\n\t0 = 0x32\n};\nlist.signatures = {" + listSignaturesSz + "\n\t0 = 0x,\n\t1 = 0x32\n};\nlist.bytecodes = {" + listBytecodesSz + "\n\t0 = 0x,\n\t1 = 0x3032\n};\n");
@@ -51,6 +53,7 @@ const bool classResultListTests() {
 	resultList.bytecodes = {"\001", "\002"};
 	classResultListDumpToTest(resultList, false, false, true, listFormatInitializer, "list.hashes={" + listHashesSz + "1:2};list.signatures={" + listSignaturesSz + "0:,1:2};list.bytecodes={" + listBytecodesSz + "1:\001,1:\002};");
 	classResultListDumpToTest(resultList, false, false, true, listFormatJson, "{\"list.hashes\":[" + listHashesSz + "\"1:2\"],\"list.signatures\":[" + listSignaturesSz + "\"0:\",\"1:2\"],\"list.bytecodes\":[" + listBytecodesSz + "\"1:\001\",\"1:\002\"]}");
+/* NOLINTEND(modernize-raw-string-literal) */
 	return true;
 }
 }; /* namespace Susuwu */
