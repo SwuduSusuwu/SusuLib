@@ -9,6 +9,7 @@
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_OPENMP SUSUWU_OVERRIDE SUSUWU_PREFER_CSTR SUSUWU_UNIT_TESTS SUSUWU_UNREACHABLE */
 #include <algorithm> /* std::search std::find std::set_intersection */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
+#include <iosfwd> /* std::streampos */
 #include <iostream> /* std::endl std::getline std::streamsize */
 //#include <stdexcept> /* std::runtime_error */
 #if SUSUWU_PREFER_CSTR
@@ -52,7 +53,7 @@ const size_t listMaxSize(const List &list) {
 #endif /* SUSUWU_PREFER_CSTR else */
 }
 
-typedef enum ListFormat {
+typedef enum ListFormat : char {
 	listFormatInitializer, /* style: C or C++ */
 	listFormatJson /* style: Java or JavaScript */
 } ListFormat;
@@ -144,7 +145,7 @@ void resultListDumpTo(const List &list, Os &os, const bool index, const bool whi
 	}
 }
 template<class List, class Is>
-void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues, const bool finalList = true, const ListFormat listFormat = listFormatInitializer) {
+void listLoadFrom(List &list, Is &is, const bool index, const bool whitespace, const bool pascalValues, const bool finalList = true, const ListFormat listFormat = listFormatInitializer) { /* NOLINT(readability-function-cognitive-complexity) TODO: inner loops depend on shared outer variables, how to factor those out? */
 	const bool whitespaceFrom = SUSUWU_IO_WHITESPACE && whitespace;
 	bool quoteValues = false;
 	char delim = '\0';
