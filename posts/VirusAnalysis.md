@@ -1336,7 +1336,8 @@ const bool classSysSetRoot(bool root) {
 				SUSUWU_WARNING("classSysSetRoot(false) {(SUSUWU_NULLPTR == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
 			} else {
-				sudoUid = static_cast<uid_t>(strtol(sudoUidStr, &sudoUidStrIt, 10));
+				static const int baseDecimal = 10;
+				sudoUid = static_cast<uid_t>(strtol(sudoUidStr, &sudoUidStrIt, baseDecimal));
 				if(sudoUidStr == sudoUidStrIt || -1 == setuid(sudoUid)) { /* prevent reescalation to root */
 					SUSUWU_WARNING("classSysSetRoot(false) {(-1 == setuid(sudoUid)) /* can't prevent reescalation to root */}");
 				}
