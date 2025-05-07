@@ -2647,9 +2647,9 @@ static const int susuwuUnitTestsAssistantCnsBit =
 	1 << 8; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
-SusuwuUnitTestsBitmask main(int argc, const char **args);
 #ifdef __cplusplus
 } /* extern "C" { */
+SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* def __cplusplus */
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
