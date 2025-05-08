@@ -185,12 +185,12 @@ static void classIoHexSsStrTest(const std::string &value, const bool printable) 
 }; /* namespace */
 const bool classIoTests() {
 	/* test `classIoHexStr()` and `classIoHexOs()`'s output lengths */
-	classIoHexOsSzTest("", 0, true /* test that `value.empty()` produces 0 hexits */);
-	classIoHexOsSzTest("22", 4, true /* test that 2 chars produces 4 hexits */);
-	classIoHexOsSzTest("uwu", 6, true /* test that 3 chars produces 6 hexits */);
-	classIoHexOsSzTest(std::string({'\0'}), 2, false /* test that char == 0x00 produces 2 hexits */);
-	classIoHexOsSzTest("\010", 2, false /* test that char <= 0x10 produces 2 hexits */);
-	classIoHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
+	classIoHexOsSzTest("", (sizeof("") - sizeof('\0')) * 2, true /* test that `value.empty()` produces 0 hexits */);
+	classIoHexOsSzTest("22", (sizeof("22") - sizeof('\0')) * 2, true /* test that 2 chars produces 4 hexits */);
+	classIoHexOsSzTest("uwu", (sizeof("uwu") - sizeof('\0')) * 2, true /* test that 3 chars produces 6 hexits */);
+	classIoHexOsSzTest(std::string({'\0'}), sizeof('\0') * 2, false /* test that char == 0x00 produces 2 hexits */);
+	classIoHexOsSzTest("\010", sizeof('\010') * 2, false /* test that char <= 0x10 produces 2 hexits */);
+	classIoHexOsSzTest("\022", sizeof('\022') * 2, false /* test that char >= 0x10 produces 2 hexits */);
 
 	/* test that `classIoHexIs()` undoes `classIoHexOs()` */
 	for(long q = 0; (1 << CHAR_BIT) >= q /* test all `char` + first `short` */; ++q) {
