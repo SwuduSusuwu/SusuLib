@@ -6,6 +6,7 @@
 #include "ClassSys.hxx" /* execves execvex */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE EXIT_SUCCESS getenv strtol system */
 #ifdef SUSUWU_POSIX
 #endif /* def SUSUWU_POSIX */

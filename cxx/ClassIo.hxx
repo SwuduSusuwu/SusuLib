@@ -15,6 +15,7 @@
 #else /* SUSUWU_HEX_TABLE else */
 #	include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* isupper isxdigit */
 #endif /* SUSUWU_HEX_TABLE else */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE */
 #include <iomanip> /* std::setw */
 #include <ios> /* std::hex */

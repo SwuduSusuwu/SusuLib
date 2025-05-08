@@ -6,6 +6,7 @@
 #include "ClassSys.hxx" /* classSysUSecondClock templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::to_string */
 extern "C" {

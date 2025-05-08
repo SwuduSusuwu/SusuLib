@@ -7,6 +7,7 @@
 //#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
 #include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
+#include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdio>, <stdio.h>) /* FILE fopen */
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* strcmp strlen */
 #ifdef __linux__
