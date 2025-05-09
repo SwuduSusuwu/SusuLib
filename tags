@@ -437,14 +437,10 @@ SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CLASS_
 SUSUWU_CLASS_OVERRIDE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_OVERRIDE /;"	d
 SUSUWU_CLEAN_OUTPUT	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT() { #\/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" *\/$/;"	f
 SUSUWU_CLEAN_OUTPUT_IMPL	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT_IMPL() ( #\/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript/;"	f
-SUSUWU_CNS_IF_BIAS	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_BIAS(/;"	d
-SUSUWU_CNS_IF_MLP	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_MLP(/;"	d
 SUSUWU_CNS_LOCAL_COEFFICIENTS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_LOCAL_COEFFICIENTS /;"	d
 SUSUWU_CNS_MODE_ENUM	cxx/ClassCns.hxx	/^#define SUSUWU_CNS_MODE_ENUM /;"	d
 SUSUWU_CNS_SEPARATE_NORMS	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SEPARATE_NORMS /;"	d
 SUSUWU_CNS_SETUP_SYNAPSES	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SETUP_SYNAPSES(/;"	d
-SUSUWU_CNS_USE_BIAS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_BIAS /;"	d
-SUSUWU_CNS_USE_MLP	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
 SUSUWU_CNS_VALUE_SEMANTICS	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_VALUE_SEMANTICS /;"	d
 SUSUWU_COMMA	cxx/Macros.hxx	/^#define SUSUWU_COMMA /;"	d
 SUSUWU_COMPILE_COMMAND	sh/make.sh	/^SUSUWU_COMPILE_COMMAND() { #\/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command/;"	f
@@ -665,8 +661,7 @@ SUSUWU_SUCCESS_EXECUTE	cxx/Macros.hxx	/^#define SUSUWU_SUCCESS_EXECUTE(/;"	d
 SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^	SUSUWU_TEMPLATE_WORKAROUND(char)$/;"	f	class:Susuwu::Cns	typeref:typename:bool
 SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^#	define SUSUWU_TEMPLATE_WORKAROUND(/;"	d
 SUSUWU_TENSORFLOWCNS_INIT_SCOPE	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /;"	d
-SUSUWU_TENSORFLOWCNS_LOGITS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
-SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d
+SUSUWU_TENSORFLOWCNS_LOGITS	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
 SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM /;"	d
 SUSUWU_TEST_BASH	sh/Macros.sh	/^SUSUWU_TEST_BASH() ( #\/* Usage: `s\/exit ${STATUS}\/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?;/;"	f
 SUSUWU_TEST_OUTPUT	sh/make.sh	/^SUSUWU_TEST_OUTPUT() { #\/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-e/;"	f
@@ -693,7 +688,6 @@ SUSUWU_WARNING_EXECUTE	cxx/Macros.hxx	/^#define SUSUWU_WARNING_EXECUTE(/;"	d
 SUSUWU_WIN32	cxx/Macros.hxx	/^#	define SUSUWU_WIN32 \/* Usage: `#ifdef SUSUWU_WIN32\\/;"	d
 Security Policy	SECURITY.md	/^# Security Policy$/;"	c
 Sensitive issues	SECURITY.md	/^## Sensitive issues$/;"	s	chapter:Security Policy
-SigmoidCrossEntropyWithLogits	cxx/ClassTensorFlowCns.hxx	/^static const TensorFlowCnsLoss SigmoidCrossEntropyWithLogits(const tensorflow::Scope &root, cons/;"	f	namespace:Susuwu	typeref:typename:const TensorFlowCnsLoss
 Signature/certificate	README.md	/^## Signature\/certificate$/;"	s	chapter:How to use this
 Signatures	cxx/ClassResultList.hxx	/^	typedef std::vector<ResultListSignature> Signatures;$/;"	t	struct:Susuwu::ResultList	typeref:typename:std::vector<ResultListSignature>
 Source code	VirusAnalysis.md	/^# Source code$/;"	c
@@ -867,7 +861,6 @@ assistantCnsTests	cxx/AssistantCns.cxx	/^const bool assistantCnsTests() {$/;"	f	
 assistantCnsTestsNoexcept	cxx/AssistantCns.hxx	/^static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistan/;"	f	namespace:Susuwu	typeref:typename:const bool
 average	cxx/ClassNumeral.hxx	/^	NumeralAccum average, magnitude;$/;"	m	struct:Susuwu::NumeralNormalizers	typeref:typename:NumeralAccum
 backprop	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
-biases	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor biases = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({s/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
 blockSize	c/rfc6234/sha.h	/^		int blockSize;              \/* block size of SHA being used *\/$/;"	m	struct:HMACContext	typeref:typename:int
 boo	cxx/Macros.cxx	/^	class SubClassWithBaseSubobject : public Zero {public: bool boo = true;};$/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithBaseSubobject	typeref:typename:bool	file:
 boo	cxx/Macros.cxx	/^	class SubClassWithMemberSubobject {public: bool boo = true; Zero zero;};$/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithMemberSubobject	typeref:typename:bool	file:
@@ -928,7 +921,6 @@ classSysSetRoot	cxx/ClassSys.cxx	/^const bool classSysSetRoot(bool root) {$/;"	f
 classSysTests	cxx/ClassSys.cxx	/^const bool classSysTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classSysTestsNoexcept	cxx/ClassSys.hxx	/^static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSysTest/;"	f	namespace:Susuwu	typeref:typename:const bool
 classSysUSecondClock	cxx/ClassSys.hxx	/^inline const ClassSysUSeconds classSysUSecondClock() {$/;"	f	namespace:Susuwu	typeref:typename:const ClassSysUSeconds
-classTensorFlowCnsTestsNoexcept	cxx/ClassTensorFlowCns.hxx	/^static const bool classTensorFlowCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(cl/;"	f	namespace:Susuwu	typeref:typename:const bool
 classTestsCommutative	cxx/ClassObject.cxx	/^static const bool classTestsCommutative(const Class *class1, const Class *class2) { \/* TODO: ca/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
 classTestsMatch	cxx/ClassObject.cxx	/^static const bool classTestsMatch(const Class *class1, const Class *class2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
 classTestsMismatch	cxx/ClassObject.cxx	/^static const bool classTestsMismatch(const Class *class1, const Class *class2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
@@ -965,7 +957,6 @@ fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizersReciprocal from
 getClass	cxx/ClassObject.hxx	/^	const Class &getClass() const { return *this; }$/;"	f	class:Susuwu::Object	typeref:typename:const Class &
 getObjectSize	cxx/ClassObject.hxx	/^	virtual const size_t getObjectSize() const { return sizeof(*this); \/* sum(sizeof({vptr, data m/;"	f	class:Susuwu::Instrumentation	typeref:typename:const size_t
 getParameterCount	cxx/ClassCns.hxx	/^	virtual const size_t getParameterCount() { \/* Notice: must `override` if architecture is spars/;"	f	class:Susuwu::Cns	typeref:typename:const size_t
-getParameterCount	cxx/ClassTensorFlowCns.hxx	/^	const size_t getParameterCount() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const size_t
 getSuperclassRef	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass();/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const Class &
 globalVirusAnalysisHook	cxx/VirusAnalysis.cxx	/^VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; \/* Just use virusAnalysis/;"	v	namespace:Susuwu	typeref:typename:VirusAnalysisHook
 graphDef	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::GraphDef graphDef; \/* TODO: If not used after init, move this into `setupRootScope/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::GraphDef
