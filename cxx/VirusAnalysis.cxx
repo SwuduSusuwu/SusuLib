@@ -8,7 +8,10 @@
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListLoadFrom resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHasRoot classSysSetRoot classSysKernelSetHook execvex */
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_USE_TENSORFLOW */
 #include "VirusAnalysis.hxx" /* abortList passList *AnalyisCaches */
 #include <algorithm> /* std::sort */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -34,7 +37,11 @@
 namespace Susuwu {
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW
+TensorFlowCns analysisCns, virusFixCns; /* `cxx/ClassTensorFlowCns.hxx` specialization of `class Cns` */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<std::string> syscallPotentialDangers = {
 	"memopen", "fwrite", "socket", "GetProcAddress", "IsVmPresent"
 };

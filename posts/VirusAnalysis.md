@@ -2899,7 +2899,7 @@ public:
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType>::value, tensorflow::TensorShape({1, 1} /* TODO: map sentences into tokens */));
 		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = std::stof(input /* map text number into `float` */);
 		auto oTensors = processToImpl<CoefficientDefaultType, tensorflow::tstring>(inputTensor, __func__);
-		return std::to_string(oTensors[0].matrix<CoefficientDefaultType /* `std::string` gives "INVALID_ARGUMENT: Inconsistent values" */>()(0, 0)); /* TODO: tokens, which map into sentences */
+		return std::to_string(oTensors[0].matrix<CoefficientDefaultType >()(0, 0 /* TODO: tokens, which map into sentences */));
 	}
 
 protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes) */
@@ -2937,7 +2937,11 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 } VirusAnalysisResult; /* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == static_cast<bool>(VirusAnalysisResult));} */
 
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns analysisCns, virusFixCns; /* `cxx/ClassTensorFlowCns.hxx` specialization of `class Cns` */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 
 extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
 /* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
@@ -3056,7 +3060,11 @@ const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = v
 ```c++
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW
+TensorFlowCns analysisCns, virusFixCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<std::string> syscallPotentialDangers = {
 	"memopen", "fwrite", "socket", "GetProcAddress", "IsVmPresent"
 };
@@ -3648,7 +3656,16 @@ Have used `class Cns` to implement assistant demo through `produceAssistantCns()
 ```c++
 /* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
 const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* returns list of Uniform Resource Identifiers from `localXhtml` */
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
+std::vector<ClassIoPath> assistantCnsDefaultHosts = {
+	"https://stackoverflow.com",
+	"https://superuser.com",
+	"https://www.quora.com"
+};
 extern std::string assistantCnsResponseDelimiter;
 
 #if SUSUWU_UNIT_TESTS
@@ -3695,7 +3712,11 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 `less `[`cxx/AssistantCns.cxx`](../cxx/AssistantCns.cxx)
 ```c++
 /* (Work-in-progress) assistants which use `class Cns` (artificial neural tissue). */
+#ifdef SUSUWU_USE_TENSORFLOW
+TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
 	"https://superuser.com",

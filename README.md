@@ -178,6 +178,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
     - `-DSUSUWU_TENSORFLOW_HAS_DATATYPETOENUM=true` to use [`tensorflow::DataTypeToEnum`](https://github.com/tensorflow/tensorflow/issues/30828#issuecomment-3039819975). Default is `=false` (implement `Susuwu::DataTypeToEnum`.)
     - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
+    - `-DSUSUWU_USE_TENSORFLOW` to use [_TensorFlow C++_](https://www.tensorflow.org/api_docs/cc/) backend ([`class TensorFlowCns`](./cxx/ClassTensorFlowCns.hxx)) for [`class Cns`](./cxx/ClassCns.hxx); default is unset.
     - `-DUSE_PUGIXML` to use [_pugixml_](https://github.com/zeux/pugixml) [**XML**](https://wikipedia.org/wiki/XML) / [**DOM**](https://wikipedia.org/wiki/Document_Object_Model) parser.
       - Improves [`./cxx/ClassWebBrowse.cxx`](./cxx/ClassWebBrowse.cxx). Improves sections of ([`./cxx/AssistantCns.cxx`](./cxx/AssistantCns.cxx) which use [**XHTML**](https://wikipedia.org/wiki/XHTML)'s **DOM** for `class Cns::setupSynapses`); default is unset.
     - `-DSUSUWU_CNS_SEPARATE_NORMS=true` causes [`class Cns`](./cxx/ClassCns.hxx) (plus subclasses) to compute separate [normalization factors](../cxx/ClassNumeral.hxx) for input versus output values. Default `=false`; reuse input factors as output factors.
