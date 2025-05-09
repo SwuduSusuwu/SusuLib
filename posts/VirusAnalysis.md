@@ -154,9 +154,13 @@ To improve how fast backpropagation (ergo "training"; such as `Cns::setupSynapse
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? #	if defined(SUSUWU_CXX11) || ((defined __has_cpp_attribute) && __has_cpp_attribute(noreturn)) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
+#	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */ /* NOLINT(misc-include-cleaner): this is used if `SUSUWU_INTPTR` is used */
+#	define SUSUWU_INTPTR intptr_t
 #else
 #	define SUSUWU_NORETURN /* old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
 #	define SUSUWU_CONSTEXPR /* No-op */
+#	include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
+#	define SUSUWU_INTPTR size_t /* is supposed to hold a positive pointer (a memory address), and `size_t` can hold all positive memory address offsets. */
 #endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 #ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
@@ -572,11 +576,7 @@ public:
 		this->~Object();
 	}
 	const Class &getClass() const { return *this; }
-#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-	virtual const intptr_t hashCode() const { return reinterpret_cast<intptr_t>(this); }
-#else /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
-	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
-#endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
+	virtual const SUSUWU_INTPTR hashCode() const { return reinterpret_cast<SUSUWU_INTPTR>(this); }
 	virtual const std::string toString() const {
 		return getName() + '@' + classIoHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
 	}
