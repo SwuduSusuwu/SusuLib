@@ -23,10 +23,10 @@ For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.
 
 To test certificates, view [this post](https://swudususuwu.substack.com/p/githubcomswudususuwusubstack-certificate-new).
 
-To improve how fast the whole program executes; `CXXFLAGS` should include auto-vectorizes/auto-parallelizes. [^CXXFLAGS]
+To improve how fast the whole program executes; [set relevent environment flags (such as `CXXFLAGS`) to enable SIMD](./SimdGpgpuTpu.md#simd-single-instruction-multiple-data) and _OpenMP_.
 
-To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]
-[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
+To improve how fast backpropagation (ergo "training"; such as `Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) and forwardpropagation (ergo "inference"; such as `Cns::processTo*()`, which {`cnsAnalysisScore()` and `cnsVirusFix()`} use) executes, [use **TPU**s](./SimdGpgpuTpu.md#tpus-tensor-processor-units) and/or implement `class Cns` with [_TensorFlow_'s `MapReduce`](./SimdGpgpuTpu.md#synopsis--related-posts).
+
 # Source code
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](../LICENSE_GPLv2) or [_Apache 2_](../LICENSE), allows all uses.
 
