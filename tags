@@ -87,8 +87,11 @@
 !_TAG_ROLE_DESCRIPTION!Sh!heredoc	endmarker	/end marker/
 !_TAG_ROLE_DESCRIPTION!Sh!script	loaded	/loaded/
 !_TAG_ROLE_DESCRIPTION!Yaml!anchor	alias	/alias/
+**GPGPU**s (General Purpose Graphics Processor Units)	posts/SimdGpgpuTpu.md	/^# **GPGPU**s (General Purpose Graphics Processor Units)$/;"	c
 **IMU** as **GPS** / magnetometer substitute	posts/ArduinoElegooTools.md	/^## **IMU** as **GPS** \/ magnetometer substitute$/;"	s	chapter:Accelerometer / gyroscope (**IMU**)
 **IMU** as kinematic collision detection	posts/ArduinoElegooTools.md	/^## **IMU** as kinematic collision detection$/;"	s	chapter:Accelerometer / gyroscope (**IMU**)
+**SIMD** ([_Single Instruction Multiple Data_](https://wikipedia.org/wiki/SIMD))	posts/SimdGpgpuTpu.md	/^# **SIMD** ([_Single Instruction Multiple Data_](https:\/\/wikipedia.org\/wiki\/SIMD))$/;"	c
+**TPU**s ([Tensor Processor Units](https://wikipedia.org/wiki/Tensor_Processing_Unit))	posts/SimdGpgpuTpu.md	/^# **TPU**s ([Tensor Processor Units](https:\/\/wikipedia.org\/wiki\/Tensor_Processing_Unit))$/;"	c
 1	SECURITY.md	/^[^1]: Asof [commmit 7a9f52b2301f16807485b6701bec883404b4bd29](https:\/\/github.com\/SwuduSusuwu\//;"	n	section:Security Policy""Errata/footnotes
 2	SECURITY.md	/^[^2]: Asof [commmit 36fa8a54a2a56d6e5bf21899980b48b462c15bde](https:\/\/github.com\/SwuduSusuwu\//;"	n	section:Security Policy""Errata/footnotes
 3	SECURITY.md	/^[^3]: Asof [commmit a40d1ff013f3007384e4ed025d0e402364d189cb](https:\/\/github.com\/SwuduSusuwu\//;"	n	section:Security Policy""Errata/footnotes
@@ -106,7 +109,6 @@ Beta test/`experimental` builds	README.md	/^## Beta test\/`experimental` builds$
 BytecodeOffset	cxx/ClassResultList.hxx	/^typedef ptrdiff_t BytecodeOffset; \/* all tests of `ResultListBytecode` should return `{Bytecode/;"	t	namespace:Susuwu	typeref:typename:ptrdiff_t
 Bytecodes	cxx/ClassResultList.hxx	/^	typedef std::vector<ResultListBytecode> Bytecodes;$/;"	t	struct:Susuwu::ResultList	typeref:typename:std::vector<ResultListBytecode>
 CXXFLAGS	VirusAnalysis.md	/^[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https:\/\/swudususuwu.substac/;"	n	chapter:Intro
-CXXFLAGS	posts/VirusAnalysis.md	/^[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https:\/\/swudususuwu.substac/;"	n	chapter:Intro
 Ch_temp1	c/rfc6234/sha384-512.c	/^static uint32_t Ch_temp1[2], Ch_temp2[2], Ch_temp3[2];$/;"	v	typeref:typename:uint32_t[2]	file:
 Ch_temp2	c/rfc6234/sha384-512.c	/^static uint32_t Ch_temp1[2], Ch_temp2[2], Ch_temp3[2];$/;"	v	typeref:typename:uint32_t[2]	file:
 Ch_temp3	c/rfc6234/sha384-512.c	/^static uint32_t Ch_temp1[2], Ch_temp2[2], Ch_temp3[2];$/;"	v	typeref:typename:uint32_t[2]	file:
@@ -206,6 +208,7 @@ Intermediate_Hash	c/rfc6234/sha.h	/^		uint32_t Intermediate_Hash[SHA256HashSize\
 Intermediate_Hash	c/rfc6234/sha.h	/^		uint32_t Intermediate_Hash[SHA512HashSize\/4]; \/* Message Digest  *\/$/;"	m	struct:SHA512Context	typeref:typename:uint32_t[]
 Intro	VirusAnalysis.md	/^# Intro$/;"	c
 Intro	posts/ArduinoElegooTools.md	/^# Intro$/;"	c
+Intro	posts/SimdGpgpuTpu.md	/^# Intro$/;"	c
 Intro	posts/VirusAnalysis.md	/^# Intro$/;"	c
 Issue/workaround	c/README.md	/^# Issue\/workaround$/;"	c
 Issues/workarounds	sh/README.md	/^# Issues\/workarounds$/;"	c
@@ -721,6 +724,7 @@ Susuwu	cxx/VirusAnalysis.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/main.cxx	/^namespace Susuwu {$/;"	n	file:
 SusuwuUnitTestsBitmask	cxx/main.hxx	/^typedef int SusuwuUnitTestsBitmask; \/* normal `int`, but used as bitmask (non-zero return value/;"	t	typeref:typename:int
 Synopsis + related posts	VirusAnalysis.md	/^# Synopsis + related posts$/;"	c
+Synopsis + related posts	posts/SimdGpgpuTpu.md	/^# Synopsis + related posts$/;"	c
 Synopsis + related posts	posts/VirusAnalysis.md	/^# Synopsis + related posts$/;"	c
 TEST1	c/rfc6234/shatest.c	/^#define TEST1 /;"	d	file:
 TEST10_1	c/rfc6234/shatest.c	/^#define TEST10_1 /;"	d	file:
@@ -756,6 +760,7 @@ Table of Contents	README.md	/^# Table of Contents$/;"	c
 Table of Contents	VirusAnalysis.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/ArduinoElegooTools.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/README.md	/^# Table of Contents$/;"	c
+Table of Contents	posts/SimdGpgpuTpu.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/TranscodeMuxHowto.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/VirusAnalysis.md	/^# Table of Contents$/;"	c
 Table of contents	posts/AlbatrossCNS.md	/^# Table of contents$/;"	c

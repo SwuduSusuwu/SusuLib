@@ -12,6 +12,7 @@
 - <https://github.com/SwuduSusuwu/SusuPosts/tree/preview/posts/> stages posts for <https://SwuduSusuwu.SubStack.com/> (which includes [`./posts/`](./) plus posts which are not about artificial neural tissue, antiviruses, assistants, or autonomous tools).
 - [`./posts/TranscodeMuxHowto.md`](./TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)).
 - [`./posts/ArduinoElegooTools.md`](./ArduinoElegooTools.md) is a preview (rough-draft work-in-progress), to process sensors (which has to do with [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)) + plan routes.
+- [`./posts/SimdGpgpuTpu.md`](./SimdGpgpuTpu.md) is a preview post about [**SIMD**](https://wikipedia.org/wiki/SIMD), [**GPGPU**](https://wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units) and [**TPU**](https://wikipedia.org/wiki/Tensor_Processing_Unit) implementations of formulas, which has to do with [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/AlbatrossCNS.md`](./AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
 
