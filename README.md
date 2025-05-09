@@ -96,6 +96,7 @@
   - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) is to implement this class.
   - `classCnsTests()` (template for unit tests, which subclasses shall use).
+- [`./cxx/ClassTensorFlowCns.hxx`](./cxx/ClassTensorFlowCns.hxx) is `class TensorFlowCns : public Cns` (implements `./cxx/ClassCns.hxx`). This will close [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) if [_TensorFlow_](https://github.com/tensorflow/tensorflow) passes `./build.sh` for all [supported systems](#how-to-use-this).
 - [`./cxx/ClassResultList.hxx`](./cxx/ClassResultList.hxx) is
   - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListLoadFrom()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
   - `enum ListFormat { listFormatInitializer /* style: C or C++ */, listFormatJson /* style: Java or JavaScript */ };` format to store to (or load from) disk.
@@ -183,6 +184,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
   - Unstable/`preview` flags:
+    - `-DSUSUWU_CNS_LOCAL_COEFFICIENTS=true` to have derivatives of `class Cns` store the connectome as part of the class, even if external libs (such as [_TensorFlow_](https://github.com/tensorflow/tensorflow)) also store the connectome.
+    - `-DSUSUWU_TENSORFLOW_HAS_DATATYPETOENUM=true` to use [`tensorflow::DataTypeToEnum`](https://github.com/tensorflow/tensorflow/issues/30828#issuecomment-3039819975). Default is `=false` (implement `Susuwu::DataTypeToEnum`.)
     - `-DSUSUWU_EXPERIMENTAL` to enable `preview` (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch preview` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
     - `-DSUSUWU_USE_PUGIXML` to use [`libpugixml`](https://github.com/zeux/pugixml) to parse [**XML**](https://wikipedia.org/wiki/XML) / [**DOM**](https://wikipedia.org/wiki/Document_Object_Model); default is unset.
