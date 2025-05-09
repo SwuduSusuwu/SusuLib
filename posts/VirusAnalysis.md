@@ -2813,6 +2813,21 @@ typedef class ApxrCns : Cns {
 namespace Susuwu {
 typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } /* `decltype(tensorflow::ops::SoftmaxCrossEntropyWithLogits(tensorflow::Scope::NewRootScope(), tensorflow::ops::Add, tensorflow::ops::Placeholder))`? */ TensorFlowCnsLoss;
 
+/* For use until [`tensorflow::ops::SigmoidCrossEntropyWithLogits`](https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/sigmoid-cross-entropy-with-logits) (which GitHub's assistant suggests, but is "404" now) is found or `tensorflow::ops::BinaryCrossEntropyWithLogits` (which Claude-3-Haiku says to use from `tensorflow/c/experimental/ops/nn_ops.h`, but is also not found) is found.
+ * BCE = max(logits, 0) - logits * labels + log(1 + exp(-abs(logits))) */
+static const TensorFlowCnsLoss SigmoidCrossEntropyWithLogits(const tensorflow::Scope &root, const tensorflow::Input &logits, const tensorflow::Input &labels) {
+	//return tensorflow::ops::Sigmoid(root, tensorflow::ops::SparseCrossEntropyWithLogits(root, logits, labels));
+	auto zeros = tensorflow::ops::ZerosLike(root, logits); /* `tensorflow::ops::Const(root, 0.0f, logits.shape());` may not support placeholders? */
+	auto cond = tensorflow::ops::Maximum(root, logits, zeros);
+	auto negAbs = tensorflow::ops::Neg(root, tensorflow::ops::Abs(root, logits));
+	auto logExp = tensorflow::ops::Log1p(root, tensorflow::ops::Exp(root, negAbs));
+	auto mul = tensorflow::ops::Multiply(root, logits, labels);
+	auto bce = tensorflow::ops::Add(root, tensorflow::ops::Subtract(root, cond, mul), logExp);
+	/* TODO: `bce = { tensorflow::ops::Mean(root, bce, 0) };`, or is the caller supposed to do this? */
+	auto sigmoid = tensorflow::ops::Sigmoid(root, logits);
+	auto grad = tensorflow::ops::Subtract(root, sigmoid, labels);
+	return { bce, grad };
+}
 template<> /* specialization continued from `cxx/ClassObject.hxx` */
 struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeString; }; /* `error: implicit instantiation of undefined template 'Susuwu::ToObjectMode<tsl::tstring>'` fix */
 
@@ -3050,15 +3065,48 @@ public:
 
 		/* Define the loss function (ergo, softmax cross-entropy) */
 		auto labels = tensorflow::ops::Placeholder(root.WithOpName("labels"), /* `DataTypeToEnum<Output>::value` gives "INVALID_ARGUMENT: Inconsistent values" */coefficientFormat/*, Placeholder::Shape({-1, outputDim})*/);
-		auto loss = tensorflow::ops::Mean(root, tensorflow::ops::SoftmaxCrossEntropyWithLogits(root, relu /* or `logits` */, labels), 0);
+#ifdef TENSORFLOW_HAS_GRADIENTTAPE
+		/* Record the operations for the loss computation */
+		tensorflow::GradientTape tape;
+		tape.Watch({coefficientsVar, biasesVar});
+#endif /* def TENSORFLOW_HAS_GRADIENTTAPE */
+		tensorflow::Output loss, grad;
+		auto scaleNum = tensorflow::ops::Const(root, 1.0f)
+		if(objectModeBool == outputMode) { /* binary classification loop */
+			auto unkClass = SigmoidCrossEntropyWithLogits(root, logits, labels);
+			loss = unkClass.loss;
+			grad = unkClass.backprop;
+		} else if(objectModeVectorBool == outputMode) { /* multi-class (categorical) one-hot classification loop */
+			auto unkClass = tensorflow::ops::SoftmaxCrossEntropyWithLogits(root, logits, labels);
+			loss = unkClass.loss;
+			grad = unkClass.backprop;
+#ifdef SUSUWU_CNS_MODE_ENUM /* TODO? Is `objectModeEnum` (or `objectModeVectorEnum`) required for class indices? */
+		} else if(objectModeEnum == outputMode || objectModeVectorEnum == outputMode) { /* multi-label multi-class classification loop */
+			auto unkClass = tensorflow::ops::SparseSoftmaxCrossEntropyWithLogits(root, logits, labels);
+			loss = unkClass.loss;
+			grad = unkClass.backprop;
+#endif /* !def SUSUWU_CNS_MODE_ENUM */
+		} else { /* common regression loop */
+			loss = tensorflow::ops::SquaredDifference(root, logits, labels); /* squared error */
+//			loss = tensorflow::ops::Multiply(root, squared, tensorflow::ops::Const(root, 1.0f / 2.0f));
+			grad = tensorflow::ops::Subtract(root, logits /* TODO: should this use `relu`? */, labels); /* shape: [batchSize, outputDim] */
+			scaleNum = tensorflow::ops::Const(root, 2.0f); /* `.loss` is `^ 2`, so `.backprop` is `* 1/2`. This is so `scale` does not require the factor of `2` (which would not suit other formulas). */
+		}
+		loss = tensorflow::ops::Mean(root, loss, 0);
 
 		/* Gradients (last argument, `delta`, to `tensorflow::ops::ApplyGradientDescent` */
 //		auto gradients = tensorflow::ops::Gradients(root, {loss}, {coefficients SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA biases}); /* gives `error: no member named 'Gradients' in namespace 'tensorflow::ops'` */
 
-		auto error = tensorflow::ops::Subtract(root, logits /* TODO: should this use `relu`? */, labels); /* shape: [batch_size, output_dim] */
+#ifdef TENSORFLOW_HAS_GRADIENTTAPE
+		/* Compute the gradients */
+		std::vector<tensorflow::Output> gradientOutputs = tape.Gradient({loss}, {coefficientsVar, biasesVar});
+		tensorflow::Output gradCoefficientsScaled = gradientOutputs[0],
+			SUSUWU_CNS_IF_BIAS(gradBiasesScaled = gradientOutputs[1]);
+		static_cast<void>(grad); /* "style: Variable 'grad' is assigned a value that is never used. [unreadVariable]" fix. */
+#else /* ! def TENSORFLOW_HAS_GRADIENTTAPE */
 		auto inputTranspose = tensorflow::ops::Transpose(root, input, {1, 0}); /* Transpose input: shape [input_dim, batch_size] */
-		SUSUWU_CNS_IF_BIAS(auto gradBiases = tensorflow::ops::Sum(root, error, {0});) /* Sum over batch axis */ /* Notice: swapped order so dependency of `MatMul` on `inputT` is masked with overhead of `Sum` */
-		auto gradCoefficients = tensorflow::ops::MatMul(root, inputTranspose, error); /* MatMul: shape [input_dim, output_dim] */
+		auto gradCoefficients = tensorflow::ops::MatMul(root, inputTranspose, grad); /* MatMul: shape [input_dim, output_dim] */
+		SUSUWU_CNS_IF_BIAS(auto gradBiases = tensorflow::ops::Sum(root, grad, {0});) /* Sum over batch axis */ /* Notice: swapped order so dependency of `MatMul` on `inputTranspose` is masked with overhead of `Sum` */
 
 		/* Scalar batch size (to divide by) */
 		auto batchSize = tensorflow::ops::Shape(root, input /* With `inputDim`, does not converge. With `input`, diverges. TODO: improve */); /* shape: [batch_size, input_dim] */
@@ -3066,12 +3114,12 @@ public:
 		auto batchSizeFloat = tensorflow::ops::Cast(root, batchSizeScalar, coefficientFormat);
 		auto batchSizeReduced = tensorflow::ops::Squeeze(root, batchSizeFloat); /* Reduce batchSize to scalar */
 
-		auto two = tensorflow::ops::Const(root, 2.0f /* since this is for "derivative of squared error" */);
-		auto scale = tensorflow::ops::Div(root, two, batchSizeReduced); /* `scale = 2.0 / batchSize` */
+		auto scale = tensorflow::ops::Div(root, scaleNum, batchSizeReduced);
 
 		/* Scaled grads (`ApplyGradientDescent`'s `delta` = `grad / scale`) */
 		auto gradCoefficientsScaled = tensorflow::ops::Multiply(root, gradCoefficients, scale);
 		SUSUWU_CNS_IF_BIAS(auto gradBiasesScaled = tensorflow::ops::Multiply(root, gradBiases, scale);) /* use same scale as above */
+#endif /* def TENSORFLOW_HAS_GRADIENTTAPE */
 
 #if SUSUWU_CNS_IF_MLP
 #	pragma message("TODO: `ApplyGradientDescent` loop for `SUSUWU_CNS_USE_MLP`")
@@ -3212,7 +3260,7 @@ public:
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	const int processToInt(const int &input) const SUSUWU_OVERRIDE {
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType /* `int` gives "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({1, 1}));
-		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = numeralNormalization(input, inputNorms());
+		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = static_cast<CoefficientDefaultType>(numeralNormalization(input, inputNorms()));
 		auto oTensors = processToImpl<CoefficientDefaultType, int>(inputTensor, __func__);
 		return static_cast<int>(numeralDenormalization(oTensors[0].matrix<CoefficientDefaultType /* `int` */>()(0, 0), outputNorms()));
 	}
