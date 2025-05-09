@@ -2391,12 +2391,13 @@ public:
 	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } /* sets connectome "hidden layer" count */
 	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } /* sets connectome coefficients-per-"hidden layer" (notice: some implementations require `inputNeurons == neuronsPerLayer`) */
 
+/* NOLINTBEGIN(google-default-arguments): derivative classes use our default values */
 	/* @throw bad_alloc
 	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
 #if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	template<typename Input, typename Output>
-	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* { inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
+	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */); /* { inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
 	template<typename Input, typename Output>
 	virtual const Output process(const Input input) const {
@@ -2408,7 +2409,7 @@ public:
 	/* @throw bad_alloc \
 	 * @pre @code !isPureVirtual() @endcode \
 	 * @post @code isInitialized() @endcode */\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs) { inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; } /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
+	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; } /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
 #	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_TYPEDEF) \
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, bool)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, char)\
@@ -2453,6 +2454,7 @@ public:
 	SUSUWU_TEMPLATE_WORKAROUND(std::string)
 #	undef SUSUWU_TEMPLATE_WORKAROUND
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
+/* NOLINTEND(google-default-arguments) */
 	const NumeralNormalizers &inputNorms() const {
 		return inputNormsStorage;
 	}
