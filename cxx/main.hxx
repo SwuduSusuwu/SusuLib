@@ -24,10 +24,12 @@ static const int susuwuUnitTestsClassResultListBit =
 	1 << 6; /*  64: `ClassResultList.hxx:classResultListTestsNoexcept()` */
 static const int susuwuUnitTestsClassWebBrowseBit =
 	1 << 7; /* 128: `ClassWebBrowse.hxx:classWebBrowseTestsNoexcept()` */
+static const int susuwuUnitTestsClassTensorFlowCnsBit =
+	1 << 8; /* 256: `ClassTensorFlowCns.hxx:classTensorFlowCnsTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit =
-	1 << 8; /* 256: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
+	1 << 9; /* 512: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit =
-	1 << 9; /* 512: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
+	1 << 10; /* 1024: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 #ifdef __cplusplus
