@@ -58,6 +58,7 @@ Those compression ratio guesses are based on the amount of visuals which human c
 ## Synopsis + related posts/resources
 - [\[Preview\] How to use _FLOSS_ code to produce autonomous _Arduino_/_Elegoo_ tools](./ArduinoElegooTools.md)
 - [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
+- [How to improve how fast desktops/laptops/phones execute code](./SimdGpgpuTpu.md)
 
 Previous posts about artificial neural tissue:
 - [Destructive (scan uses nanoscopic decomposition) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
