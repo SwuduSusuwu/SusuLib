@@ -41,6 +41,7 @@
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
   - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassCns.hxx`](./ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) is to implement this class.
+- [`./cxx/ClassTensorFlowCns.hxx`](./cxx/ClassTensorFlowCns.hxx) is `class TensorFlowCns : public Cns` (implements `./cxx/ClassCns.hxx`). This will close [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) if [_TensorFlow_](https://github.com/tensorflow/tensorflow) passes `./build.sh` for all [supported systems](#how-to-use-this).
 - [`./cxx/ClassResultList.hxx`](./ClassResultList.hxx) is
   - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListLoadFrom()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
   - `enum ListFormat { listFormatInitializer /* style: C or C++ */, listFormatJson /* style: Java or JavaScript */ };` format to store to (or load from) disk.
