@@ -22,10 +22,13 @@ For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.
 `git clone https://github.com/SwuduSusuwu/SusuLib.git && cd ./SusuLib/ && ./build.sh`
 
 To test certificates, view [`../README.md#signaturecertificate`](../README.md#signaturecertificate) + [this post](https://swudususuwu.substack.com/p/s256_1ywl0ridf6zuex1qazgx1ihgdytfkyf9t97gonfroio).
-To improve how fast the whole program executes; `CXXFLAGS` should include auto-vectorizes/auto-parallelizes. [^CXXFLAGS]
 
-To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]
-[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
+To improve how fast the whole program executes; [set relevent environment flags (such as `CXXFLAGS`) to enable **SIMD**](./SimdGpgpuTpu.md#simd-single-instruction-multiple-data) plus _OpenMP_.
+
+To improve how fast backpropagation (ergo "training"; such as `Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) plus forwardpropagation (ergo "inference"; such as `Cns::processTo*()`, which {`cnsAnalysisScore()` and `cnsVirusFix()`} use) executes:
+* for 1 or more computers, [use **TPU**s](./SimdGpgpuTpu.md#tpus-tensor-processor-units).
+* for distributed compute, implement `class Cns` with [_TensorFlow_'s `MapReduce`](./SimdGpgpuTpu.md#synopsis--related-posts).
+
 # Source code
 All of the [sources](../cxx/)  which follow, start with this 4-row attribution notice (except instead of `./cxx/*.*xx`, the `#include` source path (such as `cxx/Macros.hxx`)  is used):
 ```c+++
