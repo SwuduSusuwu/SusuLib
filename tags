@@ -692,6 +692,7 @@ SUSUWU_WARNING_EXECUTE	cxx/Macros.hxx	/^#define SUSUWU_WARNING_EXECUTE(/;"	d
 SUSUWU_WIN32	cxx/Macros.hxx	/^#	define SUSUWU_WIN32 \/* Usage: `#ifdef SUSUWU_WIN32\\/;"	d
 Security Policy	SECURITY.md	/^# Security Policy$/;"	c
 Sensitive issues	SECURITY.md	/^## Sensitive issues$/;"	s	chapter:Security Policy
+SigmoidCrossEntropyWithLogits	cxx/ClassTensorFlowCns.hxx	/^static const TensorFlowCnsLoss SigmoidCrossEntropyWithLogits(const tensorflow::Scope &root, cons/;"	f	namespace:Susuwu	typeref:typename:const TensorFlowCnsLoss
 Signature/certificate	README.md	/^## Signature\/certificate$/;"	s	chapter:How to use this
 Signatures	cxx/ClassResultList.hxx	/^	typedef std::vector<ResultListSignature> Signatures;$/;"	t	struct:Susuwu::ResultList	typeref:typename:std::vector<ResultListSignature>
 Source code	VirusAnalysis.md	/^# Source code$/;"	c
