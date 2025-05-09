@@ -3,12 +3,9 @@
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
 #include "ClassIo.hxx" /* classIoHexStr gsl::owner */
-#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
-#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */
-#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) */
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp memcpy */
 #include <new> /* ::operator new */
 #include <stdexcept> /* std::runtime_error */
@@ -143,11 +140,7 @@ public:
 		this->~Object();
 	}
 	const Class &getClass() const { return *this; }
-#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-	virtual const intptr_t hashCode() const { return reinterpret_cast<intptr_t>(this); }
-#else /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
-	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
-#endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
+	virtual const SUSUWU_INTPTR hashCode() const { return reinterpret_cast<SUSUWU_INTPTR>(this); }
 	virtual const std::string toString() const {
 		return getName() + '@' + classIoHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
 	}

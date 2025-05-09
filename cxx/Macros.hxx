@@ -133,9 +133,13 @@
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? || SUSUWU_HAS_ATTRIBUTE(noreturn) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
+#	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */ /* NOLINT(misc-include-cleaner): this is used if `SUSUWU_INTPTR` is used */
+#	define SUSUWU_INTPTR intptr_t
 #else
 #	define SUSUWU_NORETURN /* No-op; old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
 #	define SUSUWU_CONSTEXPR /* No-op */
+#	include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
+#	define SUSUWU_INTPTR size_t /* is supposed to hold a positive pointer (a memory address), and `size_t` can hold all positive memory address offsets. */
 #endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 #ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */

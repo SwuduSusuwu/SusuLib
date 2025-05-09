@@ -125,7 +125,6 @@ Cns	cxx/ClassCns.hxx	/^typedef class Cns : public Object {$/;"	c	namespace:Susuw
 Cns	cxx/ClassCns.hxx	/^} Cns;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Cns
 CnsMode	cxx/ClassCns.hxx	/^typedef enum CnsMode : char {$/;"	g	namespace:Susuwu	typeref:typename:char
 CnsMode	cxx/ClassCns.hxx	/^} CnsMode;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::CnsMode
-CoefficientDefaultType	ClassTensorFlowCns.hxx	/^	typedef float CoefficientDefaultType; \/* `float` is the most common (due to: is fast and accur/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:float
 CoefficientDefaultType	cxx/ClassTensorFlowCns.hxx	/^	typedef float CoefficientDefaultType; \/* `float` is the most common (due to: is fast and accur/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:float
 Comparison to assistants	VirusAnalysis.md	/^# Comparison to assistants$/;"	c
 Comparison to assistants	posts/VirusAnalysis.md	/^# Comparison to assistants$/;"	c
@@ -140,11 +139,9 @@ Corrupted	c/rfc6234/sha.h	/^		int Corrupted;                  \/* Cumulative cor
 Corrupted	c/rfc6234/sha.h	/^		int Corrupted;                  \/* Cumulative corruption code *\/$/;"	m	struct:SHA512Context	typeref:typename:int
 Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corruption code *\/$/;"	m	struct:HKDFContext	typeref:typename:int
 Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corruption code *\/$/;"	m	struct:HMACContext	typeref:typename:int
-DataTypeToEnum	ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
 DataTypeToEnum	cxx/ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
 Depth-image to point cloud	posts/ArduinoElegooTools.md	/^## Depth-image to point cloud$/;"	s	chapter:Howto produce point clouds
 Different forms (and placements) of servos	posts/ArduinoElegooTools.md	/^## Different forms (and placements) of servos$/;"	s	chapter:Parts & kits lists
-DimSz	ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
 DimSz	cxx/ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
 Disclaimer	posts/ArduinoElegooTools.md	/^## Disclaimer$/;"	s	chapter:Licenses
 Download	README.md	/^## Download$/;"	s	chapter:How to use this
@@ -193,7 +190,6 @@ INCLUDES_cxx_ClassSha2_cxx	cxx/ClassSha2.cxx	/^#define INCLUDES_cxx_ClassSha2_cx
 INCLUDES_cxx_ClassSha2_hxx	cxx/ClassSha2.hxx	/^#define INCLUDES_cxx_ClassSha2_hxx$/;"	d
 INCLUDES_cxx_ClassSys_cxx	cxx/ClassSys.cxx	/^#define INCLUDES_cxx_ClassSys_cxx$/;"	d	file:
 INCLUDES_cxx_ClassSys_hxx	cxx/ClassSys.hxx	/^#define INCLUDES_cxx_ClassSys_hxx$/;"	d
-INCLUDES_cxx_ClassTensorFlowCns_hxx	ClassTensorFlowCns.hxx	/^#define INCLUDES_cxx_ClassTensorFlowCns_hxx$/;"	d
 INCLUDES_cxx_ClassTensorFlowCns_hxx	cxx/ClassTensorFlowCns.hxx	/^#define INCLUDES_cxx_ClassTensorFlowCns_hxx$/;"	d
 INCLUDES_cxx_Macros_cxx	cxx/Macros.cxx	/^#define INCLUDES_cxx_Macros_cxx$/;"	d	file:
 INCLUDES_cxx_Macros_hxx	cxx/Macros.hxx	/^#define INCLUDES_cxx_Macros_hxx$/;"	d
@@ -422,22 +418,16 @@ SUSUWU_CLASS_DEFAULTS	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_DEFAULTS(SUBCLA
 SUSUWU_CLASS_GETNAME	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_GETNAME(/;"	d
 SUSUWU_CLASS_GETOBJECTSIZE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_GETOBJECTSIZE(/;"	d
 SUSUWU_CLASS_ISINSTANCE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_ISINSTANCE(/;"	d
-SUSUWU_CLASS_OPERATOREQUALTO	ClassTensorFlowCns.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassObject.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OVERRIDE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_OVERRIDE /;"	d
 SUSUWU_CLEAN_OUTPUT	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT() { #\/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" *\/$/;"	f
 SUSUWU_CLEAN_OUTPUT_IMPL	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT_IMPL() ( #\/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript/;"	f
-SUSUWU_CNS_IF_BIAS	ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_BIAS(/;"	d
 SUSUWU_CNS_IF_BIAS	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_BIAS(/;"	d
-SUSUWU_CNS_IF_MLP	ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_MLP(/;"	d
 SUSUWU_CNS_IF_MLP	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_MLP(/;"	d
-SUSUWU_CNS_LOCAL_COEFFICIENTS	ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_LOCAL_COEFFICIENTS /;"	d
 SUSUWU_CNS_LOCAL_COEFFICIENTS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_LOCAL_COEFFICIENTS /;"	d
 SUSUWU_CNS_SETUP_SYNAPSES	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SETUP_SYNAPSES(/;"	d
-SUSUWU_CNS_USE_BIAS	ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_BIAS /;"	d
 SUSUWU_CNS_USE_BIAS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_BIAS /;"	d
-SUSUWU_CNS_USE_MLP	ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
 SUSUWU_CNS_USE_MLP	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
 SUSUWU_COMMA	cxx/Macros.hxx	/^#define SUSUWU_COMMA /;"	d
 SUSUWU_COMPILE_COMMAND	sh/make.sh	/^SUSUWU_COMPILE_COMMAND() { #\/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command/;"	f
@@ -512,6 +502,7 @@ SUSUWU_INLINE	cxx/Macros.hxx	/^#	define SUSUWU_INLINE /;"	d
 SUSUWU_INSTALL	sh/make.sh	/^SUSUWU_INSTALL() ( #\/* Usage: `SUSUWU_INSTALL [USRBIN]`. Is analogous to `make install`. *\/$/;"	f
 SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL	cxx/ClassObject.hxx	/^#define SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL(/;"	d
 SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL_PURE_VIRTUAL	cxx/ClassObject.hxx	/^#define SUSUWU_INSTRUMENTATION_ISPUREVIRTUAL_PURE_VIRTUAL(/;"	d
+SUSUWU_INTPTR	cxx/Macros.hxx	/^#	define SUSUWU_INTPTR /;"	d
 SUSUWU_IO_THROW	cxx/ClassIo.hxx	/^#	define SUSUWU_IO_THROW false \/* `if(SUSUWU_IO_THROW)/;"	d
 SUSUWU_IO_WHITESPACE	cxx/ClassIo.hxx	/^#	define SUSUWU_IO_WHITESPACE /;"	d
 SUSUWU_IS_PREVIEW	sh/Macros.sh	/^SUSUWU_IS_PREVIEW() ( #\/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; then EXPERIMENTAL_/;"	f
@@ -656,11 +647,8 @@ SUSUWU_SUCCESS	cxx/Macros.hxx	/^#define SUSUWU_SUCCESS(/;"	d
 SUSUWU_SUCCESS_EXECUTE	cxx/Macros.hxx	/^#define SUSUWU_SUCCESS_EXECUTE(/;"	d
 SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^#	define SUSUWU_TEMPLATE_WORKAROUND(/;"	d
 SUSUWU_TENSORFLOWCNS_INIT_SCOPE	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /;"	d
-SUSUWU_TENSORFLOWCNS_LOGITS	ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
 SUSUWU_TENSORFLOWCNS_LOGITS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
-SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d
 SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d
-SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM	ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM /;"	d
 SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM /;"	d
 SUSUWU_TEST_BASH	sh/Macros.sh	/^SUSUWU_TEST_BASH() ( #\/* Usage: `s\/exit ${STATUS}\/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?;/;"	f
 SUSUWU_TEST_OUTPUT	sh/make.sh	/^SUSUWU_TEST_OUTPUT() { #\/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-e/;"	f
@@ -700,7 +688,6 @@ SubClassWithMemberSubobjectNoAddress	cxx/Macros.cxx	/^	class SubClassWithMemberS
 SubObject	cxx/ClassObject.cxx	/^class SubObject : public Object { SUSUWU_VIRTUAL_DEFAULTS(SubObject) };$/;"	c	namespace:Susuwu::__anonf22f36750111	file:
 SubObjectWithMemberObject	cxx/ClassObject.cxx	/^class SubObjectWithMemberObject : public Object { public: SUSUWU_VIRTUAL_DEFAULTS(SubObjectWithM/;"	c	namespace:Susuwu::__anonf22f36750111	file:
 Supported versions	SECURITY.md	/^## Supported versions$/;"	s	chapter:Security Policy
-Susuwu	ClassTensorFlowCns.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/AssistantCns.cxx	/^namespace Susuwu { \/* NOLINTBEGIN(performance-inefficient-string-concatenation): suggestion tri/;"	n	file:
 Susuwu	cxx/AssistantCns.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/ClassCns.cxx	/^namespace Susuwu {$/;"	n	file:
@@ -764,19 +751,13 @@ Table of Contents	posts/SimdGpgpuTpu.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/TranscodeMuxHowto.md	/^# Table of Contents$/;"	c
 Table of Contents	posts/VirusAnalysis.md	/^# Table of Contents$/;"	c
 Table of contents	posts/AlbatrossCNS.md	/^# Table of contents$/;"	c
-TensorFlowCns	ClassTensorFlowCns.hxx	/^	TensorFlowCns() : root(tensorflow::Scope::NewRootScope()) {$/;"	f	class:Susuwu::TensorFlowCns
-TensorFlowCns	ClassTensorFlowCns.hxx	/^	TensorFlowCns(const TensorFlowCns &obj) : Cns(obj), root(tensorflow::Scope::NewRootScope()) {$/;"	f	class:Susuwu::TensorFlowCns
-TensorFlowCns	ClassTensorFlowCns.hxx	/^class TensorFlowCns : public Cns {$/;"	c	namespace:Susuwu
 TensorFlowCns	cxx/ClassTensorFlowCns.hxx	/^	TensorFlowCns() : root(tensorflow::Scope::NewRootScope()) {$/;"	f	class:Susuwu::TensorFlowCns
 TensorFlowCns	cxx/ClassTensorFlowCns.hxx	/^	TensorFlowCns(const TensorFlowCns &obj) : Cns(obj), root(tensorflow::Scope::NewRootScope()) {$/;"	f	class:Susuwu::TensorFlowCns
 TensorFlowCns	cxx/ClassTensorFlowCns.hxx	/^class TensorFlowCns : public Cns {$/;"	c	namespace:Susuwu
-TensorFlowCnsLoss	ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	s	namespace:Susuwu
-TensorFlowCnsLoss	ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	t	namespace:Susuwu	typeref:struct:Susuwu::TensorFlowCnsLoss
 TensorFlowCnsLoss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	s	namespace:Susuwu
 TensorFlowCnsLoss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	t	namespace:Susuwu	typeref:struct:Susuwu::TensorFlowCnsLoss
 This	VirusAnalysis.md	/^`less` [`cxx\/ClassObject.cxx`](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject/;"	h	chapter:Source code
 This	posts/VirusAnalysis.md	/^`less `[`cxx\/ClassObject.cxx`](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject/;"	h	chapter:Source code
-ToObjectMode	ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	s	namespace:Susuwu
 ToObjectMode	cxx/ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	s	namespace:Susuwu
 USHABlockSize	c/rfc6234/usha.c	/^int USHABlockSize(enum SHAversion whichSha)$/;"	f	typeref:typename:int
 USHAContext	c/rfc6234/sha.h	/^typedef struct USHAContext {$/;"	s
@@ -848,9 +829,7 @@ assistantCnsProcessXhtml	cxx/AssistantCns.cxx	/^void assistantCnsProcessXhtml(Re
 assistantCnsResponseDelimiter	cxx/AssistantCns.cxx	/^std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResp/;"	v	namespace:Susuwu	typeref:typename:std::string
 assistantCnsTests	cxx/AssistantCns.cxx	/^const bool assistantCnsTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 assistantCnsTestsNoexcept	cxx/AssistantCns.hxx	/^static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistan/;"	f	namespace:Susuwu	typeref:typename:const bool
-backprop	ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
 backprop	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
-bce	ClassTensorFlowCns.hxx	/^	auto bce = tensorflow::ops::Add(root, tensorflow::ops::Subtract(root, cond, mul), logExp);$/;"	v	namespace:Susuwu	typeref:typename:auto
 biases	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor biases = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({s/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
 blockSize	c/rfc6234/sha.h	/^		int blockSize;              \/* block size of SHA being used *\/$/;"	m	struct:HMACContext	typeref:typename:int
 boo	cxx/Macros.cxx	/^	class SubClassWithBaseSubobject : public Zero {public: bool boo = true;};$/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithBaseSubobject	typeref:typename:bool	file:
@@ -937,7 +916,6 @@ cnsModeVectorInt	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsMo
 cnsModeVectorUint	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
 cnsVirusFix	cxx/VirusAnalysis.cxx	/^const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns \/* = virusFixC/;"	f	namespace:Susuwu	typeref:typename:const ClassIoBytecode
 coefficients	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor coefficients = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorSh/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
-cond	ClassTensorFlowCns.hxx	/^	auto cond = tensorflow::ops::Maximum(root, logits, zeros);$/;"	v	namespace:Susuwu	typeref:typename:auto
 ctx	c/rfc6234/sha.h	/^		} ctx;$/;"	m	struct:USHAContext	typeref:union:USHAContext::__anoncf2b51e2030a
 dataarray	c/rfc6234/shatest.c	/^		const char *dataarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 datalength	c/rfc6234/shatest.c	/^		int datalength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
@@ -959,7 +937,6 @@ getObjectSize	cxx/ClassObject.hxx	/^	virtual const size_t getObjectSize() const 
 getParameterCount	cxx/ClassTensorFlowCns.hxx	/^	const size_t getParameterCount() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const size_t
 getSuperclassRef	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass();/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const Class &
 globalVirusAnalysisHook	cxx/VirusAnalysis.cxx	/^VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; \/* Just use virusAnalysis/;"	v	namespace:Susuwu	typeref:typename:VirusAnalysisHook
-grad	ClassTensorFlowCns.hxx	/^	auto grad = tensorflow::ops::Subtract(root, sigmoid, labels);$/;"	v	namespace:Susuwu	typeref:typename:auto
 graphDef	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::GraphDef graphDef; \/* TODO: If not used after init, move this into `setupRootScope/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::GraphDef
 gsl	cxx/ClassIo.hxx	/^namespace gsl {$/;"	n
 hasExtraVirtuals	cxx/ClassObject.hxx	/^	virtual const bool hasExtraVirtuals() const { \/* if(has `virtual`s other than `Object`'s) { re/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
@@ -968,9 +945,7 @@ hash	c/rfc6234/shatest.c	/^int hash(int testno, int loopno, int hashno,$/;"	f	ty
 hash	c/rfc6234/shatest.c	/^struct hash {$/;"	s	file:
 hashAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const ResultListHash &fil/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 hashAnalysisCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
-hashCode	ClassTensorFlowCns.hxx	/^	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE SUSUWU_VIRTUAL_HASHCODE \/* Shallow hash c/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const SUSUWU_INTPTR
-hashCode	cxx/ClassObject.hxx	/^	virtual const intptr_t hashCode() const { return reinterpret_cast<intptr_t>(this); }$/;"	f	class:Susuwu::Object	typeref:typename:const intptr_t
-hashCode	cxx/ClassObject.hxx	/^	virtual const long hashCode() const { return reinterpret_cast<long>(this); } \/* NOLINT(google-/;"	f	class:Susuwu::Object	typeref:typename:const long
+hashCode	cxx/ClassObject.hxx	/^	virtual const SUSUWU_INTPTR hashCode() const { return reinterpret_cast<SUSUWU_INTPTR>(this); }$/;"	f	class:Susuwu::Object	typeref:typename:const SUSUWU_INTPTR
 hashCode	cxx/ClassTensorFlowCns.hxx	/^	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE SUSUWU_VIRTUAL_HASHCODE \/* Shallow hash c/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const SUSUWU_INTPTR
 hashHkdf	c/rfc6234/shatest.c	/^int hashHkdf(int testno, int loopno, int hashno,$/;"	f	typeref:typename:int
 hashSize	c/rfc6234/sha.h	/^		int hashSize;               \/* hash size of SHA being used *\/$/;"	m	struct:HKDFContext	typeref:typename:int
@@ -1039,8 +1014,6 @@ listMaxSize	cxx/ClassResultList.hxx	/^const size_t listMaxSize(const List &list)
 listProduceSignature	cxx/ClassResultList.hxx	/^const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_ite/;"	f	namespace:Susuwu	typeref:typename:const std::tuple<typename List::value_type::const_iterator,typename List::value_type::const_iterator>
 listToHashes	cxx/ClassResultList.hxx	/^void listToHashes(const List &list \/* ResultList::bytecodes or ResultList::hex*\/, List2 &hashe/;"	f	namespace:Susuwu	typeref:typename:void
 listsIntersect	cxx/ClassResultList.hxx	/^const bool listsIntersect(const List &list, const List &list2) {$/;"	f	namespace:Susuwu	typeref:typename:const bool
-logExp	ClassTensorFlowCns.hxx	/^	auto logExp = tensorflow::ops::Log1p(root, tensorflow::ops::Exp(root, negAbs));$/;"	v	namespace:Susuwu	typeref:typename:auto
-loss	ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
 loss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
 macrosDeclarationAttributes	cxx/Macros.cxx	/^SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENS/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_CONSTEXPR const bool	file:
 macrosNoReturn	cxx/Macros.cxx	/^SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} \/* NOLINT(concurrency-mt-unsafe): is un/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_NORETURN void	file:
@@ -1049,9 +1022,7 @@ macrosTestsNoexcept	cxx/Macros.cxx	/^const int macrosTestsNoexcept() SUSUWU_NOEX
 main	c/rfc6234/shatest.c	/^int main(int argc, char **argv)$/;"	f	typeref:typename:int
 main	cxx/main.cxx	/^SusuwuUnitTestsBitmask main(int argc, const char **args) {$/;"	f	typeref:typename:SusuwuUnitTestsBitmask
 manualReviewCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
-mul	ClassTensorFlowCns.hxx	/^	auto mul = tensorflow::ops::Multiply(root, logits, labels);$/;"	v	namespace:Susuwu	typeref:typename:auto
 name	c/rfc6234/shatest.c	/^		const char *name;$/;"	m	struct:hash	typeref:typename:const char *	file:
-negAbs	ClassTensorFlowCns.hxx	/^	auto negAbs = tensorflow::ops::Neg(root, tensorflow::ops::Abs(root, logits));$/;"	v	namespace:Susuwu	typeref:typename:auto
 neuronsPerLayer	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
 notify	cxx/ClassObject.hxx	/^	virtual void notify() {}$/;"	f	class:Susuwu::Object	typeref:typename:void
 notifyAll	cxx/ClassObject.hxx	/^	virtual void notifyAll() {}$/;"	f	class:Susuwu::Object	typeref:typename:void
@@ -1069,7 +1040,6 @@ okmarray	c/rfc6234/shatest.c	/^		const char *okmarray;$/;"	m	struct:hkdfhash	typ
 okmlength	c/rfc6234/shatest.c	/^		int okmlength;$/;"	m	struct:hkdfhash	typeref:typename:int	file:
 operator !=	cxx/ClassObject.hxx	/^	virtual bool operator!=(const Class &obj) const SUSUWU_FINAL { return !this->operator==(obj); }/;"	f	class:Susuwu::Class	typeref:typename:bool
 operator &	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator&(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
-operator ==	ClassTensorFlowCns.hxx	/^	bool operator==(const Class &obj) const SUSUWU_OVERRIDE { \/* NOLINT(fuchsia-overloaded-operato/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:bool
 operator ==	cxx/ClassTensorFlowCns.hxx	/^	bool operator==(const Class &obj) const SUSUWU_OVERRIDE { \/* NOLINT(fuchsia-overloaded-operato/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:bool
 operator |	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 outputMode	cxx/ClassCns.hxx	/^	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:CnsMode
@@ -1095,15 +1065,12 @@ produceAbortListSignatures	cxx/VirusAnalysis.cxx	/^void produceAbortListSignatur
 produceAnalysisCns	cxx/VirusAnalysis.cxx	/^void produceAnalysisCns(const ResultList &pass, const ResultList &abort,$/;"	f	namespace:Susuwu	typeref:typename:void
 produceAssistantCns	cxx/AssistantCns.cxx	/^void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, C/;"	f	namespace:Susuwu	typeref:typename:void
 produceVirusFixCns	cxx/VirusAnalysis.cxx	/^void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrNull, Cns &cns \//;"	f	namespace:Susuwu	typeref:typename:void
-pseudoRandomSynapses	ClassTensorFlowCns.hxx	/^	void pseudoRandomSynapses(const InputsToOutputs &inputsToOutputs)$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 pseudoRandomSynapses	cxx/ClassTensorFlowCns.hxx	/^	void pseudoRandomSynapses(const InputsToOutputs &inputsToOutputs)$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 randomresults	c/rfc6234/shatest.c	/^		const char *randomresults[RANDOMCOUNT];$/;"	m	struct:hash	typeref:typename:const char * []	file:
 randomtest	c/rfc6234/shatest.c	/^		const char *randomtest;$/;"	m	struct:hash	typeref:typename:const char *	file:
 randomtest	c/rfc6234/shatest.c	/^void randomtest(int hashno, const char *seed, int hashsize,$/;"	f	typeref:typename:void
 repeatcount	c/rfc6234/shatest.c	/^		long repeatcount;$/;"	m	struct:hash::__anond9b948bd0108	typeref:typename:long	file:
-restructureConnectome	ClassTensorFlowCns.hxx	/^	void restructureConnectome() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 restructureConnectome	cxx/ClassTensorFlowCns.hxx	/^	void restructureConnectome() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-restructureConnectomeImpl	ClassTensorFlowCns.hxx	/^	void restructureConnectomeImpl() { \/* CRTP backend, for internal use. *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 restructureConnectomeImpl	cxx/ClassTensorFlowCns.hxx	/^	void restructureConnectomeImpl() { \/* CRTP backend, for internal use. *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 resultListDumpTo	cxx/ClassResultList.hxx	/^void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const b/;"	f	namespace:Susuwu	typeref:typename:void
 resultListDumpToAssignment	cxx/ClassResultList.hxx	/^void resultListDumpToAssignment(const std::string &listStr, Os &os, const bool whitespace, const/;"	f	namespace:Susuwu	typeref:typename:void
@@ -1122,20 +1089,15 @@ scasecmp	c/rfc6234/shatest.c	/^int scasecmp(const char *s1, const char *s2)$/;"	
 session	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Session* session = SUSUWU_NULLPTR;$/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Session *
 setInitialized	cxx/ClassCns.hxx	/^	virtual void setInitialized(const bool is) { initialized = is; } \/* after "training" (ergo "ba/;"	f	class:Susuwu::Cns	typeref:typename:void
 setInputMode	cxx/ClassCns.hxx	/^	virtual void setInputMode(CnsMode x) { inputMode = x; } \/* sets type of input *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
-setInputNeurons	ClassTensorFlowCns.hxx	/^	void setInputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome input count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setInputNeurons	cxx/ClassCns.hxx	/^	virtual void setInputNeurons(size_t x) { inputNeurons = x; } \/* sets connectome input count *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setInputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setInputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome input count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-setLayersOfNeurons	ClassTensorFlowCns.hxx	/^	void setLayersOfNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome "hidden layer" count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassCns.hxx	/^	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } \/* sets connectome "hidden /;"	f	class:Susuwu::Cns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setLayersOfNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome "hidden layer" count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-setNeuronsPerLayer	ClassTensorFlowCns.hxx	/^	void setNeuronsPerLayer(size_t x) SUSUWU_OVERRIDE { \/* sets connectome coefficients-per-"hidde/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassCns.hxx	/^	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } \/* sets connectome coeffici/;"	f	class:Susuwu::Cns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassTensorFlowCns.hxx	/^	void setNeuronsPerLayer(size_t x) SUSUWU_OVERRIDE { \/* sets connectome coefficients-per-"hidde/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setOutputMode	cxx/ClassCns.hxx	/^	virtual void setOutputMode(CnsMode x) { outputMode = x; } \/* sets type of output (notice: some/;"	f	class:Susuwu::Cns	typeref:typename:void
-setOutputNeurons	ClassTensorFlowCns.hxx	/^	void setOutputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome output count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setOutputNeurons	cxx/ClassCns.hxx	/^	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } \/* sets connectome output count/;"	f	class:Susuwu::Cns	typeref:typename:void
 setOutputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setOutputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome output count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-setSquareConnectome	ClassTensorFlowCns.hxx	/^	void setSquareConnectome(const bool is) SUSUWU_OVERRIDE { throw std::invalid_argument(SUSUWU_ER/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setSquareConnectome	cxx/ClassTensorFlowCns.hxx	/^	void setSquareConnectome(const bool is) SUSUWU_OVERRIDE { throw std::invalid_argument(SUSUWU_ER/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setupSynapses	cxx/ClassCns.cxx	/^	void setupSynapses(const std::vector<std::tuple<float, float>>) SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::HsomCns	typeref:typename:void	file:
 setupSynapses	cxx/ClassTensorFlowCns.hxx	/^	void setupSynapses(const std::vector<std::tuple<float \/* "input" *\/, float \/* "label" *\/>> /;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
@@ -1161,7 +1123,6 @@ sigma1_temp1	c/rfc6234/sha384-512.c	/^static uint32_t sigma1_temp1[2], sigma1_te
 sigma1_temp2	c/rfc6234/sha384-512.c	/^static uint32_t sigma1_temp1[2], sigma1_temp2[2],$/;"	v	typeref:typename:uint32_t[2]	file:
 sigma1_temp3	c/rfc6234/sha384-512.c	/^	sigma1_temp3[2], sigma1_temp4[2];$/;"	v	typeref:typename:uint32_t[2]	file:
 sigma1_temp4	c/rfc6234/sha384-512.c	/^	sigma1_temp3[2], sigma1_temp4[2];$/;"	v	typeref:typename:uint32_t[2]	file:
-sigmoid	ClassTensorFlowCns.hxx	/^	auto sigmoid = tensorflow::ops::Sigmoid(root, logits);$/;"	v	namespace:Susuwu	typeref:typename:auto
 signature	cxx/ClassResultList.hxx	/^	ResultListSignature signature;$/;"	m	struct:Susuwu::ResultListSignatureMatch	typeref:typename:ResultListSignature
 signatureAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, const ResultListHash/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 signatureAnalysisCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
@@ -1198,8 +1159,6 @@ usesDynamicAllocations	cxx/ClassObject.hxx	/^	virtual const bool usesDynamicAllo
 usesFilesystem	cxx/ClassObject.hxx	/^	virtual const bool usesFilesystem() const { \/* if(uses functions suchas {`fopen`, `new`}) { re/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 usesNetwork	cxx/ClassObject.hxx	/^	virtual const bool usesNetwork() const { \/* if(uses functions suchas {`socket`}) { return true/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 usesThreads	cxx/ClassObject.hxx	/^	virtual const bool usesThreads() const { \/* if(uses functions suchas {`pthread`}) { return tru/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
-value	ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	m	struct:Susuwu::DataTypeToEnum	typeref:typename:SUSUWU_CONSTEXPR tensorflow::DataType
-value	ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
 value	cxx/ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	m	struct:Susuwu::DataTypeToEnum	typeref:typename:SUSUWU_CONSTEXPR tensorflow::DataType
 value	cxx/ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
 virusAnalyses	cxx/VirusAnalysis.cxx	/^std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, /;"	v	namespace:Susuwu	typeref:typename:std::vector<VirusAnalysisFun>
@@ -1242,10 +1201,8 @@ whichSha	c/rfc6234/shatest.c	/^		SHAversion whichSha;$/;"	m	struct:hash	typeref:
 whichSha	c/rfc6234/shatest.c	/^		SHAversion whichSha;$/;"	m	struct:hkdfhash	typeref:typename:SHAversion	file:
 zero	cxx/Macros.cxx	/^	class SubClassWithMemberSubobject {public: bool boo = true; Zero zero;};$/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithMemberSubobject	typeref:typename:Zero	file:
 zero	cxx/Macros.cxx	/^	class SubClassWithMemberSubobjectNoAddress {public: bool boo = true; SUSUWU_NO_UNIQUE_ADDRESS Z/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithMemberSubobjectNoAddress	typeref:typename:SUSUWU_NO_UNIQUE_ADDRESS Zero	file:
-zeros	ClassTensorFlowCns.hxx	/^	auto zeros = tensorflow::ops::ZerosLike(root, logits); \/* `tensorflow::ops::Const(root, 0.0f, /;"	v	namespace:Susuwu	typeref:typename:auto
 {FUNCNAME[1]}	sh/Macros.sh	/^			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${FUNCNAME[1]}(): ")"$/;"	f
 ~Class	cxx/ClassObject.hxx	/^	~Class() SUSUWU_OVERRIDE SUSUWU_DEFAULT \/* allows subclasses to release resources *\/$/;"	f	class:Susuwu::Class
 ~HsomCns	cxx/ClassCns.cxx	/^	~HsomCns() {$/;"	f	class:Susuwu::HsomCns	file:
 ~Instrumentation	cxx/ClassObject.hxx	/^	virtual ~Instrumentation() SUSUWU_DEFAULT \/* allows subclasses to release resources *\/$/;"	f	class:Susuwu::Instrumentation
-~TensorFlowCns	ClassTensorFlowCns.hxx	/^	~TensorFlowCns() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns
 ~TensorFlowCns	cxx/ClassTensorFlowCns.hxx	/^	~TensorFlowCns() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns
