@@ -847,7 +847,8 @@ addTemp	c/rfc6234/sha224-256.c	/^static uint32_t addTemp;$/;"	v	typeref:typename
 addTemp	c/rfc6234/sha384-512.c	/^static uint32_t addTemp[4] = { 0, 0, 0, 0 };$/;"	v	typeref:typename:uint32_t[4]	file:
 addTemp	c/rfc6234/sha384-512.c	/^static uint64_t addTemp;$/;"	v	typeref:typename:uint64_t	file:
 analysisCns	cxx/VirusAnalysis.cxx	/^Cns analysisCns, virusFixCns; \/* hosts produce, clients initialize shared clones of this from d/;"	v	namespace:Susuwu	typeref:typename:Cns
-assistantCns	cxx/AssistantCns.cxx	/^Cns assistantCns;$/;"	v	namespace:Susuwu	typeref:typename:Cns
+analysisCns	cxx/VirusAnalysis.cxx	/^TensorFlowCns analysisCns, virusFixCns;$/;"	v	namespace:Susuwu	typeref:typename:TensorFlowCns
+assistantCns	cxx/AssistantCns.cxx	/^TensorFlowCns assistantCns;$/;"	v	namespace:Susuwu	typeref:typename:TensorFlowCns
 assistantCnsDefaultHosts	cxx/AssistantCns.cxx	/^std::vector<ClassIoPath> assistantCnsDefaultHosts = {$/;"	v	namespace:Susuwu	typeref:typename:std::vector<ClassIoPath>
 assistantCnsDownloadHosts	cxx/AssistantCns.cxx	/^void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const s/;"	f	namespace:Susuwu	typeref:typename:void
 assistantCnsLoopProcess	cxx/AssistantCns.cxx	/^void assistantCnsLoopProcess(const Cns &cns, std::ostream &os \/* = std::cout *\/) {$/;"	f	namespace:Susuwu	typeref:typename:void
@@ -1279,6 +1280,7 @@ virusAnalysisResultListWhitespace	cxx/VirusAnalysis.cxx	/^bool virusAnalysisResu
 virusAnalysisTests	cxx/VirusAnalysis.cxx	/^const bool virusAnalysisTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 virusAnalysisTestsNoexcept	cxx/VirusAnalysis.hxx	/^static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAn/;"	f	namespace:Susuwu	typeref:typename:const bool
 virusFixCns	cxx/VirusAnalysis.cxx	/^Cns analysisCns, virusFixCns; \/* hosts produce, clients initialize shared clones of this from d/;"	v	namespace:Susuwu	typeref:typename:Cns
+virusFixCns	cxx/VirusAnalysis.cxx	/^TensorFlowCns analysisCns, virusFixCns;$/;"	v	namespace:Susuwu	typeref:typename:TensorFlowCns
 wait	cxx/ClassObject.hxx	/^	virtual void wait() {}$/;"	f	class:Susuwu::Object	typeref:typename:void
 whichSha	c/rfc6234/sha.h	/^		int whichSha;               \/* which SHA is being used *\/$/;"	m	struct:HKDFContext	typeref:typename:int
 whichSha	c/rfc6234/sha.h	/^		int whichSha;               \/* which SHA is being used *\/$/;"	m	struct:HMACContext	typeref:typename:int

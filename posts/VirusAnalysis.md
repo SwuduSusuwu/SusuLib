@@ -2792,7 +2792,7 @@ public:
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType>::value, tensorflow::TensorShape({1, 1} /* TODO: map sentences into tokens */));
 		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = std::stof(input /* map text number into `float` */);
 		auto oTensors = processToImpl<CoefficientDefaultType, tensorflow::tstring>(inputTensor, __func__);
-		return std::to_string(oTensors[0].matrix<CoefficientDefaultType /* `std::string` gives "INVALID_ARGUMENT: Inconsistent values" */>()(0, 0)); /* TODO: tokens, which map into sentences */
+		return std::to_string(oTensors[0].matrix<CoefficientDefaultType >()(0, 0 /* TODO: tokens, which map into sentences */));
 	}
 
 protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes) */

@@ -6,6 +6,9 @@
 #include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode */
 #include "ClassResultList.hxx" /* ResultList */
 #include "ClassSys.hxx" /* templateCatchAll */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
 #include <iostream> /* std::cout */
 #include <ostream> /* std::ostream */
@@ -13,7 +16,11 @@
 #include <vector> /* std::vector */
 /* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
 namespace Susuwu {
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern std::string assistantCnsResponseDelimiter;
 
 #if SUSUWU_UNIT_TESTS
