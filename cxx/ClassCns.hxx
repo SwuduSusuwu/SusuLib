@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
-#include "ClassObject.hxx" /* Object SUSUWU_VIRTUAL_DEFAULTS() */
+#include "ClassObject.hxx" /* Object SUSUWU_PURE_VIRTUAL_DEFAULTS() */
 #include "Macros.hxx" /* SUSUWU_CXX17 SUSUWU_IF_CPLUSPLUS SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -29,15 +29,18 @@ public:
 	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
 	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
 	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
-	SUSUWU_PURE_VIRTUAL_DEFAULTS(Susuwu::Cns) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
-	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; }
-	virtual void setInitialized(const bool is) { initialized = is; }
-	virtual void setInputMode(CnsMode x) { inputMode = x; }
-	virtual void setOutputMode(CnsMode x) { outputMode = x; }
-	virtual void setInputNeurons(size_t x) { inputNeurons = x; }
-	virtual void setOutputNeurons(size_t x) { outputNeurons = x; }
-	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; }
-	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; }
+	SUSUWU_PURE_VIRTUAL_DEFAULTS(Susuwu::Cns) /* `getName()`, `isPureVirtual()`, `operator==()`, ... */
+	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; } /* if can do "inference" (ergo "forwardpropagation"; `process*`) */
+	virtual void setInitialized(const bool is) { initialized = is; } /* after "training" (ergo "backpropagation") finishes, set to `true` */
+
+	/* Topological values; sets the "shape" of `Cns.synapses` (or of whatever the derived class uses to store the connectome) */
+	virtual void setInputMode(CnsMode x) { inputMode = x; } /* sets type of input */
+	virtual void setOutputMode(CnsMode x) { outputMode = x; } /* sets type of output (notice: some implementations require `inputMode == outputMode`) */
+	virtual void setInputNeurons(size_t x) { inputNeurons = x; } /* sets connectome input count */
+	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } /* sets connectome output count (notice: some implementations require `inputNeurons == outputNeurons`) */
+	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } /* sets connectome "hidden layer" count */
+	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } /* sets connectome coefficients-per-"hidden layer" (notice: some implementations require `inputNeurons == neuronsPerLayer`) */
+
 	/* @throw bad_alloc
 	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
@@ -58,6 +61,7 @@ public:
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<float>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorFloat;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<double>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorDouble;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::string>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeString;}\
+	/* @pre @code isInitialized() @endcode */\
 	virtual const bool processToBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0;}\
 	virtual const char processToChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0;}\
 	virtual const int processToInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0;}\
@@ -112,14 +116,6 @@ typedef class ApxrCns : public Cns {
  */
 } ApxrCns;
 #endif /* USE_APXR_CNS */
-
-/* Possible uses of artificial CNS:
- * Virus analysis; https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners
- * Autonomous robots (includes responses to replies from lots of forums); https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous
- * Due to understanding of human's consciousness, could undo problems of overpopulation and food shortages, if lots of us become uploads of consciousness (as opposed to below article of how to move whole CNS to robots);
- * https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont
- * https://swudususuwu.substack.com/p/destructive-unreversible-upload-of
- */
 
 /* Related to this:
  * [Howto use `class Cns` for virus analysis and digital assistants](https://github.com/SwuduSusuwu/SusuLib/blob/preview/posts/VirusAnalysis.md) [2](https://swudususuwu.substack.com/p/howto-improve-virus-analysis) (demos; `#include "VirusAnalysis.hxx"` and `#include "AssistantCns.hxx"`)
