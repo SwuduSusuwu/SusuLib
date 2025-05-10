@@ -166,6 +166,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
     - `-DSUSUWU_IO_THROW=true`; replaces `is.setstate(std::ios::failbit);` with `throw`. For now, just affects `std::istream` (and derivatives) params; don't know if `os` should have its own flag.
   - TODO (for now won't build, or has no effect):
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES=true`: No effect. If implemented, `Class::operator==(const Class &obj) { return &obj == this; }`. Default is `=false`.
+    - `-DSUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES=true`: causes "error: 'virtual' cannot be specified on member function templates". Default is `=false`.
     - `-DSUSUWU_PREFER_CSTR=true` to replace `std::string` with `char *` (more compatible with non-C++ projects); default is `=SUSUWU_PREFER_C`.
     - `-DSUSUWU_PREFER_C=true` sets `SUSUWU_PREFER_CSTR` + `SUSUWU_SH_PREFER_STDIO` ([plus other flags which will exist to allow non-C++ projects to include this](https://github.com/SwuduSusuwu/SusuLib/issues/3); default is `=!defined(__plusplus)`).
 

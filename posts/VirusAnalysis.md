@@ -1952,10 +1952,14 @@ public:
 	/* @throw bad_alloc
 	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
-	// template<Intput, Output> virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
+#if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
+	template<typename Input, typename Output>
+	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* { inputMode = typeToCnsMode<Input>; outMode = typeToCnsMode<Output>; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
-	// template<Input, Output> virtual const Output process(Input input);
-#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): can't have templates virtual */ \
+	template<typename Input, typename Output>
+	virtual const Output process(const Input input) const { /* assert(typeToCnsMode<Input> == inputMode && typeToCnsMode<Output> == outputMode);*/ throw std::runtime_error("ClassCns::process() pure virtual call"); }
+#else /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
+#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): no virtual templates, so use macros */ /* NOLINTBEGIN(misc-unused-parameters): TODO */ \
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, bool>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeBool;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, char>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeChar;}\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, int>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeInt;}\
@@ -1996,6 +2000,7 @@ public:
 	templateWorkaround(cnsModeVectorFloat, std::vector<float>)
 	templateWorkaround(cnsModeVectorDouble, std::vector<double>)
 	templateWorkaround(cnsModeString, std::string)
+#endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 private:
 	bool initialized = false;
 	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;
