@@ -15,7 +15,7 @@ SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
 }
 SUSUWU_INCLUDE "${GIT_ROOT}/sh/make.sh" #/* SUSUWU_BUILD_CTAGS() SUSUWU_LOCAL_WORKSPACE_JSON() */
 STATUS_CODE=$?
-SUSUWU_LOCAL_WORKSPACE_JSON #/* Replace `${{ github.workspace }}` with `$(pwd)` */
+SUSUWU_LOCAL_WORKSPACE_JSON #/* 'LLVM ERROR: Cannot chdir into "/home/runner/work/SusuLib/SusuLib"!' fix (replaces `${{ github.workspace }}` with `$(pwd)`) */
 SUSUWU_BUILD_CTAGS 2>/dev/null #/* Produce `./tags` */
 return ${STATUS_CODE}
 

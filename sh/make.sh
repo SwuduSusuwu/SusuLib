@@ -60,7 +60,7 @@ SUSUWU_COMPILE_JSON_PATH_FOUND() ( #/* Usage: `if SUSUWU_COMPILE_JSON_PATH_ERROR
 		return 1
 	fi
 )
-SUSUWU_LOCAL_WORKSPACE_JSON() ( #/* Usage: `git pull && SUSUWU_LOCAL_WORKSPACE_PATH_JSON && clang-tidy ${CXX_SOURCE_PATH}` [Replaces `${{ github.workspace }}` with `$(pwd)`] */
+SUSUWU_LOCAL_WORKSPACE_JSON() ( #/* Usage: `git pull && SUSUWU_LOCAL_WORKSPACE_PATH_JSON && clang-tidy ${CXX_SOURCE_PATH}`. Is 'LLVM ERROR: Cannot chdir into "/home/runner/work/SusuLib/SusuLib"!' fix (replaces `${{ github.workspace }}` with `$(pwd)`) */
 	if ! SUSUWU_COMPILE_JSON_PATH_FOUND "SUSUWU_LOCAL_WORKSPACE_JSON()"; then
 		return $?
 	fi
