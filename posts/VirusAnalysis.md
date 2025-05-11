@@ -601,8 +601,8 @@ public:
 ```c++
 #if !SUSUWU_INHERIT_GSL_OWNER /* If `gsl::owner` was not included */
 namespace gsl {
-    template <typename Resource>
-    using owner = Resource; /* Wraps pointers; [cppcoreguidelines-owning-memory] fix. */
+	template <typename Resource>
+	using owner = Resource; /* Wraps pointers; [cppcoreguidelines-owning-memory] fix. */
 }; /* namespace gsl */
 #endif /* !SUSUWU_INHERIT_GSL_OWNER */
 
@@ -2051,7 +2051,7 @@ public:
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<float>, cnsModeVectorFloat)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<double>, cnsModeVectorDouble)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::string, cnsModeString)\
-    \
+	\
 	/* @pre @code isInitialized() @endcode */\
 	virtual const bool processToBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0; }\
 	virtual const char processToChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0; }\
@@ -3036,7 +3036,7 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts) {
 	for(const auto &host : hosts) {
 #ifndef SUSUWU_POSIX
-    SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+		SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
