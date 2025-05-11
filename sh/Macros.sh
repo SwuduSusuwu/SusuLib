@@ -297,6 +297,9 @@ SUSUWU_SH_QUOTE_SUB() { #/* Usage: `SUSUWU_SH_QUOTE_SUB "<type-of-quote>" "<code
 			SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "${2}" "${3}" ;;
 		"PROPOSED") #/* speculative / proposed value */
 			SUSUWU_SH_USE2 "${SUSUWU_SH_LIGHT_PURPLE}" "${2}" "${3}" ;;
+		*) #/* default */
+			SUSUWU_SH_USE2 "" "${2}" "${3}"
+			SUSUWU_PRINT "SUSUWU_SH_QUOTE_SUB()" "$(SUSUWU_SH_NOTICE)" "Unknown $(SUSUWU_SH_QUOTE "VAR" "<type-of-quote>") $(SUSUWU_SH_QUOTE "CODE" "${1}")." ;;
 	esac
 	return $?
 }
