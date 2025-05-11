@@ -465,3 +465,29 @@ SUSUWU_DEPENDENCY_INCLUDE() { #/* Usage: `SUSUWU_DEPENDENCY_INCLUDE "<-I | -F>" 
 	return 1
 }
 
+SUSUWU_INSTALL_PACKAGES() ( #/* Usage: `SUSUWU_INSTALL_PACKAGES "<package [package2]...>" && echo success */
+	ONE_OR_MORE_PACKAGES_SUCCESS=1 #/* false */
+	if [ true = "${SUSUWU_IS_VIRTUAL}" ]; then
+#shellcheck disable=SC2068
+		for SUSUWU_INSTALL_PACKAGES_Q in $@; do
+			if command -v apt >/dev/null; then
+				if apt show "${SUSUWU_INSTALL_PACKAGES_Q}" >/dev/null 2>&1; then
+					if apt --yes install "${SUSUWU_INSTALL_PACKAGES_Q}" 2>/dev/null || sudo apt --yes install "${SUSUWU_INSTALL_PACKAGES_Q}"; then
+						ONE_OR_MORE_PACKAGES_SUCCESS=0 #/* true */
+					fi
+				fi
+			elif command -v yum >/dev/null; then
+				if yum list available "${SUSUWU_INSTALL_PACKAGES_Q}" | grep -q "^${SUSUWU_INSTALL_PACKAGES_Q}\s"; then #/* Does `yum --showduplicates` improve this? */
+					if yum --assumeyes install "${SUSUWU_INSTALL_PACKAGES_Q}" 2>/dev/null || sudo yum --assumeyes install "${SUSUWU_INSTALL_PACKAGES_Q}"; then
+						ONE_OR_MORE_PACKAGES_SUCCESS=0 #/* true */
+					fi
+				fi
+			else
+				SUSUWU_PRINT "SUSUWU_INSTALL_PACKAGES()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "apt not found"), $(SUSUWU_SH_QUOTE "CODE" "yum not found"). The system must have one of those package managers to use this."
+				return 1 #/* false */
+			fi
+		done
+	fi
+	return ${ONE_OR_MORE_PACKAGES_SUCCESS} #/* true if one or more packages installed */
+)
+
