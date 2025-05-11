@@ -445,4 +445,23 @@ SUSUWU_FIND_INCLUDE() { #/* Usage: `SUSUWU_FIND_INCLUDE "<include dir/>" ["<spec
 	done
 	return 1
 }
+SUSUWU_DEPENDENCY_INCLUDE() { #/* Usage: `SUSUWU_DEPENDENCY_INCLUDE "<-I | -F>" "<package>" "<include dir>" "<include subdir>" ["<C | C++>"] ["<install-howto>"] */
+	SUSUWU_DEPENDENCY_INCLUDE_PATH="$(SUSUWU_FIND_INCLUDE "${3}" "${4}")"
+	if [ -d "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ]; then
+		case "${5}" in #/* Language determines which flags to use */
+			"C")
+				export CFLAGS="${CFLAGS} ${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
+				export CXXFLAGS="${CXXFLAGS} ${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}" #/* As far as lib support, C++ is a superset */
+				;;
+			"C++")
+				export CXXFLAGS="${CXXFLAGS} ${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}";;
+			*) #/* Include flags for unknown languages export to all build scripts */
+				export FLAGS_USER="${FLAGS_USER} ${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}";; #/* Todo: allow to use this after `SUSUWU_SETUP_BUILD_FLAGS()` */
+		esac
+		SUSUWU_PRINT "SUSUWU_DEPENDENCY_INCLUDE()" "$(SUSUWU_SH_NOTICE)" "Found package $(SUSUWU_SH_QUOTE "CODE" "${2}"), $(SUSUWU_SH_QUOTE "VAR" "FLAGS_USER") will use $(SUSUWU_SH_QUOTE "CODE" "${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}")."
+		return 0
+	fi
+	SUSUWU_PRINT "SUSUWU_DEPENDENCY_INCLUDE()" "$(SUSUWU_SH_WARNING)" "Package $(SUSUWU_SH_QUOTE "CODE" "${2}") not found.${6:+" To install, use $(SUSUWU_SH_QUOTE "CODE" "${6}")"}" #/* For most packages, `<install-howto>` (`${6}`) is close to "sudo apt install ${2} || git clone https://github.com/${2}/${3}.git --depth 1" */
+	return 1
+}
 
