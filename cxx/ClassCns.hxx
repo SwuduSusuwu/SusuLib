@@ -5,6 +5,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
+#include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassNumeral.hxx" /* NumeralNormalizers */
 #include "ClassObject.hxx" /* Object ObjectMode SUSUWU_PURE_VIRTUAL_DEFAULTS() ToObjectMode */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_INTPTR SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
@@ -109,6 +110,13 @@ public:
 		}
 		learningFactor = x; /* how much coefficients move (converge) per step of `setupSynapses` training loop. `0.0` is static, `1.0` is straight to the first reciprocal (or whatever form of gradient the optimizer uses) */
 	}
+
+	/* dump the connectome (the `tensorflow::Tensor` of synapse coefficients)
+	 * @throw std::runtime_error */
+	virtual void dumpTo(const ClassIoPath &modelPath) const { throw std::runtime_error("ClassCns::dumpTo(\"" + modelPath + "\") pure virtual call"); }
+	/* load the connectome (the `tensorflow::Tensor` of synapse coefficients)
+	 * @throw std::runtime_error */
+	virtual void loadFrom(const ClassIoPath &modelPath) { throw std::runtime_error("ClassCns::loadFrom(\"" + modelPath + "\") pure virtual call"); }
 
 	/* Internal function, which outros of `setupSynapses()` use.
 	 * @throw std::bad_alloc std::runtime_error
