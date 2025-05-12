@@ -2213,6 +2213,13 @@ public:
 		learningFactor = x; /* how much coefficients move (converge) per step of `setupSynapses` training loop. `0.0` is static, `1.0` is straight to the first reciprocal (or whatever form of gradient the optimizer uses) */
 	}
 
+	/* dump the connectome (the `tensorflow::Tensor` of synapse coefficients)
+	 * @throw std::runtime_error */
+	virtual void dumpTo(const ClassIoPath &modelPath) const { throw std::runtime_error("ClassCns::dumpTo(\"" + modelPath + "\") pure virtual call"); }
+	/* load the connectome (the `tensorflow::Tensor` of synapse coefficients)
+	 * @throw std::runtime_error */
+	virtual void loadFrom(const ClassIoPath &modelPath) { throw std::runtime_error("ClassCns::loadFrom(\"" + modelPath + "\") pure virtual call"); }
+
 	/* Internal function, which outros of `setupSynapses()` use.
 	 * @throw std::bad_alloc std::runtime_error
 	 * @pre @code !isPureVirtual() @endcode

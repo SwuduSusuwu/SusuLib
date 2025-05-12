@@ -945,6 +945,7 @@ ctx	c/rfc6234/sha.h	/^		} ctx;$/;"	m	struct:USHAContext	typeref:union:USHAContex
 dataarray	c/rfc6234/shatest.c	/^		const char *dataarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 datalength	c/rfc6234/shatest.c	/^		int datalength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
 desiredLossThreshold	cxx/ClassCns.hxx	/^	float desiredLossThreshold = 0.01; \/* return (success) from `setupSynapses()` before `training/;"	m	class:Susuwu::Cns	typeref:typename:float
+dumpTo	cxx/ClassCns.hxx	/^	virtual void dumpTo(const ClassIoPath &modelPath) const { throw std::runtime_error("ClassCns::d/;"	f	class:Susuwu::Cns	typeref:typename:void
 endif	README.md	/^  - [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https:\/\/stackoverflow.com/;"	h	section:Contributor conventions/rules""_C_/_C++_ source
 equals	cxx/ClassCns.hxx	/^	const bool equals(const Object &obj) const SUSUWU_OVERRIDE { return this->getClass().operator==/;"	f	class:Susuwu::Cns	typeref:typename:const bool
 equals	cxx/ClassObject.hxx	/^	virtual const bool equals(const Object &obj) const { return this == &obj; } \/* Java's contract/;"	f	class:Susuwu::Object	typeref:typename:const bool
@@ -1048,6 +1049,7 @@ listMaxSize	cxx/ClassResultList.hxx	/^const size_t listMaxSize(const List &list)
 listProduceSignature	cxx/ClassResultList.hxx	/^const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_ite/;"	f	namespace:Susuwu	typeref:typename:const std::tuple<typename List::value_type::const_iterator,typename List::value_type::const_iterator>
 listToHashes	cxx/ClassResultList.hxx	/^void listToHashes(const List &list \/* ResultList::bytecodes or ResultList::hex*\/, List2 &hashe/;"	f	namespace:Susuwu	typeref:typename:void
 listsIntersect	cxx/ClassResultList.hxx	/^const bool listsIntersect(const List &list, const List &list2) {$/;"	f	namespace:Susuwu	typeref:typename:const bool
+loadFrom	cxx/ClassCns.hxx	/^	virtual void loadFrom(const ClassIoPath &modelPath) { throw std::runtime_error("ClassCns::loadF/;"	f	class:Susuwu::Cns	typeref:typename:void
 loss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
 macrosDeclarationAttributes	cxx/Macros.cxx	/^SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENS/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_CONSTEXPR const bool	file:
 macrosNoReturn	cxx/Macros.cxx	/^SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} \/* NOLINT(concurrency-mt-unsafe): is un/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_NORETURN void	file:
