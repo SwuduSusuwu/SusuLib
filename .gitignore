@@ -71,3 +71,7 @@ index.xhtml
 robots.txt
 compile_commands.json
 
+# Vendored
+ml_dtypes/
+tensorflow/
+libtensorflow/

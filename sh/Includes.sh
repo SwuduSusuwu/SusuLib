@@ -82,6 +82,23 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 	LDFLAGS_BACKUP="${LDFLAGS}" #/* Allows to undo insertions. */
 	SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS="-std=c++17 -DSUSUWU_USE_TENSORFLOW" #/* `./cxx/*` uses `#ifdef SUSUWU_USE_TENSORFLOW`, TensorFlow requires C++17 (for `std::optional`) */
 #	SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS_RELEASE="export TF_MLIR_ENABLE_V1_OPTIMIZATION_PASS=true" #/* TODO */
+
+	if [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
+		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "Was executed through one of GitHub's Workflows (or user set $(SUSUWU_SH_QUOTE "VAR" "SUSUWU_INSTALL_TENSORFLOW")), will auto-install $(SUSUWU_SH_QUOTE "CODE" "libeigen3-dev") and $(SUSUWU_SH_QUOTE "CODE" "libtensorflow")."
+		if ! (SUSUWU_INSTALL_PACKAGES "libtensorflow" #|| git clone https://github.com/tensorflow/tensorflow.git --depth 1
+			); then # If normal `apt` is not sufficient to install `libtensorflow`, ...
+			# ... then download and extract TensorFlow C++ library.
+			LIBTENSORFLOW_TAR="libtensorflow-cpu-linux-x86_64-2.11.0.tar.gz"
+			wget --no-verbose "https://storage.googleapis.com/tensorflow/libtensorflow/${LIBTENSORFLOW_TAR}" && \
+			tar xzf "${LIBTENSORFLOW_TAR}" && \
+			ls -a include && ls -a include/tensorflow && ls -a include/tensorflow/core && ls -a include/tensorflow/third-party && \
+			sudo mv lib/* /usr/lib/ #&& \
+#			sudo mv include/* /usr/include/ && \
+#			ls /usr/include/tensorflow/
+			git clone https://github.com/openxla/xla.git --depth 1 #`libtensorflow` does not include `xla`
+		fi
+	fi
+
 	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libtensorflow" "./" "tensorflow/core/" "C++" "sudo apt install libtensorflow"; then
 		TENSORFLOW_PATH_PREFIX=""
 	elif SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow" "tensorflow/" "tensorflow/core/" "C++" "git clone https://github.com/tensorflow/tensorflow.git --depth 1"; then
@@ -91,9 +108,10 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 	TENSORFLOW_FULL_PATH_PREFIX="${TENSORFLOW_INCLUDE_PATH}third_party/"
 	if [ -n "${TENSORFLOW_INCLUDE_PATH}" ]; then
 		SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:xla" "${TENSORFLOW_PATH_PREFIX}xla/" "xla/" "C++" "https://github.com/openxla/xla.git --depth 1" && {
+			XLA_SOURCE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
 			XLA_PATH_PREFIX="${TENSORFLOW_PATH_PREFIX}xla/third_party/"
-#			XLA_FULL_PATH_PREFIX="${TENSORFLOW_FULL_PATH_PREFIX}xla/third_party/" #/* Todo? */
-			SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:xla:eigen" "${XLA_PATH_PREFIX}eigen3/" "Eigen/" "C++" "cd ${XLA_PATH_PREFIX}eigen3/ && bazel build"
+			XLA_FULL_PATH_PREFIX="${TENSORFLOW_FULL_PATH_PREFIX}xla/third_party/"
+			SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:xla:eigen" "${XLA_PATH_PREFIX}eigen3/" "Eigen/" "C++" "cd ${XLA_FULL_PATH_PREFIX}eigen3/ && bazel build"
 			EIGEN_INCLUDE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
 		}
 		SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:tsl" "${TENSORFLOW_PATH_PREFIX}xla/third_party/tsl/" "tsl/" "C++" ""
@@ -102,9 +120,21 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 		ML_DTYPES_PREFIX="ml_dtypes/include/"
 		if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:ml_dtypes" "${TENSORFLOW_PATH_PREFIX}${ML_DTYPES_ROOT}" "${ML_DTYPES_PREFIX}float8.h" "C++" "cd ${TENSORFLOW_FULL_PATH_PREFIX}${ML_DTYPES_ROOT} && bazel build"; then #/* If can't use `ml_dtypes` from `tensorflow` */
 			ML_DTYPES_GIT="https://github.com/jax-ml/ml_dtypes.git"
-			SUSUWU_DEPENDENCY_INCLUDE "-I" "jax-ml:ml_dtypes" "ml_dtypes/" "${ML_DTYPES_PREFIX}float8.h" "C++" "git clone ${ML_DTYPES_GIT} --depth 1" #/* use `ml_dtypes` from `jax-ml` */
+			if [ ! -d "ml_dtypes" ] && [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
+				git clone "${ML_DTYPES_GIT}" --depth 1
+			fi
+			if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "jax-ml:ml_dtypes" "ml_dtypes/" "${ML_DTYPES_PREFIX}float8.h" "C++" "git clone ${ML_DTYPES_GIT} --depth 1"; then #/* If can't use `ml_dtypes` from `jax-ml` */
+				ML_DTYPES_FALLBACK_PREFIX="tensorflow/core/platform/"
+				ML_DTYPES_FALLBACK="${TENSORFLOW_INCLUDE_PATH}${ML_DTYPES_FALLBACK_PREFIX}"
+				if [ -e "${ML_DTYPES_FALLBACK}float8.h" ]; then # If fallback path has `float8.h`
+					SUSUWU_PRINT "$0" "$(SUSUWU_SH_WARNING)" "As last resort, will use $(SUSUWU_SH_QUOTE "PATH" "${ML_DTYPES_FALLBACK}") (which has $(SUSUWU_SH_QUOTE "PATH" "float8.h")) as path for $(SUSUWU_SH_QUOTE "CODE" "ml_dtypes"). If this causes more $(SUSUWU_SH_QUOTE "CODE" "#include") errors, execute $(SUSUWU_SH_QUOTE "CODE" "cd ${XLA_SOURCE_PATH} && git reset --hard HEAD") or $(SUSUWU_SH_QUOTE "CODE" "find \"${XLA_SOURCE_PATH}\" -type f -exec sed \"s|\\\"${ML_DTYPES_PREFIX}|\\\"${ML_DTYPES_FALLBACK_PREFIX}|\" -i'' {} +") to undo."
+					find "${XLA_SOURCE_PATH}" -type f -exec sed "s|\"${ML_DTYPES_PREFIX}|\"${ML_DTYPES_FALLBACK_PREFIX}|" -i'' {} + # [error: 'ml_dtypes/include/float8.h' file not found](https://github.com/tensorflow/tensorflow/issues/93130) fix. #/* TODO: filter with `grep "\.\(h\|cc\)$"` */
+					export SUSUWU_USED_ML_DTYPES_SED=true
+				fi
+			fi
 		fi
 		if [ -z "${EIGEN_INCLUDE_PATH}" ]; then
+			${SUSUWU_INSTALL_TENSORFLOW} && (SUSUWU_INSTALL_PACKAGES "libeigen3-dev" || SUSUWU_INSTALL_PACKAGES "eigen")
 			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "C++" "sudo apt install eigen || git clone https://github.com/PX4/eigen.git --depth 1"
 #			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "eigen3/Eigen/" "C++" "sudo apt install eigen || git clone https://github.com/PX4/eigen.git --depth 1"
 		fi
@@ -123,6 +153,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 			CFLAGS="${CFLAGS_BACKUP}" #/* Undo `-I` insertions. */
 			LDFLAGS="${LDFLAGS_BACKUP}" #/* Undo insertions. */
 			SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
+#			${SUSUWU_USED_ML_DTYPES_SED} && find "${XLA_SOURCE_PATH}" -type f -exec sed "s|\"${ML_DTYPES_FALLBACK_PREFIX}|\"${ML_DTYPES_PREFIX}|" -i'' {} + # [error: 'ml_dtypes/include/float8.h' file not found](https://github.com/tensorflow/tensorflow/issues/93130) fix. #TODO: exclude 'third_party/xla/xla/tsl/platform/resource_loader.h'
 		fi
 	fi
 	return 1 #/* "error", false */

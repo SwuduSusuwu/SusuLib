@@ -55,6 +55,9 @@ SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 
+test -n "${GITHUB_ACTIONS}" #/* If `build.sh` is executed through [GitHub Workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: `|| <test for other amnesiac environments, such as Docker>` */
+export SUSUWU_IS_VIRTUAL=$? #/* Set to last command (`test`)'s return value */
+export SUSUWU_INSTALL_TENSORFLOW=$? #${SUSUWU_IS_VIRTUAL} #/* If virtual, install prerequisites for `cxx/ClassTensorFlowCns.hxx`; use `export SUSUWU_INSTALL_TENSORFLOW=false` to reduce resource use, or `export SUSUWU_INSTALL_TENSORFLOW=true` to install prerequisites on all computers (default is to avoid changes to system unless virtual) */
 SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), SUSUWU_INCLUDES_LIBXML2(), SUSUWU_INCLUDES_LIBTENSORFLOW(), USER_FLAGS */
 SUSUWU_INCLUDES_LIBPUGIXML
 SUSUWU_INCLUDES_LIBXML2

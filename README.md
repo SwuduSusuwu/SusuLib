@@ -164,6 +164,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `--abort-on-first-error`: sets [`SUSUWU_ABORT_ON_FIRST_ERROR=true`](./sh/Macros.sh), which causes [`SUSUWU_BUILD_OBJECTS`](./sh/make.sh) to `exit 1` if a subbuild ([`${CC}`](./build.sh) or [`${CXX}`](./build.sh)) fails.
 - Environment flags: as [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/make.html#Implicit-Variables), plus;
   - `export SUSUWU_SH_TPUT_COMMAND=<path>`; replaces calls to `tput` with `<path>` (for instance, with `no-such-command` to test that `SUSUWU_SH_COLOR_COUNT()` does not require `ncurses-utils`).
+  - `SUSUWU_IS_VIRTUAL` is set (`=true`) if [`./build.sh`](./build.sh) is executed through [_GitHub Workflows_](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: test for other amnesiac environments (such as Docker).
+  - `SUSUWU_INSTALL_TENSORFLOW=true` to install [`libtensorflow`](https://github.com/tensorflow/tensorflow/) (+ prerequisites), `=false` to skip; default is `=${SUSUWU_IS_VIRTUAL}`.
 - Macro flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classIoHex*()` insert/remove "0x". Default is `=false` (caller must do).
