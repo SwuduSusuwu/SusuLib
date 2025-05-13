@@ -437,7 +437,7 @@ SUSUWU_UNINSTALL() ( #/* Usage: `SUSUWU_UNINSTALL [USRBIN]`. Is analogous to `ma
 )
 
 SUSUWU_FIND_INCLUDE() { #/* Usage: `SUSUWU_FIND_INCLUDE "<include dir/>" ["<specific subpath/>"] */
-	for SUSUWU_FIND_INCLUDE_PATH in "/usr/include/" "/usr/include/${1}" "/usr/local/include/" "/usr/local/include/${1}" "${HOME}/../usr/include/" "${HOME}/../usr/include/${1}" "${HOME}/../usr/local/include/" "${HOME}/../usr/local/include/${1}" "${HOME}/../usr/include/${1}" "./${1}" "../${1}" "./include/" "./include/${1}"; do
+	for SUSUWU_FIND_INCLUDE_PATH in "./include/" "./include/${1}" "./${1}" "../${1}" "${HOME}/../usr/local/include/" "${HOME}/../usr/local/include/${1}" "${HOME}/../usr/include/" "${HOME}/../usr/include/${1}" "${HOME}/../usr/include/${1}" "/usr/local/include/" "/usr/local/include/${1}" "/usr/include/" "/usr/include/${1}"; do
 		if [ -e "${SUSUWU_FIND_INCLUDE_PATH}${2}" ]; then #/* If caller passes some `<specific subpath>` (`${2}`), assume that `<include dir>` (`${1}`) has collisions without `<specific subpath>` (`${2}`) */
 			echo "${SUSUWU_FIND_INCLUDE_PATH}" | sed 's|[^/]\+/../|/|g' | sed 's|//|/|g' #/* Squished path. Use `realpath "${SUSUWU_FIND_INCLUDE_PATH}"` for absolute path. */
 			return 0
