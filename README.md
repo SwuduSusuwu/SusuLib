@@ -178,7 +178,12 @@ View [documented issues](https://github.com/SwuduSusuwu/SusuLib/issues/) (for id
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
 
 # Contributor conventions/rules
-General comment/message syntax rules: `<>` goes around type of option/argument (such as `<commit-hash>`, `[]` goes around optional comments/options/arguments (such as `[<optional fallback value>]`, `...` is affixed to allow multiple options/arguments (such as `[; optional extra arguments]...`). This rule is used to document function arguments (such as `sh`, `C` or `C++` use), plus to document `git` uses.
+General comment/message syntax rules:
+- If on its own line (alone) the comment refers to the next line. If the next line starts a block of code (such as a function), the comment refers to that whole block of code.
+- If at the end of a line (which has code) the comment refers to that code.
+- Parenthesis which indicates function arguments (such as `func(arg)` shall not have whitespace prefix.
+- Parenthesis which is used in the traditional English sense (such as this, which gives more information about the preceding natural-language text) shall have whitespace prefix.
+- `<>` goes around type of option/argument (such as `<commit-hash>`, `[]` goes around optional comments/options/arguments (such as `[<optional fallback value>]`, `...` is affixed to allow multiple options/arguments (such as `[; optional extra arguments]...`). This rule is used to document function arguments (such as `sh`, `C` or `C++` use), plus to document `git` uses.
 To ensure consistent code, submissions of code (such as through [pull requests](https://github.com/SwuduSusuwu/SusuLib/pulls)) have language-specific syntax rules:
 ## _Markdown_
 `` *.md `` shall use:
