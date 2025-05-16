@@ -203,7 +203,7 @@ To ensure consistent code, submissions of code (such as through [pull requests](
 
 ## `git`
 If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
-Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) --- or if `git revert` of a previous commit --- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
+Do ["atomic" / granular commits](https://poe.com/s/lnG5yXNXUTl0m8muGjav): if swapping the new commit with a previous commit (such as through `git rebase -i`) --- or if `git revert` of a previous commit --- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
 > Is followup to: \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\] \[; \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\]\]...
 
 - This shows the temporal order of commits required for `./build.sh` to pass.
