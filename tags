@@ -963,6 +963,7 @@ fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizers fromTuple(cons
 fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizersReciprocal fromTuple(const std::vector<std::tuple<Numeral, Numer/;"	f	struct:Susuwu::NumeralNormalizersReciprocal	typeref:typename:const NumeralNormalizersReciprocal
 getClass	cxx/ClassObject.hxx	/^	const Class &getClass() const { return *this; }$/;"	f	class:Susuwu::Object	typeref:typename:const Class &
 getObjectSize	cxx/ClassObject.hxx	/^	virtual const size_t getObjectSize() const { return sizeof(*this); \/* sum(sizeof({vptr, data m/;"	f	class:Susuwu::Instrumentation	typeref:typename:const size_t
+getParameterCount	cxx/ClassCns.hxx	/^	virtual const size_t getParameterCount() { return neuronsPerLayer * neuronsPerLayer * layersOfN/;"	f	class:Susuwu::Cns	typeref:typename:const size_t
 getParameterCount	cxx/ClassTensorFlowCns.hxx	/^	const size_t getParameterCount() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const size_t
 getSuperclassRef	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass();/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const Class &
 globalVirusAnalysisHook	cxx/VirusAnalysis.cxx	/^VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; \/* Just use virusAnalysis/;"	v	namespace:Susuwu	typeref:typename:VirusAnalysisHook
