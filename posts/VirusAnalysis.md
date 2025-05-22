@@ -2401,6 +2401,10 @@ public:
 	}
 
 #if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
+	/* Initialize `Cns.synapses` with pseudorandom (uses `rand()` or recipricals of `inputsToOutputs`) values
+	 * @throw std::runtime_error */
+	template<class InputsToOutputs>
+	virtual void pseudoRandomSynapses(const InputsToOutputs &inputsToOutputs) { throw std::runtime_error("ClassCns::pseudoRandomSynapses() pure virtual call"); }
 	/* @throw bad_alloc
 	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
@@ -2414,10 +2418,13 @@ public:
 	}
 #else /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 #	define SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, OUTPUT_TYPEDEF) \
+	/* Initialize `Cns.synapses` with pseudorandom (uses `rand()` or recipricals of `inputsToOutputs`) values \
+	 * @throw std::runtime_error */ \
+	virtual void pseudoRandomSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs) { throw std::runtime_error("ClassCns::pseudoRandomSynapses() pure virtual call"); } /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */ \
 	/* @throw bad_alloc \
 	 * @pre @code !isPureVirtual() @endcode \
 	 * @post @code isInitialized() @endcode */\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; } /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
+	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; } /* NOLINT(bugprone-macro-parentheses) */
 #	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_TYPEDEF) \
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, bool)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, char)\
