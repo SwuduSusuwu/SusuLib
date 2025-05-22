@@ -1135,6 +1135,7 @@ produceAbortListSignatures	cxx/VirusAnalysis.cxx	/^void produceAbortListSignatur
 produceAnalysisCns	cxx/VirusAnalysis.cxx	/^void produceAnalysisCns(const ResultList &pass, const ResultList &abort,$/;"	f	namespace:Susuwu	typeref:typename:void
 produceAssistantCns	cxx/AssistantCns.cxx	/^void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, C/;"	f	namespace:Susuwu	typeref:typename:void
 produceVirusFixCns	cxx/VirusAnalysis.cxx	/^void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrNull, Cns &cns \//;"	f	namespace:Susuwu	typeref:typename:void
+pseudoRandomSynapses	cxx/ClassCns.hxx	/^	virtual void pseudoRandomSynapses(const InputsToOutputs &inputsToOutputs) { throw std::runtime_/;"	f	class:Susuwu::Cns	typeref:typename:void
 pseudoRandomSynapses	cxx/ClassTensorFlowCns.hxx	/^	void pseudoRandomSynapses(const InputsToOutputs &inputsToOutputs)$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 randomresults	c/rfc6234/shatest.c	/^		const char *randomresults[RANDOMCOUNT];$/;"	m	struct:hash	typeref:typename:const char * []	file:
 randomtest	c/rfc6234/shatest.c	/^		const char *randomtest;$/;"	m	struct:hash	typeref:typename:const char *	file:
