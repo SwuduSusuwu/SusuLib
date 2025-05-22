@@ -61,6 +61,7 @@ public:
 	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } /* sets connectome output count (notice: some implementations require `inputNeurons == outputNeurons`) */
 	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } /* sets connectome "hidden layer" count */
 	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } /* sets connectome coefficients-per-"hidden layer" (notice: some implementations require `inputNeurons == neuronsPerLayer`) */
+	virtual const size_t getParameterCount() { return neuronsPerLayer * neuronsPerLayer * layersOfNeurons; } /* Notice: must `override` if connectome does not dense, square layout. Notice: must `override` to count biases. */
 
 /* NOLINTBEGIN(google-default-arguments): derivative classes use our default values */
 	/* Compute values; setters of training momentum (and similar arguments) which the derivative classes use */
