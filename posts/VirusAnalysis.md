@@ -917,14 +917,14 @@ const FILE *classIoFopenOwnPath() {
 const ClassIoPath classIoGetOwnPath() {
 #ifdef __linux__
 	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
-	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+	const ssize_t len = readlink("/proc/self/exe", static_cast<char *>(path), sizeof(path) - 1);
 	if (len == -1) {
 		SUSUWU_ERROR("classIoGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
 		return ClassIoPath(); /* return EXIT_FAILURE; */
 	}
 	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
-	return ClassIoPath(path); /* causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
+	return static_cast<ClassIoPath>(&path[0]); /* causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
@@ -969,9 +969,10 @@ const unsigned char classIoGetConsoleAttributes() {
 	}
 #elif defined SUSUWU_POSIX
 	std::cout << "\033[?6;1;1t" /* Request console attributes */ << std::flush;
-	char buffer[32];
-	std::cin.read/*non-blocking*/(buffer, sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
-	const size_t bytesRead = strlen(buffer);
+	const size_t bufferLen = 32;
+	char buffer[bufferLen];
+	std::cin.read/*non-blocking*/(static_cast<char *>(buffer), sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
+	const size_t bytesRead = strlen(static_cast<const char *>(buffer));
 	if(0 < bytesRead) {
 		SUSUWU_WARNING("classIoGetConsoleAttributes() {/* TODO: [decode response from `\\033[?6;1;1t`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
 # ifdef SUSUWU_DEBUG2
@@ -1063,18 +1064,18 @@ static void classIoHexSsStrTest(const std::string &value, const bool printable) 
 	classIoHexIs(os, newValue);
 	if(value != newValue) {
 		const std::string escapedValue = (printable ? ("\"" SUSUWU_SH_GREEN + value + SUSUWU_SH_DEFAULT "\"") : (SUSUWU_SH_GREEN + classIoHexStr(value) + SUSUWU_SH_DEFAULT));
-		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classIoHexStr(newValue) + SUSUWU_SH_DEFAULT));
+		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classIoHexStr(newValue) + SUSUWU_SH_DEFAULT)); /* NOLINT(readability-avoid-nested-conditional-operator): alternatives are much more verbose */
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "std::string value = " + escapedValue + ", newValue; classIoHexOs(os, value); classIoHexIs(os, newValue); newValue != value; newValue == " + escapedNewValue + ';'));
 	}
 }
 const bool classIoTests() {
 	/* test `classIoHexStr()` and `classIoHexOs()`'s output lengths */
-	classIoHexOsSzTest("", 0, true /* test that `value.empty()` produces 0 hexits */);
-	classIoHexOsSzTest("22", 4, true /* test that 2 chars produces 4 hexits */);
-	classIoHexOsSzTest("uwu", 6, true /* test that 3 chars produces 6 hexits */);
-	classIoHexOsSzTest(std::string({'\0'}), 2, false /* test that char == 0x00 produces 2 hexits */);
-	classIoHexOsSzTest("\010", 2, false /* test that char <= 0x10 produces 2 hexits */);
-	classIoHexOsSzTest("\022", 2, false /* test that char >= 0x10 produces 2 hexits */);
+	classIoHexOsSzTest("", (sizeof("") - sizeof('\0')) * 2, true /* test that `value.empty()` produces 0 hexits */);
+	classIoHexOsSzTest("22", (sizeof("22") - sizeof('\0')) * 2, true /* test that 2 chars produces 4 hexits */);
+	classIoHexOsSzTest("uwu", (sizeof("uwu") - sizeof('\0')) * 2, true /* test that 3 chars produces 6 hexits */);
+	classIoHexOsSzTest(std::string({'\0'}), sizeof('\0') * 2, false /* test that char == 0x00 produces 2 hexits */);
+	classIoHexOsSzTest("\010", sizeof('\010') * 2, false /* test that char <= 0x10 produces 2 hexits */);
+	classIoHexOsSzTest("\022", sizeof('\022') * 2, false /* test that char >= 0x10 produces 2 hexits */);
 
 	/* test that `classIoHexIs()` undoes `classIoHexOs()` */
 	for(long q = 0; (1 << CHAR_BIT) >= q /* test all `char` + first `short` */; ++q) {

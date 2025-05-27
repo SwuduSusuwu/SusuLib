@@ -32,14 +32,14 @@ const FILE *classIoFopenOwnPath() {
 const ClassIoPath classIoGetOwnPath() {
 #ifdef __linux__
 	char path[PATH_MAX]; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays) */
-	const ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+	const ssize_t len = readlink("/proc/self/exe", static_cast<char *>(path), sizeof(path) - 1);
 	if (len == -1) {
 		SUSUWU_ERROR("classIoGetOwnPath(): { if(-1 == readlink(\"/proc/self/exe\", path, sizeof(path) - 1)) { errno == " + std::to_string(errno) + "; } }");
 		return ClassIoPath(); /* return EXIT_FAILURE; */
 	}
 	path[len] = '\0'; /* NOLINT(cppcoreguidelines-pro-bounds-constant-array-index) */
 //	`return "/proc/self/exe"; /* if _Termux_, causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode("/apex/com.android.runtime/bin/linker64")` */
-	return ClassIoPath(path); /* causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
+	return static_cast<ClassIoPath>(&path[0]); /* causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
 	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
@@ -84,9 +84,10 @@ const unsigned char classIoGetConsoleAttributes() {
 	}
 #elif defined SUSUWU_POSIX
 	std::cout << "\033[?6;1;1t" /* Request console attributes */ << std::flush;
-	char buffer[32];
-	std::cin.read/*non-blocking*/(buffer, sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
-	const size_t bytesRead = strlen(buffer);
+	const size_t bufferLen = 32;
+	char buffer[bufferLen];
+	std::cin.read/*non-blocking*/(static_cast<char *>(buffer), sizeof(buffer)); /* read request response from console */ /* TODO: have it portable, support all consoles */
+	const size_t bytesRead = strlen(static_cast<const char *>(buffer));
 	if(0 < bytesRead) {
 		SUSUWU_WARNING("classIoGetConsoleAttributes() {/* TODO: [decode response from `\\033[?6;1;1t`](https://github.com/SwuduSusuwu/SubStack/issues/17)");
 # ifdef SUSUWU_DEBUG2
@@ -163,6 +164,7 @@ static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, con
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexOs(os, " + escapedValue + "); " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT " /* value.size() */ != " SUSUWU_SH_GREEN + std::to_string(os.str().size()) + SUSUWU_SH_DEFAULT " /* os.str().size() */;"));
 	}
 }
+/* NOLINTBEGIN(google-runtime-int): should not limit to `8 == CHAR_BIT` CPUs */
 static void classIoHexSsNumTest(const long &num) {
 	std::stringstream os;
 	classIoHexOs(os, num);
@@ -179,7 +181,7 @@ static void classIoHexSsStrTest(const std::string &value, const bool printable) 
 	classIoHexIs(os, newValue);
 	if(value != newValue) {
 		const std::string escapedValue = (printable ? ("\"" SUSUWU_SH_GREEN + value + SUSUWU_SH_DEFAULT "\"") : (SUSUWU_SH_GREEN + classIoHexStr(value) + SUSUWU_SH_DEFAULT));
-		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classIoHexStr(newValue) + SUSUWU_SH_DEFAULT));
+		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classIoHexStr(newValue) + SUSUWU_SH_DEFAULT)); /* NOLINT(readability-avoid-nested-conditional-operator): alternatives are much more verbose */
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "std::string value = " + escapedValue + ", newValue; classIoHexOs(os, value); classIoHexIs(os, newValue); newValue != value; newValue == " + escapedNewValue + ';'));
 	}
 }
@@ -206,6 +208,7 @@ const bool classIoTests() {
 
 	return true;
 }
+/* NOLINTEND(google-runtime-int) */
 const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }
 #endif /* SUSUWU_UNIT_TESTS */
 
