@@ -142,6 +142,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classIoHex*()` insert/remove "0x". Default is `=false` (caller must do).
   - `-DSUSUWU_LIST_COUNT` to have `listDumpTo()` prefix the list count (which allows verification through `listLoadFrom()`. Default undefined.
+  - `-DSUSUWU_INHERIT_GSL_OWNER=true` to disable `cxx/ClassIo.hxx`'s definition of `gsl::owner<>` if it conflicts with [**GSL**](https://github.com/microsoft/GSL). Default is undefined.
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
     - `-DSUSUWU_SH_VERBOSE[=true|=false]` with `=true` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `=!defined(NDEBUG)`.

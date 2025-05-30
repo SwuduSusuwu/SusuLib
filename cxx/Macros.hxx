@@ -92,6 +92,14 @@
 #	endif /* (201112 <= __STDC_VERSION__) */
 #endif /* !(defined __cplusplus */
 
+#ifndef SUSUWU_INHERIT_GSL_OWNER /* If have no `-DSUSUWU_INHERIT_GSL_OWNER` value */
+#	ifdef __cpp_lib_gsl /* If `gsl::owner` is included */
+#		define SUSUWU_INHERIT_GSL_OWNER true
+#	else /* else !def __cpp_lib_gsl */
+#		define SUSUWU_INHERIT_GSL_OWNER false
+#	endif /* !def __cpp_lib_gsl */
+#endif /* ndef SUSUWU_INHERIT_GSL_OWNER */
+
 #define SUSUWU_GLUE2(S, U) S##U /* concatanates 2 macro constants */
 #define SUSUWU_GLUE(S, U) SUSUWU_GLUE2(S, U) /* concatanates 2 macro functions or constants */
 #define SUSUWU_COMMA , /* to pass to macro functions whose `__VA_ARGS__` is conditional */

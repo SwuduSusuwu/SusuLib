@@ -3,6 +3,7 @@
 #define INCLUDES_cxx_ClassObject_cxx
 #include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_IF_CPLUSPLUS SUSUWU_PURE_VIRTUAL_DEFAULTS SUSUWU_VIRTUAL_DEFAULTS SUSUWU_UNIT_TESTS */
 #if SUSUWU_UNIT_TESTS
+#include "ClassIo.hxx" /* gsl::owner */
 #include "ClassObject.hxx" /* Class Object SUSUWU_CLASS_DEFAULTS SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS SUSUWU_VIRTUAL_DEFAULTS */
 #include "ClassSys.hxx" /* templateCatchAll */
 //#include <memory> /* std::unique_ptr std::make_unique */
@@ -92,7 +93,7 @@ static const bool classTestsMismatch(const Class *class1, const Class *class2) {
 }
 static const bool objectIsValid(const Object *obj) {
 	bool result = classIsValid(obj);
-	class Object *objectClone = obj->clone();
+	gsl::owner<class Object *> objectClone = obj->clone();
 	result &=	classTestsMatch(objectClone, obj) /* reflexive */;
 	delete objectClone;
 	return result;
@@ -144,12 +145,12 @@ class SubObjectWithMemberObject : public Object { public: SUSUWU_VIRTUAL_DEFAULT
 }; /* namespace */
 const bool classObjectTests() {
 	bool result = true;
-	const Class *newClass = new Class(),
-	*newSubClass = new SubClass(),
-	*newSubClassWithMemberObject = new SubClassWithMemberObject();
-	const Object *newObject = new Object(),
-	*newSubObject = new SubObject(),
-	*newSubObjectWithMemberObject = new SubObjectWithMemberObject();
+	gsl::owner<const Class *> newClass = new Class(),
+		newSubClass = new SubClass(),
+		newSubClassWithMemberObject = new SubClassWithMemberObject();
+	gsl::owner<const Object *> newObject = new Object(),
+		newSubObject = new SubObject(),
+		newSubObjectWithMemberObject = new SubObjectWithMemberObject();
 	const Class class2 = Class();
 	const Object object2 = Object();
 

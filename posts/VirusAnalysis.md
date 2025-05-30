@@ -13,7 +13,7 @@ Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executable
 
 [`../README.md`](../README.md) has how to use this (what follows is more of a book of source code).
 
-(Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s, `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.*xx`; follow URLs for whole sources.)
+(Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s (except files with >=2 `namespace`s), `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.*xx`; follow URLs for whole sources.)
 
 For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
 `git clone https://github.com/SwuduSusuwu/SusuLib.git && cd ./SusuLib/ && ./build.sh`
@@ -536,7 +536,7 @@ public:
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::stackClone()`: unsupported default use."); }
 		return Object(*this);
 	}
-	virtual Object *clone() const {
+	virtual gsl::owner<Object *> clone() const {
 //		return &(*(new Object) = stackClone());
 		return cloneAs(cloneableAs());
 	}
@@ -544,7 +544,7 @@ public:
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::stackCloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
 		return Object(*this);
 	}
-	virtual Object *cloneAs(ObjectCloneAs cloneAs) const {
+	virtual gsl::owner<Object *> cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
 		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
@@ -586,6 +586,15 @@ public:
 
 `less` [cxx/ClassIo.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassIo.hxx)
 ```c++
+#if !SUSUWU_INHERIT_GSL_OWNER /* If `gsl::owner` was not included */
+namespace gsl {
+    template <typename Resource>
+    using owner = Resource; /* Wraps pointers; [cppcoreguidelines-owning-memory] fix. */
+}; /* namespace gsl */
+#endif /* !SUSUWU_INHERIT_GSL_OWNER */
+
+/* Abstractions to do with filesystems (such as `procfs`) */
+namespace Susuwu {
 #ifndef SUSUWU_HEX_DOES_PREFIX
 #	define SUSUWU_HEX_DOES_PREFIX false
 #endif /* ndef SUSUWU_HEX_DOES_PREFIX */
@@ -611,7 +620,7 @@ typedef ClassIoPath ClassIoHash; /* TODO: `std::unordered_set<std::basic_string<
 /* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classIoGetOwnPath()`.
  * Error values: `return ClassIoPath();` */
 const ClassIoPath classIoGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<ClassIoPath>::value) */;
-const FILE *classIoFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classIoGetClassIoPath()>::value) */;
+const gsl::owner<FILE *> classIoFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classIoGetClassIoPath()>::value) */;
 
 static const bool classIoGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classIoSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classIoGetConsoleInput();` */
@@ -908,10 +917,12 @@ static void classIoCheckStr(const std::string &func, const std::string &expected
 const bool classIoTests();
 const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
+
+}; /* namespace Susuwu */
 ```
 `less` [cxx/ClassIo.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassIo.cxx)
 ```c++
-const FILE *classIoFopenOwnPath() {
+const gsl::owner<FILE *> classIoFopenOwnPath() {
 	return fopen(classIoGetOwnPath().c_str(), "r");
 }
 const ClassIoPath classIoGetOwnPath() {

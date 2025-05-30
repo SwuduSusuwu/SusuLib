@@ -1,7 +1,7 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
-#include "ClassIo.hxx" /* classIoHexStr */
+#include "ClassIo.hxx" /* classIoHexStr gsl::owner */
 #include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -118,7 +118,7 @@ public:
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::stackClone()`: unsupported default use."); }
 		return Object(*this);
 	}
-	virtual Object *clone() const {
+	virtual gsl::owner<Object *> clone() const {
 //		return &(*(new Object) = stackClone());
 		return cloneAs(cloneableAs());
 	}
@@ -126,7 +126,7 @@ public:
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::stackCloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
 		return Object(*this);
 	}
-	virtual Object *cloneAs(ObjectCloneAs cloneAs) const {
+	virtual gsl::owner<Object *> cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
 		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */

@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassIo_hxx
 #define INCLUDES_cxx_ClassIo_hxx
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_GREEN SUSUWU_SH_RED SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_INHERIT_GSL_OWNER SUSUWU_NOEXCEPT SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_GREEN SUSUWU_SH_RED SUSUWU_UNIT_TESTS */
 #ifndef SUSUWU_HEX_TABLE
 #	define SUSUWU_HEX_TABLE false
 #endif /* ndef SUSUWU_HEX_TABLE */
@@ -26,6 +26,13 @@
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string std::to_string */
 #include <type_traits> /* std::enable_if */
+#if !SUSUWU_INHERIT_GSL_OWNER /* If `gsl::owner` was not included */
+namespace gsl {
+    template <typename Resource>
+    using owner = Resource; /* Wraps pointers; [cppcoreguidelines-owning-memory] fix. */
+}; /* namespace gsl */
+#endif /* !SUSUWU_INHERIT_GSL_OWNER */
+
 /* Abstractions to do with filesystems (such as `procfs`) */
 namespace Susuwu {
 #ifndef SUSUWU_HEX_DOES_PREFIX
@@ -53,7 +60,7 @@ typedef ClassIoPath ClassIoHash; /* TODO: `std::unordered_set<std::basic_string<
 /* Usage: for Linux (or Windows,) if you don't trust `argv[0]`, replace it with `classIoGetOwnPath()`.
  * Error values: `return ClassIoPath();` */
 const ClassIoPath classIoGetOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_constructible<ClassIoPath>::value) */;
-const FILE *classIoFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classIoGetClassIoPath()>::value) */;
+const gsl::owner<FILE *> classIoFopenOwnPath() /* TODO: SUSUWU_NOEXCEPT(std::is_nothrow_invocable<classIoGetClassIoPath()>::value) */;
 
 static const bool classIoGetConsoleInput() { return std::cin.good() && !std::cin.eof(); }
 const bool classIoSetConsoleInput(bool input); /* Set to `false` for unit tests/background tasks (acts as if user pressed `<ctrl>+d`, thus input prompts will use default choices.) Returns `classIoGetConsoleInput();` */

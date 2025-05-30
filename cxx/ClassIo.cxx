@@ -2,7 +2,7 @@
 #ifndef INCLUDES_cxx_ClassIo_cxx
 #define INCLUDES_cxx_ClassIo_cxx
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_GREEN SUSUWU_SH_DEFAULT SUSUWU_SH_RED SUSUWU_UNIT_TESTS SUSUWU_WIN32 */
-#include "ClassIo.hxx" /* classIoHexStr classIoHexIs classIoHexOs ClassIoPath SUSUWU_HEX_PREFIX_SZ */
+#include "ClassIo.hxx" /* classIoHexStr classIoHexIs classIoHexOs ClassIoPath gsl::owner SUSUWU_HEX_PREFIX_SZ */
 #include "ClassSys.hxx" /* classSysArgs templateCatchAll */
 //#include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno */
@@ -26,7 +26,7 @@
 # undef ERROR /* undo `windows.h`'s `#define ERROR 0` */
 #endif /* def SUSUWU_WIN32 */
 namespace Susuwu {
-const FILE *classIoFopenOwnPath() {
+const gsl::owner<FILE *> classIoFopenOwnPath() {
 	return fopen(classIoGetOwnPath().c_str(), "r");
 }
 const ClassIoPath classIoGetOwnPath() {
