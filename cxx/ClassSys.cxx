@@ -11,8 +11,8 @@
 #ifdef SUSUWU_POSIX
 #endif /* def SUSUWU_POSIX */
 #include <iostream> /* std::cout std::endl std::flush */
-#ifdef SUSUWU_POSIX
 #include <stdexcept> /* std::invalid_argument */
+#ifdef SUSUWU_POSIX
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* waitpid WIFEXITED WEXITSTATUS WIFSIGNALED WSIGTERM */
 #include <unistd.h> /* execve execv fork geteuid getuid setuid */
@@ -55,10 +55,10 @@ const bool classSysInit(int argc, const char **args) {
 	return false;
 }
 
-const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) SUSUWU_NOEXCEPT {
-	const std::vector<std::string> argvSmutable = {argvS.cbegin(), argvS.cend()};
+const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) {
 	std::vector<char *> argv;
-	argv.reserve(argvSmutable.size());
+	const std::vector<std::string> argvSmutable = {argvS.cbegin(), argvS.cend()};
+	argv.reserve(argvSmutable.size() + 1);
 	//for(auto x : argvSmutable) { /* with `fsanitize=address` this triggers "stack-use-after-scope" */
 	for(const auto &x: argvSmutable /* auto x = argvSmutable.cbegin(); argvSmutable.cend() != x; ++x */) {
 		argv.push_back(const_cast<char *>(x.c_str()));
@@ -75,9 +75,9 @@ const pid_t execvesFork(const std::vector<std::string> &argvS, const std::vector
 	if(envpS.empty()) { /* Reuse LD_PRELOAD to fix https://github.com/termux-play-store/termux-issues/issues/24 */
 		execv(argv[0], &argv[0]); /* has `noreturn` */
 	} else {
-		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()};
 		std::vector<char *> envp;
-		envp.reserve(envpSmutable.size());
+		std::vector<std::string> envpSmutable = {envpS.cbegin(), envpS.cend()}; /* NOLINT(misc-const-correctness); `const` causes `addresssanitizer` errors upon `execve()` */
+		envp.reserve(envpSmutable.size() + 1);
 		for(const auto &x: envpSmutable) {
 			envp.push_back(const_cast<char *>(x.c_str()));
 		}
@@ -165,13 +165,13 @@ const bool classSysSetRoot(bool root) {
 			SUSUWU_WARNING("classSysSetRoot(true) {(-1 == seteuid(0)) /* stuck as user, perhaps is not setuid executable */}");
 		}
 #if 0
-#	ifdef __APPLE__ //TODO: https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538 says you must execute new processes to do this
-#	else //TODO: https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789 says you must spawn new processes to do this
+#	ifdef __APPLE__ //TODO: [execute new process to do this?](https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/35316538#35316538)
+#	else //TODO: spawn new process to do this? https://stackoverflow.com/questions/34723861/calling-a-c-function-with-root-privileges-without-executing-the-whole-program/70149223#70149223 https://stackoverflow.com/questions/70615937/how-to-run-a-command-as-root-with-c-or-c-with-no-pam-in-linux-with-password-au https://stackoverflow.com/questions/2483755/how-to-programmatically-gain-root-privileges/2483789#2483789
 		/* TODO: polkit? Until this is finished, you must use chmod (to give setuid to executable), or execute new processes (with `sudo`/`su`) if you wish to use firewall/antivirus (which require root) */
 #	endif /* __APPLE__ else */
 #endif /* 0 */
 	} else {
-#	if 0 && defined LINUX // TODO: pam_loginuid.so(8) // https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881
+#	if 0 && defined LINUX /* TODO: [use `pam_loginuid.so(8)` to do this?](https://stackoverflow.com/questions/10272784/how-do-i-get-the-users-real-uid-if-the-program-is-run-with-sudo/10272881#10272881) */
 		uid_t sudoUid = audit_getloginuid();
 #	else /* !def linux */
 		uid_t sudoUid = getuid();
@@ -195,7 +195,7 @@ const bool classSysSetRoot(bool root) {
 			SUSUWU_WARNING("classSysSetRoot(false) {(-1 == seteuid(sudoUid)) /* stuck as root */}");
 		}
 	}
-/* #elif defined SUSUWU_WIN32 */ //TODO: https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time says you must spawn new processes to do this
+// #elif defined SUSUWU_WIN32 /* TODO: [spawn new process to do this?](https://stackoverflow.com/questions/6418791/requesting-administrator-privileges-at-run-time) */
 #else
 	SUSUWU_WARNING("classSysSetRoot(bool) {#ifndef SUSUWU_POSIX /* TODO */}");
 #endif /* SUSUWU_POSIX */
