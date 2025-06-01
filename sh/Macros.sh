@@ -5,14 +5,14 @@
 # * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
 
 export SUSUWU_SH_CONSOLE_PARAMS="$*" #/* For functions which are not passed `$@` */
-SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param" "$@";`. [This processes params passed to `${0}`.] */
-	if [ "$#" -eq 1 ]; then
-		SUSUWU_SH_HAS_PARAM "${1}" "${SUSUWU_SH_CONSOLE_PARAMS}"
+SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param [...]" "$@";`. [This processes params passed to `${0}`.] */
+	if [ "$#" -eq 1 ]; then                                    #/* If function was not passed `$@`,
+		SUSUWU_SH_HAS_PARAM "${1}" "${SUSUWU_SH_CONSOLE_PARAMS}" # * use stored values */
 		return $?
 	fi
 	PARAM_Q="${1}"; shift;
 	for PARAM_W in "$@"; do
-		for PARAM in ${PARAM_Q}; do
+		for PARAM in ${PARAM_Q}; do #/* The param can have aliases, such as short forms. */
 			if [ "${PARAM}" = "${PARAM_W}" ]; then
 				return 0
 			fi
@@ -53,14 +53,14 @@ SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; the
 	fi
 	SUSUWU_STATIC_IS_PREVIEW #/* Use hardcoded value. */
 )
-SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR=$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}")` */
+SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR="$(SUSUWU_ENSURE_DIR_SLASH "${OBJDIR}")"` */
 	DIR=${1}
 	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this,
 		DIR="${DIR}/"                    # * ... original doesn't have '/', append '/'. */
 	fi
 	echo "${DIR}" #/* return with slash */
 )
-SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")` */
+SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")"` */
 	DIR=${1}
 	case "${DIR}" in
 		./*) #/* If original has "./", continue. */
@@ -71,7 +71,7 @@ SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR=$(SUSUWU_PATH_AFFIX_DOTSLASH "
 	esac
 	echo "${DIR}" #/* return with "./" */
 )
-SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN='$(SUSUWU_UNAMBIGUOUS_PATH "USRBIN")` */
+SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN=\"$(SUSUWU_UNAMBIGUOUS_PATH "${USRBIN}")\"` */
 	if [ "$(realpath -q "${1}")" != "${1}" ]; then #/* If relative path,
 		SUSUWU_PATH_AFFIX_DOTSLASH "${1}"            # * ensure path starts with "./" */
 	else
@@ -87,11 +87,11 @@ SUSUWU_PATH_SHOULD_NOT_EXIST() { #/* Usage: `SUSUWU_PATH_SHOULD_NOT_EXIST "<func
 }
 SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(SUSUWU_ESCAPE_SPACES "${OBJECT}"). */
 #	echo $(echo "$@" | sed 's/ /\\\ /') #/* Error: `sed not found`, although is installed. */
-#	echo "\"${@}\""; #/* Error: if `OBJECT="obj/main.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: '"obj/main.o"'`. */
+#	echo "\"${@}\""; #/* Error: if `OBJECT="obj/main.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: '"obj/main.o"'` (uses path with literal quotes). */
 	NEW_PATH=""
-	for OLD_PATH in "$@"; do
+	for OLD_PATH_TOKEN in "$@"; do #/* Split old path into tokens */
 		if [ -z "${NEW_PATH}" ]; then
-			NEW_PATH="${OLD_PATH}"
+			NEW_PATH="${OLD_PATH_TOKEN}"
 		elif [ -n "${NEW_PATH}" ]; then
 			NEW_PATH="${NEW_PATH}\\ ${OLD_PATH}" #/* Error: if `OBJECT="obj/long path.o"`, `SUSUWU_BUILD_EXECUTABLE()` gives `clang++: error: no such file or directory: 'obj/long\'\nclang++: error: no such file or directory: 'path.o'`. TODO: fix this. Is not a regression (`Macros.sh` never supported spaces; `build.sh`'s paths don't have spaces.) */
 		fi
@@ -103,21 +103,21 @@ SUSUWU_ESCAPE_QUOTED() ( #/* Usage: `echo "\"param\": \"$(SUSUWU_ESCAPE_QUOTED "
 )
 
 SUSUWU_STR_TOKEN_FIRST() ( # Usage: `SUSUWU_STR_TOKEN_FIRST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all before last <delimiter>.
-	echo "${1%${2}*}" #echo "${1}" | sed "s/\(${2}[^${2}]*\)\$//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001
-) #TODO: allow <delimiter>="\033".
+	echo "${1%${2}*}" #/* TODO: allow <delimiter>="\033". */
+) #/* Analogous to echo "${1}" | sed "s/\(${2}[^${2}]*\)\$//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001 */
 [ "uwu" = "$(SUSUWU_STR_TOKEN_FIRST "uwu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 [ "uwu:q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu:q:mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 [ "uwu^q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu^q^mukyu" "^")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 #[ "uwu\033q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu\033q\033mukyu" "\\033")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 #[ "uwu$'\033'q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu$'\033'q$'\033'mukyu" $'\033')" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
-SUSUWU_STR_TOKEN_LAST() ( # Usage: `SUSUWU_STR_TOKEN_LAST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all after last <delimiter>.
-	RESULT="${1#*${2}}"
-	if [ "${RESULT}" != "${1}" ]; then
-		SUSUWU_STR_TOKEN_LAST "${RESULT}" "${2}"
+SUSUWU_STR_TOKEN_LAST() ( #/* Usage: `SUSUWU_STR_TOKEN_LAST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all after last <delimiter>. */
+	RESULT="${1#*${2}}" #/* `RESULT` is all after first <delimiter>` */
+	if [ "${RESULT}" != "${1}" ]; then         #/* if `RESULT` is not the input, 1 or more <delimiter> was found,
+		SUSUWU_STR_TOKEN_LAST "${RESULT}" "${2}" # * so search for next <delimiter>. */
 	else
-		echo "${RESULT}" #echo "${1}" | sed "s/^.*${2}//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001
+		echo "${RESULT}" #/* `RESULT` is all after last <delimiter> */
 	fi
-)
+) #/* Analogous to: echo "${1}" | sed "s/^.*${2}//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001 */
 [ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
 [ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "uwu:q:mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
 [ "mukyu" = "$(SUSUWU_STR_TOKEN_LAST "uwu^q^mukyu" "^")" ] || echo "[$0: SUSUWU_STR_TOKEN_LAST(): Error: logic_error; test failed.]"
@@ -167,45 +167,45 @@ SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` *
 	SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS=8
 	if [ -n "${SUSUWU_SH_COLOR_COUNT_CACHE}" ]; then
 		echo "${SUSUWU_SH_COLOR_COUNT_CACHE}"
-		test "${SUSUWU_SH_COLOR_COUNT_CACHE}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
-		return $? #return `test`'s return value
+		test "${SUSUWU_SH_COLOR_COUNT_CACHE}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #/* test that color count is Greater or Equal to minimum count */
+		return $? #/* return `test`'s return value */
 	fi
 	if [ -n "${GITHUB_ACTIONS}" ]; then
 		echo "[$0: Warning: SUSUWU_SH_COLOR_COUNT(): detected environment is _GitHub_ (due to \`[ -n \"\${GITHUB_ACTIONS}\" ]\`), will force color use. If this console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`, which _GitHub_ uses) lacks colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (shows glitches, or literal codes such as \"\\\033[0;34m\"), [post an issue](https://github.com/SwuduSusuwu/SusuLib/issues/new) about this.]" >&2
 		echo 8 #/* [_GitHub_ Autobuild](https://github.com/SwuduSusuwu/SusuLib/actions/runs/13209802112/job/36880995224) workaround. */
 		return 0 #/* TODO: include other tests (`return 1` if the console does not allow color codes) */
 	fi
-	if command -v "${SUSUWU_SH_TPUT_COMMAND}" >/dev/null; then #if installed `ncurses-utils`
+	if command -v "${SUSUWU_SH_TPUT_COMMAND}" >/dev/null; then            #/* if installed `ncurses-utils`,
 		COLOR_COUNT="$(${SUSUWU_SH_TPUT_COMMAND} colors 2>/dev/null)" || COLOR_COUNT="-1"
 		echo "${COLOR_COUNT}"
-		test "${COLOR_COUNT}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
-		return $? #return `test`'s return value
+		test "${COLOR_COUNT}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" # * test that color count is Greater or Equal to minimum count */
+		return $? #/* return `test`'s return value */
 	else
 		echo "[$0: Notice: SUSUWU_SH_COLOR_COUNT(): The program \`${SUSUWU_SH_TPUT_COMMAND}\` was not found; use \`apt install ncurses-utils\` to have \`SUSUWU_SH_*()\` compatible with all consoles.]" >&2
 	fi
 	for CONSOLE in "xterm-256color" "screen-256color" "tmux-256color" "rxvt-256color"; do
 		if [ "${TERM}" = "${CONSOLE}" ]; then
-			echo 256 #256-color console
+			echo 256 #/* 256-color console */
 			return 0
 		fi
 	done
 	for CONSOLE in "xterm" "xterm-color" "screen" "screen-color" "tmux" "tmux-color" "linux" "rxvt" "rxvt-unicode"; do
 		if [ "${TERM}" = "${CONSOLE}" ]; then
-			echo 8 #standard console
-			return 0
+			echo 8 #/* standard 8-color console */
+			return 0 #/* supported console */
 		fi
 	done
-	echo -1
-	return 1 #unsupported console
+	echo -1 #/* no known attributes */
+	return 1 #/* unsupported console */
 )
 SUSUWU_SH_COLOR_COUNT_CACHE="$(SUSUWU_SH_COLOR_COUNT)"
 SUSUWU_SH_HAS_UNIX_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_UNIX_CONSOLE; then echo "\033[0;34mThis is blue."` */
-		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "8" #test that color count is Greater or Equal to 8
-		return $? #return `test`'s output value
+		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "8" #/* test that color count is Greater or Equal to 8 */
+		return $? #/* return `test`'s return value */
 )
 SUSUWU_SH_HAS_256COLOR_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_256COLOR_CONSOLE; then echo "\033[38;5;4mThis is blue."` */
-		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "256" #test that color count is Greater or Equal to 256
-		return $? #return `test`'s output value
+		test "$(SUSUWU_SH_COLOR_COUNT)" -ge "256" #/* test that color count is Greater or Equal to 256 */
+		return $? #/* return `test`'s return value */
 )
 export SUSUWU_SH_USE_PUSH_DEFAULT="${SUSUWU_SH_DEFAULT}"
 export SUSUWU_SH_USE_PUSH_RESET_WHITE="${SUSUWU_SH_RESET_WHITE}"
@@ -235,11 +235,11 @@ SUSUWU_SH_USE_POP() { #/* Usage: `SUSUWU_SH_USE_PUSH "${SUSUWU_SH_<attribute>}" 
 		SUSUWU_SH_RESET_WHITE="${SUSUWU_SH_USE_PUSH_RESET_WHITE##*^}"
 		SUSUWU_SH_USE_PUSH_DEBUG "SUSUWU_SH_USE_POP" "" "Popped:"
 	fi
-} #TODO: figure out if/why this is always executed sequential (does not nest blocks, which is required to push & pop)
+} #/* TODO: figure out if why [it appears that] this is always executed sequential (does not nest blocks, which is required to push & pop) */
 SUSUWU_SH_USE() { #/* Usage: `SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_DEFAULT}"] ["&1"]`. Uses <attribute> on <message>. */
 #	if [ ! $(SUSUWU_SH_HAS_UNIX_CONSOLE) ]; then
 #		case "${1}" in
-#			"${SUSUWU_SH_}") #TODO; non-standard code routes (such as `ConsoleApi2.h:SetConsoleTextAttribute`).
+#			"${SUSUWU_SH_}") #/* TODO; non-standard code routes (such as `ConsoleApi2.h:SetConsoleTextAttribute`). */
 #			;;
 #		esac
 #	fi
@@ -248,7 +248,7 @@ SUSUWU_SH_USE() { #/* Usage: `SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message
 		SUSUWU_SH_USE_PUSH "${1}"
 		printf '%b' "${2}"
 		SUSUWU_SH_USE_POP
-		echo "${3:-${SUSUWU_SH_RESET_WHITE}}" #echo "${3:-${SUSUWU_SH_DEFAULT}}"
+		echo "${3:-${SUSUWU_SH_RESET_WHITE}}" #/* echo "${3:-${SUSUWU_SH_DEFAULT}}" */
 	else
 		echo "${2}" #TODO: `>${4:-&1}` #/* `&1` is `std::cout`/`stdout` */
 	fi
@@ -266,10 +266,10 @@ SUSUWU_SH_SUCCESS() ( SUSUWU_SH_USE2 "${SUSUWU_SH_GREEN}" "Success: "; )
 SUSUWU_SH_NOTICE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: "; )
 SUSUWU_SH_DEBUG() ( SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: "; )
 
-SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote ...>" "<code | quote>" ["<optional original color>"])"`. */
-#	if [ "${1% }" != "${1}" ]; then #if [ ${1} != "${1}" ]; then# if [ "${1#}" -gt 1 ]; then
+SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote [...]>" "<code | quote>" ["<optional original color>"])"`. */
+#	if [ "${1% }" != "${1}" ]; then #if [ ${1} != "${1}" ]; then #/* analogous to `if [ "${1#}" -gt 1 ]; then` */
 #		echo "SUSUWU_SH_QUOTE: multiple modes"
-#	fi #TODO: figure out why noneof those conditions work
+#	fi #/* TODO: figure out why noneof those conditions work */
 	SUSUWU_SH_QUOTE_Q="${2}"
 	for SUSUWU_SH_QUOTE_W in ${1}; do
 		if [ "${SUSUWU_SH_QUOTE_Q}" != "${2}" ]; then
@@ -310,14 +310,14 @@ export SUSUWU_ECHO_COMMANDS_TO="/dev/null" #/* `sh/make.sh:SUSUWU_SH_COMPILER_CO
 SUSUWU_ECHO_COMMANDS() { #/* Usage: `SUSUWU_ECHO_COMMANDS [true | false]`. ] */
 	(  ${1}) && (${SUSUWU_VERBOSE}) && set -x
 	(! ${1}) && (${SUSUWU_VERBOSE}) && set +x
-	(  ${1}) && (! ${SUSUWU_S}) && SUSUWU_ECHO_COMMANDS_TO="&2" #TODO: fix variable descriptors
+	(  ${1}) && (! ${SUSUWU_S}) && SUSUWU_ECHO_COMMANDS_TO="&2" #/* TODO: fix variable descriptors */
 	(! ${1}) && (! ${SUSUWU_VERBOSE}) && SUSUWU_ECHO_COMMANDS_TO="/dev/null"
 }
 SUSUWU_PROCESS_S() { #/* Usage: `SUSUWU_PROCESS_S $@`. [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "-s --silent --quiet --debug=n" "$@"; then
 		SUSUWU_S=true
 	fi
-#	SUSUWU_PRINT "SUSUWU_PROCESS_VERBOSE()" "$(SUSUWU_SH_INFO)" "Was passed \`$(SUSUWU_SH_QUOTE "CURRENT" "--silent")\` (or an alias), so $(SUSUWU_SH_QUOTE "CODE" "\$(SUSUWU_SH_NOTICE)") is disabled." #TODO? Is it against the principles of `--silent` to print about it?
+#	SUSUWU_PRINT "SUSUWU_PROCESS_VERBOSE()" "$(SUSUWU_SH_INFO)" "Was passed \`$(SUSUWU_SH_QUOTE "CURRENT" "--silent")\` (or an alias), so $(SUSUWU_SH_QUOTE "CODE" "\$(SUSUWU_SH_NOTICE)") is disabled." #/* TODO? Is it against the principles of `--silent` to print about it? */
 }
 SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This processes params passed to `${0}`.] */
 	if SUSUWU_SH_HAS_PARAM "-v --verbose -d --debug=a" "$@"; then
@@ -327,25 +327,24 @@ SUSUWU_PROCESS_VERBOSE() { #/* Usage: `SUSUWU_PROCESS_VERBOSE $@`. [This process
 	SUSUWU_PRINT "SUSUWU_PROCESS_VERBOSE()" "$(SUSUWU_SH_DEBUG)" "Was passed \`$(SUSUWU_SH_QUOTE "CURRENT" "--verbose")\` (or an alias), so $(SUSUWU_SH_QUOTE "CODE" "\$(SUSUWU_SH_DEBUG)") is enabled."
 }
 SUSUWU_SH_HAS_FUNCNAME() ( #/* Usage: `if SUSUWU_SH_HAS_FUNCNAME 2>/dev/null; then echo "${FUNCNAME[0]}(): used FUNCNAME."` */
-#	[ "$(uname)" = "Darwin" ] && return 0 #redundant (due to `${FUNCNAME[0]}` test).
-#	test "$(type -t FUNCNAME)" = "array" #always returns "1".
-	#shellcheck disable=SC2039 #this is a feature test, so disable "In POSIX sh, array references are undefined."
+#	[ "$(uname)" = "Darwin" ] && return 0 #/* redundant (due to `${FUNCNAME[0]}` test). */
+#	test "$(type -t FUNCNAME)" = "array" #/* always returns "1". */
+	#shellcheck disable=SC2039 #/* this is a feature test, so disable "In POSIX sh, array references are undefined." */
 	test "${FUNCNAME[0]}" = "SUSUWU_SH_HAS_FUNCNAME" 2>/dev/null #if no arrays, prints "Bad substitution".
-	return $?
-)
+) #/* ends with implicit `return $?` */
 if [ -z "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" ]; then
-	SUSUWU_SH_HAS_FUNCNAME 2>/dev/null #`/bin/sh` ignores the `2>/dev/null` in `SUSUWU_SH_HAS_FUNCNAME()`.
+	SUSUWU_SH_HAS_FUNCNAME 2>/dev/null #/* `/bin/sh` ignores the `2>/dev/null` in `SUSUWU_SH_HAS_FUNCNAME()`. */
 	export SUSUWU_SH_HAS_FUNCNAME_RESULT=$? #/* Usage: `if [ ${SUSUWU_SH_HAS_FUNCNAME_RESULT} -eq 0 ]; then echo "${FUNCNAME[0]}: used FUNCNAME."` */
 fi
 #for var in SUSUWU_SH_FILE SUSUWU_SH_LINE SUSUWU_SH_FUNC; do
-#	[ -z "${!var}" ] && export "$var=true" #prints "Bad substitution".
+#	[ -z "${!var}" ] && export "$var=true" #/* prints "Bad substitution". */
 #done
 export SUSUWU_SH_FILE="${SUSUWU_SH_FILE:-""}"
 export SUSUWU_SH_LINE="${SUSUWU_SH_LINE:-""}"
 export SUSUWU_SH_FUNC="${SUSUWU_SH_FUNC:-"true"}"
 export SUSUWU_SH_FILE_OR_LINE="${SUSUWU_SH_FILE:-${SUSUWU_SH_LINE}}"
 SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_SH_<warn-level>)" "<message>" */
-	if [ "$#" -eq 3 ]; then
+	if [ "$#" -eq 3 ]; then #/* If passed `<caller-name>` */
 		CALLER_FUNC="${1}"; shift
 	fi
 	LEVEL="${1}"
@@ -371,8 +370,7 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	fi
 	NEW_MESSAGE="${NEW_MESSAGE}${MESSAGE}${SUSUWU_SH_CLOSE_}]"
 	printf '%b\n' "${NEW_MESSAGE}" >&2 #/* fd=2 is `std::cerr`/`stderr` */
-	return $?
-)
+) #/* ends with implicit `return $?` */
 SUSUWU_PRINT "SUSUWU_PRINT()" "$(SUSUWU_SH_DEBUG)" "Test: $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_PUSH") ... $(SUSUWU_SH_QUOTE "FUNCTION" "SUSUWU_SH_USE_POP")"). TODO: test should have ellipses ($(SUSUWU_SH_QUOTE "CODE" "...")) brown."
 if ! SUSUWU_SH_HAS_UNIX_CONSOLE && [ ! "${SUSUWU_SH_CONSOLE_ERROR_SHOWN}" ]; then
 	export SUSUWU_SH_CONSOLE_ERROR_SHOWN=true
@@ -391,19 +389,19 @@ SUSUWU_LOCAL_WORKSPACE_PATH() ( #/* Usage: `"$(SUSUWU_LOCAL_WORKSPACE_PATH)/comp
 	dirname "$(git rev-parse --absolute-git-dir 2>/dev/null)"
 )
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
-	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #remote branch
-	if [ -z "${DEFAULT_BRANCH}" ]; then #if `git remote` not found
+	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #/* remote branch */
+	if [ -z "${DEFAULT_BRANCH}" ]; then #/* if `git remote` not found */
 		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #local branch; if you update this, update `README.md#git`.
 	fi
-	echo "${DEFAULT_BRANCH:-${1}}" #https://github.com/SwuduSusuwu/SusuLib/actions/runs/<number>/job/<number> has bare repos, which use <fallback>.
+	echo "${DEFAULT_BRANCH:-${1}}" #/* https://github.com/SwuduSusuwu/SusuLib/actions/runs/<number>/job/<number> has bare repos, which use <fallback>. */
 )
 SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]` */
-	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #test -d ".git/"; then
-		THIS_BRANCH="$(git rev-parse --abbrev-ref HEAD)" #detect current branch
+	if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then #/* analogous to `test -d ".git/"; then` */
+		THIS_BRANCH="$(git rev-parse --abbrev-ref HEAD)" #/* detect current branch */
 		if [ -n "${1}" ]; then
-			DEFAULT_BRANCH="${1}" #use default branch from build script
+			DEFAULT_BRANCH="${1}" #/* use default branch from build script */
 		else
-			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #detect default branch
+			DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "${1}")" #/* detect default branch */
 		fi
 		if [ "${DEFAULT_BRANCH}" = "${THIS_BRANCH}" ]; then
 			SUSUWU_PRINT "SUSUWU_PRODUCTION_USE()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "${THIS_BRANCH}")\"."
@@ -414,17 +412,18 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 )
 
 SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?; exit ${STATUS}/` */
-	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then # If system has `bash`, && this is not an infinite loop;
-		BASH_PATH="${0}.bash" # , path for `bash` version of this.
 		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" # In case user wants to disable this (or this crashed on last execution).
+	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then #/* If system has `bash`, && this is not an infinite loop (this is not already `bash`);
+		BASH_PATH="${0}.bash" # * , path for `bash` version of this. */
+		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" #/* In case user wants to disable this (or this crashed on last execution). */
 		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") to test $(SUSUWU_SH_QUOTE "CODE" "/bin/bash"). Execute $(SUSUWU_SH_QUOTE "CODE" "touch '${BASH_PATH}'") to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
-		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then # If produced `/bin/bash` version;
-			#shellcheck disable=SC2016 # That's not supposed to expand
-			sed 's|^\s*SUSUWU_BUILD_OBJECTS[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_BUILD_OBJECTS()`.
-			#shellcheck disable=SC2016 # That's not supposed to expand
-			sed 's|^\s*SUSUWU_TEST_OUTPUT[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" # Silence subsequent `SUSUWU_TEST_OUTPUT()`.
-			("${BASH_PATH}") # Execute `/bin/bash` version.
+		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then #/* If produced `/bin/bash` version; */
+			#shellcheck disable=SC2016 #/* That's not supposed to expand */
+			sed 's|^\s*SUSUWU_BUILD_OBJECTS[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" #/* Silence subsequent `SUSUWU_BUILD_OBJECTS()`. */
+			#shellcheck disable=SC2016 #/* That's not supposed to expand */
+			sed 's|^\s*SUSUWU_TEST_OUTPUT[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" #/* Silence subsequent `SUSUWU_TEST_OUTPUT()`. */
+			("${BASH_PATH}") #/* Execute `/bin/bash` version. */
 		fi
 		BASH_STATUS=$?
 		rm "${BASH_PATH}"
