@@ -2,7 +2,7 @@
 #
 #/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 # * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
-GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #`git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
+GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}` */
 if [ ! "$(realpath -q ./)" = "$(realpath -q "${GIT_ROOT}")" ]; then
 	GIT_ROOT_USE="${GIT_ROOT}" #/* If current path is not root, add root path */
 fi
@@ -39,11 +39,11 @@ SUSUWU_HAS_PARTIAL_JSON() ( #/* Usage: `if $(SUSUWU_HAS_PARTIAL_JSON "compile_co
 )
 SUSUWU_COMPILE_COMMAND() { #/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command>" | <arguments>...]"`. Allows to echo commands ( + produce `./${SUSUWU_COMPILE_JSON_PATH}`). */
 	if [ "/dev/null" != "${SUSUWU_ECHO_COMMANDS_TO}" ]; then
-		SUSUWU_PRINT "SUSUWU_COMPILE_COMMAND()" "$(SUSUWU_SH_NOTICE)" "${3}" #"${SUSUWU_ECHO_COMMANDS_TO}" #TODO: redirection
+		SUSUWU_PRINT "SUSUWU_COMPILE_COMMAND()" "$(SUSUWU_SH_NOTICE)" "${3}" #"${SUSUWU_ECHO_COMMANDS_TO}" #/* TODO: redirection */
 	fi
 	if SUSUWU_HAS_PARTIAL_JSON "${SUSUWU_COMPILE_JSON_PATH_}" && [ "/dev/null" = "${SUSUWU_COMPILE_JSON_PATH}" ]; then
 		SUSUWU_PRINT "SUSUWU_HAS_PARTIAL_JSON()" "$(SUSUWU_SH_INFO)" "found partial $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_COMPILE_JSON_PATH_}"), will resume."
-		export SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" #Notice: assumes that `SUSUWU_PROCESS_INCLUDES()` is not called once `SUSUWU_COMPILE_COMMAND()` is.
+		export SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" #/* Notice: assumes that `SUSUWU_PROCESS_INCLUDES()` is not called once `SUSUWU_COMPILE_COMMAND()` is. */
 	fi
 	{
 		echo "	{"
@@ -67,17 +67,17 @@ SUSUWU_LOCAL_WORKSPACE_JSON() ( #/* Usage: `git pull && SUSUWU_LOCAL_WORKSPACE_P
 	fi
 	[ -n "$(SUSUWU_LOCAL_WORKSPACE_PATH)" ] && sed "s|\"directory\": \"[^\"]\+\"|\"directory\": \"$(SUSUWU_LOCAL_WORKSPACE_PATH)\"|g" -i"" "${SUSUWU_COMPILE_JSON_PATH_}"
 )
-SUSUWU_LOCAL_WORKSPACE_JSON #TODO: suitable spot to put this, perhaps into `SUSUWU_SETUP_CXX()`.
+SUSUWU_LOCAL_WORKSPACE_JSON #/* TODO: suitable spot to put this, perhaps into `SUSUWU_SETUP_CXX()`. */
 SUSUWU_GITHUB_WORKSPACE_JSON() ( #/* Usage: `echo "SUSUWU_GITHUB_WORKSPACE_JSON" >> .git/hooks/pre-commit` [Replaces `$(pwd)` with `${{ github.workspace }}` */
 	if ! SUSUWU_COMPILE_JSON_PATH_FOUND "SUSUWU_GITHUB_WORKSPACE_JSON()"; then
 		return $?
 	fi
-	JSON_BACKUP_SUFFIX=".bak" #TODO; remove, since this is restored with `SUSUWU_LOCAL_WORKSPACE_PATH`?
+	JSON_BACKUP_SUFFIX=".bak" #/* TODO; remove, since this is restored with `SUSUWU_LOCAL_WORKSPACE_PATH`? */
 	JSON_BACKUP_PATH="${SUSUWU_COMPILE_JSON_PATH_}${JSON_BACKUP_SUFFIX}"
 	if SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_GITHUB_WORKSPACE_JSON()" "${JSON_BACKUP_PATH}"; then
 		sed 's|"directory": "\([^"]\+\)"|"directory": "/home/runner/work/SusuLib/SusuLib"|g' -i"${JSON_BACKUP_SUFFIX}" "${SUSUWU_COMPILE_JSON_PATH_}" && {
 			git add -f "${SUSUWU_COMPILE_JSON_PATH_}"
-			rm "${JSON_BACKUP_PATH}" # `mv "${JSON_BACKUP_PATH}" "${SUSUWU_COMPILE_JSON_PATH_}"` causes "error: cannot rebase: You have unstaged changes."
+			rm "${JSON_BACKUP_PATH}" #/* `mv "${JSON_BACKUP_PATH}" "${SUSUWU_COMPILE_JSON_PATH_}"` causes "error: cannot rebase: You have unstaged changes." */
 		}
 	fi
 )
@@ -174,7 +174,7 @@ SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 		OBJDIR="${1}"
 		SUSUWU_SETUP_OBJDIR_OLD() ( SUSUWU_SH_QUOTE "CURRENT PATH" "${OBJDIR}" )
 		SUSUWU_SETUP_OBJDIR_NEW() ( SUSUWU_SH_QUOTE "PROPOSED PATH" "<new-path>" )
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\${OBJ}.o\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)") (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)." #TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed.
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\${OBJ}.o\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)") (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
 	else
 		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"${OBJDIR}\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
 	fi
@@ -188,7 +188,7 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		BINDIR="${1}"
 		SUSUWU_SETUP_BINDIR_OLD() ( SUSUWU_SH_QUOTE "CURRENT PATH" "${BINDIR}" )
 		SUSUWU_SETUP_BINDIR_NEW() ( SUSUWU_SH_QUOTE "PROPOSED PATH" "<new-path>" )
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${OUTPUT}\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)") (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)." #TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed.
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${OUTPUT}\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)") (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
 	else
 		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR")}\${OUTPUT}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
 	fi
@@ -278,17 +278,17 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 )
 SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
 	LOCAL_BUILD=${1}
-	LOCAL_BUILDFLAGS=${2} #`=$(echo ${2} | xargs)` strips quotes, which breaks `-DSUSUWU_DEFAULT_BRANCH="trunk"`.
+	LOCAL_BUILDFLAGS=${2} #/* `=$(echo ${2} | xargs)` strips quotes, which breaks `-DSUSUWU_DEFAULT_BRANCH="trunk"`. */
 	LOCAL_SOURCE_SUFFIX=${3}
 	shift 3 #/* `${@:4}` requires `/bin/bash`. `shift X` sets `$@` to `${X+1} ... ${N-1}`. */
 	SUSUWU_ECHO_COMMANDS true
-#shellcheck disable=SC2068 #`"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'"
+#shellcheck disable=SC2068 #/* `"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'" */
 	for LOCAL_SOURCE in $@; do
 		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
-#shellcheck disable=SC2166 #With `set -x`, the `[] || []` form prints 2 commands
+#shellcheck disable=SC2166 #/* With `set -x`, the `[] || []` form prints 2 commands */
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
-				SUSUWU_COMPILE_COMMAND "$(pwd)" "${LOCAL_SOURCE}" "${LOCAL_BUILD} ${LOCAL_BUILDFLAGS} -c ${LOCAL_SOURCE} -o ${LOCAL_OBJECT}" || { #TODO: figure out how to quote `${LOCAL_BUILD}`, `${LOCAL_SOURCE}` `${LOCAL_OBJECT}`
-#shellcheck disable=SC2086 #`"${LOCAL_BUILDFLAGS}"` gives "clang++: error: language not recognized"
+				SUSUWU_COMPILE_COMMAND "$(pwd)" "${LOCAL_SOURCE}" "${LOCAL_BUILD} ${LOCAL_BUILDFLAGS} -c ${LOCAL_SOURCE} -o ${LOCAL_OBJECT}" || { #/* TODO: figure out how to quote `${LOCAL_BUILD}`, `${LOCAL_SOURCE}` `${LOCAL_OBJECT}` */
+#shellcheck disable=SC2086 #/* `"${LOCAL_BUILDFLAGS}"` gives "clang++: error: language not recognized" */
 #			"${LOCAL_BUILD}" ${LOCAL_BUILDFLAGS} -c "${LOCAL_SOURCE}" -o "${LOCAL_OBJECT}" || {
 				SUSUWU_STATUS=$?
 				SUSUWU_ECHO_COMMANDS false
@@ -309,7 +309,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS() SUSUWU_BUILD_EXECUTABLE() ... */
 	echo "]" >> "${SUSUWU_COMPILE_JSON_PATH}" && \
 	sed ':a;N;$!ba;s/},\n]/}\n]/g' -i'' "${SUSUWU_COMPILE_JSON_PATH}" 2>/dev/null
-#shellcheck disable=SC2046 #Is not possible to use more quotes.
+#shellcheck disable=SC2046 #/* Is not possible to use more quotes. */
 	${SUSUWU_RELINK} && "${LD}" $(echo "${LDFLAGS}${SUSUWU_OBJECTLIST}" | xargs) -o "${BINDIR}${OUTPUT}"
 	SUSUWU_STATUS=$?
 	SUSUWU_ECHO_COMMANDS false
@@ -371,7 +371,7 @@ SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${U
 		SUSUWU_PRINT "SUSUWU_HAS_USABLE_USRBIN()" "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_QUOTE "CODE" "\${PATH}") not set; will use \`$(SUSUWU_SH_QUOTE "VAR" "USRBIN")=\"$(SUSUWU_SH_QUOTE "PROPOSED" "${1}")\"\` (first guessed path which exists)."
 		return 0
 	fi
-	IFS=":" #`PATH` format is `"PATH_0:PATH_1:PATH_N-1"`.
+	IFS=":" #/* `PATH` format is `"PATH_0:PATH_1:PATH_N-1"`. */
 	for PATH_W in ${PATH}; do
 		if [ "${PATH_W}" = "${1}" ]; then
 			return 0
@@ -380,8 +380,8 @@ SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${U
 	return 1
 )
 SUSUWU_FIRST_PATH() ( #/* Usage: `USRBIN="$(SUSUWU_FIRST_PATH)"`. Is just for internal use. */
-	IFS=":" #`PATH` format is `"PATH_0:PATH_1:PATH_N-1"`.
-	for PATH_W in ${PATH}; do #With `in "${PATH|"`, this will not loop
+	IFS=":" #/* `PATH` format is `"PATH_0:PATH_1:PATH_N-1"`. */
+	for PATH_W in ${PATH}; do #/* With `in "${PATH|"`, this will not loop */
 		if [ -d "${PATH_W}" ]; then
 			echo "${PATH_W}"
 			return 0
@@ -406,7 +406,7 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/us
 		fi
 		USRBIN=""
 	done
-	if [ -z "${USRBIN}" ]; then #if array above is "", or does not have usable values
+	if [ -z "${USRBIN}" ]; then #/* if array above is "", or does not have usable values */
 		SUSUWU_PRINT "SUSUWU_PROCESS_USRBIN()" "$(SUSUWU_SH_NOTICE)" "None of the usual paths for \`$(SUSUWU_SH_QUOTE "VAR" "USRBIN")\` suitable to use; will use the first directory from \`$(SUSUWU_SH_QUOTE "VAR" "\${PATH}")\` which exists."
 		USRBIN="$(SUSUWU_FIRST_PATH)"
 	fi
@@ -421,6 +421,7 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/us
 SUSUWU_INSTALL() ( #/* Usage: `SUSUWU_INSTALL [USRBIN]`. Is analogous to `make install`. */
 	SUSUWU_PROCESS_USRBIN "SUSUWU_INSTALL()" "${1}" &&
 	cp --interactive "${BINDIR}${OUTPUT}" "${USRBIN}/${OUTPUT}"
+	#/* TODO: multiple output bins, support libs, configs */
 ) #/* returns result of `cp`; thus `SUSUWU_INSTALL && SUSUWU_UNINSTALL` won't remove files unless the interactive `SUSUWU_INSTALL` has total success */
 SUSUWU_UNINSTALL() ( #/* Usage: `SUSUWU_UNINSTALL [USRBIN]`. Is analogous to `make uninstall`. */
 	SUSUWU_PROCESS_USRBIN "SUSUWU_UNINSTALL()" "${1}" &&
