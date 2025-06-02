@@ -2473,15 +2473,19 @@ public:
 		return inputNormsStorage;
 #endif /* !SUSUWU_CNS_SEPARATE_NORMS */
 	}
-private:
+protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers) */
 	NumeralNormalizers inputNormsStorage; /* store inputNorms which `setupSynapses` ("training" / backpropagation) used, so that `processTo*` ("inference" / forwardpropagation) can reuse those */
 #if SUSUWU_CNS_SEPARATE_NORMS
 	NumeralNormalizers outputNormsStorage; /* separate normalization factors for "labels" (for expected output values) */
 #endif /* !SUSUWU_CNS_SEPARATE_NORMS */
-	bool initialized = false;
 	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;
 	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
+	size_t patience = 10; float minLossDelta = 0.001; /* `setupSynapses()`'s minimum per-iterations-improvement; abort (undefined if this is "success" or "failure") if the loss function is less than `minLossDelta` for `patience` iterations in a row */ /* TODO: include `setMinLossDelta()`, or turn `patience` and `minLossDelta` into arguments to `setupSynapses()` */
+	float desiredLossThreshold = 0.01; /* return (success) from `setupSynapses()` before `trainingIterations` if the loss function goes below this value */ /* TODO: include `setDesiredLossThreshold()`, or turn `desiredLossThreshold` into an argument to `setupSynapses()` */
+	float validationFactor = 0.2; /* so overfitting (convergence on non-generalizable patterns) is prevented, reserve this much of `inputsToOutputs` for validation (to compute true loss) */
 	float learningFactor = 0.02;
+	bool initialized = false;
+/* NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers) */
 } Cns;
 
 #ifdef USE_HSOM_CNS
