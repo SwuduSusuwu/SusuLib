@@ -1179,6 +1179,7 @@ setupSynapses	cxx/ClassCns.cxx	/^	void setupSynapses(const std::vector<std::tupl
 setupSynapses	cxx/ClassTensorFlowCns.hxx	/^	void setupSynapses(const std::vector<std::tuple<float \/* "input" *\/, float \/* "label" *\/>> /;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setupSynapses	cxx/ClassTensorFlowCns.hxx	/^	void setupSynapses(const std::vector<std::tuple<int \/* "input" *\/, int \/* "label" *\/>> &inp/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setupSynapsesImpl	cxx/ClassTensorFlowCns.hxx	/^	void setupSynapsesImpl(const std::vector<std::tuple<Input \/* "input" *\/, Output \/* "label" */;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
+setupSynapsesPostProcess	cxx/ClassCns.hxx	/^	virtual void setupSynapsesPostProcess() { setInitialized(true); } \/* `override` with code comm/;"	f	class:Susuwu::Cns	typeref:typename:void
 setupSynapsesPostProcess	cxx/ClassTensorFlowCns.hxx	/^	void setupSynapsesPostProcess() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 sha1Context	c/rfc6234/sha.h	/^		SHA1Context sha1Context;$/;"	m	union:USHAContext::__anoncf2b51e2030a	typeref:typename:SHA1Context
 sha224Context	c/rfc6234/sha.h	/^		SHA224Context sha224Context; SHA256Context sha256Context;$/;"	m	union:USHAContext::__anoncf2b51e2030a	typeref:typename:SHA224Context

@@ -107,16 +107,20 @@ public:
 		learningFactor = x; /* how much coefficients move (converge) per step of `setupSynapses` training loop. `0.0` is static, `1.0` is straight to the first reciprocal (or whatever form of gradient the optimizer uses) */
 	}
 
+	/* Internal function, which outros of `setupSynapses()` use.
+	 * @throw std::bad_alloc std::runtime_error
+	 * @pre @code !isPureVirtual() @endcode
+	 * @post @code isInitialized() @endcode */
+	virtual void setupSynapsesPostProcess() { setInitialized(true); } /* `override` with code common to all `setupSynapses`. */
 #if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* Initialize `Cns.synapses` with pseudorandom (uses `rand()` or recipricals of `inputsToOutputs`) values
 	 * @throw std::runtime_error */
 	template<class InputsToOutputs>
 	virtual void pseudoRandomSynapses(const InputsToOutputs &inputsToOutputs) { throw std::runtime_error("ClassCns::pseudoRandomSynapses() pure virtual call"); }
 	/* @throw bad_alloc
-	 * @pre @code !isPureVirtual() @endcode
-	 * @post @code isInitialized() @endcode */
+	 * @pre @code !isPureVirtual() @endcode */
 	template<typename Input, typename Output>
-	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */); /* { restructureConnectome(); inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
+	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */); /* { restructureConnectome(); inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; setupSynapsesPostProcess(); throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
 	template<typename Input, typename Output>
 	virtual const Output process(const Input input) const {
@@ -132,7 +136,7 @@ public:
 	/* @throw bad_alloc \
 	 * @pre @code !isPureVirtual() @endcode \
 	 * @post @code isInitialized() @endcode */\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { restructureConnectome(); inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; setInitialized(true); /* stub so unit tests pass */ } /* NOLINT(bugprone-macro-parentheses) */
+	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { restructureConnectome(); inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; setupSynapsesPostProcess(); /* stub so unit tests pass */ } /* NOLINT(bugprone-macro-parentheses) */
 #	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_TYPEDEF) \
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, bool)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, char)\
