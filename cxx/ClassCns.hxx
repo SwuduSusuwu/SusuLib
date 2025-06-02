@@ -7,11 +7,8 @@
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_INTPTR SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
-#if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
-#	include <stdexcept> /* std::runtime_error */
-#else /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
-#	include <string> /* std::string */
-#endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
+#include <stdexcept> /* std::invalid_argument std::runtime_error */
+#include <string> /* std::string std::to_string */
 #include <tuple> /* std::tuple */
 #include <vector> /* std::vector */
 #ifndef SUSUWU_CNS_SEPARATE_NORMS
@@ -63,10 +60,18 @@ public:
 	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } /* sets connectome coefficients-per-"hidden layer" (notice: some implementations require `inputNeurons == neuronsPerLayer`) */
 
 /* NOLINTBEGIN(google-default-arguments): derivative classes use our default values */
+	/* Compute values; setters of training momentum (and similar arguments) which the derivative classes use */
+	virtual void setLearningFactor(CnsMode x) {
+		if(0 > learningFactor || 1 < learningFactor) {
+			throw std::invalid_argument("ClassCns::setLearningFactor(\"" + std::to_string(x) + "\") out of bounds");
+		}
+		learningFactor = x; /* how much coefficients move (converge) per step of `setupSynapses` training loop. `0.0` is static, `1.0` is straight to the first reciprocal (or whatever form of gradient the optimizer uses) */
+	}
+
+#if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	/* @throw bad_alloc
 	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
-#if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	template<typename Input, typename Output>
 	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */); /* { inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
@@ -146,6 +151,7 @@ private:
 	bool initialized = false;
 	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;
 	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
+	float learningFactor = 0.02;
 } Cns;
 
 #ifdef USE_HSOM_CNS
