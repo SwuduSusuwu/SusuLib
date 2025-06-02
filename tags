@@ -963,7 +963,7 @@ fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizers fromTuple(cons
 fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizersReciprocal fromTuple(const std::vector<std::tuple<Numeral, Numer/;"	f	struct:Susuwu::NumeralNormalizersReciprocal	typeref:typename:const NumeralNormalizersReciprocal
 getClass	cxx/ClassObject.hxx	/^	const Class &getClass() const { return *this; }$/;"	f	class:Susuwu::Object	typeref:typename:const Class &
 getObjectSize	cxx/ClassObject.hxx	/^	virtual const size_t getObjectSize() const { return sizeof(*this); \/* sum(sizeof({vptr, data m/;"	f	class:Susuwu::Instrumentation	typeref:typename:const size_t
-getParameterCount	cxx/ClassCns.hxx	/^	virtual const size_t getParameterCount() { return neuronsPerLayer * neuronsPerLayer * layersOfN/;"	f	class:Susuwu::Cns	typeref:typename:const size_t
+getParameterCount	cxx/ClassCns.hxx	/^	virtual const size_t getParameterCount() { \/* Notice: must `override` if architecture is spars/;"	f	class:Susuwu::Cns	typeref:typename:const size_t
 getParameterCount	cxx/ClassTensorFlowCns.hxx	/^	const size_t getParameterCount() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const size_t
 getSuperclassRef	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass();/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const Class &
 globalVirusAnalysisHook	cxx/VirusAnalysis.cxx	/^VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; \/* Just use virusAnalysis/;"	v	namespace:Susuwu	typeref:typename:VirusAnalysisHook
@@ -1025,6 +1025,7 @@ isInitialized	cxx/ClassObject.hxx	/^	virtual const bool isInitialized() const { 
 isPlainOldData	cxx/ClassObject.hxx	/^	virtual const bool isPlainOldData() const { return !(usesDynamicAllocations() || usesFilesystem/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 isPureVirtual	cxx/ClassObject.hxx	/^	virtual const bool isPureVirtual() const { return false; } \/* in case the compiler does not re/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 isRelatedTo	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const bool isRelatedTo(const Class &obj) const { return (this->isInstance(obj) ||/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const bool
+isSquareConnectome	cxx/ClassCns.hxx	/^	virtual const bool isSquareConnectome() const { return false; } \/* returns `true` if the imple/;"	f	class:Susuwu::Cns	typeref:typename:const bool
 k_opad	c/rfc6234/sha.h	/^		unsigned char k_opad[USHA_Max_Message_Block_Size];$/;"	m	struct:HMACContext	typeref:typename:unsigned char[]
 keyarray	c/rfc6234/shatest.c	/^		const char *keyarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 keylength	c/rfc6234/shatest.c	/^		int keylength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
@@ -1161,16 +1162,17 @@ scasecmp	c/rfc6234/shatest.c	/^int scasecmp(const char *s1, const char *s2)$/;"	
 session	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Session* session = SUSUWU_NULLPTR;$/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Session *
 setInitialized	cxx/ClassCns.hxx	/^	virtual void setInitialized(const bool is) { initialized = is; } \/* after "training" (ergo "ba/;"	f	class:Susuwu::Cns	typeref:typename:void
 setInputMode	cxx/ClassCns.hxx	/^	virtual void setInputMode(ObjectMode x) { inputMode = x; } \/* sets type of input *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
-setInputNeurons	cxx/ClassCns.hxx	/^	virtual void setInputNeurons(size_t x) { inputNeurons = x; } \/* sets connectome input count *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
+setInputNeurons	cxx/ClassCns.hxx	/^	virtual void setInputNeurons(size_t x) { \/* sets connectome input count *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setInputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setInputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome input count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-setLayersOfNeurons	cxx/ClassCns.hxx	/^	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } \/* sets connectome "hidden /;"	f	class:Susuwu::Cns	typeref:typename:void
+setLayersOfNeurons	cxx/ClassCns.hxx	/^	virtual void setLayersOfNeurons(size_t x) { \/* sets connectome "hidden layer" count *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setLayersOfNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome "hidden layer" count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-setLearningFactor	cxx/ClassCns.hxx	/^	virtual void setLearningFactor(CnsMode x) {$/;"	f	class:Susuwu::Cns	typeref:typename:void
-setNeuronsPerLayer	cxx/ClassCns.hxx	/^	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } \/* sets connectome coeffici/;"	f	class:Susuwu::Cns	typeref:typename:void
+setLearningFactor	cxx/ClassCns.hxx	/^	virtual void setLearningFactor(ObjectMode x) {$/;"	f	class:Susuwu::Cns	typeref:typename:void
+setNeuronsPerLayer	cxx/ClassCns.hxx	/^	virtual void setNeuronsPerLayer(size_t x) { \/* sets connectome coefficients-per-"hidden layer"/;"	f	class:Susuwu::Cns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassTensorFlowCns.hxx	/^	void setNeuronsPerLayer(size_t x) SUSUWU_OVERRIDE { \/* sets connectome coefficients-per-"hidde/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setOutputMode	cxx/ClassCns.hxx	/^	virtual void setOutputMode(ObjectMode x) { outputMode = x; } \/* sets type of output (notice: s/;"	f	class:Susuwu::Cns	typeref:typename:void
-setOutputNeurons	cxx/ClassCns.hxx	/^	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } \/* sets connectome output count/;"	f	class:Susuwu::Cns	typeref:typename:void
+setOutputNeurons	cxx/ClassCns.hxx	/^	virtual void setOutputNeurons(size_t x) { \/* sets connectome output count *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setOutputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setOutputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome output count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
+setSquareConnectome	cxx/ClassCns.hxx	/^	virtual void setSquareConnectome(const bool is) { throw std::invalid_argument(SUSUWU_ERRSTR(SUS/;"	f	class:Susuwu::Cns	typeref:typename:void
 setSquareConnectome	cxx/ClassTensorFlowCns.hxx	/^	void setSquareConnectome(const bool is) SUSUWU_OVERRIDE { throw std::invalid_argument(SUSUWU_ER/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setupSynapses	cxx/ClassCns.cxx	/^	void setupSynapses(const std::vector<std::tuple<float, float>>) SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::HsomCns	typeref:typename:void	file:
 setupSynapses	cxx/ClassTensorFlowCns.hxx	/^	void setupSynapses(const std::vector<std::tuple<float \/* "input" *\/, float \/* "label" *\/>> /;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
