@@ -457,6 +457,7 @@ public:
 			if(0 == validationCount) {
 				lossVal = outputs[0].scalar<float>()();
 			} else {
+				outputs.clear();
 				status = session->Run(
 					{
 						{"input", inputTensor2},
@@ -467,7 +468,8 @@ public:
 					throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setupSynapses() { const tensorflow::Status status = session->Run({{\"inputs\", inputTensor2}, {\"labels\", expectedOutputTensor2}}, {\"loss\"}, {}, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } }"));
 				}
 				lossVal = outputs[0].scalar<float>()(); /* TODO: use for eager stop */
-							}
+			}
+			if(lossVal < desiredLossThreshold) { break; }
 		}
 		setupSynapsesPostProcess();
 	}

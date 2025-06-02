@@ -2625,6 +2625,7 @@ typedef class ApxrCns : Cns {
 
 `less `[`cxx/ClassTensorFlowCns.hxx`](../cxx/ClassTensorFlowCns.hxx)
 ```c++
+#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /* The is the most close to fit-for-use */
 #ifndef SUSUWU_CNS_LOCAL_COEFFICIENTS
 #	define SUSUWU_CNS_LOCAL_COEFFICIENTS false
 #endif /* ndef SUSUWU_CNS_LOCAL_COEFFICIENTS */
@@ -3045,6 +3046,7 @@ public:
 			if(0 == validationCount) {
 				lossVal = outputs[0].scalar<float>()();
 			} else {
+				outputs.clear();
 				status = session->Run(
 					{
 						{"input", inputTensor2},
@@ -3055,7 +3057,8 @@ public:
 					throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setupSynapses() { const tensorflow::Status status = session->Run({{\"inputs\", inputTensor2}, {\"labels\", expectedOutputTensor2}}, {\"loss\"}, {}, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } }"));
 				}
 				lossVal = outputs[0].scalar<float>()(); /* TODO: use for eager stop */
-							}
+			}
+			if(lossVal < desiredLossThreshold) { break; }
 		}
 		setupSynapsesPostProcess();
 	}
