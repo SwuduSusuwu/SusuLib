@@ -2491,6 +2491,7 @@ public:
 		}
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS
 		this->coefficients = obj.coefficients;
+		this->biases = obj.biases;
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 		this->graphDef = obj.graphDef;
 	}
@@ -2508,7 +2509,8 @@ public:
 		const auto *objFlow = dynamic_cast<const TensorFlowCns *>(&obj);
 		return Cns::operator==(obj) &&
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS
-			thisFlow->coefficients == objFlow->coefficients;
+			thisFlow->coefficients == objFlow->coefficients &&
+			thisFlow->biases == objFlow->biases;
 #else /* else !SUSUWU_CNS_LOCAL_COEFFICIENTS */
 			thisFlow->graphDef.SerializeAsString() == objFlow->graphDef.SerializeAsString();
 /* TODO: `#include <google/protobuf/util/message_differencer.h>` `bool areEqual = google::protobuf::util::MessageDifferencer::Equals(thisFlow->graphDef, objFlow->graphDef);`. This development environment does not have `message_differencer.h` to test those. */
@@ -2529,6 +2531,7 @@ public:
 		setInitialized(false);
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS
 		coefficients = tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)}));
+		biases = tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(neuronsPerLayer)}));
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 	}
 	void restructureConnectome() SUSUWU_OVERRIDE {
@@ -2567,6 +2570,12 @@ public:
 			restructureConnectome();
 		}
 	}
+	const size_t getParameterCount() SUSUWU_OVERRIDE {
+		if(!isSquareConnectome()) {
+			/*throw std::runtime_error*/SUSUWU_WARNING(getName() + "::getParameterCount() { isSquareConnectome() == false; /*Is not simple dense, square connectome. Must `override` for sparse connectomes. */ }")/*) TODO: `throw`? */;
+		}
+		return (neuronsPerLayer * neuronsPerLayer * layersOfNeurons) + (neuronsPerLayer * layersOfNeurons);
+	}
 
 	template<class CoefficientType,	class InputIt>
 	void initCoefficient(CoefficientType &coefficientRef, InputIt inputIt, const float scale) {
@@ -2591,6 +2600,7 @@ public:
 	{ /* Initialize `coefficients` with pseudorandom (uses `rand()` or recipricals of `inputsToOutputs`) values */
 #if !SUSUWU_CNS_LOCAL_COEFFICIENTS
 		tensorflow::Tensor coefficients(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)}))); /* connectome coefficients ("synaptic strengths") */
+		tensorflow::Tensor biases(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(neuronsPerLayer)}))); /* connectome biases (membrane potentials) */
 #endif /* !SUSUWU_CNS_LOCAL_COEFFICIENTS */
 		const auto inputBegin = inputsToOutputs.cbegin(), inputEnd = inputsToOutputs.cend();
 		auto inputIt = inputBegin;
@@ -2612,8 +2622,8 @@ public:
 			}
 		}
 		TF_CHECK_OK(session->Run({
-					{"randomCoefficients", coefficients}
-					}, {}, {"assignCoefficients"},
+					{"randomCoefficients", coefficients}, {"randomBiases", biases}
+					}, {}, {"assignCoefficients", "assignBiases"},
 					SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
 	}
 
@@ -2621,13 +2631,15 @@ public:
 #	pragma message("TODO: `SUSUWU_TENSORFLOWCNS_LOGITS` loop for `SUSUWU_CNS_USE_MLP`")
 //	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
 #endif /* SUSUWU_CNS_IF_MLP */
-#define SUSUWU_TENSORFLOWCNS_LOGITS tensorflow::ops::MatMul(root.WithOpName("logits"), input, coefficientsVar)
+#define SUSUWU_TENSORFLOWCNS_LOGITS tensorflow::ops::Add(root.WithOpName("logits"), tensorflow::ops::MatMul(root, input, coefficientsVar), biases)
 #define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /* Simple (1 dense layer) inference model. TODO: [choose how to implement `layersOfNeurons`](https://github.com/copilot/share/427f408e-08e0-8c80-9151-f24920212857) */\
 		const auto inputDim = static_cast<DimSz>(inputNeurons), outputDim = static_cast<DimSz>(outputNeurons); /* TODO: assert `1` for base types? */ \
 		root = tensorflow::Scope::NewRootScope(); \
 		auto input = tensorflow::ops::Placeholder(root.WithOpName("input"), /* `DataTypeToEnum<Input>::value` gives "INVALID_ARGUMENT: Inconsistent values" */coefficientFormat/*, Placeholder::Shape({-1, inputDim})*/); \
 		auto coefficientsVar = tensorflow::ops::Variable(root.WithOpName("coefficients"), tensorflow::TensorShape({inputDim, outputDim}), coefficientFormat); \
 		auto randomCoefficientsVar = tensorflow::ops::Variable(root.WithOpName("randomCoefficients"), tensorflow::TensorShape({inputDim, outputDim}), coefficientFormat); \
+		auto biasesVar = tensorflow::ops::Variable(root.WithOpName("biases"), tensorflow::TensorShape({outputDim}), coefficientFormat); \
+		auto randomBiasesVar = tensorflow::ops::Variable(root.WithOpName("randomBiases"), tensorflow::TensorShape({outputDim}), coefficientFormat); \
 		auto logits = SUSUWU_TENSORFLOWCNS_LOGITS; /* TODO: ensure that `"logits"` is usable as-is for `process*()`. For classification use `"relu"`? */ \
 		auto relu = tensorflow::ops::Relu(root.WithOpName("relu"), logits); /* TODO: benchmark test how accurate this is? [Rectified Linear Unit activation function](https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/relu) does; scaling, cutoff and `abs`. Gives non-linear version of `logits` (can use as input to hidden-layer `loss`). [Python version has better documents](https://www.tensorflow.org/api_docs/python/tf/keras/layers/ReLU). */
 	template<class Input, class Output>
@@ -2671,12 +2683,15 @@ public:
 #	pragma message("TODO: `ApplyGradientDescent` loop for `SUSUWU_CNS_USE_MLP`")
 //	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
 #endif /* SUSUWU_CNS_IF_MLP */
-	//		auto optimizer = tensorflow::ops::ApplyAdam(root, coefficientsVar, learningFactor); /* TODO? Heard this is just part of the Python TensorFlow */
+	//		auto optimizer = tensorflow::ops::ApplyAdam(root, coefficientsVar, biasesVar, learningFactor); /* TODO? Heard this is just part of the Python TensorFlow */
 //		auto optimizer = tensorflow::ops::AdamOptimizer(learningFactor); /* TODO? */
 		auto optimizerCoefficients = tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients"), coefficientsVar, learningFactor, gradCoefficientsScaled /* gradients[0] */); /* TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */
+		auto optimizerBiases = tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerBiases"), biasesVar, learningFactor, gradBiasesScaled /* gradients[1] */); /* TODO: the derivative of `coefficients` is `n`, but the derivative of `biases` is `1`; use low-order optimizer for `biases`? */
 
 		auto initCoefficients = tensorflow::ops::Assign(root.WithOpName("initCoefficients"), coefficientsVar, tensorflow::ops::Const(root, 0.2f /* gradients are all `0` if initial values are `0` */, tensorflow::TensorShape({inputDim, outputDim})) /* std::vector<std::vector<CoefficientType>>(inputDim, std::vector<CoefficientType>(outputDim, 0.0f)))*/ );
 		auto assignCoefficients = tensorflow::ops::Assign(root.WithOpName("assignCoefficients"), coefficientsVar, randomCoefficientsVar);
+		auto initBiases = tensorflow::ops::Assign(root.WithOpName("initBiases"), biasesVar, tensorflow::ops::Const(root, 0.2f, tensorflow::TensorShape({outputDim})));
+		auto assignBiases = tensorflow::ops::Assign(root.WithOpName("assignBiases"), biasesVar, randomBiasesVar);
 //		auto init = tensorflow::ops::InitializeVariables(root.WithOpName("init")); /* gives `error: no member named 'InitializeVariables' in namespace 'tensorflow::ops'` */
 
 		/* Create and init the graph (`this->graphDef`) */
@@ -2747,12 +2762,13 @@ public:
 		} else {
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS /* Store model values into `class TensorFlowCns`. */
 			std::vector<tensorflow::Tensor> outputs;
-			const tensorflow::Status status = session->Run({}, {"coefficients"}, {}, &outputs);
+			const tensorflow::Status status = session->Run({}, {"coefficients", "biases"}, {}, &outputs);
 			if(!status.ok()) {
 				printGraphNodes();
-				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + __func__ + "() { const tensorflow::Status status = session->Run({}, {\"coefficients\"}, {}, &outputs); (!status.ok()) { outputs.size() == " + std::to_string(outputs.size()) + "; status.ToString() == \"" + status.ToString() + "\"; } }"));
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + __func__ + "() { const tensorflow::Status status = session->Run({}, {\"coefficients\", \"biases\"}, {}, &outputs); (!status.ok()) { outputs.size() == " + std::to_string(outputs.size()) + "; status.ToString() == \"" + status.ToString() + "\"; } }"));
 			}
 			this->coefficients = outputs[0];
+			this->biases = outputs[1];
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 			setInitialized(true);
 		}
@@ -2780,10 +2796,10 @@ public:
 //		initScopeRootForward<Input, Output>(DataTypeToEnum<CoefficientType>::value); /* TODO: uncomment if `root` is set to `mutable` */
 		std::vector<tensorflow::Tensor> oTensors;
 		const tensorflow::Status status = session->Run(
-			{{"input", inputTensor}/*, {"coefficients", coefficients} */},
+			{{"input", inputTensor}/*, {"coefficients", coefficients}, {"biases", biases} */},
 			{"logits"}, {"logits"}, &oTensors);
 		if(!status.ok()) {
-			const std::string coefficientStr = "/*, {\"coefficients\", coefficients}*/"; /* Notice: can set to "" */
+			const std::string coefficientStr = "/*, {\"coefficients\", coefficients}, {\"biases\", biases}*/"; /* Notice: can set to "" */
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + func + "() { const tensorflow::Status status = session->Run({{\"input\", inputTensor}" + coefficientStr + "}, {\"output\"}, {}, &oTensors); (!status.ok()) { status.ToString() == \"" + status.ToString() + "\"; } }"));
 		}
 		return oTensors; //return static_cast<Output /* cannot cast to `std::string` */>(oTensors[0].matrix<CoefficientType>()(0, 0));
@@ -2822,7 +2838,8 @@ protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-clas
 	tensorflow::Scope root; /* TODO: If not used after init, move this into `setupRootScope()` */
 	tensorflow::GraphDef graphDef; /* TODO: If not used after init, move this into `setupRootScope()`. */
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS
-	tensorflow::Tensor coefficients = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({static_cast<DimSz>(inputneurons), static_cast<DimSz>(neuronsPerLayer)})); /* connectome coefficients ("synaptic strengths") */
+	tensorflow::Tensor coefficients = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)})); /* connectome coefficients ("synaptic strengths") */
+	tensorflow::Tensor biases = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({static_cast<DimSz>(neuronsPerLayer)})); /* connectome biases ("membrane potentials") */
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 /* NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes) */
 };

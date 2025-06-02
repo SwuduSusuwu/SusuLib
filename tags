@@ -864,6 +864,7 @@ assistantCnsTests	cxx/AssistantCns.cxx	/^const bool assistantCnsTests() {$/;"	f	
 assistantCnsTestsNoexcept	cxx/AssistantCns.hxx	/^static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistan/;"	f	namespace:Susuwu	typeref:typename:const bool
 average	cxx/ClassNumeral.hxx	/^	NumeralAccum average, magnitude;$/;"	m	struct:Susuwu::NumeralNormalizers	typeref:typename:NumeralAccum
 backprop	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
+biases	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor biases = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({s/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
 blockSize	c/rfc6234/sha.h	/^		int blockSize;              \/* block size of SHA being used *\/$/;"	m	struct:HMACContext	typeref:typename:int
 boo	cxx/Macros.cxx	/^	class SubClassWithBaseSubobject : public Zero {public: bool boo = true;};$/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithBaseSubobject	typeref:typename:bool	file:
 boo	cxx/Macros.cxx	/^	class SubClassWithMemberSubobject {public: bool boo = true; Zero zero;};$/;"	m	class:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest::SubClassWithMemberSubobject	typeref:typename:bool	file:
@@ -960,6 +961,7 @@ fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizersReciprocal from
 getClass	cxx/ClassObject.hxx	/^	const Class &getClass() const { return *this; }$/;"	f	class:Susuwu::Object	typeref:typename:const Class &
 getObjectSize	cxx/ClassObject.hxx	/^	virtual const size_t getObjectSize() const { return sizeof(*this); \/* sum(sizeof({vptr, data m/;"	f	class:Susuwu::Instrumentation	typeref:typename:const size_t
 getParameterCount	cxx/ClassCns.hxx	/^	virtual const size_t getParameterCount() { \/* Notice: must `override` if architecture is spars/;"	f	class:Susuwu::Cns	typeref:typename:const size_t
+getParameterCount	cxx/ClassTensorFlowCns.hxx	/^	const size_t getParameterCount() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const size_t
 getSuperclassRef	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const Class &getSuperclassRef() const { const auto *superclass = getSuperclass();/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const Class &
 globalVirusAnalysisHook	cxx/VirusAnalysis.cxx	/^VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; \/* Just use virusAnalysis/;"	v	namespace:Susuwu	typeref:typename:VirusAnalysisHook
 graphDef	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::GraphDef graphDef; \/* TODO: If not used after init, move this into `setupRootScope/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::GraphDef
