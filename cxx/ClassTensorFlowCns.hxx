@@ -18,6 +18,7 @@
 #	include <algorithm> /* std::shuffle */
 #	include <random> /* std::default_random_engine */
 #endif /* def SUSUWU_CNS_SHUFFLE */
+#include <limits> /* std::numeric_limits */
 #include <stdexcept> /* std::invalid_argument std::runtime_error */
 #include <string> /* std::string */
 //#include <tensorflow/c/experimental/ops/math_ops.h> /* tensorflow::ops::* */ /* TODO: fix "../tensorflow/tensorflow/c/eager/abstract_function.h:19:10: error: 'tensorflow/core/framework/function.pb.h' file not found" */
@@ -434,6 +435,8 @@ public:
 			trainingIterations = 1000; /* TODO: use input specifics (and available host resources?) to compute best value */
 		}
 		const std::vector<std::string> outputTensors = {"loss"};
+		float bestLoss = std::numeric_limits<float>::max();
+		size_t patienceCounter = 0;
 		for(size_t epoch = 0; epoch < trainingIterations; ++epoch) {
 			std::vector<tensorflow::Tensor> outputs;
 			tensorflow::Status status = session->Run(
@@ -465,6 +468,13 @@ public:
 				lossVal = outputs[0].scalar<float>()(); /* TODO: use for eager stop */
 			}
 			if(lossVal < desiredLossThreshold) { break; }
+			if(lossVal < bestLoss - minLossDelta) {
+				bestLoss = lossVal;
+				patienceCounter = 0;
+			} else {
+				patienceCounter++;
+				if(patienceCounter >= patience) { break; }
+			}
 		}
 		setupSynapsesPostProcess();
 	}
