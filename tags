@@ -944,6 +944,7 @@ coefficients	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor coefficients = ten
 ctx	c/rfc6234/sha.h	/^		} ctx;$/;"	m	struct:USHAContext	typeref:union:USHAContext::__anoncf2b51e2030a
 dataarray	c/rfc6234/shatest.c	/^		const char *dataarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 datalength	c/rfc6234/shatest.c	/^		int datalength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
+desiredLossThreshold	cxx/ClassCns.hxx	/^	float desiredLossThreshold = 0.01; \/* return (success) from `setupSynapses()` before `training/;"	m	class:Susuwu::Cns	typeref:typename:float
 endif	README.md	/^  - [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https:\/\/stackoverflow.com/;"	h	section:Contributor conventions/rules""_C_/_C++_ source
 equals	cxx/ClassCns.hxx	/^	const bool equals(const Object &obj) const SUSUWU_OVERRIDE { return this->getClass().operator==/;"	f	class:Susuwu::Cns	typeref:typename:const bool
 equals	cxx/ClassObject.hxx	/^	virtual const bool equals(const Object &obj) const { return this == &obj; } \/* Java's contract/;"	f	class:Susuwu::Object	typeref:typename:const bool
@@ -1054,6 +1055,7 @@ magnitude	cxx/ClassNumeral.hxx	/^	NumeralAccum average, magnitude;$/;"	m	struct:
 main	c/rfc6234/shatest.c	/^int main(int argc, char **argv)$/;"	f	typeref:typename:int
 main	cxx/main.cxx	/^SusuwuUnitTestsBitmask main(int argc, const char **args) {$/;"	f	typeref:typename:SusuwuUnitTestsBitmask
 manualReviewCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
+minLossDelta	cxx/ClassCns.hxx	/^	size_t patience = 10; float minLossDelta = 0.001; \/* `setupSynapses()`'s minimum per-iteration/;"	m	class:Susuwu::Cns	typeref:typename:float
 name	c/rfc6234/shatest.c	/^		const char *name;$/;"	m	struct:hash	typeref:typename:const char *	file:
 neuronsPerLayer	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
 notify	cxx/ClassObject.hxx	/^	virtual void notify() {}$/;"	f	class:Susuwu::Object	typeref:typename:void
@@ -1114,6 +1116,7 @@ outputNormsStorage	cxx/ClassCns.hxx	/^	NumeralNormalizers outputNormsStorage; \/
 owner	cxx/ClassIo.hxx	/^    using owner = Resource; \/* Wraps pointers; [cppcoreguidelines-owning-memory] fix. *\/$/;"	t	namespace:gsl	typeref:typename:Resource
 passList	cxx/VirusAnalysis.cxx	/^ResultList passList, abortList; \/* hosts produce, clients initialize shared clones of this from/;"	v	namespace:Susuwu	typeref:typename:ResultList
 path	cxx/ClassPortableExecutable.hxx	/^	const ClassIoPath path; \/* Suchas "C:\\Program.exe" or "\/usr\/bin\/library.so" *\/ \/* NOLINT/;"	m	class:Susuwu::PortableExecutable	typeref:typename:const ClassIoPath
+patience	cxx/ClassCns.hxx	/^	size_t patience = 10; float minLossDelta = 0.001; \/* `setupSynapses()`'s minimum per-iteration/;"	m	class:Susuwu::Cns	typeref:typename:size_t
 pid_t	cxx/ClassSys.cxx	/^typedef int pid_t;$/;"	t	typeref:typename:int	file:
 pid_t	cxx/ClassSys.hxx	/^typedef int pid_t;$/;"	t	typeref:typename:int
 printGraphNodes	cxx/ClassTensorFlowCns.hxx	/^	void printGraphNodes() const {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
@@ -1227,6 +1230,7 @@ usesDynamicAllocations	cxx/ClassObject.hxx	/^	virtual const bool usesDynamicAllo
 usesFilesystem	cxx/ClassObject.hxx	/^	virtual const bool usesFilesystem() const { \/* if(uses functions suchas {`fopen`, `new`}) { re/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 usesNetwork	cxx/ClassObject.hxx	/^	virtual const bool usesNetwork() const { \/* if(uses functions suchas {`socket`}) { return true/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 usesThreads	cxx/ClassObject.hxx	/^	virtual const bool usesThreads() const { \/* if(uses functions suchas {`pthread`}) { return tru/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
+validationFactor	cxx/ClassCns.hxx	/^	float validationFactor = 0.2; \/* so overfitting (convergence on non-generalizable patterns) is/;"	m	class:Susuwu::Cns	typeref:typename:float
 value	cxx/ClassObject.hxx	/^struct ToObjectMode<bool> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeBool; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
 value	cxx/ClassObject.hxx	/^struct ToObjectMode<char> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeChar; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
 value	cxx/ClassObject.hxx	/^struct ToObjectMode<double> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeDouble; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
