@@ -54,18 +54,51 @@ public:
 	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; } /* if can do "inference" (ergo "forwardpropagation"; `process*`) */
 	virtual void setInitialized(const bool is) { initialized = is; } /* after "training" (ergo "backpropagation") finishes, set to `true` */
 
-	/* Topological values; sets the "shape" of `Cns.synapses` (or of whatever the derived class uses to store the connectome) */
+	/* Topological values; methods which set the "shape" of `Cns.synapses` (or of whatever the derived class uses to store the connectome) */
+	virtual const bool isSquareConnectome() const { return false; } /* returns `true` if the implementation requires `inputNeurons == outputNeurons == neuronsPerLayer` (square layout does not support all uses, but is most simple to code and allows the most [SIMD](../posts/SimdGpgpuTpu.md) */
+//	virtual bool setSquareConnectome(const bool is) { return false; } /* returns `true` (and sets the squareness to `is`) if the implementation has customizable squareness (dynamic code paths for square versus non-square connectomes) */
+	virtual void setSquareConnectome(const bool is) { throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setSquareConnectome(" + std::to_string(is) + ") { /* implementation does not support setting this */ }")); } /* if the implementation has customizable squareness (dynamic code paths for square versus non-square connectomes), sets the squareness to `is`. */
 	virtual void setInputMode(ObjectMode x) { inputMode = x; } /* sets type of input */
 	virtual void setOutputMode(ObjectMode x) { outputMode = x; } /* sets type of output (notice: some implementations require `inputMode == outputMode`) */
-	virtual void setInputNeurons(size_t x) { inputNeurons = x; } /* sets connectome input count */
-	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } /* sets connectome output count (notice: some implementations require `inputNeurons == outputNeurons`) */
-	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } /* sets connectome "hidden layer" count */
-	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } /* sets connectome coefficients-per-"hidden layer" (notice: some implementations require `inputNeurons == neuronsPerLayer`) */
-	virtual const size_t getParameterCount() { return neuronsPerLayer * neuronsPerLayer * layersOfNeurons; } /* Notice: must `override` if connectome does not dense, square layout. Notice: must `override` to count biases. */
+	virtual void setInputNeurons(size_t x) { /* sets connectome input count */
+		if(x != inputNeurons) {
+			if(isSquareConnectome() && 0 != neuronsPerLayer && x != neuronsPerLayer) {
+				throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setInputNeurons(.x = " + std::to_string(x) + ") { isSquareConnectome() && 0 != neuronsPerLayer && x != neuronsPerLayer }"));
+			}
+			inputNeurons = x;
+		}
+	}
+	virtual void setOutputNeurons(size_t x) { /* sets connectome output count */
+		if(x != outputNeurons) {
+			if(isSquareConnectome() && 0 != neuronsPerLayer && x != neuronsPerLayer) {
+				throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setOutputNeurons(.x = " + std::to_string(x) + ") { isSquareConnectome() && 0 != neuronsPerLayer && x != neuronsPerLayer }"));
+			}
+			outputNeurons = x;
+		}
+	}
+	virtual void setLayersOfNeurons(size_t x) { /* sets connectome "hidden layer" count */
+		if(x != layersOfNeurons) {
+			layersOfNeurons = x;
+		}
+	}
+	virtual void setNeuronsPerLayer(size_t x) { /* sets connectome coefficients-per-"hidden layer" */
+		if(x != neuronsPerLayer) {
+			if(isSquareConnectome() && 0 != inputNeurons && x != inputNeurons) {
+				throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setNeuronsPerLayer(.x = " + std::to_string(x) + ") { isSquareConnectome() && 0 != inputNeurons && x != inputNeurons }"));
+			}
+			neuronsPerLayer = x;
+		}
+	}
+	virtual const size_t getParameterCount() { /* Notice: must `override` if architecture is sparse. Must `override` to count constant biases. */
+		if(!isSquareConnectome()) {
+			/*throw std::runtime_error*/SUSUWU_WARNING(getName() + "::getParameterCount() { isSquareConnectome() == false; /*Is not simple dense, square connectome. Must `override` for sparse connectomes. */ }")/*) TODO: `throw`? */;
+		}
+		return neuronsPerLayer * neuronsPerLayer * layersOfNeurons; /* default is; counts 1 coefficient per input to next layer of neurons */
+	}
 
 /* NOLINTBEGIN(google-default-arguments): derivative classes use our default values */
 	/* Compute values; setters of training momentum (and similar arguments) which the derivative classes use */
-	virtual void setLearningFactor(CnsMode x) {
+	virtual void setLearningFactor(ObjectMode x) {
 		if(0 > learningFactor || 1 < learningFactor) {
 			throw std::invalid_argument("ClassCns::setLearningFactor(\"" + std::to_string(x) + "\") out of bounds");
 		}
