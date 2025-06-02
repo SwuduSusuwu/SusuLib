@@ -1027,6 +1027,7 @@ k_opad	c/rfc6234/sha.h	/^		unsigned char k_opad[USHA_Max_Message_Block_Size];$/;
 keyarray	c/rfc6234/shatest.c	/^		const char *keyarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 keylength	c/rfc6234/shatest.c	/^		int keylength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
 layersOfNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
+learningFactor	cxx/ClassCns.hxx	/^	float learningFactor = 0.02;$/;"	m	class:Susuwu::Cns	typeref:typename:float
 length	c/rfc6234/shatest.c	/^		int length;$/;"	m	struct:hash::__anond9b948bd0108	typeref:typename:int	file:
 length	c/rfc6234/shatest.c	/^#define length(/;"	d	file:
 listDumpTo	cxx/ClassResultList.hxx	/^void listDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const bool pa/;"	f	namespace:Susuwu	typeref:typename:void
@@ -1159,6 +1160,7 @@ setInputNeurons	cxx/ClassCns.hxx	/^	virtual void setInputNeurons(size_t x) { inp
 setInputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setInputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome input count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassCns.hxx	/^	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } \/* sets connectome "hidden /;"	f	class:Susuwu::Cns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setLayersOfNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome "hidden layer" count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
+setLearningFactor	cxx/ClassCns.hxx	/^	virtual void setLearningFactor(CnsMode x) {$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassCns.hxx	/^	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } \/* sets connectome coeffici/;"	f	class:Susuwu::Cns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassTensorFlowCns.hxx	/^	void setNeuronsPerLayer(size_t x) SUSUWU_OVERRIDE { \/* sets connectome coefficients-per-"hidde/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setOutputMode	cxx/ClassCns.hxx	/^	virtual void setOutputMode(ObjectMode x) { outputMode = x; } \/* sets type of output (notice: s/;"	f	class:Susuwu::Cns	typeref:typename:void
