@@ -835,8 +835,8 @@ assistantCnsDefaultHosts	cxx/AssistantCns.cxx	/^std::vector<ClassIoPath> assista
 assistantCnsDownloadHosts	cxx/AssistantCns.cxx	/^void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const s/;"	f	namespace:Susuwu	typeref:typename:void
 assistantCnsLoopProcess	cxx/AssistantCns.cxx	/^void assistantCnsLoopProcess(const Cns &cns, std::ostream &os \/* = std::cout *\/) {$/;"	f	namespace:Susuwu	typeref:typename:void
 assistantCnsProcess	cxx/AssistantCns.cxx	/^const std::string assistantCnsProcess(const Cns &cns, const ClassIoBytecode &bytecode) {$/;"	f	namespace:Susuwu	typeref:typename:const std::string
-assistantCnsProcessQuestion	cxx/AssistantCns.cxx	/^const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {return "";} \//;"	f	namespace:Susuwu	typeref:typename:const ClassIoBytecode
-assistantCnsProcessResponses	cxx/AssistantCns.cxx	/^const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {/;"	f	namespace:Susuwu	typeref:typename:const std::vector<ClassIoBytecode>
+assistantCnsProcessQuestion	cxx/AssistantCns.cxx	/^const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {$/;"	f	namespace:Susuwu	typeref:typename:const ClassIoBytecode
+assistantCnsProcessResponses	cxx/AssistantCns.cxx	/^const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {$/;"	f	namespace:Susuwu	typeref:typename:const std::vector<ClassIoBytecode>
 assistantCnsProcessUrls	cxx/AssistantCns.cxx	/^const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {$/;"	f	namespace:Susuwu	typeref:typename:const std::vector<ClassIoPath>
 assistantCnsProcessXhtml	cxx/AssistantCns.cxx	/^void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const Cl/;"	f	namespace:Susuwu	typeref:typename:void
 assistantCnsResponseDelimiter	cxx/AssistantCns.cxx	/^std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResp/;"	v	namespace:Susuwu	typeref:typename:std::string

@@ -166,8 +166,36 @@ const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localX
 #endif /* !def USE_PUGIXML */
 	return urls;
 }
-const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {return "";} /* TODO */
-const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {return {};} /* TODO */
+const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {
+#if defined(USE_PUGIXML)
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+		pugi::xpath_node question = doc.select_node("//div[@class='question']"); /* TODO: if there is still no Web Consortium standard which marks questions, hardcode values for popular resources which graduates use (such as for StackOverflow), or implement heuristics to use */
+		if(question) {
+			return question.node().child_value();
+		}
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without pugixml")
+#endif /* !def USE_PUGIXML */
+	return "";
+}
+const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {
+	std::vector<ClassIoBytecode> responses;
+#if defined(USE_PUGIXML)
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+		for(pugi::xpath_node_set responseSet = doc.select_nodes("//div[@class='response']") /* TODO: if there is still no Web Consortium standard which marks answers, hardcode values for popular resources which graduates use (such as for StackOverflow), or implement heuristics to use */; auto& response : responseSet) {
+			responses.push_back(response.node().child_value());
+		}
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without pugixml")
+#endif /* !def USE_PUGIXML */
+	return responses;
+}
 
 const std::string assistantCnsProcess(const Cns &cns, const ClassIoBytecode &bytecode) {
 	return cns.processToString(bytecode);
