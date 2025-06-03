@@ -88,8 +88,9 @@ const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &loca
 	if(result) {
 #	ifdef ASSISTANTCNS_LIMIT_TO_TOP_LEVEL
 		for(pugi::xml_node node = doc.child("html").child("body").child("a"); node; node = node.next_sibling("a")) {
-			if(node.attribute("href")) {
-				urls.push_back(node.attribute("href").value());
+			const auto &attributeHref = node.attribute("href"); /* notice: if multiple execution cores access `doc`, remove `&` (do not reuse references) unless you know other execution cores just use `const` member functions */
+			if(attributeHref) {
+				urls.push_back(attributeHref.value());
 			}
 		} /* limited to direct descendants of `<body>` */
 #	else /* !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
