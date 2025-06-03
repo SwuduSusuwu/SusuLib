@@ -11,7 +11,10 @@ namespace Susuwu {
 #ifdef BOOST_VERSION
 #	include <boost/property_tree/ptree.hpp> /* boost::property_tree::ptree */
 #	include <boost/property_tree/xml_parser.hpp> /* BOOST_FOREACH read_xml */
-#endif /* !def BOOST_VERSION */
+#elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
+#	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
+#endif /* !def USE_PUGIXML */
+
 const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml) {
 	std::vector<ClassIoPath> urls;
 #ifdef BOOST_VERSION
@@ -21,9 +24,28 @@ const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &loca
 			boost::property_tree::ptree::value_type &v,
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
-#else /* else !def BOOST_VERSION */
-#	pragma message("TODO: process XHTML without `Boost`") /* TODO: fall back to regular expression (such as <https://www.boost.io/libraries/regex/> <https://github.com/boostorg/regex>) */
-#endif /* !def BOOST_VERSION */
+#elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+#	ifdef ASSISTANTCNS_LIMIT_TO_TOP_LEVEL
+		for(pugi::xml_node node = doc.child("html").child("body").child("a"); node; node = node.next_sibling("a")) {
+			if(node.attribute("href")) {
+				urls.push_back(node.attribute("href").value());
+			}
+		} /* limited to direct descendants of `<body>` */
+#	else /* !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
+		const pugi::xpath_node_set links = doc.select_nodes("//a[@href]");
+		for(const auto &link : links) {
+			urls.push_back(link.node().attribute("href").value());
+		}
+#	endif /* else !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
+	} else {
+		SUSUWU_WARNING("classWebBrowseProcessUrls(.localXhtml = \"" + localXhtml + "\"): { (!doc.load_file(localXhtml.c_str())) }");
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without `Boost` or `pugixml`") /* TODO: fall back to regular expression (such as <https://www.boost.io/libraries/regex/> <https://github.com/boostorg/regex>) */
+#endif /* !def USE_PUGIXML */
 	return urls;
 }
 
