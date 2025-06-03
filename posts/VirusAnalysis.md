@@ -3045,7 +3045,7 @@ extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
  * @code sha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts = assistantCnsDefaultHosts);
 void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml = "index.xhtml");
-const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml");
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* returns list of Uniform Resource Identifiers from `localXhtml` */
 const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 
@@ -3066,6 +3066,9 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 
 `less `[`cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
 ```c++
+#if defined(SUSUWU_USE_PUGIXML) /* !def BOOST_VERSION */
+#	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
+#endif /* !def SUSUWU_USE_PUGIXML */
 Cns assistantCns;
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
@@ -3179,8 +3182,37 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {
 	return classWebBrowseProcessUrls(localXhtml);
 }
-const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {return "";} /* TODO */
-const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {return {};} /* TODO */
+const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {
+#if defined(SUSUWU_USE_PUGIXML)
+	pugi::xml_document doc;
+	const pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+		const pugi::xpath_node question = doc.select_node("//div[@class='question']"); /* TODO: if there is still no Web Consortium standard which marks questions, hardcode values for popular resources which graduates use (such as for StackOverflow), or implement heuristics to use */
+		if(question) {
+			return question.node().child_value();
+		}
+	}
+#else /* else !def SUSUWU_USE_PUGIXML */
+#	pragma message("TODO: process XHTML without pugixml")
+#endif /* !def SUSUWU_USE_PUGIXML */
+	return "";
+}
+const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {
+	std::vector<ClassIoBytecode> responses;
+#if defined(SUSUWU_USE_PUGIXML)
+	pugi::xml_document doc;
+	const pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+		const pugi::xpath_node_set responseSet = doc.select_nodes("//div[@class='response']"); /* TODO: if there is still no Web Consortium standard which marks answers, hardcode values for popular resources which graduates use (such as for StackOverflow), or implement heuristics to use */
+		for(const auto &response : responseSet) {
+			responses.push_back(response.node().child_value());
+		}
+	}
+#else /* else !def SUSUWU_USE_PUGIXML */
+#	pragma message("TODO: process XHTML without pugixml")
+#endif /* !def SUSUWU_USE_PUGIXML */
+	return responses;
+}
 
 const std::string assistantCnsProcess(const Cns &cns, const ClassIoBytecode &bytecode) {
 	return cns.processToString(bytecode);
