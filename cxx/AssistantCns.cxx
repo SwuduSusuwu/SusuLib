@@ -15,8 +15,8 @@
 #include <string> /* std::string */
 #include <tuple> /* std::tuple */
 #include <vector> /* std::vector */
-/* (Work-in-progress) assistant bots with artificial CNS. */
-namespace Susuwu {
+/* (Work-in-progress) assistants which use `class Cns` (artificial neural tissue). */
+namespace Susuwu { /* NOLINTBEGIN(performance-inefficient-string-concatenation): suggestion triggers `cppcheck`'s `error: syntax error: "' -O" += [syntaxError]` */
 Cns assistantCns;
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
@@ -69,7 +69,7 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	cns.setOutputNeurons(maxResponseSize);
 	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
 	cns.setNeuronsPerLayer(maxWidthOfMessages /* TODO: reduce this */);
-	assert(questionsOrNull.bytecodes.size() == questionsOrNull.bytecodes.size());
+	assert(questionsOrNull.bytecodes.size() == responsesOrNull.bytecodes.size());
 	inputsToOutputs.reserve(questionsOrNull.bytecodes.size());
 	for(size_t x = 0; questionsOrNull.bytecodes.size() > x; ++x) {
 		inputsToOutputs.push_back({questionsOrNull.bytecodes[x], responsesOrNull.bytecodes[x]});
@@ -120,18 +120,19 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-			execvex("wget '" + url + "' -O" += localXhtml);
+			execvex("wget '" + url + "' -O" + localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
 	}
 }
+
 #ifdef BOOST_VERSION
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+#	include <boost/property_tree/ptree.hpp>
+#	include <boost/property_tree/xml_parser.hpp>
 #endif /* BOOST_VERSION */
 const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {
-	const std::vector<ClassIoPath> urls;
+	std::vector<ClassIoPath> urls;
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt;
 	read_xml(localXhtml, pt);
@@ -140,7 +141,7 @@ const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localX
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
 #else /* else !BOOST_VERSION */
-#	pragma message("TODO: process XHTML without Boost")
+#	pragma message("TODO: process XHTML without `Boost`")
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
@@ -176,10 +177,11 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */)
 #endif /* !def IGNORE_PAST_MESSAGES */
 	}
 }
-
-/* To process fast (lag less,) use flags which auto-vectorizes/auto-parallelizes; To do `produceAssistantCns` fast, use TensorFlow's `MapReduce`;
- * https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops
+/* How to have performance improve;
+ * [compiler options / flags to use](https://github.com/SwuduSusuwu/SusuLib/blob/preview/posts/SimdGpgpuTpu.md#intro)
+ * Use [**SIMD**](https://github.com/SwuduSusuwu/SusuLib/blob/preview/posts/SimdGpgpuTpu.md#simd-single-instruction-multiple-data) for functions such as `resultListProduceHashes`.
+ * Use [**TPU**s](https://github.com/SwuduSusuwu/SusuLib/blob/preview/posts/SimdGpgpuTpu.md#tpus-tensor-processor-units) for functions such as `produceAssistantCns`. The [**TensorFlow** backend for `class Cns`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx) can use: {**SIMD**, **GPGPU**s, **TPU**s}.
  */
-}; /* namespace Susuwu */
+}; /* namespace Susuwu */ /* NOLINTEND(performance-inefficient-string-concatenation) */
 #endif /* ndef INCLUDES_cxx_AssistantCns_cxx */
 

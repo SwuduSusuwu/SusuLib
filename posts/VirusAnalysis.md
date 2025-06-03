@@ -2860,6 +2860,7 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 ```
 `less` [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
 ```c++
+/* (Work-in-progress) assistants which use `class Cns` (artificial neural tissue). */
 Cns assistantCns;
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
@@ -2912,7 +2913,7 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	cns.setOutputNeurons(maxResponseSize);
 	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
 	cns.setNeuronsPerLayer(maxWidthOfMessages /* TODO: reduce this */);
-	assert(questionsOrNull.bytecodes.size() == questionsOrNull.bytecodes.size());
+	assert(questionsOrNull.bytecodes.size() == responsesOrNull.bytecodes.size());
 	inputsToOutputs.reserve(questionsOrNull.bytecodes.size());
 	for(size_t x = 0; questionsOrNull.bytecodes.size() > x; ++x) {
 		inputsToOutputs.push_back({questionsOrNull.bytecodes[x], responsesOrNull.bytecodes[x]});
@@ -2963,18 +2964,19 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-			execvex("wget '" + url + "' -O" += localXhtml);
+			execvex("wget '" + url + "' -O" + localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
 	}
 }
+
 #ifdef BOOST_VERSION
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+#	include <boost/property_tree/ptree.hpp>
+#	include <boost/property_tree/xml_parser.hpp>
 #endif /* BOOST_VERSION */
-const std::vector<ClassIoPath> assistantCnsProcessUrls(const FilePath &localXhtml) {
-	const std::vector<ClassIoPath> urls;
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {
+	std::vector<ClassIoPath> urls;
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt;
 	read_xml(localXhtml, pt);
@@ -2983,7 +2985,7 @@ const std::vector<ClassIoPath> assistantCnsProcessUrls(const FilePath &localXhtm
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
 #else /* else !BOOST_VERSION */
-#	pragma message("TODO: process XHTML without Boost")
+#	pragma message("TODO: process XHTML without `Boost`")
 #endif /* else !BOOST_VERSION */
 	return urls;
 }
