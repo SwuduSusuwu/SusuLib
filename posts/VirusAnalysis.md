@@ -4447,7 +4447,7 @@ const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml)
 		}
 	}
 #else /* else !def SUSUWU_USE_PUGIXML */
-#	pragma message("TODO: process XHTML without pugixml")
+#	pragma message("TODO: process XHTML without `pugixml`")
 #endif /* !def SUSUWU_USE_PUGIXML */
 	return "";
 }
@@ -4463,7 +4463,7 @@ const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPat
 		}
 	}
 #else /* else !def SUSUWU_USE_PUGIXML */
-#	pragma message("TODO: process XHTML without pugixml")
+#	pragma message("TODO: process XHTML without `pugixml`")
 #endif /* !def SUSUWU_USE_PUGIXML */
 	return responses;
 }
