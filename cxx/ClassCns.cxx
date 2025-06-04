@@ -6,6 +6,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+
 namespace Susuwu {
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`

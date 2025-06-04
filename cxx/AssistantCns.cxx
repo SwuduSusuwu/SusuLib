@@ -2,8 +2,9 @@
 #ifndef INCLUDES_cxx_AssistantCns_cxx
 #define INCLUDES_cxx_AssistantCns_cxx
 #include "AssistantCns.hxx" /* assistantCnsProcessQuestion assistantCnsProcessResponses assistantCnsProcessUrls */
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath */
+#include "ClassObject.hxx" /* ObjectMode */
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
@@ -64,8 +65,8 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	const size_t maxResponseSize = listMaxSize(responsesOrNull.bytecodes);
 	const size_t maxQuestionSize = listMaxSize(questionsOrNull.bytecodes);
 	const size_t maxWidthOfMessages = (maxResponseSize > maxQuestionSize) ? maxResponseSize : maxQuestionSize;
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeString);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeString);
 	cns.setInputNeurons(maxQuestionSize);
 	cns.setOutputNeurons(maxResponseSize);
 	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
