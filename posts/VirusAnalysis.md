@@ -472,6 +472,17 @@ const bool classObjectTests();
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 
+typedef enum ObjectMode : char {
+	objectModeBool /* binary classification */, objectModeChar, objectModeEnum /* multi-class indices */, objectModeInt, objectModeUint, objectModeFloat, objectModeDouble,
+	objectModeVectorBool /* one-hot binary-classification */, objectModeVectorChar, objectModeVectorEnum /* multi-label multi-class indices */, objectModeVectorInt, objectModeVectorUint, objectModeVectorFloat, objectModeVectorDouble,
+#if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
+	objectModeString = objectModeVectorChar /* std::string == std::vector<char> */
+#else /* else !def SUSUWU_CXX17 */
+/* https://stackoverflow.com/questions/5115166/how-to-construct-a-stdstring-from-a-stdvectorchar */
+	objectModeString
+#endif /* def SUSUWU_CXX17 else */
+} ObjectMode;
+
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
 	virtual ~Instrumentation() SUSUWU_DEFAULT /* allows subclasses to release resources */
@@ -2155,17 +2166,6 @@ const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchA
 #	define SUSUWU_CNS_VALUE_SEMANTICS true
 #endif /* ndef SUSUWU_CNS_VALUE_SEMANTICS */
 #define SUSUWU_CNS_MODE_ENUM /* use `enum`s for multi-class indices */
-typedef enum CnsMode : char {
-	cnsModeBool /* binary classification */, cnsModeChar, cnsModeEnum /* multi-class indices */, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
-	cnsModeVectorBool /* one-hot binary-classification */, cnsModeVectorChar, cnsModeVectorEnum /* multi-label multi-class indices */, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
-#if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
-	cnsModeString = cnsModeVectorChar /* std::string == std::vector<char> */
-#else /* else !def SUSUWU_CXX17 */
-/* https://stackoverflow.com/questions/5115166/how-to-construct-a-stdstring-from-a-stdvectorchar */
-	cnsModeString
-#endif /* def SUSUWU_CXX17 else */
-} CnsMode;
-
 typedef class Cns : public Object {
 public:
 	Cns() SUSUWU_DEFAULT /* Default constructor */
@@ -2198,8 +2198,8 @@ public:
 	virtual void setInitialized(const bool is) { initialized = is; } /* after "training" (ergo "backpropagation") finishes, set to `true` */
 
 	/* Topological values; sets the "shape" of `Cns.synapses` (or of whatever the derived class uses to store the connectome) */
-	virtual void setInputMode(CnsMode x) { inputMode = x; } /* sets type of input */
-	virtual void setOutputMode(CnsMode x) { outputMode = x; } /* sets type of output (notice: some implementations require `inputMode == outputMode`) */
+	virtual void setInputMode(ObjectMode x) { inputMode = x; } /* sets type of input */
+	virtual void setOutputMode(ObjectMode x) { outputMode = x; } /* sets type of output (notice: some implementations require `inputMode == outputMode`) */
 	virtual void setInputNeurons(size_t x) { inputNeurons = x; } /* sets connectome input count */
 	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } /* sets connectome output count (notice: some implementations require `inputNeurons == outputNeurons`) */
 	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } /* sets connectome "hidden layer" count */
@@ -2210,10 +2210,10 @@ public:
 	 * @post @code isInitialized() @endcode */
 #if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
 	template<typename Input, typename Output>
-	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* { inputMode = typeToCnsMode<Input>; outMode = typeToCnsMode<Output>; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
+	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* { inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
 	template<typename Input, typename Output>
-	virtual const Output process(const Input input) const { /* assert(typeToCnsMode<Input> == inputMode && typeToCnsMode<Output> == outputMode);*/ throw std::runtime_error("ClassCns::process() pure virtual call"); }
+	virtual const Output process(const Input input) const { /* assert(ToObjectMode<Input>::value == inputMode && ToObjectMode<Output>::value == outputMode);*/ throw std::runtime_error("ClassCns::process() pure virtual call"); }
 #else /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 #	define SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, OUTPUT_TYPEDEF, OUTPUT_MODE) \
 	/* @throw bad_alloc \
@@ -2221,52 +2221,52 @@ public:
 	 * @post @code isInitialized() @endcode */\
 	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = OUTPUT_MODE;} /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
 #	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_MODE, INPUT_TYPEDEF) \
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, bool, cnsModeBool)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, char, cnsModeChar)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, int, cnsModeInt)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, unsigned int, cnsModeUint)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, float, cnsModeFloat)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, double, cnsModeDouble)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<bool>, cnsModeVectorBool)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<char>, cnsModeVectorChar)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<int>, cnsModeVectorInt)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<unsigned int>, cnsModeVectorUint)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<float>, cnsModeVectorFloat)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<double>, cnsModeVectorDouble)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::string, cnsModeString)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, bool, objectModeBool)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, char, objectModeChar)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, int, objectModeInt)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, unsigned int, objectModeUint)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, float, objectModeFloat)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, double, objectModeDouble)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<bool>, objectModeVectorBool)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<char>, objectModeVectorChar)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<int>, objectModeVectorInt)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<unsigned int>, objectModeVectorUint)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<float>, objectModeVectorFloat)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<double>, objectModeVectorDouble)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::string, objectModeString)\
 	\
 	/* @pre @code isInitialized() @endcode */\
-	virtual const bool processToBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0; }\
-	virtual const char processToChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0; }\
-	virtual const int processToInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0; }\
-	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeUint == outputMode); return 0; }\
-	virtual const float processToFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeFloat == outputMode); return 0; }\
-	virtual const double processToDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 0; }\
-	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorBool == outputMode); return {}; }\
-	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorChar == outputMode); return {}; }\
-	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorInt == outputMode); return {}; }\
-	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorUint == outputMode); return {}; }\
-	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorFloat == outputMode); return {}; }\
-	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorDouble == outputMode); return {}; }\
+	virtual const bool processToBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeBool == outputMode); return 0; }\
+	virtual const char processToChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeChar == outputMode); return 0; }\
+	virtual const int processToInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeInt == outputMode); return 0; }\
+	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeUint == outputMode); return 0; }\
+	virtual const float processToFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeFloat == outputMode); return 0; }\
+	virtual const double processToDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeDouble == outputMode); return 0; }\
+	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorBool == outputMode); return {}; }\
+	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorChar == outputMode); return {}; }\
+	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorInt == outputMode); return {}; }\
+	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorUint == outputMode); return {}; }\
+	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorFloat == outputMode); return {}; }\
+	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorDouble == outputMode); return {}; }\
 	virtual const std::string processToString(const INPUT_TYPEDEF &input) const { auto val = processToVectorChar(input); return std::string(&val[0], val.size()); }
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeBool, bool)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeChar, char)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeInt, int)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeUint, unsigned int)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeFloat, float)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeDouble, double)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorBool, std::vector<bool>)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorChar, std::vector<char>)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorInt, std::vector<int>)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorUint, std::vector<unsigned int>)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorFloat, std::vector<float>)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorDouble, std::vector<double>)
-	SUSUWU_TEMPLATE_WORKAROUND(cnsModeString, std::string)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeBool, bool)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeChar, char)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeInt, int)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeUint, unsigned int)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeFloat, float)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeDouble, double)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorBool, std::vector<bool>)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorChar, std::vector<char>)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorInt, std::vector<int>)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorUint, std::vector<unsigned int>)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorFloat, std::vector<float>)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorDouble, std::vector<double>)
+	SUSUWU_TEMPLATE_WORKAROUND(objectModeString, std::string)
 #	undef SUSUWU_TEMPLATE_WORKAROUND
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 private:
 	bool initialized = false;
-	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;
+	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;
 	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
 } Cns;
 
@@ -2862,8 +2862,8 @@ Cns &cns /* = analysisCns */
 	const size_t maxAbortSize = listMaxSize(abort.bytecodes);
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeFloat);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeFloat);
 	cns.setInputNeurons(maxWidthOfOpcodes);
 	cns.setOutputNeurons(1);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
@@ -2910,8 +2910,8 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	const size_t maxPassSize = listMaxSize(passOrNull.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abortOrNull.bytecodes);
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeString);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeString);
 	cns.setInputNeurons(maxAbortSize);
 	cns.setOutputNeurons(maxPassSize);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
@@ -3210,8 +3210,8 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	const size_t maxResponseSize = listMaxSize(responsesOrNull.bytecodes);
 	const size_t maxQuestionSize = listMaxSize(questionsOrNull.bytecodes);
 	const size_t maxWidthOfMessages = (maxResponseSize > maxQuestionSize) ? maxResponseSize : maxQuestionSize;
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeString);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeString);
 	cns.setInputNeurons(maxQuestionSize);
 	cns.setOutputNeurons(maxResponseSize);
 	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
