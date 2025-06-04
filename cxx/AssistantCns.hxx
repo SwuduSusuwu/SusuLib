@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_AssistantCns_hxx
 #define INCLUDES_cxx_AssistantCns_hxx
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode */
 #include "ClassResultList.hxx" /* ResultList */
 #include "ClassSys.hxx" /* templateCatchAll */
