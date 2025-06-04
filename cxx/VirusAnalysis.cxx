@@ -1,8 +1,9 @@
 /* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath classIoGetOwnPath classIoHexStr */
+#include "ClassObject.hxx" /* ObjectMode */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListLoadFrom resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
@@ -383,8 +384,8 @@ Cns &cns /* = analysisCns */
 	const size_t maxAbortSize = listMaxSize(abort.bytecodes);
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeFloat);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeFloat);
 	cns.setInputNeurons(maxWidthOfOpcodes);
 	cns.setOutputNeurons(1);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
@@ -431,8 +432,8 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	const size_t maxPassSize = listMaxSize(passOrNull.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abortOrNull.bytecodes);
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeString);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeString);
 	cns.setInputNeurons(maxAbortSize);
 	cns.setOutputNeurons(maxPassSize);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);

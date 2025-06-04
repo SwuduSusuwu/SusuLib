@@ -3,13 +3,14 @@
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
 #include "ClassIo.hxx" /* classIoHexStr gsl::owner */
-#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX17 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp memcpy */
 #include <new> /* ::operator new */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
+
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SusuLib/issues/10) */
@@ -19,6 +20,17 @@ namespace Susuwu {
 const bool classObjectTests();
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
+
+typedef enum ObjectMode : char {
+	objectModeBool /* binary classification */, objectModeChar, objectModeEnum /* multi-class indices */, objectModeInt, objectModeUint, objectModeFloat, objectModeDouble,
+	objectModeVectorBool /* one-hot binary-classification */, objectModeVectorChar, objectModeVectorEnum /* multi-label multi-class indices */, objectModeVectorInt, objectModeVectorUint, objectModeVectorFloat, objectModeVectorDouble,
+#if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
+	objectModeString = objectModeVectorChar /* std::string == std::vector<char> */
+#else /* else !def SUSUWU_CXX17 */
+/* https://stackoverflow.com/questions/5115166/how-to-construct-a-stdstring-from-a-stdvectorchar */
+	objectModeString
+#endif /* def SUSUWU_CXX17 else */
+} ObjectMode;
 
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:

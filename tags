@@ -123,8 +123,6 @@ ClassSysUSeconds	cxx/ClassSys.hxx	/^typedef decltype(std::chrono::duration_cast<
 Cns	cxx/ClassCns.hxx	/^	Cns() SUSUWU_DEFAULT \/* Default constructor *\/$/;"	f	class:Susuwu::Cns
 Cns	cxx/ClassCns.hxx	/^typedef class Cns : public Object {$/;"	c	namespace:Susuwu
 Cns	cxx/ClassCns.hxx	/^} Cns;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Cns
-CnsMode	cxx/ClassCns.hxx	/^typedef enum CnsMode : char {$/;"	g	namespace:Susuwu	typeref:typename:char
-CnsMode	cxx/ClassCns.hxx	/^} CnsMode;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::CnsMode
 CoefficientDefaultType	cxx/ClassTensorFlowCns.hxx	/^	typedef float CoefficientDefaultType; \/* `float` is the most common (due to: is fast and accur/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:float
 Comparison to assistants	VirusAnalysis.md	/^# Comparison to assistants$/;"	c
 Comparison to assistants	posts/VirusAnalysis.md	/^# Comparison to assistants$/;"	c
@@ -241,6 +239,8 @@ Object	cxx/ClassObject.hxx	/^typedef class Object : public Class { \/* Port of `
 Object	cxx/ClassObject.hxx	/^} Object;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Object
 ObjectCloneAs	cxx/ClassObject.hxx	/^typedef enum ObjectCloneAs : unsigned char { \/* Is extra (not part of Java); accomodates the nu/;"	g	namespace:Susuwu	typeref:typename:unsigned char
 ObjectCloneAs	cxx/ClassObject.hxx	/^} ObjectCloneAs;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ObjectCloneAs
+ObjectMode	cxx/ClassObject.hxx	/^typedef enum ObjectMode : char {$/;"	g	namespace:Susuwu	typeref:typename:char
+ObjectMode	cxx/ClassObject.hxx	/^} ObjectMode;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ObjectMode
 Optical flow processing of visuals into point cloud (computes z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (computes z-axis)$/;"	s	chapter:Howto produce point clouds
 Optical flow processing of visuals into point cloud (limited; static z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (limited; static z-axis)$/;"	s	chapter:Howto produce point clouds
 Options/setup	README.md	/^## Options\/setup$/;"	s	chapter:How to use this
@@ -906,21 +906,6 @@ cnsAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult cnsAnalysis(const 
 cnsAnalysisCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
 cnsAnalysisImpl	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult cnsAnalysisImpl(const PortableExecutable &file, const ResultListHash &/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 cnsAnalysisScore	cxx/VirusAnalysis.cxx	/^const float cnsAnalysisScore(const PortableExecutable &file, const ResultListHash &fileHash, con/;"	f	namespace:Susuwu	typeref:typename:const float
-cnsModeBool	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeChar	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeDouble	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeEnum	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeFloat	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeInt	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeString	cxx/ClassCns.hxx	/^	cnsModeString = cnsModeVectorChar \/* std::string == std::vector<char> *\/$/;"	e	enum:Susuwu::CnsMode
-cnsModeUint	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorBool	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorChar	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorDouble	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorEnum	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorFloat	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorInt	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
-cnsModeVectorUint	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
 cnsVirusFix	cxx/VirusAnalysis.cxx	/^const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns \/* = virusFixC/;"	f	namespace:Susuwu	typeref:typename:const ClassIoBytecode
 coefficients	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor coefficients = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorSh/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
 ctx	c/rfc6234/sha.h	/^		} ctx;$/;"	m	struct:USHAContext	typeref:union:USHAContext::__anoncf2b51e2030a
@@ -991,7 +976,7 @@ initCoefficient	cxx/ClassTensorFlowCns.hxx	/^	void initCoefficient(CoefficientTy
 initScopeRootBack	cxx/ClassTensorFlowCns.hxx	/^	void initScopeRootBack(tensorflow::DataType coefficientFormat) { \/* Reusable graph logic (for /;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 initScopeRootForward	cxx/ClassTensorFlowCns.hxx	/^	void initScopeRootForward(tensorflow::DataType coefficientFormat) { \/* Reusable graph logic (f/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 initialized	cxx/ClassCns.hxx	/^	bool initialized = false;$/;"	m	class:Susuwu::Cns	typeref:typename:bool
-inputMode	cxx/ClassCns.hxx	/^	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:CnsMode
+inputMode	cxx/ClassCns.hxx	/^	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:ObjectMode
 inputNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
 instanceof	cxx/ClassObject.hxx	/^SUSUWU_INLINE const bool instanceof(const Class &obj, const Class &thiso) { return thiso.isInsta/;"	f	namespace:Susuwu	typeref:typename:SUSUWU_INLINE const bool
 int_least16_t	c/rfc6234/stdintexample.h	/^typedef short int_least16_t;            \/* integer of >= 16 bits *\/$/;"	t	typeref:typename:short
@@ -1042,6 +1027,21 @@ objectCloneAsNone	cxx/ClassObject.hxx	/^	objectCloneAsNone           = 0, \/* `!
 objectCloneAsReferenceCount	cxx/ClassObject.hxx	/^	objectCloneAsReferenceCount = 4, \/* `std::shared_ptr` *\/ \/* TODO: `objectCloneAsReferenceCou/;"	e	enum:Susuwu::ObjectCloneAs
 objectCloneAsShallow	cxx/ClassObject.hxx	/^	objectCloneAsShallow        = 2, \/* `memcpy` *\/$/;"	e	enum:Susuwu::ObjectCloneAs
 objectIsValid	cxx/ClassObject.cxx	/^static const bool objectIsValid(const Object *obj) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
+objectModeBool	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeChar	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeDouble	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeEnum	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeFloat	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeInt	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeString	cxx/ClassObject.hxx	/^	objectModeString = objectModeVectorChar \/* std::string == std::vector<char> *\/$/;"	e	enum:Susuwu::ObjectMode
+objectModeUint	cxx/ClassObject.hxx	/^	objectModeBool \/* binary classification *\/, objectModeChar, objectModeEnum \/* multi-class in/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorBool	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorChar	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorDouble	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorEnum	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorFloat	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorInt	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
+objectModeVectorUint	cxx/ClassObject.hxx	/^	objectModeVectorBool \/* one-hot binary-classification *\/, objectModeVectorChar, objectModeVec/;"	e	enum:Susuwu::ObjectMode
 objectTestsCommutative	cxx/ClassObject.cxx	/^static const bool objectTestsCommutative(const Object *object1, const Object *object2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
 objectTestsMatch	cxx/ClassObject.cxx	/^static const bool objectTestsMatch(const Object *object1, const Object *object2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
 objectTestsMismatch	cxx/ClassObject.cxx	/^static const bool objectTestsMismatch(const Object *object1, const Object *object2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
@@ -1051,7 +1051,7 @@ operator !=	cxx/ClassObject.hxx	/^	virtual bool operator!=(const Class &obj) con
 operator &	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator&(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 operator ==	cxx/ClassTensorFlowCns.hxx	/^	bool operator==(const Class &obj) const SUSUWU_OVERRIDE { \/* NOLINT(fuchsia-overloaded-operato/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:bool
 operator |	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
-outputMode	cxx/ClassCns.hxx	/^	CnsMode inputMode = cnsModeBool, outputMode = cnsModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:CnsMode
+outputMode	cxx/ClassCns.hxx	/^	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:ObjectMode
 outputNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
 owner	cxx/ClassIo.hxx	/^    using owner = Resource; \/* Wraps pointers; [cppcoreguidelines-owning-memory] fix. *\/$/;"	t	namespace:gsl	typeref:typename:Resource
 passList	cxx/VirusAnalysis.cxx	/^ResultList passList, abortList; \/* hosts produce, clients initialize shared clones of this from/;"	v	namespace:Susuwu	typeref:typename:ResultList
@@ -1065,7 +1065,7 @@ printxstr	c/rfc6234/shatest.c	/^void printxstr(const char *str, int len)$/;"	f	t
 prk	c/rfc6234/sha.h	/^		unsigned char prk[USHAMaxHashSize];$/;"	m	struct:HKDFContext	typeref:typename:unsigned char[]
 prkarray	c/rfc6234/shatest.c	/^		const char *prkarray;$/;"	m	struct:hkdfhash	typeref:typename:const char *	file:
 prklength	c/rfc6234/shatest.c	/^		int prklength;$/;"	m	struct:hkdfhash	typeref:typename:int	file:
-process	cxx/ClassCns.hxx	/^	virtual const Output process(const Input input) const { \/* assert(typeToCnsMode<Input> == inpu/;"	f	class:Susuwu::Cns	typeref:typename:const Output
+process	cxx/ClassCns.hxx	/^	virtual const Output process(const Input input) const { \/* assert(ToObjectMode<Input>::value =/;"	f	class:Susuwu::Cns	typeref:typename:const Output
 processToFloat	cxx/ClassTensorFlowCns.hxx	/^	const float processToFloat(const float &input) const SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const float
 processToImpl	cxx/ClassTensorFlowCns.hxx	/^	const std::vector<tensorflow::Tensor> processToImpl(const tensorflow::Tensor &inputTensor, cons/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const std::vector<tensorflow::Tensor>
 processToInt	cxx/ClassTensorFlowCns.hxx	/^	const int processToInt(const int &input) const SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const int
@@ -1097,14 +1097,14 @@ sandboxAnalysisCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnal
 scasecmp	c/rfc6234/shatest.c	/^int scasecmp(const char *s1, const char *s2)$/;"	f	typeref:typename:int
 session	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Session* session = SUSUWU_NULLPTR;$/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Session *
 setInitialized	cxx/ClassCns.hxx	/^	virtual void setInitialized(const bool is) { initialized = is; } \/* after "training" (ergo "ba/;"	f	class:Susuwu::Cns	typeref:typename:void
-setInputMode	cxx/ClassCns.hxx	/^	virtual void setInputMode(CnsMode x) { inputMode = x; } \/* sets type of input *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
+setInputMode	cxx/ClassCns.hxx	/^	virtual void setInputMode(ObjectMode x) { inputMode = x; } \/* sets type of input *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setInputNeurons	cxx/ClassCns.hxx	/^	virtual void setInputNeurons(size_t x) { inputNeurons = x; } \/* sets connectome input count *\/$/;"	f	class:Susuwu::Cns	typeref:typename:void
 setInputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setInputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome input count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassCns.hxx	/^	virtual void setLayersOfNeurons(size_t x) { layersOfNeurons = x; } \/* sets connectome "hidden /;"	f	class:Susuwu::Cns	typeref:typename:void
 setLayersOfNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setLayersOfNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome "hidden layer" count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassCns.hxx	/^	virtual void setNeuronsPerLayer(size_t x) { neuronsPerLayer = x; } \/* sets connectome coeffici/;"	f	class:Susuwu::Cns	typeref:typename:void
 setNeuronsPerLayer	cxx/ClassTensorFlowCns.hxx	/^	void setNeuronsPerLayer(size_t x) SUSUWU_OVERRIDE { \/* sets connectome coefficients-per-"hidde/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
-setOutputMode	cxx/ClassCns.hxx	/^	virtual void setOutputMode(CnsMode x) { outputMode = x; } \/* sets type of output (notice: some/;"	f	class:Susuwu::Cns	typeref:typename:void
+setOutputMode	cxx/ClassCns.hxx	/^	virtual void setOutputMode(ObjectMode x) { outputMode = x; } \/* sets type of output (notice: s/;"	f	class:Susuwu::Cns	typeref:typename:void
 setOutputNeurons	cxx/ClassCns.hxx	/^	virtual void setOutputNeurons(size_t x) { outputNeurons = x; } \/* sets connectome output count/;"	f	class:Susuwu::Cns	typeref:typename:void
 setOutputNeurons	cxx/ClassTensorFlowCns.hxx	/^	void setOutputNeurons(size_t x) SUSUWU_OVERRIDE { \/* sets connectome output count *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 setSquareConnectome	cxx/ClassTensorFlowCns.hxx	/^	void setSquareConnectome(const bool is) SUSUWU_OVERRIDE { throw std::invalid_argument(SUSUWU_ER/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
