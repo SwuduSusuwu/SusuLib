@@ -1081,7 +1081,7 @@ printxstr	c/rfc6234/shatest.c	/^void printxstr(const char *str, int len)$/;"	f	t
 prk	c/rfc6234/sha.h	/^		unsigned char prk[USHAMaxHashSize];$/;"	m	struct:HKDFContext	typeref:typename:unsigned char[]
 prkarray	c/rfc6234/shatest.c	/^		const char *prkarray;$/;"	m	struct:hkdfhash	typeref:typename:const char *	file:
 prklength	c/rfc6234/shatest.c	/^		int prklength;$/;"	m	struct:hkdfhash	typeref:typename:int	file:
-process	cxx/ClassCns.hxx	/^	virtual const Output process(const Input input) const { \/* assert(ToObjectMode<Input>::value =/;"	f	class:Susuwu::Cns	typeref:typename:const Output
+process	cxx/ClassCns.hxx	/^	virtual const Output process(const Input input) const {$/;"	f	class:Susuwu::Cns	typeref:typename:const Output
 processToFloat	cxx/ClassTensorFlowCns.hxx	/^	const float processToFloat(const float &input) const SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const float
 processToImpl	cxx/ClassTensorFlowCns.hxx	/^	const std::vector<tensorflow::Tensor> processToImpl(const tensorflow::Tensor &inputTensor, cons/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const std::vector<tensorflow::Tensor>
 processToInt	cxx/ClassTensorFlowCns.hxx	/^	const int processToInt(const int &input) const SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const int
