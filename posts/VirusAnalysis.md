@@ -2247,55 +2247,58 @@ public:
 	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs); /* { inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
 	template<typename Input, typename Output>
-	virtual const Output process(const Input input) const { /* assert(ToObjectMode<Input>::value == inputMode && ToObjectMode<Output>::value == outputMode);*/ throw std::runtime_error("ClassCns::process() pure virtual call"); }
+	virtual const Output process(const Input input) const {
+		assert(ToObjectMode<Input>::value == inputMode && ToObjectMode<Output>::value == outputMode);
+		throw std::runtime_error("ClassCns::process() pure virtual call");
+	}
 #else /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
-#	define SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, OUTPUT_TYPEDEF, OUTPUT_MODE) \
+#	define SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, OUTPUT_TYPEDEF) \
 	/* @throw bad_alloc \
 	 * @pre @code !isPureVirtual() @endcode \
 	 * @post @code isInitialized() @endcode */\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = OUTPUT_MODE;} /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
-#	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_MODE, INPUT_TYPEDEF) \
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, bool, objectModeBool)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, char, objectModeChar)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, int, objectModeInt)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, unsigned int, objectModeUint)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, float, objectModeFloat)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, double, objectModeDouble)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<bool>, objectModeVectorBool)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<char>, objectModeVectorChar)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<int>, objectModeVectorInt)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<unsigned int>, objectModeVectorUint)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<float>, objectModeVectorFloat)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<double>, objectModeVectorDouble)\
-	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::string, objectModeString)\
+	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs) { inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; } /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
+#	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_TYPEDEF) \
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, bool)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, char)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, int)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, unsigned int)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, float)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, double)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::vector<bool>)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::vector<char>)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::vector<int>)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::vector<unsigned int>)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::vector<float>)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::vector<double>)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, std::string)\
 	\
 	/* @pre @code isInitialized() @endcode */\
-	virtual const bool processToBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeBool == outputMode); return 0; }\
-	virtual const char processToChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeChar == outputMode); return 0; }\
-	virtual const int processToInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeInt == outputMode); return 0; }\
-	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeUint == outputMode); return 0; }\
-	virtual const float processToFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeFloat == outputMode); return 0; }\
-	virtual const double processToDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeDouble == outputMode); return 0; }\
-	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorBool == outputMode); return {}; }\
-	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorChar == outputMode); return {}; }\
-	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorInt == outputMode); return {}; }\
-	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorUint == outputMode); return {}; }\
-	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorFloat == outputMode); return {}; }\
-	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && objectModeVectorDouble == outputMode); return {}; }\
+	virtual const bool processToBool(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeBool == outputMode); return 0; }\
+	virtual const char processToChar(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeChar == outputMode); return 0; }\
+	virtual const int processToInt(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeInt == outputMode); return 0; }\
+	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeUint == outputMode); return 0; }\
+	virtual const float processToFloat(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeFloat == outputMode); return 0; }\
+	virtual const double processToDouble(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeDouble == outputMode); return 0; }\
+	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeVectorBool == outputMode); return {}; }\
+	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeVectorChar == outputMode); return {}; }\
+	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeVectorInt == outputMode); return {}; }\
+	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeVectorUint == outputMode); return {}; }\
+	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeVectorFloat == outputMode); return {}; }\
+	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const { assert((ToObjectMode<INPUT_TYPEDEF>::value) == inputMode && objectModeVectorDouble == outputMode); return {}; }\
 	virtual const std::string processToString(const INPUT_TYPEDEF &input) const { auto val = processToVectorChar(input); return std::string(&val[0], val.size()); }
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeBool, bool)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeChar, char)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeInt, int)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeUint, unsigned int)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeFloat, float)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeDouble, double)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorBool, std::vector<bool>)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorChar, std::vector<char>)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorInt, std::vector<int>)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorUint, std::vector<unsigned int>)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorFloat, std::vector<float>)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeVectorDouble, std::vector<double>)
-	SUSUWU_TEMPLATE_WORKAROUND(objectModeString, std::string)
+	SUSUWU_TEMPLATE_WORKAROUND(bool)
+	SUSUWU_TEMPLATE_WORKAROUND(char)
+	SUSUWU_TEMPLATE_WORKAROUND(int)
+	SUSUWU_TEMPLATE_WORKAROUND(unsigned int)
+	SUSUWU_TEMPLATE_WORKAROUND(float)
+	SUSUWU_TEMPLATE_WORKAROUND(double)
+	SUSUWU_TEMPLATE_WORKAROUND(std::vector<bool>)
+	SUSUWU_TEMPLATE_WORKAROUND(std::vector<char>)
+	SUSUWU_TEMPLATE_WORKAROUND(std::vector<int>)
+	SUSUWU_TEMPLATE_WORKAROUND(std::vector<unsigned int>)
+	SUSUWU_TEMPLATE_WORKAROUND(std::vector<float>)
+	SUSUWU_TEMPLATE_WORKAROUND(std::vector<double>)
+	SUSUWU_TEMPLATE_WORKAROUND(std::string)
 #	undef SUSUWU_TEMPLATE_WORKAROUND
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 private:
