@@ -1959,20 +1959,25 @@ public:
 	template<typename Input, typename Output>
 	virtual const Output process(const Input input) const { /* assert(typeToCnsMode<Input> == inputMode && typeToCnsMode<Output> == outputMode);*/ throw std::runtime_error("ClassCns::process() pure virtual call"); }
 #else /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
-#define templateWorkaround(INPUT_MODE, INPUT_TYPEDEF) /* NOLINT(cppcoreguidelines-macro-usage): no virtual templates, so use macros */ /* NOLINTBEGIN(misc-unused-parameters): TODO */ \
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, bool>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeBool;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, char>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeChar;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, int>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeInt;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, unsigned int>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeUint;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, float>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeFloat;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, double>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeDouble;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<bool>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorBool;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<char>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorChar;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<int>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorInt;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<unsigned int>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorUint;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<float>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorFloat;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::vector<double>>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeVectorDouble;}\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, std::string>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = cnsModeString;}\
+#	define SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, OUTPUT_TYPEDEF, OUTPUT_MODE) \
+	/* @throw bad_alloc \
+	 * @pre @code !isPureVirtual() @endcode \
+	 * @post @code isInitialized() @endcode */\
+	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs) {inputMode = (INPUT_MODE); outputMode = OUTPUT_MODE;} /* NOLINT(bugprone-macro-parentheses): parentheses cause "error: expected expression [clang-diagnostic-error]" */
+#	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_MODE, INPUT_TYPEDEF) \
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, bool, cnsModeBool)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, char, cnsModeChar)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, int, cnsModeInt)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, unsigned int, cnsModeUint)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, float, cnsModeFloat)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, double, cnsModeDouble)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<bool>, cnsModeVectorBool)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<char>, cnsModeVectorChar)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<int>, cnsModeVectorInt)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<unsigned int>, cnsModeVectorUint)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<float>, cnsModeVectorFloat)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<double>, cnsModeVectorDouble)\
+	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::string, cnsModeString)\
     /* @pre @code isInitialized() @endcode */\
 	virtual const bool processToBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0;}\
 	virtual const char processToChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0;}\
@@ -1987,19 +1992,20 @@ public:
 	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorFloat == outputMode); return {};}\
 	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorDouble == outputMode); return {};}\
 	virtual const std::string processToString(const INPUT_TYPEDEF &input) const {auto val = processToVectorChar(input); return std::string(&val[0], val.size());}
-	templateWorkaround(cnsModeBool, bool)
-	templateWorkaround(cnsModeChar, char)
-	templateWorkaround(cnsModeInt, int)
-	templateWorkaround(cnsModeUint, unsigned int)
-	templateWorkaround(cnsModeFloat, float)
-	templateWorkaround(cnsModeDouble, double)
-	templateWorkaround(cnsModeVectorBool, std::vector<bool>)
-	templateWorkaround(cnsModeVectorChar, std::vector<char>)
-	templateWorkaround(cnsModeVectorInt, std::vector<int>)
-	templateWorkaround(cnsModeVectorUint, std::vector<unsigned int>)
-	templateWorkaround(cnsModeVectorFloat, std::vector<float>)
-	templateWorkaround(cnsModeVectorDouble, std::vector<double>)
-	templateWorkaround(cnsModeString, std::string)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeBool, bool)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeChar, char)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeInt, int)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeUint, unsigned int)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeFloat, float)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeDouble, double)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorBool, std::vector<bool>)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorChar, std::vector<char>)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorInt, std::vector<int>)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorUint, std::vector<unsigned int>)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorFloat, std::vector<float>)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeVectorDouble, std::vector<double>)
+	SUSUWU_TEMPLATE_WORKAROUND(cnsModeString, std::string)
+#	undef SUSUWU_TEMPLATE_WORKAROUND
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 private:
 	bool initialized = false;
