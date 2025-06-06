@@ -102,6 +102,18 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 				git clone https://github.com/openxla/xla.git --depth 1 #/* `libtensorflow` does not include `xla` */
 			elif [ true = "${SUSUWU_BUILD_TENSORFLOW}" ]; then #/* prepackaged `libtensorflow` does not have C++ headers; use shallow clone of TensorFlow source */
 				git clone https://github.com/tensorflow/tensorflow.git --depth 1
+				command -v bazel || SUSUWU_INSTALL_PACKAGES "bazel" || {
+					curl -LO "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64"
+					mkdir -p "${GITHUB_WORKSPACE}/bin/"
+					mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
+					chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
+					PATH="${PATH} ${GITHUB_WORKSPACE}/bin"
+				}
+				SUSUWU_INCLUDES_LIBTENSORFLOW_PWD_BACKUP="$(pwd)"
+				command -v bazel && cd ./tensorflow/third_party/xla/third_party/eigen3/ && {
+					bazel build
+					cd "${SUSUWU_INCLUDES_LIBTENSORFLOW_PWD_BACKUP}" || exit 1
+				}
 			else #/* `libtensorflow` C++ package */
 				wget --no-verbose "https://github.com/ika-rwth-aachen/libtensorflow_cc/releases/download/v2.13.0/libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
 				sudo dpkg -i "libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
