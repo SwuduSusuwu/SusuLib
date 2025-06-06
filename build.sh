@@ -30,26 +30,41 @@ export FLAGS_DEBUG="${FLAGS_DEBUG} -fno-omit-frame-pointer" #/* thus optimizatio
 #export FLAGS_DEBUG="${FLAGS_DEBUG} -fno-optimize-sibling-calls" #/* Don't inline functions. Does extra stacktraces. */
 export FLAGS_FSAN="-fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment"
 #export FLAGS_FSAN="${FLAGS_FSAN} -fsanitize=undefined" #/* causes 'cannot locate symbol "__ubsan_handle_function_type_mismatch_abort"' */
-export FLAGS_TENSORFLOW="-std=c++17 -DUSE_TENSORFLOW_CNS" #/* `./cxx/*` uses `#ifdef USE_TENSORFLOW_CNS`, TensorFlow requires C++17 (for `std::optional`) */
+export FLAGS_TENSORFLOW="-std=c++17 -DSUSUWU_USE_TENSORFLOW" #/* `./cxx/*` uses `#ifdef SUSUWU_USE_TENSORFLOW`, TensorFlow requires C++17 (for `std::optional`) */
+export FLAGS_TENSORFLOW_RELEASE="export TF_MLIR_ENABLE_V1_OPTIMIZATION_PASS=true" #/* TODO */
 C_SOURCE_PATH="./c/" #/* Usage: replace with directory root for _C_ source code */
 CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source code */
 
-test -n "${GITHUB_ACTIONS}" #/* If `build.sh` is executed through [GitHub Workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: `|| <test for other amnesiac environments, such as Docker>` */
-SUSUWU_IS_VIRTUAL=$? #/* Set to last command (`test`)'s return value */
-SUSUWU_INSTALL_TENSORFLOW=$? #${SUSUWU_IS_VIRTUAL} #/* If virtual, install prerequisites for `cxx/ClassTensorFlowCns.hxx`; use `export SUSUWU_INSTALL_TENSORFLOW=false` to reduce resource use, or `export SUSUWU_INSTALL_TENSORFLOW=true` to install prerequisites on all computers (default is to avoid changes to system unless virtual) */
+if [ -n "${GITHUB_ACTIONS}" ]; then
+	SUSUWU_IS_VIRTUAL=true #/* `build.sh` is executed through [GitHub Workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: `|| <test for other amnesiac environments, such as Docker>` */
+else
+	SUSUWU_IS_VIRTUAL=false
+fi
+SUSUWU_INSTALL_TENSORFLOW="${SUSUWU_INSTALL_TENSORFLOW:-"${SUSUWU_IS_VIRTUAL}"}" #/* If virtual, install prerequisites for `cxx/ClassTensorFlowCns.hxx`; use `export SUSUWU_INSTALL_TENSORFLOW=false` to reduce resource use, or `export SUSUWU_INSTALL_TENSORFLOW=true` to install prerequisites on all computers (default is to avoid changes to system unless virtual) */
+if [ -f "${0}.bash" ] && [ -n "${BASH_VERSION}" ] || [ "${0##*.}" = "bash" ]; then #/* Notice: assumes left-associative */
+	SUSUWU_INSTALL_TENSORFLOW=false #/* `SUSUWU_TEST_BASH` should not reinstall. TODO: ensure compatible (does not prevent install) with ports to `/bin/bash` */
+fi
+FLAGS_USER_BACKUP="${FLAGS_USER}" #/* Allows to undo insertion of TensorFlow includes */
 if [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
 	SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "Was executed through one of GitHub's Workflows (or user set $(SUSUWU_SH_QUOTE "VAR" "SUSUWU_INSTALL_TENSORFLOW")), will auto-install $(SUSUWU_SH_QUOTE "CODE" "libeigen3-dev") and $(SUSUWU_SH_QUOTE "CODE" "libtensorflow")."
-	if ! (sudo apt -y install libtensorflow #|| git clone https://github.com/tensorflow/tensorflow.git --depth 1
-		); then # If normal `apt` is not sufficient to install `libtensorflow`, ...
-		# ... then download and extract TensorFlow C++ library.
-		LIBTENSORFLOW_TAR="libtensorflow-cpu-linux-x86_64-2.11.0.tar.gz"
-		wget --no-verbose "https://storage.googleapis.com/tensorflow/libtensorflow/${LIBTENSORFLOW_TAR}" && \
-		tar xzf "${LIBTENSORFLOW_TAR}" && \
-		ls -a include && ls -a include/tensorflow && ls -a include/tensorflow/core && ls -a include/tensorflow/third-party && \
-		sudo mv lib/* /usr/lib/ #&& \
-#		sudo mv include/* /usr/include/ && \
-#		ls /usr/include/tensorflow/
-		git clone https://github.com/openxla/xla.git --depth 1 #`libtensorflow` does not include `xla`
+	if ! (sudo apt -y install libtensorflow || sudo apt -y install libtensorflow-dev #|| git clone https://github.com/tensorflow/tensorflow.git --depth 1
+		); then #/* If normal `apt` is not sufficient to install `libtensorflow` */
+		if [ true = "${USE_GOOGLEAPIS_TENSORFLOW}" ]; then
+			LIBTENSORFLOW_TAR="libtensorflow-cpu-linux-x86_64-2.11.0.tar.gz"
+			wget --no-verbose "https://storage.googleapis.com/tensorflow/libtensorflow/${LIBTENSORFLOW_TAR}" && \
+			tar xzf "${LIBTENSORFLOW_TAR}" && \
+			ls -a include && ls -a include/tensorflow && ls -a include/tensorflow/core && ls -a include/tensorflow/third-party && \
+			sudo mv lib/* /usr/lib/ #&& \
+#			sudo mv include/* /usr/include/ && \
+#			ls /usr/include/tensorflow/
+			git clone https://github.com/openxla/xla.git --depth 1 #/* `libtensorflow` does not include `xla` */
+		elif [ true = "${SUSUWU_BUILD_TENSORFLOW}" ]; then #/* prepackaged `libtensorflow` does not have C++ headers; use shallow clone of TensorFlow source */
+			git clone https://github.com/tensorflow/tensorflow.git --depth 1
+		else #/* `libtensorflow` C++ package */
+			wget --no-verbose "https://github.com/ika-rwth-aachen/libtensorflow_cc/releases/download/v2.13.0/libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
+			sudo dpkg -i "libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
+			sudo ldconfig
+		fi
 	fi
 fi
 
@@ -57,6 +72,7 @@ if SUSUWU_DEPENDENCY_INCLUDE "-I" "libtensorflow" "./" "tensorflow/core/" "sudo 
 	TENSORFLOW_PATH_PREFIX=""
 elif SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow" "tensorflow/" "tensorflow/core/" "git clone https://github.com/tensorflow/tensorflow.git --depth 1"; then
 	TENSORFLOW_PATH_PREFIX="tensorflow/third_party/"
+	TENSORFLOW_FULL_PATH_PREFIX="${SUSUWU_DEPENDENCY_INCLUDE_PATH}third_party/"
 fi
 TENSORFLOW_INCLUDE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}" #/* `TENSORFLOW_INCLUDE_PATH=$(SUSUWU_DEPENDENCY_INCLUDE ...)` discards `SUSUWU_DEPENDENCY_INCLUDE`'s changes to env vars */
 TENSORFLOW_FULL_PATH_PREFIX="${TENSORFLOW_INCLUDE_PATH}third_party/"
@@ -69,13 +85,38 @@ if [ -n "${TENSORFLOW_INCLUDE_PATH}" ]; then
 		EIGEN_INCLUDE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
 	}
 	SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:tsl" "${TENSORFLOW_PATH_PREFIX}xla/third_party/tsl/" "tsl/" ""
-
+	if [ -z "${EIGEN_INCLUDE_PATH}" ]; then
+		SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "unsupported/Eigen/" "sudo apt -y install libeigen3-dev eigen" ||
+			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "git clone https://github.com/PX4/eigen.git --depth 1"
+		if [ -z "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ] &&
+			[ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
+			if sudo apt -y install libeigen3-dev || sudo apt -y install eigen || git clone https://github.com/PX4/eigen.git --depth 1; then
+				SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "unsupported/Eigen/" "" ||
+					SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" ""
+			fi
+		fi
+	fi
 	ML_DTYPES_ROOT="xla/third_party/py/ml_dtypes/"
+	ML_DTYPES_PATH="${TENSORFLOW_PATH_PREFIX}${ML_DTYPES_ROOT}"
 	ML_DTYPES_PREFIX="ml_dtypes/include/"
-	if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:ml_dtypes" "${TENSORFLOW_PATH_PREFIX}${ML_DTYPES_ROOT}" "${ML_DTYPES_PREFIX}float8.h" "cd ${TENSORFLOW_FULL_PATH_PREFIX}${ML_DTYPES_ROOT} && bazel build"; then #/* If can't use `ml_dtypes` from `tensorflow` */
+	ML_DTYPES_FULL_PATH="${TENSORFLOW_FULL_PATH_PREFIX}${ML_DTYPES_ROOT}"
+#	if [ -e "../${ML_DTYPES_PATH}${ML_DTYPES_PREFIX}float8.h" ]; then
+#		echo "Found: ../${ML_DTYPES_PATH}${ML_DTYPES_PREFIX}float8.h"
+#	fi
+	if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:ml_dtypes" "${ML_DTYPES_PATH}" "${ML_DTYPES_PREFIX}float8.h" "cd ${ML_DTYPES_FULL_PATH} && bazel build"; then #/* If can't use `ml_dtypes` from `tensorflow` */
 		ML_DTYPES_GIT="https://github.com/jax-ml/ml_dtypes.git"
 		if [ ! -d "ml_dtypes" ] && [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
-			git clone "${ML_DTYPES_GIT}" --depth 1
+			ML_DTYPES_COMMIT_HASH="00d98cd92ade342fef589c0470379abb27baebe9" #/* TODO: extract compatible commit hash from `workspace.bzl` */
+			if [ -z "${ML_DTYPES_COMMIT_HASH}" ]; then
+				git clone "${ML_DTYPES_GIT}" --depth 1 #/* Possible mismatch if commit is too new */
+			else
+				if git init ml_dtypes && cd ml_dtypes; then
+					git remote add origin ${ML_DTYPES_GIT}
+					git fetch --depth 1 origin ${ML_DTYPES_COMMIT_HASH}
+					git checkout FETCH_HEAD
+					cd ../
+				fi
+			fi
 		fi
 		if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "jax-ml:ml_dtypes" "ml_dtypes/" "${ML_DTYPES_PREFIX}float8.h" "git clone ${ML_DTYPES_GIT} --depth 1"; then #/* If can't use `ml_dtypes` from `jax-ml` */
 			ML_DTYPES_FALLBACK_PREFIX="tensorflow/core/platform/"
@@ -86,11 +127,6 @@ if [ -n "${TENSORFLOW_INCLUDE_PATH}" ]; then
 				export SUSUWU_USED_ML_DTYPES_SED=true
 			fi
 		fi
-	fi
-	if [ -z "${EIGEN_INCLUDE_PATH}" ]; then
-		${SUSUWU_INSTALL_TENSORFLOW} && (sudo apt -y install libeigen3-dev || sudo apt -y install eigen)
-		SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "sudo apt install eigen || git clone https://github.com/PX4/eigen.git --depth 1"
-#		SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "eigen3/Eigen/" "sudo apt install eigen || git clone https://github.com/PX4/eigen.git --depth 1"
 	fi
 fi
 
@@ -107,6 +143,8 @@ SUSUWU_SETUP_BINDIR "./bin/" #/* Usage: replace with directory root for new exec
 SUSUWU_SETUP_OUTPUT "Susuwu" #/* Usage: replace with name of your program */
 SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
 
+CFLAGS_BACKUP="${CFLAGS}" #/* Allows to undo insertion of TensorFlow includes */
+CXXFLAGS_BACKUP="${CXXFLAGS}" #/* Allows to undo insertion of TensorFlow includes */
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_TENSORFLOW_ERROR}" ]; then #/* If `libtensorflow` was found */
 	SUSUWU_TENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.hxx"
@@ -118,6 +156,10 @@ if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_TENSORFLOW_ERROR}
 		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${SUSUWU_TENSORFLOW_TEST_PATH}") passed, will enable $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${FLAGS_TENSORFLOW}\"")."
 	else
 		export SUSUWU_TENSORFLOW_ERROR=true
+		FLAGS_USER="${FLAGS_USER_BACKUP}" #/* Undo insertion of TensorFlow includes */
+		CFLAGS="${CFLAGS_BACKUP}" #/* Undo insertion of TensorFlow includes */
+		CXXFLAGS="${CXXFLAGS_BACKUP}" #/* Undo insertion of TensorFlow includes */
+		SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${CXXFLAGS} ${SUSUWU_TENSORFLOW_TEST_PATH}") failed, will not enable $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${FLAGS_TENSORFLOW}\"") (skipped). If $(SUSUWU_SH_QUOTE "CODE" "libtensorflow") is installed, insert $(SUSUWU_SH_QUOTE "CODE" "${FLAGS_TENSORFLOW}") into $(SUSUWU_SH_QUOTE "CODE" "$0:FLAGS_USER"). To troubleshoot, use $(SUSUWU_SH_QUOTE "CODE" "cd ${TENSORFLOW_INCLUDE_PATH} && ./configure")"
 #		${SUSUWU_USED_ML_DTYPES_SED} && find "${XLA_SOURCE_PATH}" -type f -exec sed "s|\"${ML_DTYPES_FALLBACK_PREFIX}|\"${ML_DTYPES_PREFIX}|" -i'' {} + # [error: 'ml_dtypes/include/float8.h' file not found](https://github.com/tensorflow/tensorflow/issues/93130) fix. #TODO: exclude 'third_party/xla/xla/tsl/platform/resource_loader.h'
 	fi
@@ -130,7 +172,7 @@ SUSUWU_BUILD_OBJECTS "${CXX}" "${CXXFLAGS}" ".cxx" "${CXX_SOURCE_PATH}*.cxx"
 SUSUWU_BUILD_EXECUTABLE
 SUSUWU_STATUS=$?
 SUSUWU_BUILD_STATUS=${SUSUWU_STATUS}
-
+export TF_CPP_MIN_LOG_LEVEL=0 #/* Prints debug info to `stderr` */
 SUSUWU_TEST_OUTPUT #/* Analogous to `make test` or `make execute` */
 SUSUWU_STATUS=$?
 [ 0 -eq ${SUSUWU_BUILD_STATUS} ] && SUSUWU_INSTALL "${USRBIN}" && SUSUWU_UNINSTALL "${USRBIN}" #/* Analogous to `make install && make uninstall`. Won't clobber files which exist. */
