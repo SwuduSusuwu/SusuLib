@@ -83,19 +83,30 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 	SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS="-std=c++17 -DSUSUWU_USE_TENSORFLOW" #/* `./cxx/*` uses `#ifdef SUSUWU_USE_TENSORFLOW`, TensorFlow requires C++17 (for `std::optional`) */
 #	SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS_RELEASE="export TF_MLIR_ENABLE_V1_OPTIMIZATION_PASS=true" #/* TODO */
 
+	SUSUWU_INSTALL_TENSORFLOW="${SUSUWU_INSTALL_TENSORFLOW:-"${SUSUWU_IS_VIRTUAL}"}" #/* If virtual, install prerequisites for `cxx/ClassTensorFlowCns.hxx`; use `export SUSUWU_INSTALL_TENSORFLOW=false` to reduce resource use, or `export SUSUWU_INSTALL_TENSORFLOW=true` to install prerequisites on all computers (default is to avoid changes to system unless virtual) */
+	if [ -f "${0}.bash" ] && [ -n "${BASH_VERSION}" ] || [ "${0##*.}" = "bash" ]; then #/* Notice: assumes left-associative */
+		SUSUWU_INSTALL_TENSORFLOW=false #/* `SUSUWU_TEST_BASH` should not reinstall. TODO: ensure compatible (does not prevent install) with ports to `/bin/bash` */
+	fi
 	if [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
 		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "Was executed through one of GitHub's Workflows (or user set $(SUSUWU_SH_QUOTE "VAR" "SUSUWU_INSTALL_TENSORFLOW")), will auto-install $(SUSUWU_SH_QUOTE "CODE" "libeigen3-dev") and $(SUSUWU_SH_QUOTE "CODE" "libtensorflow")."
-		if ! (SUSUWU_INSTALL_PACKAGES "libtensorflow" #|| git clone https://github.com/tensorflow/tensorflow.git --depth 1
-			); then # If normal `apt` is not sufficient to install `libtensorflow`, ...
-			# ... then download and extract TensorFlow C++ library.
-			LIBTENSORFLOW_TAR="libtensorflow-cpu-linux-x86_64-2.11.0.tar.gz"
-			wget --no-verbose "https://storage.googleapis.com/tensorflow/libtensorflow/${LIBTENSORFLOW_TAR}" && \
-			tar xzf "${LIBTENSORFLOW_TAR}" && \
-			ls -a include && ls -a include/tensorflow && ls -a include/tensorflow/core && ls -a include/tensorflow/third-party && \
-			sudo mv lib/* /usr/lib/ #&& \
-#			sudo mv include/* /usr/include/ && \
-#			ls /usr/include/tensorflow/
-			git clone https://github.com/openxla/xla.git --depth 1 #`libtensorflow` does not include `xla`
+		if ! (SUSUWU_INSTALL_PACKAGES "libtensorflow" || SUSUWU_INSTALL_PACKAGES "libtensorflow-dev" #|| git clone https://github.com/tensorflow/tensorflow.git --depth 1
+			); then #/* If system package manager is not sufficient to install `libtensorflow` */
+			if [ true = "${USE_GOOGLEAPIS_TENSORFLOW}" ]; then
+				LIBTENSORFLOW_TAR="libtensorflow-cpu-linux-x86_64-2.11.0.tar.gz"
+				wget --no-verbose "https://storage.googleapis.com/tensorflow/libtensorflow/${LIBTENSORFLOW_TAR}" && \
+				tar xzf "${LIBTENSORFLOW_TAR}" && \
+				ls -a include && ls -a include/tensorflow && ls -a include/tensorflow/core && ls -a include/tensorflow/third-party && \
+				sudo mv lib/* /usr/lib/ #&& \
+#				sudo mv include/* /usr/include/ && \
+#				ls /usr/include/tensorflow/
+				git clone https://github.com/openxla/xla.git --depth 1 #/* `libtensorflow` does not include `xla` */
+			elif [ true = "${SUSUWU_BUILD_TENSORFLOW}" ]; then #/* prepackaged `libtensorflow` does not have C++ headers; use shallow clone of TensorFlow source */
+				git clone https://github.com/tensorflow/tensorflow.git --depth 1
+			else #/* `libtensorflow` C++ package */
+				wget --no-verbose "https://github.com/ika-rwth-aachen/libtensorflow_cc/releases/download/v2.13.0/libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
+				sudo dpkg -i "libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
+				sudo ldconfig
+			fi
 		fi
 	fi
 
@@ -103,6 +114,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 		TENSORFLOW_PATH_PREFIX=""
 	elif SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow" "tensorflow/" "tensorflow/core/" "C++" "git clone https://github.com/tensorflow/tensorflow.git --depth 1"; then
 		TENSORFLOW_PATH_PREFIX="tensorflow/third_party/"
+		TENSORFLOW_FULL_PATH_PREFIX="${SUSUWU_DEPENDENCY_INCLUDE_PATH}third_party/"
 	fi
 	TENSORFLOW_INCLUDE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}" #/* `TENSORFLOW_INCLUDE_PATH=$(SUSUWU_DEPENDENCY_INCLUDE ...)` discards `SUSUWU_DEPENDENCY_INCLUDE`'s changes to env vars */
 	TENSORFLOW_FULL_PATH_PREFIX="${TENSORFLOW_INCLUDE_PATH}third_party/"
@@ -115,13 +127,38 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 			EIGEN_INCLUDE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
 		}
 		SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:tsl" "${TENSORFLOW_PATH_PREFIX}xla/third_party/tsl/" "tsl/" "C++" ""
-
+		if [ -z "${EIGEN_INCLUDE_PATH}" ]; then
+			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "unsupported/Eigen/" "C++" "sudo apt -y install libeigen3-dev eigen" ||
+				SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "C++" "git clone https://github.com/PX4/eigen.git --depth 1"
+			if [ -z "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ] &&
+				[ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
+				if SUSUWU_INSTALL_PACKAGES "libeigen3-dev" || SUSUWU_INSTALL_PACKAGES "eigen" || git clone https://github.com/PX4/eigen.git --depth 1; then
+					SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "unsupported/Eigen/" "C++" "" ||
+						SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "C++" ""
+				fi
+			fi
+		fi
 		ML_DTYPES_ROOT="xla/third_party/py/ml_dtypes/"
+		ML_DTYPES_PATH="${TENSORFLOW_PATH_PREFIX}${ML_DTYPES_ROOT}"
+		ML_DTYPES_FULL_PATH="${TENSORFLOW_FULL_PATH_PREFIX}${ML_DTYPES_ROOT}"
 		ML_DTYPES_PREFIX="ml_dtypes/include/"
-		if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:ml_dtypes" "${TENSORFLOW_PATH_PREFIX}${ML_DTYPES_ROOT}" "${ML_DTYPES_PREFIX}float8.h" "C++" "cd ${TENSORFLOW_FULL_PATH_PREFIX}${ML_DTYPES_ROOT} && bazel build"; then #/* If can't use `ml_dtypes` from `tensorflow` */
+#		if [ -e "../${ML_DTYPES_PATH}${ML_DTYPES_PREFIX}float8.h" ]; then
+#			echo "Found: ../${ML_DTYPES_PATH}${ML_DTYPES_PREFIX}float8.h"
+#		fi
+		if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:ml_dtypes" "${ML_DTYPES_PATH}" "${ML_DTYPES_PREFIX}float8.h" "C++" "cd ${ML_DTYPES_FULL_PATH} && bazel build"; then #/* If can't use `ml_dtypes` from `tensorflow` */
 			ML_DTYPES_GIT="https://github.com/jax-ml/ml_dtypes.git"
 			if [ ! -d "ml_dtypes" ] && [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
-				git clone "${ML_DTYPES_GIT}" --depth 1
+				ML_DTYPES_COMMIT_HASH="00d98cd92ade342fef589c0470379abb27baebe9" #/* TODO: extract compatible commit hash from `workspace.bzl` */
+				if [ -z "${ML_DTYPES_COMMIT_HASH}" ]; then
+					git clone "${ML_DTYPES_GIT}" --depth 1 #/* Possible mismatch if commit is too new */
+				else
+					if git init ml_dtypes && cd ml_dtypes; then
+						git remote add origin ${ML_DTYPES_GIT}
+						git fetch --depth 1 origin ${ML_DTYPES_COMMIT_HASH}
+						git checkout FETCH_HEAD
+						cd ../
+					fi
+				fi
 			fi
 			if ! SUSUWU_DEPENDENCY_INCLUDE "-I" "jax-ml:ml_dtypes" "ml_dtypes/" "${ML_DTYPES_PREFIX}float8.h" "C++" "git clone ${ML_DTYPES_GIT} --depth 1"; then #/* If can't use `ml_dtypes` from `jax-ml` */
 				ML_DTYPES_FALLBACK_PREFIX="tensorflow/core/platform/"
@@ -133,13 +170,9 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 				fi
 			fi
 		fi
-		if [ -z "${EIGEN_INCLUDE_PATH}" ]; then
-			${SUSUWU_INSTALL_TENSORFLOW} && (SUSUWU_INSTALL_PACKAGES "libeigen3-dev" || SUSUWU_INSTALL_PACKAGES "eigen")
-			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "C++" "sudo apt install eigen || git clone https://github.com/PX4/eigen.git --depth 1"
-#			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "eigen3/Eigen/" "C++" "sudo apt install eigen || git clone https://github.com/PX4/eigen.git --depth 1"
-		fi
 	fi
 
+	export TF_CPP_MIN_LOG_LEVEL=0 #/* Prints debug info to `stderr` */
 	if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_INCLUDES_LIBTENSORFLOW_ERROR}" ]; then #/* If `libtensorflow` was found */
 		SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.hxx"
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
