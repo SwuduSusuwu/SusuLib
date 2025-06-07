@@ -182,6 +182,44 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 				fi
 			fi
 		fi
+
+		SUSUWU_INCLUDES_LIBTENSORFLOW_HAS_PROTOS=$(test -f "${TENSORFLOW_INCLUDE_PATH}tensorflow/core/framework/types.pb.h")
+		if [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ] && ! ${SUSUWU_INCLUDES_LIBTENSORFLOW_HAS_PROTOS}; then
+			if ! command -v protoc >/dev/null; then
+				sudo apt install protobuf || sudo snap install protobuf
+			fi
+			TENSORFLOW_FW="tensorflow/core/framework/"
+#			TENSORFLOW_INCLUDE_PATH_FW="${TENSORFLOW_INCLUDE_PATH}${TENSORFLOW_FW}"
+#			for PROTO_SOURCE_CODE in "${TENSORFLOW_INCLUDE_PATH}${TENSORFLOW_FW}"*.proto; do
+#				if [ ! -e "${PROTO_SOURCE_CODE%proto}pb.h" ]; then
+#					protoc --cpp_out="${TENSORFLOW_INCLUDE_PATH_FW}" --proto_path="${TENSORFLOW_INCLUDE_PATH}" --experimental_allow_proto3_optional "${PROTO_SOURCE_CODE##*"${TENSORFLOW_INCLUDE_PATH}"}" #/* "../tensorflow/tensorflow/core/framework/tensor_shape.h:*:10: fatal error: 'tensorflow/core/framework/*.pb.h' file not found" workaround */
+			SUSUWU_INCLUDES_LIBTENSORFLOW_PWD_BACKUP="$(pwd)"
+			cd "${TENSORFLOW_INCLUDE_PATH}" || exit 1
+#			ls "${TENSORFLOW_FW}" | grep ".proto"
+#			protoc --cpp_out="${TENSORFLOW_INCLUDE_PATH_FW}" --proto_path="${TENSORFLOW_INCLUDE_PATH}" "${TENSORFLOW_FW}*.proto" #/* "../tensorflow/tensorflow/core/framework/tensor_shape.h:*:10: fatal error: 'tensorflow/core/framework/*.pb.h' file not found" workaround */
+#			if [ ! -e "${TENSORFLOW_INCLUDE_PATH_FW}types.pb.h" ]; then
+#				protoc --cpp_out="${TENSORFLOW_INCLUDE_PATH_FW}" --proto_path="${TENSORFLOW_INCLUDE_PATH}" "${TENSORFLOW_FW}types.proto" #/* "../tensorflow/tensorflow/core/framework/tensor_shape.h:22:10: fatal error: 'tensorflow/core/framework/types.pb.h' file not found" workaround */
+#			fi
+#			if [ ! -e "${TENSORFLOW_INCLUDE_PATH_FW}function.pb.h" ]; then
+#				protoc --cpp_out="${TENSORFLOW_INCLUDE_PATH_FW}" --proto_path="${TENSORFLOW_INCLUDE_PATH}" "${TENSORFLOW_FW}function.proto" #/* " ../tensorflow/tensorflow/c/eager/abstract_function.h:19:10: fatal error: 'tensorflow/core/framework/function.pb.h' file not found" */
+#			fi
+			for PROTO_SOURCE_CODE in "${TENSORFLOW_FW}"*.proto; do
+				if [ ! -e "${PROTO_SOURCE_CODE%proto}pb.h" ]; then
+					protoc --cpp_out="${TENSORFLOW_FW}" --proto_path=./ --experimental_allow_proto3_optional "${PROTO_SOURCE_CODE}" #/* "../tensorflow/tensorflow/core/framework/tensor_shape.h:*:10: fatal error: 'tensorflow/core/framework/*.pb.h' file not found" workaround */
+				fi
+			done
+			if [ -d "${XLA_SOURCE_PATH}" ]; then
+				TENSORFLOW_PROTOBUF="xla/tsl/protobuf/"
+				cd "${SUSUWU_INCLUDES_LIBTENSORFLOW_PWD_BACKUP}" && cd "${XLA_SOURCE_PATH}" || exit 1
+#				ls "${TENSORFLOW_PROTOBUF}" | grep ".proto"
+				for PROTO_SOURCE_CODE in "${TENSORFLOW_PROTOBUF}"*.proto; do
+					if [ ! -e "${PROTO_SOURCE_CODE%proto}pb.h" ]; then
+						protoc --cpp_out="${TENSORFLOW_PROTOBUF}" --proto_path=./ "${PROTO_SOURCE_CODE}" #/* "../tensorflow/third_party/xla/xla/tsl/platform/status.h:38:10: fatal error: 'xla/tsl/protobuf/error_codes.pb.h' file not found" workaround */
+					fi
+				done
+			fi
+			cd "${SUSUWU_INCLUDES_LIBTENSORFLOW_PWD_BACKUP}" || exit 1
+		fi
 	fi
 
 	export TF_CPP_MIN_LOG_LEVEL=0 #/* Prints debug info to `stderr` */
