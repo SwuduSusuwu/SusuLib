@@ -273,6 +273,9 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
   - Rationales:
     - Most simple to nest (`echo $(stat $(pwd))`). Common (much known) **subshell** syntax is reused.
     - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2006).
+- Document unintuitive quirks
+  - Most languages group `&&` before `||`, but in `/bin/sh` (plus derivatives, such as `/bin/bash`) `&&` is grouped similar to `||`, [which requires to restructure the code to use the fact that `/bin/sh` is left-associative](https://unix.stackexchange.com/questions/88850/precedence-of-the-shell-logical-operators/88851#88851).
+
 ## _C_/_C++_ source
 Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](./.clang-tidy) options).
 
