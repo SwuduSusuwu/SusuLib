@@ -170,8 +170,8 @@ SUSUWU_SH_COLOR_COUNT() ( #/* Usage: `LOCAL_COLOR_COUNT=SUSUWU_SH_COLOR_COUNT` *
 		test "${SUSUWU_SH_COLOR_COUNT_CACHE}" -ge "${SUSUWU_SH_COLOR_COUNT_MINIMUM_COLORS}" #test that color count is Greater or Equal to minimum count
 		return $? #return `test`'s return value
 	fi
-	if [ "${TERM}" = "" ]; then
-		echo "[$0: Warning: SUSUWU_SH_COLOR_COUNT(): If your console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`, which _GitHub_ uses) lacks colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (shows glitches, or literal codes such as \"\\\033[0;34m\"), execute \`export TERM=\"dumb\"\` to disable those.]" >&2
+	if [ -n "${GITHUB_ACTIONS}" ]; then
+		echo "[$0: Warning: SUSUWU_SH_COLOR_COUNT(): detected environment is _GitHub_ (due to \`[ -n \"\${GITHUB_ACTIONS}\" ]\`), will force color use. If this console (\`[ \"\${TERM}\" = \"${TERM}\" ]\`, which _GitHub_ uses) lacks colors such as ${SUSUWU_SH_BLUE}blue${SUSUWU_SH_DEFAULT} (shows glitches, or literal codes such as \"\\\033[0;34m\"), [post an issue](https://github.com/SwuduSusuwu/SusuLib/issues/new) about this.]" >&2
 		echo 8 #/* [_GitHub_ Autobuild](https://github.com/SwuduSusuwu/SusuLib/actions/runs/13209802112/job/36880995224) workaround. */
 		return 0 #/* TODO: include other tests (`return 1` if the console does not allow color codes) */
 	fi
