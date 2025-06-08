@@ -234,8 +234,14 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 	if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_INCLUDES_LIBTENSORFLOW_ERROR}" ]; then #/* If `libtensorflow` was found */
 		SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.hxx"
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
-		if [ true = "${SUSUWU_INCLUDES_LIBTENSORFLOW_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "" "${SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS}" "-ltensorflow" "${SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH}" "To troubleshoot, use $(SUSUWU_SH_QUOTE "CODE" "cd ${TENSORFLOW_INCLUDE_PATH} && ./configure")"; then
+		if [ true = "${SUSUWU_INCLUDES_LIBTENSORFLOW_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "" "${SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS}" "-labsl_status -labsl_strings -labsl_base -ltensorflow_cc -ltensorflow_framework" "${SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH}" "To troubleshoot, use $(SUSUWU_SH_QUOTE "CODE" "cd ${TENSORFLOW_INCLUDE_PATH} && ./configure")"; then
 			export SUSUWU_INCLUDES_LIBTENSORFLOW_PASS=true
+#			LDFLAGS="${LDFLAGS} -lprotobuf" #/* `-lprotobuf` gives "SUMMARY: AddressSanitizer: SEGV generated_message_reflection.cc in google::protobuf::(anonymous namespace)::AddDescriptorsImpl(google::protobuf::internal::DescriptorTable const*)" */
+#			LDFLAGS="${LDFLAGS} -l:libabsl_status.so"
+#	if [ -d "/usr/local/lib/" ]; then
+#			#LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+#		if [ -f /usr/local/lib/libtensorflow_framework.so ] || [ -f /usr/local/lib/libtensorflow_framework.so.2 ]; then
+#			ls /usr/local/lib/libtensorflow*
 			return 0 #/* "success", true */
 		else
 			export SUSUWU_INCLUDES_LIBTENSORFLOW_ERROR=true
