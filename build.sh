@@ -209,8 +209,15 @@ if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_TENSORFLOW_ERROR}
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
 	if [ true = "${SUSUWU_TENSORFLOW_PASS}" ] || (${CXX} ${CXXFLAGS} ${FLAGS_TENSORFLOW} -c "${SUSUWU_TENSORFLOW_TEST_PATH}"); then #/* TODO: ` 2>/dev/null; then` as soon as difficult-to-parse errors such as `fatal error: "unsupported/Eigen/CXX11/Tensor' file not found" have solutions */
 		export SUSUWU_TENSORFLOW_PASS=true
-		FLAGS_USER="${FLAGS_USER} ${FLAGS_TENSORFLOW}" #/* TODO; if sure `FLAGS_USER` has no use after `SUSUWU_SETUP_BUILD_FLAGS()`, remove. */
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_TENSORFLOW}"
+		LDFLAGS="${LDFLAGS} -labsl_status -labsl_strings -labsl_base"
+#		LDFLAGS="${LDFLAGS} -lprotobuf" #/* `-lprotobuf` gives "SUMMARY: AddressSanitizer: SEGV generated_message_reflection.cc in google::protobuf::(anonymous namespace)::AddDescriptorsImpl(google::protobuf::internal::DescriptorTable const*)" */
+		LDFLAGS="${LDFLAGS} -ltensorflow_cc -ltensorflow_framework"
+#		#LDFLAGS="${LDFLAGS} -l:libabsl_status.so"
+#if [ -d "/usr/local/lib/" ]; then
+#		#LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+#	if [ -f /usr/local/lib/libtensorflow_framework.so ] || [ -f /usr/local/lib/libtensorflow_framework.so.2 ]; then
+#		ls /usr/local/lib/libtensorflow*
 		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${SUSUWU_TENSORFLOW_TEST_PATH}") passed, will enable $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${FLAGS_TENSORFLOW}\"")."
 	else
 		export SUSUWU_TENSORFLOW_ERROR=true
