@@ -910,7 +910,7 @@ const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 `less` [cxx/ClassIo.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassIo.cxx)
-```
+```c++
 const FILE *classIoFopenOwnPath() {
 	return fopen(classIoGetOwnPath().c_str(), "r");
 }
@@ -2668,7 +2668,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* def __cplusplus */
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
-`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx)
+`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_cxx
