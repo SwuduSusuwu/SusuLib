@@ -2263,6 +2263,7 @@ public:
 	virtual const bool isSquareConnectome() const { return false; } /* returns `true` if the implementation requires `inputNeurons == outputNeurons == neuronsPerLayer` (square layout does not support all uses, but is most simple to code and allows the most [SIMD](../posts/SimdGpgpuTpu.md) */
 //	virtual bool setSquareConnectome(const bool is) { return false; } /* returns `true` (and sets the squareness to `is`) if the implementation has customizable squareness (dynamic code paths for square versus non-square connectomes) */
 	virtual void setSquareConnectome(const bool is) { throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setSquareConnectome(" + std::to_string(is) + ") { /* implementation does not support setting this */ }")); } /* if the implementation has customizable squareness (dynamic code paths for square versus non-square connectomes), sets the squareness to `is`. */
+	virtual void restructureConnectome() { setInitialized(false); /* stub, since root class has no `synapses` tensor */ } /* updates (or rebuilds) connectome (tensor of coefficients and/or biases) to match new topological layout */
 	virtual void setInputMode(ObjectMode x) { inputMode = x; } /* sets type of input */
 	virtual void setOutputMode(ObjectMode x) { outputMode = x; } /* sets type of output (notice: some implementations require `inputMode == outputMode`) */
 	virtual void setInputNeurons(size_t x) { /* sets connectome input count */
@@ -2271,6 +2272,7 @@ public:
 				throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setInputNeurons(.x = " + std::to_string(x) + ") { isSquareConnectome() && 0 != neuronsPerLayer && x != neuronsPerLayer }"));
 			}
 			inputNeurons = x;
+			restructureConnectome();
 		}
 	}
 	virtual void setOutputNeurons(size_t x) { /* sets connectome output count */
@@ -2279,11 +2281,13 @@ public:
 				throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setOutputNeurons(.x = " + std::to_string(x) + ") { isSquareConnectome() && 0 != neuronsPerLayer && x != neuronsPerLayer }"));
 			}
 			outputNeurons = x;
+			restructureConnectome();
 		}
 	}
 	virtual void setLayersOfNeurons(size_t x) { /* sets connectome "hidden layer" count */
 		if(x != layersOfNeurons) {
 			layersOfNeurons = x;
+			restructureConnectome();
 		}
 	}
 	virtual void setNeuronsPerLayer(size_t x) { /* sets connectome coefficients-per-"hidden layer" */
@@ -2292,6 +2296,7 @@ public:
 				throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setNeuronsPerLayer(.x = " + std::to_string(x) + ") { isSquareConnectome() && 0 != inputNeurons && x != inputNeurons }"));
 			}
 			neuronsPerLayer = x;
+			restructureConnectome();
 		}
 	}
 	virtual const size_t getParameterCount() { /* Notice: must `override` if architecture is sparse. Must `override` to count constant biases. */
@@ -2319,7 +2324,7 @@ public:
 	 * @pre @code !isPureVirtual() @endcode
 	 * @post @code isInitialized() @endcode */
 	template<typename Input, typename Output>
-	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */); /* { inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
+	virtual void setupSynapses(std::vector<std::tuple<Input, Output>> inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */); /* { restructureConnectome(); inputMode = ToObjectMode<Input>::value; outMode = ToObjectMode<Output>::value; throw std::runtime_error("ClassCns::setupSynapses() pure virtual call"); } */
 	/* @pre @code isInitialized() @endcode */
 	template<typename Input, typename Output>
 	virtual const Output process(const Input input) const {
@@ -2334,7 +2339,7 @@ public:
 	/* @throw bad_alloc \
 	 * @pre @code !isPureVirtual() @endcode \
 	 * @post @code isInitialized() @endcode */\
-	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; } /* NOLINT(bugprone-macro-parentheses) */
+	virtual void setupSynapses(const std::vector<std::tuple<INPUT_TYPEDEF, OUTPUT_TYPEDEF>> &inputsToOutputs, size_t trainingIterations = 0 /* if 0, guesses suitable loop count */) { restructureConnectome(); inputMode = ToObjectMode<INPUT_TYPEDEF>::value; outputMode = ToObjectMode<OUTPUT_TYPEDEF>::value; setInitialized(true); /* stub so unit tests pass */ } /* NOLINT(bugprone-macro-parentheses) */
 #	define SUSUWU_TEMPLATE_WORKAROUND(INPUT_TYPEDEF) \
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, bool)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, char)\
