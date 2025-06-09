@@ -1143,6 +1143,7 @@ randomresults	c/rfc6234/shatest.c	/^		const char *randomresults[RANDOMCOUNT];$/;
 randomtest	c/rfc6234/shatest.c	/^		const char *randomtest;$/;"	m	struct:hash	typeref:typename:const char *	file:
 randomtest	c/rfc6234/shatest.c	/^void randomtest(int hashno, const char *seed, int hashsize,$/;"	f	typeref:typename:void
 repeatcount	c/rfc6234/shatest.c	/^		long repeatcount;$/;"	m	struct:hash::__anond9b948bd0108	typeref:typename:long	file:
+restructureConnectome	cxx/ClassCns.hxx	/^	virtual void restructureConnectome() { setInitialized(false); \/* stub, since root class has no/;"	f	class:Susuwu::Cns	typeref:typename:void
 restructureConnectome	cxx/ClassTensorFlowCns.hxx	/^	void restructureConnectome() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 restructureConnectomeImpl	cxx/ClassTensorFlowCns.hxx	/^	void restructureConnectomeImpl() { \/* CRTP backend, for internal use. *\/$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 resultListDumpTo	cxx/ClassResultList.hxx	/^void resultListDumpTo(const List &list, Os &os, const bool index, const bool whitespace, const b/;"	f	namespace:Susuwu	typeref:typename:void
