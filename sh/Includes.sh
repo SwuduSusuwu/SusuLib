@@ -150,6 +150,14 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 				fi
 			fi
 		fi
+		if [ -z "${ABSEIL_INCLUDE_PATH}" ]; then #/* Allows custom path with `ABSEIL_INCLUDE_PATH=path; ./build.sh` */
+			SUSUWU_DEPENDENCY_INCLUDE "-I" "abseil" "absl/" "status/status.h" "C++" "git clone https://github.com/abseil/abseil-cpp.git --depth 1 && sudo apt install libabsl-dev"
+			if [ -z "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ] &&
+				[ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
+				git clone https://github.com/abseil/abseil-cpp.git --depth 1 && SUSUWU_INSTALL_PACKAGES "libabsl-dev"
+				SUSUWU_DEPENDENCY_INCLUDE "-I" "abseil" "absl/" "status/status.h" ""
+			fi
+		fi
 		ML_DTYPES_ROOT="xla/third_party/py/ml_dtypes/"
 		ML_DTYPES_PATH="${TENSORFLOW_PATH_PREFIX}${ML_DTYPES_ROOT}"
 		ML_DTYPES_FULL_PATH="${TENSORFLOW_FULL_PATH_PREFIX}${ML_DTYPES_ROOT}"
