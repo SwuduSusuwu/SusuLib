@@ -387,7 +387,7 @@ Cns &cns /* = analysisCns */
 	cns.setInputMode(objectModeString);
 	cns.setOutputMode(objectModeFloat);
 	cns.setInputNeurons(maxWidthOfOpcodes);
-	cns.setOutputNeurons(1);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : 1);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
 	cns.setNeuronsPerLayer(maxWidthOfOpcodes /* TODO: reduce this */);
 	inputsToOutputs.reserve(pass.bytecodes.size());
@@ -434,8 +434,8 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
 	cns.setInputMode(objectModeString);
 	cns.setOutputMode(objectModeString);
-	cns.setInputNeurons(maxAbortSize);
-	cns.setOutputNeurons(maxPassSize);
+	cns.setInputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : maxAbortSize);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : maxPassSize);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
 	cns.setNeuronsPerLayer(maxWidthOfOpcodes /* TODO: reduce this */);
 	assert(passOrNull.bytecodes.size() == abortOrNull.bytecodes.size());

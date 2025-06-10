@@ -66,8 +66,8 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	const size_t maxWidthOfMessages = (maxResponseSize > maxQuestionSize) ? maxResponseSize : maxQuestionSize;
 	cns.setInputMode(objectModeString);
 	cns.setOutputMode(objectModeString);
-	cns.setInputNeurons(maxQuestionSize);
-	cns.setOutputNeurons(maxResponseSize);
+	cns.setInputNeurons(cns.isSquareConnectome() ? maxWidthOfMessages : maxQuestionSize);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfMessages : maxResponseSize);
 	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
 	cns.setNeuronsPerLayer(maxWidthOfMessages /* TODO: reduce this */);
 	assert(questionsOrNull.bytecodes.size() == responsesOrNull.bytecodes.size());

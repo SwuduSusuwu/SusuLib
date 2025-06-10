@@ -2950,8 +2950,8 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
 	cns.setInputMode(objectModeString);
 	cns.setOutputMode(objectModeString);
-	cns.setInputNeurons(maxAbortSize);
-	cns.setOutputNeurons(maxPassSize);
+	cns.setInputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : maxAbortSize);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : maxPassSize);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
 	cns.setNeuronsPerLayer(maxWidthOfOpcodes /* TODO: reduce this */);
 	assert(passOrNull.bytecodes.size() == abortOrNull.bytecodes.size());
@@ -3232,8 +3232,8 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 	const size_t maxWidthOfMessages = (maxResponseSize > maxQuestionSize) ? maxResponseSize : maxQuestionSize;
 	cns.setInputMode(objectModeString);
 	cns.setOutputMode(objectModeString);
-	cns.setInputNeurons(maxQuestionSize);
-	cns.setOutputNeurons(maxResponseSize);
+	cns.setInputNeurons(cns.isSquareConnectome() ? maxWidthOfMessages : maxQuestionSize);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfMessages : maxResponseSize);
 	cns.setLayersOfNeurons(maxConvolutionsOfMessages);
 	cns.setNeuronsPerLayer(maxWidthOfMessages /* TODO: reduce this */);
 	assert(questionsOrNull.bytecodes.size() == responsesOrNull.bytecodes.size());
