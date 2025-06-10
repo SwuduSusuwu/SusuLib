@@ -392,8 +392,8 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_DEBUG_EXECUTE(x) ((SUSUWU_DEBUG(#x)), (x))
 
 /* Use this to reduce (conditional) print + (conditional) execute into single statement. */
-#define SUSUWU_NOTICE_EXECUTEVERBOSE(x) ((SUSUWU_NOTICE(#x)), SUSUWU_EXECUTEVERBOSE(x))
-#define SUSUWU_DEBUG_EXECUTEVERBOSE(x) ((SUSUWU_DEBUG(#x)), SUSUWU_EXECUTEVERBOSE(x))
+#define SUSUWU_NOTICE_EXECUTEVERBOSE(x) SUSUWU_EXECUTEVERBOSE(((SUSUWU_NOTICE(#x)), x))
+#define SUSUWU_DEBUG_EXECUTEVERBOSE(x) SUSUWU_EXECUTEVERBOSE((SUSUWU_DEBUG(#x), x))
 #ifdef __cplusplus
 }; /* namespace Susuwu */
 #endif /* ifdef __cplusplus */
