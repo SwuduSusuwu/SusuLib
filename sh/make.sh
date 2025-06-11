@@ -11,10 +11,11 @@ SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "err
 }
 #shellcheck source=./sh/Macros.sh
 SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
-	if [ ! -e "${GIT_ROOT_USE}${1}" ]; then
-		SUSUWU_INCLUDE_ERROR "${1}" "not found"
-	elif [ ! -x "${GIT_ROOT_USE}${1}" ] || ! . "${GIT_ROOT_USE}${1}"; then
-		SUSUWU_INCLUDE_ERROR "${1}" "not executable"
+	SUSUWU_INCLUDE_PATH=${1}; shift #/* So path is not included in source'd scripts `$@` and `$*`. */
+	if [ ! -e "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}" ]; then
+		SUSUWU_INCLUDE_ERROR "${SUSUWU_INCLUDE_PATH}" "was not found"
+	elif [ ! -x "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}" ] || ! . "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}"; then
+		SUSUWU_INCLUDE_ERROR "${SUSUWU_INCLUDE_PATH}" "is not executable"
 	fi
 }
 SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */

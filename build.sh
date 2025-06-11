@@ -8,10 +8,11 @@ SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "err
 }
 #shellcheck source=./sh/make.sh
 SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
-	if [ ! -e "${GIT_ROOT}${1}" ]; then
-		SUSUWU_INCLUDE_ERROR "${1}" "not found"
-	elif [ ! -x "${GIT_ROOT}${1}" ] || ! . "${GIT_ROOT}${1}"; then
-		SUSUWU_INCLUDE_ERROR "${1}" "not executable"
+	SUSUWU_INCLUDE_PATH=${1}; shift #/* So path is not included in source'd scripts `$@` and `$*`. */
+	if [ ! -e "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}" ]; then
+		SUSUWU_INCLUDE_ERROR "${SUSUWU_INCLUDE_PATH}" "was not found"
+	elif [ ! -x "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}" ] || ! . "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}"; then
+		SUSUWU_INCLUDE_ERROR "${SUSUWU_INCLUDE_PATH}" "is not executable"
 	fi
 }
 SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_DEFAULT_BRANCH() SUSUWU_PRINT() SUSUWU_PROCESS_ABORT_ON_FIRST_ERROR() SUSUWU_PROCESS_S() SUSUWU_PROCESS_VERBOSE() SUSUWU_PRODUCTION_USE() SUSUWU_SH_* */
