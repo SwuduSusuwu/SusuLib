@@ -97,8 +97,9 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 			LDFLAGS="${LDFLAGS} -rtlib=compiler-rt -lunwind -static" #-no-lgcc -nolibgcc -lmingw32 -static-libstdc++" #workaround for [`lld: error: unable to find library -lgcc`](https://github.com/termux/termux-packages/issues/24194#issuecomment-2799574245)
 			USE_FSAN=true #/* `-fsan*` [supports `x86_64-w64-mingw32-clang++`](https://github.com/SwuduSusuwu/SusuLib/issues/16) */
 		elif command -v x86_64-w64-mingw32-g++ >/dev/null; then
+			FLAGS_USER="${FLAGS_USER} -fopenmp"
 			CXX="x86_64-w64-mingw32-g++"
-			LDFLAGS="${LDFLAGS} -static-libgcc -static-libstdc++"
+			LDFLAGS="${LDFLAGS} -lgomp -static-libgcc -static-libstdc++"
 			USE_FSAN=false #/* `TODO: `-fsan*` for `x86_64-w64-mingw32-g++`](https://www.mingw-w64.org/contribute/#thorough-status-report-for-sanitizers-asan-tsan-usan) */
 		else
 			SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "x86_64-w64-mingw32-clang++ not found"), $(SUSUWU_SH_QUOTE "CODE" "x86_64-w64-mingw32-g++ not found"). Do $(SUSUWU_SH_QUOTE "CODE" "apt install llvm-mingw-w64") or $(SUSUWU_SH_QUOTE "CODE" "apt install mingw-w64")."
@@ -108,7 +109,9 @@ SUSUWU_SETUP_CXX() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [
 		CXX="clang++" #/* TODO: +` -Xclang -analyze -Xclang -analyzer-output=text` (got no extra outputs from this) */
 		USE_FSAN=true #/* [`-fsan*` supports `g++`/`clang++`](https://developers.redhat.com/blog/2021/05/05/memory-error-checking-in-c-and-c-comparing-sanitizers-and-valgrind#tldr) */
 	elif command -v g++ >/dev/null; then
+		FLAGS_USER="${FLAGS_USER} -fopenmp"
 		CXX="g++"
+		LDFLAGS="${LDFLAGS} -lgomp"
 		USE_FSAN=true
 	elif command -v "${CXX}" >/dev/null; then #/* TODO: if our flags are compatible with all `${CXX}`, move this to top */
 		SUSUWU_PRINT "SUSUWU_SETUP_CXX()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "clang++ not found"), $(SUSUWU_SH_QUOTE "CODE" "g++ not found"). $(SUSUWU_SH_QUOTE "CODE" "CXX=${CXX}") found, will use."
