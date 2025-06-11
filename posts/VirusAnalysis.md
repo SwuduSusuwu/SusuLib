@@ -91,6 +91,12 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 #		define SUSUWU_OPENMP false /* `#pragma omp <directive>` can trigger `[-Wunknown-pragma]` */
 #	endif /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
 #endif /* ndef SUSUWU_OPENMP */
+#if SUSUWU_OPENMP
+#	define SUSUWU_OMP_PRAGMA(x) _Pragma(#x)
+#else /* else !SUSUWU_OPENMP */
+#	define SUSUWU_OMP_PRAGMA(x) SUSUWU_NOOP
+#endif /* else !SUSUWU_OPENMP */
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
@@ -1748,6 +1754,7 @@ template<class List, class List2>
 /*	@pre @code !(list.empty() || hashes.full()) @endcode
  *	@post @code !hashes.empty() @endcode */
 void listToHashes(const List &list /* ResultList::bytecodes or ResultList::hex*/, List2 &hashes /* ResultList::hashess */) {
+	SUSUWU_OMP_PRAGMA(omp parallel for) /* TODO: ensure OpenMP won't cause problems if `List` has dependence on previous values (such as if `List`: is sorted, is a binary tree or heap, or is a hashmap) */
 	for(const auto &value : list) {
 		hashes.insert(classSha2(value));
 	}
@@ -1773,6 +1780,7 @@ template<class List>
 /* return `list`'s `const_iterator` to first instance of `value`, or `list.cend()` (if not found) */
 auto listFindValue(const List &list, const typename List::value_type &value) -> decltype(std::find(list.cbegin(), list.cend(), value)) {
 //const class List::const_iterator listFindValue(const List &list, const typename List::value_type &value) {
+//	SUSUWU_OMP_PRAGMA(omp simd) /* "error: statement after '#pragma omp simd' must be a for loop"
 	return std::find(list.cbegin(), list.cend(), value);
 }
 template<class List>
@@ -1784,9 +1792,7 @@ template<class List>
 /* return `list`'s `const_iterator` to first instance of `std::string(itBegin, itEndSubstr)`, or default iterator (if not found)
  * @pre @code itBegin < itEnd @endcode */
 const typename List::value_type::const_iterator listFindSubstr(const List &list, typename List::value_type::const_iterator itBegin, typename List::value_type::const_iterator itEnd) {
-#if SUSUWU_OPENMP
-#	pragma omp simd
-#endif /* SUSUWU_OPENMP */
+//	SUSUWU_OMP_PRAGMA(omp parallel for) /* "error: cannot return from OpenMP region". `break;` version gives "error: 'break' statement cannot be used in OpenMP for loop" */
 	for(const auto &value : list) {
 		auto result = std::search(value.cbegin(), value.cend(), itBegin, itEnd, [](char chValue, char chIt) { return chValue == chIt; });
 		if(value.cend() != result) {
@@ -1806,6 +1812,7 @@ template<class List>
 const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_iterator> listProduceSignature(const List &list, const typename List::value_type &value) {
 	ptrdiff_t smallest = value.size();
 	auto itBegin = value.cbegin(), itEnd = value.cend();
+	SUSUWU_OMP_PRAGMA(omp parallel for) /* TODO: ensure OpenMP won't cause problems if `List` has dependence on previous values (such as if `List`: is sorted, is a binary tree or heap, or is a hashmap) */
 	for(auto first = itBegin; value.cend() != first; ++first) {
 		for(auto last = value.cend(); first != last; --last) {
 			if((last - first) < smallest) {
@@ -1826,7 +1833,9 @@ typedef struct ResultListSignatureMatch {
 template<class List>
 /* Usage: `auto it = listFindSignatureOfValue(resultList.signatures, value)); if(it) { std::cout << "value has resultList.signatures[" << tohex(match.signature) << "]"; }` */
 ResultListSignatureMatch listFindSignatureOfValue(const List &list, const typename List::value_type &value) {
+//	SUSUWU_OMP_PRAGMA(omp parallel for) /* "error: cannot return from OpenMP region". `break;` version gives "error: 'break' statement cannot be used in OpenMP for loop" */
 	for(const auto &signature : list) {
+//		SUSUWU_OMP_PRAGMA(omp simd) /* new compilers know when to use SIMD opcodes. If the compiler chose not to, and the pragma causes it to, the overhead of SIMD can cause slow downs */ /* "error: statement after '#pragma omp simd' must be a for loop" */
 #if SUSUWU_PREFER_CSTR
 		auto it = memmem(&value[0], strlen(&value[0]), &signature[0], strlen(&signature[0]));
 		if(NULL != it) {

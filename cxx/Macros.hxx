@@ -62,6 +62,12 @@
 #		define SUSUWU_OPENMP false /* `#pragma omp <directive>` can trigger `[-Wunknown-pragma]` */
 #	endif /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
 #endif /* ndef SUSUWU_OPENMP */
+#if SUSUWU_OPENMP
+#	define SUSUWU_OMP_PRAGMA(x) _Pragma(#x)
+#else /* else !SUSUWU_OPENMP */
+#	define SUSUWU_OMP_PRAGMA(x) SUSUWU_NOOP
+#endif /* else !SUSUWU_OPENMP */
+
 #ifdef __cplusplus
 #	include <cassert> /* assert static_assert */
 #	define SUSUWU_IF_CPLUSPLUS(TRUE, FALSE) TRUE
