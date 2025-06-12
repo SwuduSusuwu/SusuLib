@@ -208,7 +208,7 @@ CFLAGS_BACKUP="${CFLAGS}" #/* Allows to undo insertion of TensorFlow includes */
 CXXFLAGS_BACKUP="${CXXFLAGS}" #/* Allows to undo insertion of TensorFlow includes */
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_TENSORFLOW_ERROR}" ]; then #/* If `libtensorflow` was found */
-	SUSUWU_TENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.hxx"
+	SUSUWU_TENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.cxx"
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
 	if [ true = "${SUSUWU_TENSORFLOW_PASS}" ] || (${CXX} ${CXXFLAGS} ${FLAGS_TENSORFLOW} -c "${SUSUWU_TENSORFLOW_TEST_PATH}"); then #/* TODO: ` 2>/dev/null; then` as soon as difficult-to-parse errors such as `fatal error: "unsupported/Eigen/CXX11/Tensor' file not found" have solutions */
 		export SUSUWU_TENSORFLOW_PASS=true
