@@ -14,6 +14,7 @@
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NOOP SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW SUSUWU_WARNING */
 #ifdef SUSUWU_USE_TENSORFLOW
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
+#include SUSUWU_IF_CPLUSPLUS(<cmath>, <math.h>) /* std::abs */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #if (defined(SUSUWU_CNS_TRUE_RANDOM_INIT) && SUSUWU_CNS_TRUE_RANDOM_INIT) || ( defined(SUSUWU_CNS_HE_INIT) && SUSUWU_CNS_HE_INIT) || ( defined(SUSUWU_CNS_XAVIER_INIT) && SUSUWU_CNS_XAVIER_INIT)
 #	include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlibf.h>) /* rand() RAND_MAX */
@@ -455,7 +456,8 @@ public:
 			trainingIterations = 1000; /* TODO: use input specifics (and available host resources?) to compute best value */
 		}
 		const std::vector<std::string> outputTensors = {"loss"};
-		float bestLoss = std::numeric_limits<float>::max();
+		float bestLoss = std::numeric_limits<float>::max(),
+			bestLossAbs = std::abs(bestLoss);
 		size_t patienceCounter = 0;
 		for(size_t epoch = 0; epoch < trainingIterations; ++epoch) {
 			std::vector<tensorflow::Tensor> outputs;
@@ -485,15 +487,40 @@ public:
 				if(!status.ok()) {
 					throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setupSynapses() { const tensorflow::Status status = session->Run({{\"inputs\", inputTensor2}, {\"labels\", expectedOutputTensor2}}, {\"loss\"}, {}, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } }"));
 				}
-				lossVal = outputs[0].scalar<float>()(); /* TODO: use for eager stop */
+				lossVal = outputs[0].scalar<float>()();
 			}
-			if(lossVal < desiredLossThreshold) { break; }
-			if(lossVal < bestLoss - minLossDelta) {
+			static const size_t printoutAmount = 4; /* minimumAbs desired printouts */
+			const float lossValAbs = std::abs(lossVal);
+			bool printout = false;
+			if(printoutAmount > epoch /* logarithmic backoff, to limit amount of debug messages */
+					|| (128 > epoch && !(0xF /* 15 */ & epoch))
+					|| (32768 > epoch && !(0x7F /* 127 */ & epoch))
+					|| ((1UL << 23) > epoch && !(0x7FFF /* ((1 << 15) - 1) */ & epoch))
+					|| ((1UL << 31) > epoch && !(0x7FFFFF /* ((1 << 23) - 1) */ & epoch))
+			) {
+				printout = true;
+			}
+			if(lossValAbs < desiredLossThreshold) { break; }
+			std::string printBestLoss = ""; /* don't print, unless pathological */ /* cppcheck-suppress variableScope */
+			const float currentDelta = bestLossAbs - lossValAbs;
+			if(currentDelta > minLossDelta) {
 				bestLoss = lossVal;
+				bestLossAbs = lossValAbs;
 				patienceCounter = 0;
-			} else {
+			} else { /* Pathological */
 				patienceCounter++;
+				if(printoutAmount + patienceCounter > patience) { /* If stalled, printout the last `printoutAmount` loops. */
+					printout = true;
+					if(lossVal > bestLoss) { /* If diverging, then ... */
+						printBestLoss = "; bestLoss == " + std::to_string(bestLoss); /* ... print pre-divergence value. */
+						printBestLoss += "; currentDelta == " + std::to_string(currentDelta);
+						printBestLoss += "; minLossDelta == " + std::to_string(minLossDelta);
+					}
+				}
 				if(patienceCounter >= patience) { break; }
+			}
+			if(printout) {
+				SUSUWU_DEBUG(getName() + "::setupSynapses() { maxEpoch == " + std::to_string(trainingIterations) + "; epoch == " + std::to_string(epoch) + "; lossVal == " + std::to_string(lossVal) + printBestLoss + "; status.ToString() == \"" + status.ToString() + "\"; ... } }");
 			}
 		}
 		setupSynapsesPostProcess();
