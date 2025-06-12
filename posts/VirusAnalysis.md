@@ -3339,6 +3339,8 @@ protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-clas
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 /* NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes) */
 };
+const bool classTensorFlowCnsTests();
+static const bool classTensorFlowCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classTensorFlowCnsTests, "classTensorFlowCnsTests()"); }
 
 }; /* namespace Susuwu */
 ```
@@ -3447,6 +3449,22 @@ void TensorFlowCns::loadFrom(const ClassIoPath &modelPath) { /* TODO: the implem
 //	coefficients = /* TODO */
 	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\""+ modelPath + "\") { /* TODO; deserialize `sp` into `tensorflow::Tensor`. Use `tensorflow::SavedModelBundle` or `TF_LoadSessionFromSavedModel`? */ }"));
 #endif /* SUSUWU_TENSORFLOWCNS_MANUAL_FS */
+}
+
+const bool classTensorFlowCnsTests() {
+	return classCnsTests<TensorFlowCns, TensorFlowCns::CoefficientDefaultType>(
+#if SUSUWU_CNS_IS_VALUE_OBJECT
+			true
+#else
+			false
+#endif /* SUSUWU_CNS_IS_VALUE_OBJECT else */
+			,
+#ifdef SUSUWU_TENSORFLOWCNS_HAS_DUMPTO
+			true
+#else
+			false
+#endif /* def SUSUWU_TENSORFLOWCNS_HAS_DUMPTO else */
+			);
 }
 ```
 ******************************************
@@ -4064,8 +4082,11 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysTestsNoexcept */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* classTensorFlowCnsTestsNoexcept */
+#endif /* def SUSUWU_USE_TENSORFLOW */
 #include "ClassWebBrowse.hxx" /* classWebBrowseTestsNoexcept */
-#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_USE_TENSORFLOW */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #endif /* SUSUWU_UNIT_TESTS */
@@ -4161,6 +4182,15 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
+#	ifdef SUSUWU_USE_TENSORFLOW
+	std::cout << "classTensorFlowCnsTestsNoexcept" << std::flush;
+	if(classTensorFlowCnsTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassTensorFlowCnsBit;
+	}
+#	endif /* def SUSUWU_USE_TENSORFLOW */
 #else /* else !SUSUWU_UNIT_TESTS */
 	SUSUWU_NOTICE('`' + std::string(Susuwu::classIoGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
 #endif /* else !SUSUWU_UNIT_TESTS */

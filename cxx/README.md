@@ -43,6 +43,7 @@
 - [`./cxx/ClassCns.hxx`](./ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) is to implement this class.
   - `classCnsTests()` (template for unit tests, which subclasses shall use).
 - [`./cxx/ClassTensorFlowCns.hxx`](./cxx/ClassTensorFlowCns.hxx) is `class TensorFlowCns : public Cns` (implements `./cxx/ClassCns.hxx`). This will close [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) if [_TensorFlow_](https://github.com/tensorflow/tensorflow) passes `./build.sh` for all [supported systems](#how-to-use-this).
+  - `classTensorFlowCnsTests()`, or `classTensorFlowCnsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassResultList.hxx`](./ClassResultList.hxx) is
   - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListLoadFrom()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
   - `enum ListFormat { listFormatInitializer /* style: C or C++ */, listFormatJson /* style: Java or JavaScript */ };` format to store to (or load from) disk.

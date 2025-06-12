@@ -1,14 +1,15 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_ClassTensorFlowCns_cxx
 #define INCLUDES_cxx_ClassTensorFlowCns_cxx
-#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /* The is the most close to fit-for-use */
-#include "ClassTensorFlowCns.hxx" /* TensorFlowCns SUSUWU_CNS_USE_BIAS SUSUWU_CNS_USE_BIAS */
+//#include "ClassCns.hxx" /* classCnsTests */
 #include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassObject.hxx" /* ObjectMode */
+#include "ClassTensorFlowCns.hxx" /* classCnsTests CoefficientDefaultType TensorFlowCns SUSUWU_CNS_USE_BIAS SUSUWU_CNS_USE_BIAS */
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW */
 #ifdef SUSUWU_USE_TENSORFLOW
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string std::to_string */
+//#include "tensorflow/core/lib/core/errors.h" /* TODO: true source of `tensorflow::error::Status` */
 #include <tensorflow/core/framework/graph.pb.h> /* tensorflow::GraphDef */
 #include <tensorflow/core/framework/tensor.h> /* tensorflow::Tensor */
 #include <tensorflow/core/framework/types.h> /* tensorflow::uint64 */
@@ -126,6 +127,22 @@ void TensorFlowCns::loadFrom(const ClassIoPath &modelPath) { /* TODO: the implem
 //	coefficients = /* TODO */
 	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\""+ modelPath + "\") { /* TODO; deserialize `sp` into `tensorflow::Tensor`. Use `tensorflow::SavedModelBundle` or `TF_LoadSessionFromSavedModel`? */ }"));
 #endif /* SUSUWU_TENSORFLOWCNS_MANUAL_FS */
+}
+
+const bool classTensorFlowCnsTests() {
+	return classCnsTests<TensorFlowCns, TensorFlowCns::CoefficientDefaultType>(
+#if SUSUWU_CNS_IS_VALUE_OBJECT
+			true
+#else
+			false
+#endif /* SUSUWU_CNS_IS_VALUE_OBJECT else */
+			,
+#ifdef SUSUWU_TENSORFLOWCNS_HAS_DUMPTO
+			true
+#else
+			false
+#endif /* def SUSUWU_TENSORFLOWCNS_HAS_DUMPTO else */
+			);
 }
 
 }; /* namespace Susuwu */

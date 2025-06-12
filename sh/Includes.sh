@@ -83,7 +83,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 	SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS="-std=c++17 -DSUSUWU_USE_TENSORFLOW" #/* `./cxx/*` uses `#ifdef SUSUWU_USE_TENSORFLOW`, TensorFlow requires C++17 (for `std::optional`) */
 #	SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS_RELEASE="export TF_MLIR_ENABLE_V1_OPTIMIZATION_PASS=true" #/* TODO */
 
-	SUSUWU_INSTALL_TENSORFLOW="${SUSUWU_INSTALL_TENSORFLOW:-"${SUSUWU_IS_VIRTUAL}"}" #/* If virtual, install prerequisites for `cxx/ClassTensorFlowCns.hxx`; use `export SUSUWU_INSTALL_TENSORFLOW=false` to reduce resource use, or `export SUSUWU_INSTALL_TENSORFLOW=true` to install prerequisites on all computers (default is to avoid changes to system unless virtual) */
+	SUSUWU_INSTALL_TENSORFLOW="${SUSUWU_INSTALL_TENSORFLOW:-"${SUSUWU_IS_VIRTUAL}"}" #/* If virtual, install prerequisites for `cxx/ClassTensorFlowCns.cxx`; use `export SUSUWU_INSTALL_TENSORFLOW=false` to reduce resource use, or `export SUSUWU_INSTALL_TENSORFLOW=true` to install prerequisites on all computers (default is to avoid changes to system unless virtual) */
 	if [ -f "${0}.bash" ] && [ -n "${BASH_VERSION}" ] || [ "${0##*.}" = "bash" ]; then #/* Notice: assumes left-associative */
 		SUSUWU_INSTALL_TENSORFLOW=false #/* `SUSUWU_TEST_BASH` should not reinstall. TODO: ensure compatible (does not prevent install) with ports to `/bin/bash` */
 	fi
@@ -232,7 +232,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 
 	export TF_CPP_MIN_LOG_LEVEL=0 #/* Prints debug info to `stderr` */
 	if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_INCLUDES_LIBTENSORFLOW_ERROR}" ]; then #/* If `libtensorflow` was found */
-		SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.hxx"
+		SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH="${CXX_SOURCE_PATH}ClassTensorFlowCns.cxx"
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
 		if [ true = "${SUSUWU_INCLUDES_LIBTENSORFLOW_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "" "${SUSUWU_INCLUDES_LIBTENSORFLOW_FLAGS}" "-labsl_status -labsl_strings -labsl_base -ltensorflow_cc -ltensorflow_framework" "${SUSUWU_INCLUDES_LIBTENSORFLOW_TEST_PATH}" "To troubleshoot, use $(SUSUWU_SH_QUOTE "CODE" "cd ${TENSORFLOW_INCLUDE_PATH} && ./configure")"; then
 			export SUSUWU_INCLUDES_LIBTENSORFLOW_PASS=true
