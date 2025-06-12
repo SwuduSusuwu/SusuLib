@@ -2966,6 +2966,8 @@ protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-clas
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 /* NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes) */
 };
+const bool classTensorFlowCnsTests();
+static const bool classTensorFlowCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classTensorFlowCnsTests, "classTensorFlowCnsTests()");}
 
 }; /* namespace Susuwu */
 ```
@@ -3076,6 +3078,84 @@ void TensorFlowCns::loadFrom(const ClassIoPath &modelPath) { /* TODO: the implem
 #endif /* SUSUWU_TENSORFLOWCNS_MANUAL_FS */
 }
 
+template <typename Numeral, class Input, class Output, typename Process>
+static const bool classTensorFlowCnsTestLinear(const Input min, const Input max, const Input step, const Numeral epsilon /* For now, `epsilon` is best result known (so that regressions trigger debug messages) */, Process process) {
+	std::vector<std::tuple<Input, Output>> inputsToOutputs;
+//	 epsilon = std::numeric_limits<Numeral>::epsilon /* TODO: [compute most accurate possible values](https://github.com/copilot/share/c056538e-08c0-8822-9001-720924696114) */
+	for(Input input = min; max >= input; input += step) {
+		inputsToOutputs.push_back({input, input * 2});
+	}
+	TensorFlowCns tensorFlowCns;
+	Cns &cns = tensorFlowCns;
+	cns.setInputNeurons(1);
+	cns.setInputMode(ToObjectMode<Input>::value);
+	cns.setNeuronsPerLayer(1);
+	cns.setLayersOfNeurons(1);
+	cns.setOutputNeurons(1);
+	cns.setOutputMode(ToObjectMode<Output>::value);
+#if SUSUWU_TENSORFLOW_EXCEPTIONS
+	try {
+#endif /* SUSUWU_TENSORFLOW_EXCEPTIONS */
+		const size_t inputsCount = inputsToOutputs.size();
+		cns.setupSynapses(inputsToOutputs);
+		{
+#if SUSUWU_CNS_IS_VALUE_OBJECT /* if comparison is not limited to object addresses */
+			TensorFlowCns tensorFlowCns2 = tensorFlowCns;
+			Cns &cns2 = tensorFlowCns2;
+#endif /* SUSUWU_CNS_IS_VALUE_OBJECT */
+			assert(inputsCount == inputsToOutputs.size());
+			Output worstLoss = 0;
+			for(unsigned index = 0; inputsToOutputs.size() > index; ++index) {
+				const Output label = std::get<1>(inputsToOutputs.at(index)),
+					output = process(cns, std::get<0>(inputsToOutputs.at(index))),
+					loss = label - output,
+					absLoss = abs(loss);
+				if(absLoss > worstLoss) {
+					worstLoss = absLoss;
+				}
+				if(!(epsilon >= absLoss) /* inverted test (with `!`) catches `nan` */) {
+					throw std::runtime_error("classTensorFlowCnsTests(.min = " + std::to_string(min) + ", .max = " + std::to_string(max) + ", .step = " + std::to_string(step) + ", .epsilon == " + std::to_string(epsilon) + ") { label[" + std::to_string(index) + "] == " + std::to_string(label) + "; output[" + std::to_string(index) + "] == " + std::to_string(output) + "; loss /* label - output */ == " + std::to_string(loss) + "; if(!(abs(loss) <= epsilon)) { throw std::runtime_error; } }");
+				}
+			}
+			if(epsilon > (1 + worstLoss)) {
+				SUSUWU_DEBUG("classTensorFlowCnsTests(.min = " + std::to_string(min) + ", .max = " + std::to_string(max) + ", .step = " + std::to_string(step) + ", .epsilon == " + std::to_string(epsilon) + ") { worstLoss == " + std::to_string(worstLoss) + "; /* `(epsilon > (1 + worstLoss))`, set `epsilon = worstLoss` to detect future regressions */; }");
+			}
+
+#if SUSUWU_CNS_IS_VALUE_OBJECT /* test that `process()` follows `const` method rules, and that `equals()` and `hashCode` do what those are supposed to do */
+			assert(cns.equals(cns2));
+			assert(cns.hashCode() == cns2.hashCode());
+#endif /* SUSUWU_CNS_IS_VALUE_OBJECT */
+		}
+
+#ifdef SUSUWU_TENSORFLOWCNS_HAS_DUMPTO /* TODO: implement `dumpTo()` and `loadFrom()`, remove `cppcheck-suppress knownConditionTrueFalse`. */
+		TensorFlowCns tensorFlowCns2 = tensorFlowCns;
+		Cns &cns2 = tensorFlowCns2;
+		const ClassIoPath dumpToPath = "classTensorFlowCnsTests.tmp"; /* TODO: if file exists, ask user what to do? TODO: use system temp path? */
+		cns.dumpTo(dumpToPath);
+		cns2.loadFrom(dumpToPath);
+//		classIoRemove(dumpToPath); /* TODO: does our IO library have a function for file removal? Perhaps there is some `fopen` flag to use instead, which causes removal as soon as the file is closed?  */
+		assert(cns.equals(cns2));
+		assert(cns.hashCode() == cns2.hashCode()); /* cppcheck-suppress knownConditionTrueFalse */
+#endif /* else ndef SUSUWU_TENSORFLOWCNS_HAS_DUMPTO */
+
+#if SUSUWU_TENSORFLOW_EXCEPTIONS
+	} catch(const tensorflow::error::Status &w) {
+		(void) /* TODO */
+	}
+#endif /* SUSUWU_TENSORFLOW_EXCEPTIONS */
+	return true;
+}
+const bool classTensorFlowCnsTests() {
+	std::function<const float(const Cns &, const float)> processToFloatLambda = [](const Cns &cns, const float x) { return cns.processToFloat(x); };
+	std::function<const int(const Cns &, const int)> processToIntLambda = [](const Cns &cns, const int x) { return cns.processToInt(x); };
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1.0, 1.0, 0.001, /* 0.072094 ... */ 0.1180462, processToFloatLambda); /* "normalization" (average == 0, std == 1), most simple to learn */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1000.0, 1000.0, 1.0, /* 70.774782 ... */ 107.8262, processToFloatLambda); /* (average == 0, std == 1000) */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2.0, 0.001, /* 0.072054 ... */ 0.118012, processToFloatLambda); /* (average == 1, std == 1) */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2000.0, 1.0, /* 70.698730 ... */ 117.921631, processToFloatLambda); /* (average == 1000, std == 1000) */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 2242, processToIntLambda);
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 2552, processToIntLambda);
+	return true;
+}
 ```
 
 `less `[`cxx/VirusAnalysis.hxx`](../cxx/VirusAnalysis.hxx)

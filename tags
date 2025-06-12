@@ -667,7 +667,6 @@ SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^	SUSUWU_TEMPLATE_WORKAROUND(char)$
 SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^#	define SUSUWU_TEMPLATE_WORKAROUND(/;"	d
 SUSUWU_TENSORFLOWCNS_INIT_SCOPE	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /;"	d
 SUSUWU_TENSORFLOWCNS_LOGITS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
-SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	cxx/ClassTensorFlowCns.cxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d	file:
 SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d
 SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM /;"	d
 SUSUWU_TEST_BASH	sh/Macros.sh	/^SUSUWU_TEST_BASH() ( #\/* Usage: `s\/exit ${STATUS}\/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?;/;"	f
@@ -840,6 +839,8 @@ __anon73fa30250202	cxx/VirusAnalysis.cxx	/^		auto lambdaScanExecv = [](const cha
 __anon8f7309390111	cxx/ClassResultList.cxx	/^namespace { \/* [misc-use-anonymouse-namespace] *\/$/;"	n	namespace:Susuwu	file:
 __anon8f731e7e0102	cxx/ClassResultList.hxx	/^		auto result = std::search(value.cbegin(), value.cend(), itBegin, itEnd, [](char chValue, char /;"	f	function:Susuwu::listFindSubstr	file:
 __anon8f731e7e0202	cxx/ClassResultList.hxx	/^		auto it = std::search(x, s.cend(), token.cbegin(), token.cend(), [](char ch1, char ch2) { retu/;"	f	function:Susuwu::explodeToList	file:
+__anon971bc8150102	cxx/ClassTensorFlowCns.cxx	/^	std::function<const float(const Cns &, const float)> processToFloatLambda = [](const Cns &cns, /;"	f	function:Susuwu::classTensorFlowCnsTests	file:
+__anon971bc8150202	cxx/ClassTensorFlowCns.cxx	/^	std::function<const int(const Cns &, const int)> processToIntLambda = [](const Cns &cns, const /;"	f	function:Susuwu::classTensorFlowCnsTests	file:
 __anona3432b6d0111	cxx/Macros.cxx	/^namespace { \/* [misc-use-anonymous-namespace] *\/$/;"	n	namespace:Susuwu	file:
 __anoncf2b51e20103	c/rfc6234/sha.h	/^enum {$/;"	g
 __anoncf2b51e20203	c/rfc6234/sha.h	/^enum {$/;"	g
@@ -932,6 +933,9 @@ classSysSetRoot	cxx/ClassSys.cxx	/^const bool classSysSetRoot(bool root) {$/;"	f
 classSysTests	cxx/ClassSys.cxx	/^const bool classSysTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classSysTestsNoexcept	cxx/ClassSys.hxx	/^static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSysTest/;"	f	namespace:Susuwu	typeref:typename:const bool
 classSysUSecondClock	cxx/ClassSys.hxx	/^inline const ClassSysUSeconds classSysUSecondClock() {$/;"	f	namespace:Susuwu	typeref:typename:const ClassSysUSeconds
+classTensorFlowCnsTestLinear	cxx/ClassTensorFlowCns.cxx	/^static const bool classTensorFlowCnsTestLinear(const Input min, const Input max, const Input ste/;"	f	namespace:Susuwu	typeref:typename:const bool	file:
+classTensorFlowCnsTests	cxx/ClassTensorFlowCns.cxx	/^const bool classTensorFlowCnsTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
+classTensorFlowCnsTestsNoexcept	cxx/ClassTensorFlowCns.hxx	/^static const bool classTensorFlowCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(cla/;"	f	namespace:Susuwu	typeref:typename:const bool
 classTestsCommutative	cxx/ClassObject.cxx	/^static const bool classTestsCommutative(const Class *class1, const Class *class2) { \/* TODO: ca/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
 classTestsMatch	cxx/ClassObject.cxx	/^static const bool classTestsMatch(const Class *class1, const Class *class2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
 classTestsMismatch	cxx/ClassObject.cxx	/^static const bool classTestsMismatch(const Class *class1, const Class *class2) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
@@ -1224,6 +1228,7 @@ susuwuUnitTestsClassObjectBit	cxx/main.hxx	/^static const int susuwuUnitTestsCla
 susuwuUnitTestsClassResultListBit	cxx/main.hxx	/^static const int susuwuUnitTestsClassResultListBit =$/;"	v	typeref:typename:const int
 susuwuUnitTestsClassSha2Bit	cxx/main.hxx	/^static const int susuwuUnitTestsClassSha2Bit =$/;"	v	typeref:typename:const int
 susuwuUnitTestsClassSysBit	cxx/main.hxx	/^static const int susuwuUnitTestsClassSysBit =$/;"	v	typeref:typename:const int
+susuwuUnitTestsClassTensorFlowCnsBit	cxx/main.hxx	/^static const int susuwuUnitTestsClassTensorFlowCnsBit =$/;"	v	typeref:typename:const int
 susuwuUnitTestsConsoleBit	cxx/main.hxx	/^static const int susuwuUnitTestsConsoleBit =$/;"	v	typeref:typename:const int
 susuwuUnitTestsMacrosBit	cxx/main.hxx	/^static const int susuwuUnitTestsMacrosBit =$/;"	v	typeref:typename:const int
 susuwuUnitTestsVirusAnalysisBit	cxx/main.hxx	/^static const int susuwuUnitTestsVirusAnalysisBit =$/;"	v	typeref:typename:const int

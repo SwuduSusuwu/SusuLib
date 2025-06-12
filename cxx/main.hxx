@@ -26,6 +26,8 @@ static const int susuwuUnitTestsVirusAnalysisBit =
 	1 << 7; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit =
 	1 << 8; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
+static const int susuwuUnitTestsClassTensorFlowCnsBit =
+	1 << 9; /* 512: `ClassTensorFlowCns.hxx:classTensorFlowCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 #ifdef __cplusplus

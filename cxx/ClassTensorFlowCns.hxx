@@ -7,7 +7,8 @@
 #include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassNumeral.hxx" /* numeralDenormalization() numeralNormalization() NumeralNormalizers::fromTuple */
 #include "ClassObject.hxx" /* ObjectMode ToObjectMode SUSUWU_PURE_VIRTUAL_DEFAULTS() */
-#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NOOP SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW SUSUWU_WARNING */
+#include "ClassSys.hxx" /* templateCatchAll */
+#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NOOP SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW SUSUWU_WARNING */
 #ifdef SUSUWU_USE_TENSORFLOW
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -574,6 +575,8 @@ protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-clas
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 /* NOLINTEND(cppcoreguidelines-non-private-member-variables-in-classes) */
 };
+const bool classTensorFlowCnsTests();
+static const bool classTensorFlowCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classTensorFlowCnsTests, "classTensorFlowCnsTests()");}
 
 }; /* namespace Susuwu */
 #endif /* def SUSUWU_USE_TENSORFLOW */
