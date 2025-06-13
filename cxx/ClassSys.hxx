@@ -86,13 +86,15 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 }
 
 template<typename Func, typename... Args>
-auto templateCatchAll(Func func, const std::string &funcName, Args... args) -> const decltype(func(args...)) {
+auto templateCatchAll(Func func, const std::string &funcName, Args... args) SUSUWU_NOEXCEPT -> const decltype(func(args...)) {
 	try {
 		return func(args...);
-	} catch (const std::exception &ex) {
-		SUSUWU_ERROR(funcName + " {throw std::exception(\"" + ex.what() + "\");}");
-		return decltype(func(args...))(); /* `func(args...)`'s default return value; if `int func(args...)`, `return 0;`. If `bool func(args...)`, `return false;` */
+	} catch (const std::exception &w) {
+		SUSUWU_ERROR(funcName + " { throw std::exception(\"" + w.what() + "\"); }");
+	} catch (...) { /* "error: Exception thrown in function declared not to throw exceptions. [throwInNoexceptFunction]" fix */
+		SUSUWU_ERROR(funcName + " { throw ??? /* unknown; not derivative of std::exception */; }");
 	}
+	return decltype(func(args...))(); /* `func(args...)`'s default return value; if `int func(args...)`, `return 0;`. If `bool func(args...)`, `return false;` */
 }
 
 #if SUSUWU_UNIT_TESTS
