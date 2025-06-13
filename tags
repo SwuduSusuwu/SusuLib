@@ -437,10 +437,12 @@ SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CLASS_
 SUSUWU_CLASS_OVERRIDE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_OVERRIDE /;"	d
 SUSUWU_CLEAN_OUTPUT	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT() { #\/* Usage: `SUSUWU_REBUILD_OUTPUT "Reason to clean" *\/$/;"	f
 SUSUWU_CLEAN_OUTPUT_IMPL	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT_IMPL() ( #\/* Usage: `SUSUWU_CLEAN_OUTPUT_IMPL "Reason to clean" "postscript/;"	f
+SUSUWU_CNS_IF_MLP	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_MLP(/;"	d
 SUSUWU_CNS_LOCAL_COEFFICIENTS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_LOCAL_COEFFICIENTS /;"	d
 SUSUWU_CNS_MODE_ENUM	cxx/ClassCns.hxx	/^#define SUSUWU_CNS_MODE_ENUM /;"	d
 SUSUWU_CNS_SEPARATE_NORMS	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SEPARATE_NORMS /;"	d
 SUSUWU_CNS_SETUP_SYNAPSES	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SETUP_SYNAPSES(/;"	d
+SUSUWU_CNS_USE_MLP	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
 SUSUWU_CNS_VALUE_SEMANTICS	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_VALUE_SEMANTICS /;"	d
 SUSUWU_COMMA	cxx/Macros.hxx	/^#define SUSUWU_COMMA /;"	d
 SUSUWU_COMPILE_COMMAND	sh/make.sh	/^SUSUWU_COMPILE_COMMAND() { #\/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command/;"	f
