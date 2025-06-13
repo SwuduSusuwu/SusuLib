@@ -37,6 +37,16 @@
 #ifndef SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM
 #	define SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM false
 #endif /* ndef SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM */
+/* NOLINTBEGIN(cppcoreguidelines-macro-usage) */
+#ifndef SUSUWU_CNS_USE_MLP
+#	define SUSUWU_CNS_USE_MLP false /* Multiple-Layer-Perceptron mode. No reason to disable this (if `1 == layersOfNeurons`, `setupSynapses()` and `processTo*()` act as Single-Layer-Perceptrons), but for now is TODO */
+#endif /* ndef SUSUWU_CNS_USE_MLP */
+#if SUSUWU_CNS_IF_MLP
+# define SUSUWU_CNS_IF_MLP(THEN, ELSE) THEN
+#else /* else !SUSUWU_CNS_USE_MLP */
+# define SUSUWU_CNS_IF_MLP(THEN, ELSE) ELSE
+#endif /* else !SUSUWU_CNS_USE_MLP */
+/* NOLINTEND(cppcoreguidelines-macro-usage) */
 
 namespace Susuwu {
 typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } /* `decltype(tensorflow::ops::SoftmaxCrossEntropyWithLogits(tensorflow::Scope::NewRootScope(), tensorflow::ops::Add, tensorflow::ops::Placeholder))`? */ TensorFlowCnsLoss;
@@ -226,6 +236,10 @@ public:
 					SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
 	}
 
+#if SUSUWU_CNS_IF_MLP
+#	pragma message("TODO: `SUSUWU_TENSORFLOWCNS_LOGITS` loop for `SUSUWU_CNS_USE_MLP`")
+//	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
+#endif /* SUSUWU_CNS_IF_MLP */
 #define SUSUWU_TENSORFLOWCNS_LOGITS tensorflow::ops::MatMul(root.WithOpName("logits"), input, coefficientsVar)
 #define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /* Simple (1 dense layer) inference model. TODO: [choose how to implement `layersOfNeurons`](https://github.com/copilot/share/427f408e-08e0-8c80-9151-f24920212857) */\
 		const auto inputDim = static_cast<DimSz>(inputNeurons), outputDim = static_cast<DimSz>(outputNeurons); /* TODO: assert `1` for base types? */ \
@@ -272,6 +286,10 @@ public:
 		/* Scaled grads (`ApplyGradientDescent`'s `delta` = `grad / scale`) */
 		auto gradCoefficientsScaled = tensorflow::ops::Multiply(root, gradCoefficients, scale);
 
+#if SUSUWU_CNS_IF_MLP
+#	pragma message("TODO: `ApplyGradientDescent` loop for `SUSUWU_CNS_USE_MLP`")
+//	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
+#endif /* SUSUWU_CNS_IF_MLP */
 	//		auto optimizer = tensorflow::ops::ApplyAdam(root, coefficientsVar, learningFactor); /* TODO? Heard this is just part of the Python TensorFlow */
 //		auto optimizer = tensorflow::ops::AdamOptimizer(learningFactor); /* TODO? */
 		auto optimizerCoefficients = tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients"), coefficientsVar, learningFactor, gradCoefficientsScaled /* gradients[0] */); /* TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */

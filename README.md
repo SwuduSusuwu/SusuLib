@@ -185,6 +185,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
   - Unstable/`preview` flags:
     - `-DSUSUWU_CNS_LOCAL_COEFFICIENTS=true` to have derivatives of `class Cns` store the connectome as part of the class, even if external libs (such as [_TensorFlow_](https://github.com/tensorflow/tensorflow)) also store the connectome.
+    - `-DSUSUWU_CNS_USE_MLP=true` to enable _Multiple-Layer-Perceptron_ mode (TODO: implement this). Default is `=false` (_Single-Layer-Perceptron_ mode).
     - `-DSUSUWU_TENSORFLOW_HAS_DATATYPETOENUM=true` to use [`tensorflow::DataTypeToEnum`](https://github.com/tensorflow/tensorflow/issues/30828#issuecomment-3039819975). Default is `=false` (implement `Susuwu::DataTypeToEnum`.)
     - `-DSUSUWU_EXPERIMENTAL` to enable `preview` (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch preview` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
