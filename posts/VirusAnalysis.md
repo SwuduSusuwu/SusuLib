@@ -2804,7 +2804,7 @@ typedef class ApxrCns : Cns {
 #ifndef SUSUWU_CNS_USE_MLP
 #	define SUSUWU_CNS_USE_MLP false /* Multiple-Layer-Perceptron mode. No reason to disable this (if `1 == layersOfNeurons`, `setupSynapses()` and `processTo*()` act as Single-Layer-Perceptrons), but for now is TODO */
 #endif /* ndef SUSUWU_CNS_USE_MLP */
-#if SUSUWU_CNS_IF_MLP
+#if SUSUWU_CNS_USE_MLP
 # define SUSUWU_CNS_IF_MLP(THEN, ELSE) THEN
 #else /* else !SUSUWU_CNS_USE_MLP */
 # define SUSUWU_CNS_IF_MLP(THEN, ELSE) ELSE
@@ -3038,10 +3038,10 @@ public:
 					SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
 	}
 
-#if SUSUWU_CNS_IF_MLP
+#if SUSUWU_CNS_USE_MLP
 #	pragma message("TODO: `SUSUWU_TENSORFLOWCNS_LOGITS` loop for `SUSUWU_CNS_USE_MLP`")
 //	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
-#endif /* SUSUWU_CNS_IF_MLP */
+#endif /* SUSUWU_CNS_USE_MLP */
 #if SUSUWU_CNS_USE_BIAS
 #	define SUSUWU_TENSORFLOWCNS_LOGITS tensorflow::ops::Add(root.WithOpName("logits"), tensorflow::ops::MatMul(root, input, coefficientsVar), biasesVar)
 #else /* !SUSUWU_CNS_USE_BIAS */
@@ -3129,10 +3129,10 @@ public:
 		SUSUWU_CNS_IF_BIAS(auto gradBiasesScaled = tensorflow::ops::Multiply(root, gradBiases, scale);) /* use same scale as above */
 #endif /* def TENSORFLOW_HAS_GRADIENTTAPE */
 
-#if SUSUWU_CNS_IF_MLP
+#if SUSUWU_CNS_USE_MLP
 #	pragma message("TODO: `ApplyGradientDescent` loop for `SUSUWU_CNS_USE_MLP`")
 //	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
-#endif /* SUSUWU_CNS_IF_MLP */
+#endif /* SUSUWU_CNS_USE_MLP */
 	//		auto optimizer = tensorflow::ops::ApplyAdam(root, coefficientsVar, SUSUWU_CNS_IF_BIAS(biasesVar SUSUWU_COMMA), learningFactor); /* TODO? Heard this is just part of the Python TensorFlow */
 //		auto optimizer = tensorflow::ops::AdamOptimizer(learningFactor); /* TODO? */
 		auto optimizerCoefficients = tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients"), coefficientsVar, learningFactor, gradCoefficientsScaled /* gradients[0] */); /* TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */
