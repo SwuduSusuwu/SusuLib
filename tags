@@ -441,6 +441,7 @@ SUSUWU_CNS_IF_BIAS	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_BIAS(/;"	
 SUSUWU_CNS_IF_MLP	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_MLP(/;"	d
 SUSUWU_CNS_LOCAL_COEFFICIENTS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_LOCAL_COEFFICIENTS /;"	d
 SUSUWU_CNS_MODE_ENUM	cxx/ClassCns.hxx	/^#define SUSUWU_CNS_MODE_ENUM /;"	d
+SUSUWU_CNS_SEPARATE_NORMS	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SEPARATE_NORMS /;"	d
 SUSUWU_CNS_SETUP_SYNAPSES	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SETUP_SYNAPSES(/;"	d
 SUSUWU_CNS_USE_BIAS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_BIAS /;"	d
 SUSUWU_CNS_USE_MLP	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
@@ -661,6 +662,7 @@ SUSUWU_STR_TOKEN_LAST	sh/Macros.sh	/^SUSUWU_STR_TOKEN_LAST() ( #\/* Usage: `SUSU
 SUSUWU_SUBCLASS_OPERATOREQUALTO	cxx/ClassObject.hxx	/^#define SUSUWU_SUBCLASS_OPERATOREQUALTO(SUBCLASS) bool operator==(const SUBCLASS &obj) const SUS/;"	d
 SUSUWU_SUCCESS	cxx/Macros.hxx	/^#define SUSUWU_SUCCESS(/;"	d
 SUSUWU_SUCCESS_EXECUTE	cxx/Macros.hxx	/^#define SUSUWU_SUCCESS_EXECUTE(/;"	d
+SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^	SUSUWU_TEMPLATE_WORKAROUND(char)$/;"	f	class:Susuwu::Cns	typeref:typename:bool
 SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^#	define SUSUWU_TEMPLATE_WORKAROUND(/;"	d
 SUSUWU_TENSORFLOWCNS_INIT_SCOPE	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /;"	d
 SUSUWU_TENSORFLOWCNS_LOGITS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
@@ -1011,6 +1013,7 @@ initScopeRootForward	cxx/ClassTensorFlowCns.hxx	/^	void initScopeRootForward(ten
 initialized	cxx/ClassCns.hxx	/^	bool initialized = false;$/;"	m	class:Susuwu::Cns	typeref:typename:bool
 inputMode	cxx/ClassCns.hxx	/^	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:ObjectMode
 inputNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
+inputNormsStorage	cxx/ClassCns.hxx	/^	NumeralNormalizers inputNormsStorage; \/* store inputNorms which `setupSynapses` ("training" \//;"	m	class:Susuwu::Cns	typeref:typename:NumeralNormalizers
 instanceof	cxx/ClassObject.hxx	/^SUSUWU_INLINE const bool instanceof(const Class &obj, const Class &thiso) { return thiso.isInsta/;"	f	namespace:Susuwu	typeref:typename:SUSUWU_INLINE const bool
 int_least16_t	c/rfc6234/stdintexample.h	/^typedef short int_least16_t;            \/* integer of >= 16 bits *\/$/;"	t	typeref:typename:short
 int_least32_t	c/rfc6234/stdintexample.h	/^typedef int int_least32_t;              \/* integer of >= 32 bits *\/$/;"	t	typeref:typename:int
@@ -1105,6 +1108,8 @@ operator NumeralNormalizers	cxx/ClassNumeral.hxx	/^	explicit operator NumeralNor
 operator |	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 outputMode	cxx/ClassCns.hxx	/^	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:ObjectMode
 outputNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
+outputNorms	cxx/ClassCns.hxx	/^	const NumeralNormalizers &outputNorms() const {$/;"	f	class:Susuwu::Cns	typeref:typename:const NumeralNormalizers &
+outputNormsStorage	cxx/ClassCns.hxx	/^	NumeralNormalizers outputNormsStorage; \/* separate normalization factors for "labels" (for exp/;"	m	class:Susuwu::Cns	typeref:typename:NumeralNormalizers
 owner	cxx/ClassIo.hxx	/^    using owner = Resource; \/* Wraps pointers; [cppcoreguidelines-owning-memory] fix. *\/$/;"	t	namespace:gsl	typeref:typename:Resource
 passList	cxx/VirusAnalysis.cxx	/^ResultList passList, abortList; \/* hosts produce, clients initialize shared clones of this from/;"	v	namespace:Susuwu	typeref:typename:ResultList
 path	cxx/ClassPortableExecutable.hxx	/^	const ClassIoPath path; \/* Suchas "C:\\Program.exe" or "\/usr\/bin\/library.so" *\/ \/* NOLINT/;"	m	class:Susuwu::PortableExecutable	typeref:typename:const ClassIoPath
