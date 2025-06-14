@@ -2329,7 +2329,21 @@ public:
 	SUSUWU_TEMPLATE_WORKAROUND(std::string)
 #	undef SUSUWU_TEMPLATE_WORKAROUND
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
+	const NumeralNormalizers &inputNorms() const {
+		return inputNormsStorage;
+	}
+	const NumeralNormalizers &outputNorms() const {
+#if SUSUWU_CNS_SEPARATE_NORMS
+		return outputNormsStorage;
+#else /* else !SUSUWU_CNS_SEPARATE_NORMS */
+		return inputNormsStorage;
+#endif /* !SUSUWU_CNS_SEPARATE_NORMS */
+	}
 private:
+	NumeralNormalizers inputNormsStorage; /* store inputNorms which `setupSynapses` ("training" / backpropagation) used, so that `processTo*` ("inference" / forwardpropagation) can reuse those */
+#if SUSUWU_CNS_SEPARATE_NORMS
+	NumeralNormalizers outputNormsStorage; /* separate normalization factors for "labels" (for expected output values) */
+#endif /* !SUSUWU_CNS_SEPARATE_NORMS */
 	bool initialized = false;
 	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;
 	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
