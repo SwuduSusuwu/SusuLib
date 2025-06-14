@@ -251,6 +251,10 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 			LDFLAGS="${LDFLAGS_BACKUP}" #/* Undo insertions. */
 			SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 #			${SUSUWU_USED_ML_DTYPES_SED} && find "${XLA_SOURCE_PATH}" -type f -exec sed "s|\"${ML_DTYPES_FALLBACK_PREFIX}|\"${ML_DTYPES_PREFIX}|" -i'' {} + # [error: 'ml_dtypes/include/float8.h' file not found](https://github.com/tensorflow/tensorflow/issues/93130) fix. #TODO: exclude 'third_party/xla/xla/tsl/platform/resource_loader.h'
+			if [ true = "${SUSUWU_ABORT_ON_FIRST_ERROR}" ]; then
+				SUSUWU_PRINT "$0" "$(SUSUWU_SH_ERROR)" "[Due to $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_QUOTE "CURRENT" "--abort-on-first-error")"), this is fatal.]"
+				exit 1
+			fi
 		fi
 	fi
 	return 1 #/* "error", false */

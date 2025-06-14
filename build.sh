@@ -56,6 +56,9 @@ SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 
 if [ -n "${GITHUB_ACTIONS}" ]; then
+	if SUSUWU_IS_PREVIEW "${THIS_DEFAULT_BRANCH}"; then #/* Super active, so ... */
+		export SUSUWU_ABORT_ON_FIRST_ERROR=true #/* ... if there are errors don't waste resources on full build. */
+	fi
 	export SUSUWU_IS_VIRTUAL=true #/* `build.sh` is executed through [GitHub Workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: `|| <test for other amnesiac environments, such as Docker>` */
 else
 	export SUSUWU_IS_VIRTUAL=false
