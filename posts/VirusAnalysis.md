@@ -3080,6 +3080,7 @@ void TensorFlowCns::loadFrom(const ClassIoPath &modelPath) { /* TODO: the implem
 
 template <typename Numeral, class Input, class Output, typename Process>
 static const bool classTensorFlowCnsTestLinear(const Input min, const Input max, const Input step, const Numeral epsilon /* For now, `epsilon` is best result known (so that regressions trigger debug messages) */, Process process) {
+	bool success = true;
 	std::vector<std::tuple<Input, Output>> inputsToOutputs;
 //	 epsilon = std::numeric_limits<Numeral>::epsilon /* TODO: [compute most accurate possible values](https://github.com/copilot/share/c056538e-08c0-8822-9001-720924696114) */
 	for(Input input = min; max >= input; input += step) {
@@ -3114,7 +3115,9 @@ static const bool classTensorFlowCnsTestLinear(const Input min, const Input max,
 					worstLoss = absLoss;
 				}
 				if(!(epsilon >= absLoss) /* inverted test (with `!`) catches `nan` */) {
-					throw std::runtime_error("classTensorFlowCnsTests(.min = " + std::to_string(min) + ", .max = " + std::to_string(max) + ", .step = " + std::to_string(step) + ", .epsilon == " + std::to_string(epsilon) + ") { label[" + std::to_string(index) + "] == " + std::to_string(label) + "; output[" + std::to_string(index) + "] == " + std::to_string(output) + "; loss /* label - output */ == " + std::to_string(loss) + "; if(!(abs(loss) <= epsilon)) { throw std::runtime_error; } }");
+					/* throw std::runtime_error */SUSUWU_WARNING("classTensorFlowCnsTests(.min = " + std::to_string(min) + ", .max = " + std::to_string(max) + ", .step = " + std::to_string(step) + ", .epsilon == " + std::to_string(epsilon) + ") { label[" + std::to_string(index) + "] == " + std::to_string(label) + "; output[" + std::to_string(index) + "] == " + std::to_string(output) + "; loss /* label - output */ == " + std::to_string(loss) + "; if(!(abs(loss) <= epsilon)) { throw std::runtime_error; } }");
+//					return false; /* abort on first warning */
+					success = false; /* so all warnings show */
 				}
 			}
 			if(epsilon > (1 + worstLoss)) {
@@ -3143,18 +3146,19 @@ static const bool classTensorFlowCnsTestLinear(const Input min, const Input max,
 		(void) /* TODO */
 	}
 #endif /* SUSUWU_TENSORFLOW_EXCEPTIONS */
-	return true;
+	return success;
 }
 const bool classTensorFlowCnsTests() {
+	bool success = true;
 	std::function<const float(const Cns &, const float)> processToFloatLambda = [](const Cns &cns, const float x) { return cns.processToFloat(x); };
 	std::function<const int(const Cns &, const int)> processToIntLambda = [](const Cns &cns, const int x) { return cns.processToInt(x); };
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1.0, 1.0, 0.001, /* 0.072094 ... */ 0.1180462, processToFloatLambda); /* "normalization" (average == 0, std == 1), most simple to learn */
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1000.0, 1000.0, 1.0, /* 70.774782 ... */ 107.8262, processToFloatLambda); /* (average == 0, std == 1000) */
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2.0, 0.001, /* 0.072054 ... */ 0.118012, processToFloatLambda); /* (average == 1, std == 1) */
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2000.0, 1.0, /* 70.698730 ... */ 117.921631, processToFloatLambda); /* (average == 1000, std == 1000) */
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 2242, processToIntLambda);
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 2552, processToIntLambda);
-	return true;
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1.0, 1.0, 0.001, /* 0.072094 ... */ 0.1180462, processToFloatLambda) || (success = false); /* "normalization" (average == 0, std == 1), most simple to learn */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1000.0, 1000.0, 1.0, /* 70.774782 ... */ 107.8262, processToFloatLambda) || (success = false); /* (average == 0, std == 1000) */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2.0, 0.001, /* 0.072054 ... */ 0.118012, processToFloatLambda) || (success = false); /* (average == 1, std == 1) */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2000.0, 1.0, /* 70.698730 ... */ 117.921631, processToFloatLambda) || (success = false); /* (average == 1000, std == 1000) */
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 2242, processToIntLambda) || (success = false);
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 2552, processToIntLambda) || (success = false);
+	return success;
 }
 ```
 
