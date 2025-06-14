@@ -36,6 +36,9 @@ C_SOURCE_PATH="./c/" #/* Usage: replace with directory root for _C_ source code 
 CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source code */
 
 if [ -n "${GITHUB_ACTIONS}" ]; then
+	if SUSUWU_IS_PREVIEW "${THIS_DEFAULT_BRANCH}"; then #/* Super active, so ... */
+		SUSUWU_ABORT_ON_FIRST_ERROR=true #/* ... if there are errors don't waste resources on full build. */
+	fi
 	SUSUWU_IS_VIRTUAL=true #/* `build.sh` is executed through [GitHub Workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: `|| <test for other amnesiac environments, such as Docker>` */
 else
 	SUSUWU_IS_VIRTUAL=false
@@ -227,6 +230,10 @@ if [ -n "${TENSORFLOW_INCLUDE_PATH}" ] && ! [ true = "${SUSUWU_TENSORFLOW_ERROR}
 		SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${CXXFLAGS} ${SUSUWU_TENSORFLOW_TEST_PATH}") failed, will not enable $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${FLAGS_TENSORFLOW}\"") (skipped). If $(SUSUWU_SH_QUOTE "CODE" "libtensorflow") is installed, insert $(SUSUWU_SH_QUOTE "CODE" "${FLAGS_TENSORFLOW}") into $(SUSUWU_SH_QUOTE "CODE" "$0:FLAGS_USER"). To troubleshoot, use $(SUSUWU_SH_QUOTE "CODE" "cd ${TENSORFLOW_INCLUDE_PATH} && ./configure")"
 #		${SUSUWU_USED_ML_DTYPES_SED} && find "${XLA_SOURCE_PATH}" -type f -exec sed "s|\"${ML_DTYPES_FALLBACK_PREFIX}|\"${ML_DTYPES_PREFIX}|" -i'' {} + # [error: 'ml_dtypes/include/float8.h' file not found](https://github.com/tensorflow/tensorflow/issues/93130) fix. #TODO: exclude 'third_party/xla/xla/tsl/platform/resource_loader.h'
+		if [ true = ${SUSUWU_ABORT_ON_FIRST_ERROR} ]; then
+			SUSUWU_PRINT "$0" "$(SUSUWU_SH_ERROR)" "[Due to $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_QUOTE "CURRENT" "--abort-on-first-error")"), this is fatal.]"
+			exit 1
+		fi
 	fi
 fi
 SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
