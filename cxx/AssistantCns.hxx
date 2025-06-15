@@ -58,21 +58,9 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 
 
 /* Related to this:
- * To process fast (lag less,) use flags which auto-vectorizes/auto-parallelizes; To do `produceAssistantCns` fast, use TensorFlow's `MapReduce`;
- * https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops
- *
- * Alternative CNS's;
- * https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural
- *
- * Autonomous robots (includes responses to replies from lots of forums);
- * https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous
- *
- * Simple examples of CNS as virus analysis;
- * https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners
- *
- * Due to understanding of human's consciousness, could undo problems of overpopulation and food shortages, if lots of us become uploads of consciousness (as opposed to below article of how to move whole CNS to robots);
- * https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont
- * https://swudususuwu.substack.com/p/destructive-unreversible-upload-of
+ * [How to: throughput improved](https://github.com/SwuduSusuwu/SusuLib/blob/experimental/posts/SimdGpgpuTpu.md) [2](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
+ * [Alternative CNS's architectures](https://github.com/SwuduSusuwu/SusuLib/blob/experimental/posts/AlbatrossCNS.md) [2](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural)
+ * [`cnsVirusFix` is close to assistants](https://github.com/SwuduSusuwu/SusuLib/blob/preview/posts/VirusAnalysis.md#comparison-to-assistants) [2](https://swudususuwu.substack.com/p/howto-improve-virus-analysis?utm_source=publication-search#%C2%A7comparison-to-assistants) (demo; `#include "AssistantCns.hxx"`)
  */
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_AssistantCns_hxx */

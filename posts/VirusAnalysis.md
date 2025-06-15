@@ -1,5 +1,7 @@
+
 **Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved**
 \[This post [from _SubStack_](https://swudususuwu.substack.com/p/howto-improve-virus-analysis) allows [all uses](https://creativecommons.org/licenses/by/2.0/).\]
+
 # Table of Contents
 - [Intro](#intro)
 - [Source code](#source-code)
@@ -8,6 +10,7 @@
   - [Neural resources](#neural-resources)
 - [Synopsis + related posts](#synopsis--related-posts)
 - [Sponsor this](../README.md#sponsor)
+
 # Intro
 Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executables** (secures all app launches,) but after first launch: **caches** reduce this to **less than 1ms** (just cost to compute `caches.at(classSha2(ClassIoBytecode()))`, where `caches` is `std::map<ResultListHash, VirusAnalysisResult>` or `ResultList::hashes`).
 
@@ -2805,8 +2808,10 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 /* `clang-tidy` on: NOLINTEND(hicpp-signed-bitwise, readability-simplify-boolean-expr) */
 #endif /* ndef INCLUDES_cxx_main_cxx */
 ```
+
 # Comparison to assistants
-For comparison; `produceVirusFixCns()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)" or _Anthropic_'s "[_Assistant_](https://poe.com/Assistant)";) have such demo as `produceAssistantCns()`;
+For comparison; `produceVirusFixCns()` with `cnsVirusFix()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])" or _Anthropic_'s "[_Claude-3-Haiku_](https://poe.com/Claude-3-Haiku)"), since all of them are general use artificial neural tissues which trains on couples of problems (questions, or programs infected with viruses) which map to solutions (answers, or original programs) to learn how to compute such solutions (for new problems) on their own.
+Have used `class Cns` to implement assistant demo through `produceAssistantCns()`, `assistantCnsProcess()` and  `assistantCnsLoopProcess()`:
 `less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```c++
 /* (Work-in-progress) assistant bots with artificial CNS. */
@@ -3015,6 +3020,7 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */)
 	}
 }
 ```
+
 # Post, with resources
 **Hash resources:**
 Hash is just a checksum (such as [Sha-2](https://wikipedia.org/wiki/Sha-2)) of all sample inputs, which maps to "this passes" (or "this does not pass".)
@@ -3070,7 +3076,7 @@ Just as (if humans grew trillions of neurons plus thousands of layers of cortice
   - outputs = EOF/null (if is infection that can not revert to fresh executables,) or else outputs = fresh executables;
 - To setup synapses, must have access to huge sample databases (such as _Virustotal_'s access.)
 
-_Github_ [has lots of _FLOSS_ simulators of neural tissue](https://github.com/topics/artificial-neural-network) which have uses to program virus analysis tools (or assistants such as _ChatGPT 4.0_ or _Claude-3 Opus_,) but not sufficient to house human consciousness:
+_Github_ [has lots of _FLOSS_ simulators of neural tissue](https://github.com/topics/artificial-neural-network) which have uses to program virus analysis tools (or assistants such as [_LLaMA 2_](https://www.llama.com/llama2/) or [_Grok-2__](https://www.segmind.com/models/grok-2])) but which do not have [sufficient integration / interconnectedness to house human consciousness](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42):
 
 - [_HSOM_](https://github.com/CarsonScott/HSOM) (`git clone https://github.com/CarsonScott/HSOM.git`, license is _FLOSS_) is a simple Python neural map.
   - [`./src/examples/`](https://github.com/Rober-t/apxr_run/blob/master/src/examples/) has examples of howto setup as artificial CNS.
@@ -3086,6 +3092,7 @@ Simple to setup once you have relevant databases downloaded.
   - [`./examples/`](https://github.com/CarsonScott/HSOM/tree/master/examples) has examples of howto setup as artificial CNS.
 
 Simple to convert [_Erlang_](https://wikipedia.org/wiki/Erlang) functions to [_Java_](https://wikipedia.org/wiki/Java)/[_C++_](https://wikipedia.org/wiki/C++) (to reuse for fast programs); the dynamic-typed, functional, concurrent syntax is close to [_Lisp_](https://wikipedia.org/wiki/Lisp)'s.) [_Fortran_](https://wikipedia.org/wiki/Fortran) to _Erlang_ converters [exist](https://www.codeconvert.ai/fortran-to-erlang-converter) (plus _Erlang_ has a [_Fortran_ frontend](https://dev.to/escribapetrus/transparent-execution-of-fortran-code-from-the-erlang-machine-using-ports-37ba)), which you can peruse for clues on how to convert _Erlang_ to _C++_.
+
 # Synopsis + related posts
 This post was about general methods to produce virus analysis tools, which do not require that local resources do all of this;
 - For systems with lots of resources, can use local sandboxes/CNS.

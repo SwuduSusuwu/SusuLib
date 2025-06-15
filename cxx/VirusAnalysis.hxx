@@ -150,24 +150,9 @@ void produceVirusFixCns(
 const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = virusFixCns);
 
 /* Related to this:
- * `cnsVirusFix` is close to assistants (such as "ChatGPT 4.0" or "Claude-3 Opus",) "HSOM" (the simple Python artificial CNS) is enough to do this;
- * #include "AssistantCns.cxx"
- *
- * To process fast (lag less,) use flags which auto-vectorizes/auto-parallelizes; To do `produceConversationCns` fast, use TensorFlow's `MapReduce`;
- * https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops
- *
- * Alternative CNS's;
- * https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural
- *
- * Autonomous robots (includes responses to replies from lots of forums);
- * https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous
- *
- * Simple examples of CNS as virus analysis;
- * https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners
- *
- * Due to understanding of human's consciousness, could undo problems of overpopulation and food shortages, if lots of us become uploads of consciousness (as opposed to below article of how to move whole CNS to robots);
- * https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont
- * https://swudususuwu.substack.com/p/destructive-unreversible-upload-of
+ * [`cnsVirusFix` is close to assistants](https://github.com/SwuduSusuwu/SusuLib/blob/preview/posts/VirusAnalysis.md#comparison-to-assistants) [2](https://swudususuwu.substack.com/p/howto-improve-virus-analysis?utm_source=publication-search#%C2%A7comparison-to-assistants) (demo; `#include "AssistantCns.hxx"`)
+ * [How to: throughput improved](https://github.com/SwuduSusuwu/SusuLib/blob/experimental/posts/SimdGpgpuTpu.md) [2](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
+ * [Alternative CNS's architectures](https://github.com/SwuduSusuwu/SusuLib/blob/experimental/posts/AlbatrossCNS.md) [2](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural)
  */
 }; /* namespace Susuwu */
 #endif /* ndef INCLUDES_cxx_VirusAnalysis_hxx */
