@@ -2043,19 +2043,20 @@ typedef class ApxrCns : public Cns {
  * Documentation: `less HSOM/README.md` `less HSOM/Documentation.md` */
 /* "If you're using Python >3.5, PyString_FromString() is PyUnicode_FromString()" */
 #include <Python.h> /* Sources: `pkg install python` */
+#include <vector> /* std::vector */
 typedef class HsomCns : Cns { /* TODO. ( https://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value ) suggests various syntaxes to use for this, with unanswered comments such as "Does this support classes?" */
 	//template<Input, Output> void setupSynapses(const std::vector<std::tuple<Input, Output>>) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
 	void setupSynapses(const std::vector<std::tuple<float, float>>) SUSUWU_OVERRIDE {
-	setenv("PYTHONPATH", ".",1);
-	Py_Initialize();
-//  PyRun_SimpleString("import sys; sys.path.append('.')"); PyRun_SimpleString("import hsom; from hsom import SelfOrganizingNetwork;");
+		setenv("PYTHONPATH", ".",1);
+		Py_Initialize();
+//		PyRun_SimpleString("import sys; sys.path.append('.')"); PyRun_SimpleString("import hsom; from hsom import SelfOrganizingNetwork;");
 #if USE_PYRUN /* Was told not to use PyRun because "PyRun requires all results go to stdout" */
-PyRun_SimpleString("import sys; sys.path.append('./HSOM/')");
+		PyRun_SimpleString("import sys; sys.path.append('./HSOM/')");
 
 /* Based off of https://github.com/CarsonScott/HSOM/blob/master/examples/self_organizing_network.py
  * Not sure if `input_size` is "Inputs from each layer to next layer" and `node_count` is "Inputs to HSOM" (process(input.length())) or vice versa, assumed vice versa */
 
-PyRun_SimpleString("import hsom\n\
+		PyRun_SimpleString("import hsom\n\
 from hsom import SelfOrganizingNetwork\n\
 from random import sample\n\
 \
@@ -2084,18 +2085,19 @@ self_organizing_network = SelfOrganizingNetwork(\
 \
 # Create a set of sparse samples\n\
 samples = []");
-	foreach(inputsToOutputs as sample) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
-		PyRun_SimpleString("samples.append(" + sample.first() +" -> " + sample.last() + ")");
-	}
-	PyRun_SimpleString("for i in range(200):\n\
+		foreach(inputsToOutputs as sample) { /* TODO: templates not allowed for virtual functions with C++ ( https://stackoverflow.com/a/78440416/24473928 ), so must produce codes for each combination of inputMode+outputMode */
+			PyRun_SimpleString("samples.append(" + sample.first() +" -> " + sample.last() + ")");
+		}
+		PyRun_SimpleString("for i in range(200):\n\
 	self_organizing_network.train(samples)");
 #else /* else !USE_PYRUN */
-	PyObject *module = PyImport_ImportModule("hsom")
-	if(NULL == module) {throw "'hsom' module not found";}
-	PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module, (char*)"SelfOrganizingNetwork"); /* or	"PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, (char*)"SelfOrganizingNetwork");" */
-	if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) {throw "'SelfOrganizingNetwork' object not found";}
-	double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or "PyObject *pValue=Py_BuildValue("(z)",(char*)"args");	PyObject *pResult=PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) {throw "PyObject_CallObject failed";} double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);" */
-	Py_DECREF(module);
+		PyObject *module = PyImport_ImportModule("hsom")
+		if(NULL == module) {throw "'hsom' module not found";}
+		PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module, (char*)"SelfOrganizingNetwork"); /* or	"PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, (char*)"SelfOrganizingNetwork");" */
+		if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) {throw "'SelfOrganizingNetwork' object not found";}
+		double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or "PyObject *pValue=Py_BuildValue("(z)",(char*)"args");	PyObject *pResult=PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) {throw "PyObject_CallObject failed";} double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);" */
+		Py_DECREF(module);
+	}
  ~HsomCns() {
 #if PYTHON3
 	Py_FinalizeEx();
@@ -2117,7 +2119,6 @@ typedef class ApxrCns : Cns {
  * ""The closest thing I know for interfacing Erlang with C++ directly is EPAPI. Of course it relies on the tried and tested C erl_interface that comes standard with the Erlang distribution."" references https://epapi.googlecode.com/ , which returns "404 not found".
  */
 } ApxrCns;
-#endif /* USE_APXR_CNS */
 ```
 `less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
 ```c++
