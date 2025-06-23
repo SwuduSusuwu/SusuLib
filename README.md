@@ -343,8 +343,9 @@ Code rules (lots overlap with _Mozilla Org_'s):
     - As soon as `clang++` (or `g++`) has _Contracts_ (part of _C++26_), regular expressions (such as `:%s/@pre (.*) @code (.*) @endcode/[[expects: \2]] \\* \1 \\*/` `:%s/@post (.*) @code (.*) @endcode/[[ensures: \2]] \\* \1 \\*/`) can convert _Doxygen_-ish comments into contracts.
     - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) has `SUSUWU_ASSUME(X)`, which is close to `[[expects: x]]`, but `SUSUWU_ASSUME(X)` goes to `*.cxx`, whereas `[[expects]]` goes to `*.hxx`.
     - Advantages of `[[expects]]`: allows to move information of interfaces out of `*.cxx`, to `*.hxx`.
-- Include guards:
+- `#include` guards versus `#pragma once`: use both, since [(on all compilers) `#include` guards enforce the One Definition Rule](https://wikipedia.org/wiki/Include_guard), but [`#pragma once` (on supported compilers) reduces resource use](https://learn.microsoft.com/en-us/cpp/preprocessor/once?view=msvc-170).
   ```c++
+  #pragma once
   #ifndef INCLUDES_Path_To_File
   #define INCLUDES_Path_To_File
   #endif /* ndef INCLUDES_Path_To_File */

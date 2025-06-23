@@ -1,4 +1,5 @@
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+#pragma once
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
 #include "ClassIo.hxx" /* classIoHexStr gsl::owner */
