@@ -199,13 +199,6 @@ To ensure consistent code, submissions of code (such as through [pull requests](
   - [_Microsoft Windows_](https://wikipedia.org/wiki/Microsoft_Windows) can use _Unix_ paths, except that absolute paths must start with the drive prefix (`[A-Z]:/` versus `/`).
   - [_HTTP_](https://wikipedia.org/wiki/HTTP) can use _Unix_ paths, except that absolute paths must start with the protocol (`http[s]*://` versus `/`).
 
-## `sh` source
-Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
-- Act as if all functions/variables are macros (which use `CONSTANT_CASE`).
-- Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
-  - Rationales:
-    - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
-    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2250).
 ## `git`
 If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
 Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) -- or if `git revert` of a previous commit -- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
