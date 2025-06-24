@@ -7,7 +7,7 @@ if [ ! "$(realpath -q ./)" = "$(realpath -q "${GIT_ROOT}")" ]; then
 	GIT_ROOT_USE="${GIT_ROOT}" #/* If current path is not root, add root path */
 fi
 SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
-		echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
+	echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
 }
 #shellcheck source=./sh/Macros.sh
 SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */

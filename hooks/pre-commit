@@ -4,7 +4,7 @@
 # Produces `./tags` [for `vim`](../README.md#purposes), updates `./compile_commands.json` [for `clang-tidy`](../README.md#purposes), calls [sample `pre-commit` (which scans for non-ASCII filenames, conflict markers or whitespace errors)](../.git/hooks/pre-commit.sample)
 GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" # `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
 SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
-		echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
+	echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
 }
 SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
 	SUSUWU_INCLUDE_PATH=${1}; shift #/* So path is not included in source'd scripts `$@` and `$*`. */
