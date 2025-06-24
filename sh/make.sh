@@ -322,7 +322,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	elif [ 0 -eq ${SUSUWU_STATUS} ]; then
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Produced $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	else
-		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${LD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). [If errors include \"ld... $(SUSUWU_SH_QUOTE "STDERR" "unknown file type")\" or \"ld... $(SUSUWU_SH_QUOTE "STDERR" "undefined symbol __asan_")*\"; remove intermediate objects ($(SUSUWU_SH_QUOTE "CODE" "rm \"${OBJDIR}\"*.o")). Use $(SUSUWU_SH_QUOTE "CODE" "${0} ${SUSUWU_SH_CONSOLE_PARAMS} $(SUSUWU_SH_QUOTE "PROPOSED" "--rebuild")") to remove plus continue."
+		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${LD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). [If errors include \"ld... $(SUSUWU_SH_QUOTE "STDERR" "unknown file type")\" or \"ld... $(SUSUWU_SH_QUOTE "STDERR" "undefined symbol __asan_")*\"; remove intermediate objects ($(SUSUWU_SH_QUOTE "CODE" "rm \"${OBJDIR}\"*.o")). Use $(SUSUWU_SH_QUOTE "CODE" "${0} ${SUSUWU_SH_CONSOLE_PARAMS} $(SUSUWU_SH_QUOTE "PROPOSED" "--rebuild")") to remove plus continue.]"
 	fi
 	return ${SUSUWU_STATUS}
 }
