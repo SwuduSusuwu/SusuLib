@@ -3,6 +3,7 @@
 \[This post allows all uses.\] Is [now on SubStack](https://swudususuwu.substack.com/p/ffmpeg-is-floss-no-cost-mux-tool).
 
 Tools compatible with this howto:
+- For `/bin/sh`: `apt install ffmpeg`
 - For _Android OS_: [_FFmpeg Media Encoder_ - Apps on _Google_](https://play.google.com/store/apps/details?id=com.silentlexx.ffmpeggui) (_SilentLexx_) with much success; has a visual interface to `ffmpeg` but can process commands through console.
   - \[Alternative (have not used): [_FFmpeg_ - Apps on _Google_](https://play.google.com/store/apps/details?id=com.crossplat.ffmpegmobile) (_FFmpeg_ from _CrossPlat_).\]
 - For misc _Linux_ OSs (suchas [_Ubuntu_](https://ubuntu.com/) or [_Android OS_ +_Termux_](https://play.google.com/store/apps/details?id=com.termux)): `apt install ffmpeg`.
@@ -58,12 +59,12 @@ Suppose you wish to produce a *10fps* HD `.gif` from the first *24* seconds of `
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920x1080 -t 24 "/storage/emulated/0/Visuals/visual.gif"
 ```
-or, if you have _ImageMagick_ installed (`apt install magick`):
+or, if you have _ImageMagick_ installed (`apt install magick || apt install imagemagick`):
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920x1080 -t 24 -f image2pipe -vcodec ppm - | convert -delay $(expr 100 / 10) - "/storage/emulated/0/Visuals/visual.gif"
 ```
 will use more disk but has dither and palette improved.
-Optimization (lossless compression, such as: duplicate frames and duplicate palettes are reduced).
+Optimization (lossless compression, such as: duplicate frames and duplicate palettes are reduced) through _Gifsicle_ (`apt install gifsicle`):
 ```sh
 gifsicle -O2 "/storage/emulated/0/Visuals/visual.gif" --batch
 ```
