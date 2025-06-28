@@ -2836,7 +2836,9 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 
 # Comparison to assistants
 For comparison; `produceVirusFixCns()` with `cnsVirusFix()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])" or _Anthropic_'s "[_Claude-3-Haiku_](https://poe.com/Claude-3-Haiku)"), since all of them are general use artificial neural tissues which trains on couples of problems (questions, or programs infected with viruses) which map to solutions (answers, or original programs) to learn how to compute such solutions (for new problems) on their own.
+
 Have used `class Cns` to implement assistant demo through `produceAssistantCns()`, `assistantCnsProcess()` and  `assistantCnsLoopProcess()`:
+
 `less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```c++
 /* (Work-in-progress) assistant bots with artificial CNS. */
