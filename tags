@@ -418,6 +418,7 @@ SUSUWU_CLASS_DEFAULTS	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_DEFAULTS(SUBCLA
 SUSUWU_CLASS_GETNAME	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_GETNAME(/;"	d
 SUSUWU_CLASS_GETOBJECTSIZE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_GETOBJECTSIZE(/;"	d
 SUSUWU_CLASS_ISINSTANCE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_ISINSTANCE(/;"	d
+SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassCns.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassObject.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OPERATOREQUALTO	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CLASS_OPERATOREQUALTO(/;"	d
 SUSUWU_CLASS_OVERRIDE	cxx/ClassObject.hxx	/^#define SUSUWU_CLASS_OVERRIDE /;"	d
@@ -429,6 +430,7 @@ SUSUWU_CNS_LOCAL_COEFFICIENTS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_L
 SUSUWU_CNS_SETUP_SYNAPSES	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SETUP_SYNAPSES(/;"	d
 SUSUWU_CNS_USE_BIAS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_BIAS /;"	d
 SUSUWU_CNS_USE_MLP	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
+SUSUWU_CNS_VALUE_SEMANTICS	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_VALUE_SEMANTICS /;"	d
 SUSUWU_COMMA	cxx/Macros.hxx	/^#define SUSUWU_COMMA /;"	d
 SUSUWU_COMPILE_COMMAND	sh/make.sh	/^SUSUWU_COMPILE_COMMAND() { #\/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command/;"	f
 SUSUWU_COMPILE_JSON_PATH_FOUND	sh/make.sh	/^SUSUWU_COMPILE_JSON_PATH_FOUND() ( #\/* Usage: `if SUSUWU_COMPILE_JSON_PATH_ERROR "${FUNCNAME}";/;"	f
@@ -922,6 +924,7 @@ ctx	c/rfc6234/sha.h	/^		} ctx;$/;"	m	struct:USHAContext	typeref:union:USHAContex
 dataarray	c/rfc6234/shatest.c	/^		const char *dataarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 datalength	c/rfc6234/shatest.c	/^		int datalength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
 endif	README.md	/^  - [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https:\/\/stackoverflow.com/;"	h	section:Contributor conventions/rules""_C_/_C++_ source
+equals	cxx/ClassCns.hxx	/^	const bool equals(const Object &obj) const SUSUWU_OVERRIDE { return this->getClass().operator==/;"	f	class:Susuwu::Cns	typeref:typename:const bool
 equals	cxx/ClassObject.hxx	/^	virtual const bool equals(const Object &obj) const { return this == &obj; } \/* Java's contract/;"	f	class:Susuwu::Object	typeref:typename:const bool
 equals	cxx/ClassObject.hxx	/^	virtual const bool equals(const Object &obj) const { return this->getClass().operator==(obj); }/;"	f	class:Susuwu::Object	typeref:typename:const bool
 execves	cxx/ClassSys.cxx	/^const int execves(const std::vector<std::string> &argvS, const std::vector<std::string> &envpS) /;"	f	namespace:Susuwu	typeref:typename:const int
@@ -947,6 +950,7 @@ hash	c/rfc6234/shatest.c	/^int hash(int testno, int loopno, int hashno,$/;"	f	ty
 hash	c/rfc6234/shatest.c	/^struct hash {$/;"	s	file:
 hashAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult hashAnalysis(const PortableExecutable &file, const ResultListHash &fil/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 hashAnalysisCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
+hashCode	cxx/ClassCns.hxx	/^	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE SUSUWU_VIRTUAL_HASHCODE \/* Shallow hash c/;"	f	class:Susuwu::Cns	typeref:typename:const SUSUWU_INTPTR
 hashCode	cxx/ClassObject.hxx	/^	virtual const SUSUWU_INTPTR hashCode() const { return reinterpret_cast<SUSUWU_INTPTR>(this); }$/;"	f	class:Susuwu::Object	typeref:typename:const SUSUWU_INTPTR
 hashCode	cxx/ClassTensorFlowCns.hxx	/^	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE SUSUWU_VIRTUAL_HASHCODE \/* Shallow hash c/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const SUSUWU_INTPTR
 hashHkdf	c/rfc6234/shatest.c	/^int hashHkdf(int testno, int loopno, int hashno,$/;"	f	typeref:typename:int

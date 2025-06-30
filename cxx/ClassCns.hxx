@@ -3,7 +3,7 @@
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
 #include "ClassObject.hxx" /* Object SUSUWU_PURE_VIRTUAL_DEFAULTS() */
-#include "Macros.hxx" /* SUSUWU_CXX17 SUSUWU_IF_CPLUSPLUS SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
+#include "Macros.hxx" /* SUSUWU_CXX17 SUSUWU_IF_CPLUSPLUS SUSUWU_INTPTR SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #if SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES /* C++ does not support templates of virtual functions ( https://stackoverflow.com/a/78440416/24473928 ) */
@@ -13,7 +13,11 @@
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 #include <tuple> /* std::tuple */
 #include <vector> /* std::vector */
+
 namespace Susuwu {
+#ifndef SUSUWU_CNS_VALUE_SEMANTICS
+#	define SUSUWU_CNS_VALUE_SEMANTICS true
+#endif /* ndef SUSUWU_CNS_VALUE_SEMANTICS */
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
 	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
@@ -33,6 +37,25 @@ public:
 	Cns(Cns&&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move constructor */
 	Cns& operator=(Cns &&) SUSUWU_NOEXCEPT SUSUWU_DEFAULT /* Move assignment */
 	~Cns() SUSUWU_OVERRIDE SUSUWU_DEFAULT
+#if SUSUWU_CNS_VALUE_SEMANTICS
+#	undef SUSUWU_CLASS_OPERATOREQUALTO
+#	define SUSUWU_CLASS_OPERATOREQUALTO(noop) ; /* NOLINT(cppcoreguidelines-macro-usage) */
+	bool operator==(const Class &obj) const SUSUWU_OVERRIDE { /* NOLINT(fuchsia-overloaded-operator) */
+//		SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR /* shallow comparison, with virtual pointer included */
+//		return this->hashCode() == obj.hashCode();
+		const Cns *thisFlow = dynamic_cast<const Cns *>(this);
+		const Cns *objFlow = dynamic_cast<const Cns *>(&obj);
+		return typeid(*this) == typeid(obj) &&
+			thisFlow->inputMode == objFlow->inputMode &&
+			thisFlow->outputMode == objFlow->outputMode &&
+			thisFlow->inputNeurons == objFlow->inputNeurons &&
+			thisFlow->outputNeurons == objFlow->outputNeurons &&
+			thisFlow->neuronsPerLayer == objFlow->neuronsPerLayer &&
+			thisFlow->layersOfNeurons == objFlow->layersOfNeurons;
+	}
+	const bool equals(const Object &obj) const SUSUWU_OVERRIDE { return this->getClass().operator==(obj); }
+	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE SUSUWU_VIRTUAL_HASHCODE /* Shallow hash code. TODO: ensure that derivatives of `class Cns` override this to hash container values */
+#endif /* SUSUWU_CNS_VALUE_SEMANTICS */
 	SUSUWU_PURE_VIRTUAL_DEFAULTS(Susuwu::Cns) /* `getName()`, `isPureVirtual()`, `operator==()`, ... */
 	const bool isInitialized() const SUSUWU_OVERRIDE { return initialized; } /* if can do "inference" (ergo "forwardpropagation"; `process*`) */
 	virtual void setInitialized(const bool is) { initialized = is; } /* after "training" (ergo "backpropagation") finishes, set to `true` */
