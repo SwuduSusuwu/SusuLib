@@ -502,6 +502,20 @@ public:
 #else /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
 #	define SUSUWU_CLASS_OPERATOREQUALTO(SUBCLASS) SUSUWU_VIRTUAL_ bool operator==(const Class &obj) const SUSUWU_CLASS_OVERRIDE SUSUWU_VIRTUAL_OPERATOREQUALTO_WITHOUT_VPTR
 #endif /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+
+/* NOLINTBEGIN(hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix,google-runtime-int) */
+SUSUWU_INLINE const unsigned long long classObjectHashcodeVo64(const unsigned char *data, const size_t objectSz) { /* [Fowler-Noll-Vo hashcode](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash) */
+	const unsigned long long fowlerNollVo64OffsetBasis = 14695981039346656037ull;
+	const unsigned long long fowlerNollVo64Prime = 1099511628211ull; /* NOLINT(hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix) */
+	unsigned long long hash = fowlerNollVo64OffsetBasis;
+	for (const unsigned char *const dataEnd = &data[objectSz]; data != dataEnd; ++data) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic): TODO, replace pointers with some sort of `_view`? */
+	    hash ^= *data; /* the "1a" version does exclusive-or first, so that even if `1 == objectSz`, single-bit-input-differences still flip half the output-bits (cause avalanches) */
+	    hash *= fowlerNollVo64Prime;
+	}
+	return hash;
+} /* NOLINTEND(hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix,google-runtime-int) */
+#define SUSUWU_VIRTUAL_HASHCODE { return classObjectHashcodeVo64(reinterpret_cast<const unsigned char *>(this), this->getObjectSize()); }
+
 #define SUSUWU_CLASS_GETNAME(SUBCLASS) SUSUWU_VIRTUAL_ const std::string /* returns as value so subclasses can return dynamic values */ getName() const SUSUWU_CLASS_OVERRIDE { return #SUBCLASS; }
 #define SUSUWU_CLASS_GETOBJECTSIZE(SUBCLASS) SUSUWU_VIRTUAL_ const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(SUBCLASS); } /* Run-time type information */
 #define SUSUWU_CLASS_ISINSTANCE(SUBCLASS) SUSUWU_VIRTUAL_ const bool isInstance(const Class &obj) const SUSUWU_CLASS_OVERRIDE { auto ptr = dynamic_cast<const SUBCLASS *>(&obj); return SUSUWU_NULLPTR != ptr; } /* port of Java's */
