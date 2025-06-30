@@ -662,6 +662,7 @@ SUSUWU_VIRTUAL_	cxx/ClassObject.hxx	/^#define SUSUWU_VIRTUAL_ /;"	d
 SUSUWU_VIRTUAL_DEFAULTS	cxx/ClassObject.hxx	/^	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::Object) \/* use `SUSUWU_PURE_VIRTUAL_DEFAULTS(SubClass)` if `Su/;"	f	class:Susuwu::Object
 SUSUWU_VIRTUAL_DEFAULTS	cxx/ClassObject.hxx	/^#define SUSUWU_VIRTUAL_DEFAULTS(SUBCLASS) \/* Usage: `class SubClass : public Object { SUSUWU_VI/;"	d
 SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES	cxx/ClassObject.hxx	/^#	define SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /;"	d
+SUSUWU_VIRTUAL_HASHCODE	cxx/ClassObject.hxx	/^#define SUSUWU_VIRTUAL_HASHCODE /;"	d
 SUSUWU_VIRTUAL_OPERATOREQUALTO_DEFAULT	cxx/ClassObject.hxx	/^#	define SUSUWU_VIRTUAL_OPERATOREQUALTO_DEFAULT /;"	d
 SUSUWU_VIRTUAL_OPERATOREQUALTO_WITHOUT_VPTR	cxx/ClassObject.hxx	/^#define SUSUWU_VIRTUAL_OPERATOREQUALTO_WITHOUT_VPTR /;"	d
 SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR	cxx/ClassObject.hxx	/^#define SUSUWU_VIRTUAL_OPERATOREQUALTO_WITH_VPTR /;"	d
@@ -869,6 +870,7 @@ classIoSetConsoleInput	cxx/ClassIo.cxx	/^const bool classIoSetConsoleInput(bool 
 classIoTests	cxx/ClassIo.cxx	/^const bool classIoTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIoTestsNoexcept	cxx/ClassIo.cxx	/^const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "class/;"	f	namespace:Susuwu	typeref:typename:const bool
 classIsValid	cxx/ClassObject.cxx	/^static const bool classIsValid(const Class *clas) {$/;"	f	namespace:Susuwu::__anonf22f36750111	typeref:typename:const bool	file:
+classObjectHashcodeVo64	cxx/ClassObject.hxx	/^SUSUWU_INLINE const unsigned long long classObjectHashcodeVo64(const unsigned char *data, const /;"	f	namespace:Susuwu	typeref:typename:SUSUWU_INLINE const unsigned long long
 classObjectTests	cxx/ClassObject.cxx	/^const bool classObjectTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 classObjectTestsNoexcept	cxx/ClassObject.cxx	/^const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classObjectTests/;"	f	namespace:Susuwu	typeref:typename:const bool
 classResultListDumpToTest	cxx/ClassResultList.cxx	/^static void classResultListDumpToTest(const ResultList &resultList, const bool index, const bool/;"	f	namespace:Susuwu::__anon8f7309390111	typeref:typename:void	file:
