@@ -2030,9 +2030,10 @@ const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchA
 #ifndef SUSUWU_CNS_VALUE_SEMANTICS
 #	define SUSUWU_CNS_VALUE_SEMANTICS true
 #endif /* ndef SUSUWU_CNS_VALUE_SEMANTICS */
+#define SUSUWU_CNS_MODE_ENUM /* use `enum`s for multi-class indices */
 typedef enum CnsMode : char {
-	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
-	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
+	cnsModeBool /* binary classification */, cnsModeChar, cnsModeEnum /* multi-class indices */, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
+	cnsModeVectorBool /* one-hot binary-classification */, cnsModeVectorChar, cnsModeVectorEnum /* multi-label multi-class indices */, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, cnsModeVectorDouble,
 #if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
 	cnsModeString = cnsModeVectorChar /* std::string == std::vector<char> */
 #else /* else !def SUSUWU_CXX17 */
