@@ -427,6 +427,7 @@ SUSUWU_CLEAN_OUTPUT_IMPL	sh/make.sh	/^SUSUWU_CLEAN_OUTPUT_IMPL() ( #\/* Usage: `
 SUSUWU_CNS_IF_BIAS	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_BIAS(/;"	d
 SUSUWU_CNS_IF_MLP	cxx/ClassTensorFlowCns.hxx	/^# define SUSUWU_CNS_IF_MLP(/;"	d
 SUSUWU_CNS_LOCAL_COEFFICIENTS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_LOCAL_COEFFICIENTS /;"	d
+SUSUWU_CNS_MODE_ENUM	cxx/ClassCns.hxx	/^#define SUSUWU_CNS_MODE_ENUM /;"	d
 SUSUWU_CNS_SETUP_SYNAPSES	cxx/ClassCns.hxx	/^#	define SUSUWU_CNS_SETUP_SYNAPSES(/;"	d
 SUSUWU_CNS_USE_BIAS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_BIAS /;"	d
 SUSUWU_CNS_USE_MLP	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_CNS_USE_MLP /;"	d
@@ -905,19 +906,21 @@ cnsAnalysis	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult cnsAnalysis(const 
 cnsAnalysisCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
 cnsAnalysisImpl	cxx/VirusAnalysis.cxx	/^const VirusAnalysisResult cnsAnalysisImpl(const PortableExecutable &file, const ResultListHash &/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisResult
 cnsAnalysisScore	cxx/VirusAnalysis.cxx	/^const float cnsAnalysisScore(const PortableExecutable &file, const ResultListHash &fileHash, con/;"	f	namespace:Susuwu	typeref:typename:const float
-cnsModeBool	cxx/ClassCns.hxx	/^	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,$/;"	e	enum:Susuwu::CnsMode
-cnsModeChar	cxx/ClassCns.hxx	/^	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,$/;"	e	enum:Susuwu::CnsMode
-cnsModeDouble	cxx/ClassCns.hxx	/^	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,$/;"	e	enum:Susuwu::CnsMode
-cnsModeFloat	cxx/ClassCns.hxx	/^	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,$/;"	e	enum:Susuwu::CnsMode
-cnsModeInt	cxx/ClassCns.hxx	/^	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,$/;"	e	enum:Susuwu::CnsMode
+cnsModeBool	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
+cnsModeChar	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
+cnsModeDouble	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
+cnsModeEnum	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
+cnsModeFloat	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
+cnsModeInt	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
 cnsModeString	cxx/ClassCns.hxx	/^	cnsModeString = cnsModeVectorChar \/* std::string == std::vector<char> *\/$/;"	e	enum:Susuwu::CnsMode
-cnsModeUint	cxx/ClassCns.hxx	/^	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,$/;"	e	enum:Susuwu::CnsMode
-cnsModeVectorBool	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
-cnsModeVectorChar	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
-cnsModeVectorDouble	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
-cnsModeVectorFloat	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
-cnsModeVectorInt	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
-cnsModeVectorUint	cxx/ClassCns.hxx	/^	cnsModeVectorBool, cnsModeVectorChar, cnsModeVectorInt, cnsModeVectorUint, cnsModeVectorFloat, /;"	e	enum:Susuwu::CnsMode
+cnsModeUint	cxx/ClassCns.hxx	/^	cnsModeBool \/* binary classification *\/, cnsModeChar, cnsModeEnum \/* multi-class indices *\//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorBool	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorChar	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorDouble	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorEnum	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorFloat	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorInt	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
+cnsModeVectorUint	cxx/ClassCns.hxx	/^	cnsModeVectorBool \/* one-hot binary-classification *\/, cnsModeVectorChar, cnsModeVectorEnum \//;"	e	enum:Susuwu::CnsMode
 cnsVirusFix	cxx/VirusAnalysis.cxx	/^const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns \/* = virusFixC/;"	f	namespace:Susuwu	typeref:typename:const ClassIoBytecode
 coefficients	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor coefficients = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorSh/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
 ctx	c/rfc6234/sha.h	/^		} ctx;$/;"	m	struct:USHAContext	typeref:union:USHAContext::__anoncf2b51e2030a
