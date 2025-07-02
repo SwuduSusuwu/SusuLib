@@ -1,6 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 # [Table of Contents](../README.md#table-of-contents)
 - [Purposes](#purposes)
+
 # Purposes
 [`./cxx/`](./) is [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) source code (produced for [`./posts/`](../posts/) and for general use):
 - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) is

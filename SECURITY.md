@@ -2,6 +2,7 @@
 Asof 2024-12-24, all [commit signatures](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) values. [./README.md#signaturecertificate](./README.md#signaturecertificate) shows how to test this on your own.
 
 Asof 2025-04-09 ([commit a40d1ff013f3007384e4ed025d0e402364d189cb](https://github.com/SwuduSusuwu/SusuLib/commit/a40d1ff013f3007384e4ed025d0e402364d189cb)), [`./.ssh/allowed_signers.old`](./.ssh/allowed_signers.old) holds old certificates[^3] (not known as "compromised"; just no longer used). **TODO**; warn if new commits use old certificates.
+
 Asof 2025-07-10 ([commit 4073fc729bdf7eda455a1a9914310e118efa5833](https://github.com/SwuduSusuwu/SusuLib/commit/4073fc729bdf7eda455a1a9914310e118efa5833)), this repo switches to a new certificate[^4]. The previous certificates are not known as "compromised", but were used on numerous devices and are no longer trustable.
 ## Supported versions
 Users can expect that past 2024-06-26, [`trunk`](https://github.com/SwuduSusuwu/SusuLib) passes [`susuwuUnitTests()`, which uses `Susuwu::unitTestsCxx()`](./cxx/main.cxx#L22-L82)[^1] + [_GitHub_'s code scans](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=branch%3Atrunk+is%3Aopen+severity%3Amedium%2Clow%2Ccritical%2Cerror%2Chigh)[^2].
@@ -22,9 +23,13 @@ You can expect:
 - with you anonymous (unless you ask to publish credits to you.)
 
 ## Errata/footnotes
+**TODO**; have [`./.ssh/setup.sh`](./.ssh/setup.sh) do `git config` to warn if new commits use old certificates (don't know how to).
+
 [^1]: Asof [commmit 7a9f52b2301f16807485b6701bec883404b4bd29](https://github.com/SwuduSusuwu/SusuLib/commit/7a9f52b2301f16807485b6701bec883404b4bd29) (+[`cxx/main.hxx`](./cxx/main.hxx): for issues #3, #14: cross-language), `testHarnesses` is now `susuwuUnitTests`.
+
 [^2]: Asof [commmit 36fa8a54a2a56d6e5bf21899980b48b462c15bde](https://github.com/SwuduSusuwu/SusuLib/commit/36fa8a54a2a56d6e5bf21899980b48b462c15bde) (+[`.github/workflows/codacy.yml`](./.github/workflows/codacy.yml) New _GitHub_ analysis.), the code scans now include all of _Codacy_'s test results; before this, [just _GitHub_'s _CodeQL_ produced code scans](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=is%3Aopen+tool%3ACodeQL+).
+
 [^3]: Asof [commmit a40d1ff013f3007384e4ed025d0e402364d189cb](https://github.com/SwuduSusuwu/SusuLib/commit/a40d1ff013f3007384e4ed025d0e402364d189cb) [`./.ssh/sha256.sig`](./.ssh/sha256.sig) (and the [`./.ssh/allowed_signers`](./.ssh/allowed_signers) which `sha256.sig` produces) have a new certificate (`SHA256:1csQw8HZNJa7t2gbG9/usNZ6cXdlUlSMcA3dVb3j16c`). This footnote was last altered by the first commit which uses that new certificate.
-[^4]: Asof [commit 4073fc729bdf7eda455a1a9914310e118efa5833](https://github.com/SwuduSusuwu/SusuLib/commit/4073fc729bdf7eda455a1a9914310e118efa5833), [`./.ssh/sha256.sig`](./.ssh/sha256.sig) (and the [`./.ssh/allowed_signers`](./.ssh/allowed_signers) which `sha256.sig` produces) have a new certificate. This footnote was last altered by the commit which introduces that new certificate. All commits which follow this commit must use that new certificate. **TODO**; warn if new commits use old certificates.
-**TODO**; have [`./.ssh/setup.sh`](./.ssh/setup.sh) set `git` to warn if new commits use old certificates (don't know how to).
+
+[^4]: Asof [commit 4073fc729bdf7eda455a1a9914310e118efa5833](https://github.com/SwuduSusuwu/SusuLib/commit/4073fc729bdf7eda455a1a9914310e118efa5833), [`./.ssh/sha256.sig`](./.ssh/sha256.sig) (and the [`./.ssh/allowed_signers`](./.ssh/allowed_signers) which `sha256.sig` produces) have a new certificate. All commits which follow that commit must use that new certificate. **TODO**; warn if new commits use old certificates.
 

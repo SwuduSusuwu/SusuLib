@@ -35,9 +35,9 @@
 #	endif /* else !SUSUWU_PREFER_C */
 #endif /* !defined(SUSUWU_SH_PREFER_CSTR) */
 #if SUSUWU_SH_PREFER_STDIO /* `-DSUSUWU_SH_PREFER_STDIO` to force this. Replaces `std::cXXX << x << std::endl;` with `fprintf(stdXXX, "%s\n", x);` */
-#	include <stdio.h> /* fprintf stderr stdout */ /* NOLINT (misc-include-cleaner): those are used if `SUSUWU_STDERR` is used */
+#	include <stdio.h> /* fprintf stderr stdout */ /* NOLINT(misc-include-cleaner): those are used if `SUSUWU_STDERR` is used */
 #else
-#	include <iostream> /* std::cerr std::cout std::endl */ /* NOLINT (misc-include-cleaner): those are used if `SUSUWU_CERR` is used */
+#	include <iostream> /* std::cerr std::cout std::endl */ /* NOLINT(misc-include-cleaner): those are used if `SUSUWU_CERR` is used */
 #endif
 
 #ifndef SUSUWU_DEFAULT_BRANCH

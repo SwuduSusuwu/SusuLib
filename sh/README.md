@@ -2,6 +2,7 @@
 # [Table of contents](../README.md#table-of-contents)
 - [Purposes](#purposes)
 - [Issues/workarounds](#issuesworkarounds)
+
 # Purposes
 [`./build.sh`](../build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). \[View [Options/setup](../README.md#optionssetup) for options.\]
 [`./sh/`](./) is [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) "scripts" / source code (produced for `./build.sh` and for general use):.

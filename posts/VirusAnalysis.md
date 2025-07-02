@@ -30,7 +30,7 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 # Source code
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE), allows all uses.
 
-`less` [cxx/Macros.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled color codes + unused OSC codes
+`less `[`cxx/Macros.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled [color codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C0_controls) + unused [**OSC**](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls) codes
 ```c++
 /* Miscellaneous macros */
 /* To printout default preprocessor definitions:
@@ -381,7 +381,8 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
 #define SUSUWU_NOTICE_EXECUTEVERBOSE(x) SUSUWU_EXECUTEVERBOSE(((SUSUWU_NOTICE(#x)), x))
 #define SUSUWU_DEBUG_EXECUTEVERBOSE(x) SUSUWU_EXECUTEVERBOSE((SUSUWU_DEBUG(#x), x))
 ```
-`less` [cxx/Macros.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.cxx)
+
+`less `[`cxx/Macros.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.cxx)
 ```c++
 #if SUSUWU_UNIT_TESTS /* `cxx/Macros.cxx` is just unit tests. `Macros.hxx` has all which has actual use. */
 #ifdef SUSUWU_CXX11
@@ -440,7 +441,8 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassObject.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
+
+`less `[`cxx/ClassObject.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
 ```c++
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
@@ -592,9 +594,10 @@ public:
  * [`-devirtualize` is improved if functions use `final` (which requires C++11)](https://stackoverflow.com/questions/8824587/what-is-the-purpose-of-the-final-keyword-in-c11-for-functions/78680754#78680754]. If >=C++11, `SUSUWU_FINAL` is `final`, if <C++11, is no-op. */
 }; /* namespace Susuwu */
 ```
-`less` [cxx/ClassObject.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
 
-`less` [cxx/ClassIo.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassIo.hxx)
+`less `[`cxx/ClassObject.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
+
+`less `[`cxx/ClassIo.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassIo.hxx)
 ```c++
 #if !SUSUWU_INHERIT_GSL_OWNER /* If `gsl::owner` was not included */
 namespace gsl {
@@ -930,7 +933,8 @@ const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT;
 
 }; /* namespace Susuwu */
 ```
-`less` [cxx/ClassIo.cxx](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassIo.cxx)
+
+`less `[`cxx/ClassIo.cxx`](https://github.com/SwuduSusuwu/SubStack/blob/trunk/cxx/ClassIo.cxx)
 ```c++
 const gsl::owner<FILE *> classIoFopenOwnPath() {
 	return fopen(classIoGetOwnPath().c_str(), "r");
@@ -1114,7 +1118,8 @@ const bool classIoTests() {
 const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassPortableExecutable.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
+
+`less `[`cxx/ClassPortableExecutable.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```c++
 typedef class PortableExecutable : public Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
@@ -1133,7 +1138,8 @@ public:
 	explicit PortableExecutableBytecode(ClassIoPath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 ```
-`less` [cxx/ClassSys.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
+
+`less `[`cxx/ClassSys.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
 ```c++
 /* Abstractions to do with: `sh` scripts (such as: `exec*`, `sudo`), sockets (such as `socket`, `WinSock2`) */
 #ifdef SUSUWU_CXX20
@@ -1207,7 +1213,8 @@ const bool classSysTests();
 static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassSys.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.cxx)
+
+`less `[`cxx/ClassSys.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.cxx)
 ```c++
 #ifdef SUSUWU_CXX20
 std::span<const char *> classSysArgs({}); /* [cppcoreguidelines-pro-bounds-pointer-arithmetic] fix */
@@ -1404,7 +1411,8 @@ const bool classSysTests() {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassSha2.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
+
+`less `[`cxx/ClassSha2.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
 ```c++
 /* const */ ClassIoHash /* 128 bits, not null-terminated */ classSha1(const ClassIoBytecode &bytecode);
 /* const */ ClassIoHash /* 256 bits, not null-terminated */ classSha256(const ClassIoBytecode &bytecode);
@@ -1416,7 +1424,8 @@ const bool classSha2Tests();
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassSha2.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.cxx)
+
+`less `[`cxx/ClassSha2.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.cxx)
 ```c++
 /* Uses https://www.rfc-editor.org/rfc/rfc6234#section-8.2.2 */
 ClassSha2 classSha2 = classSha256;
@@ -1478,7 +1487,8 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassResultList.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
+
+`less `[`cxx/ClassResultList.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
 ```c++
 typedef ClassIoHash ResultListHash;
 typedef ClassIoBytecode ResultListBytecode; /* Should have structure of ClassIoBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
@@ -1868,7 +1878,8 @@ const std::vector<S> explodeToList(const S &s, const S &token) {
 	return list;
 }
 ```
-`less` [cxx/ClassResultList.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx)
+
+`less `[`cxx/ClassResultList.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx)
 ```c++
 #if SUSUWU_UNIT_TESTS
 static void classResultListLoadFromTest(std::stringstream &is, const bool index, const bool whitespace, const bool pascalValues, const ListFormat listFormat, const std::string &expectedValue) {
@@ -1916,7 +1927,8 @@ const bool classResultListTests() {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
-`less` [cxx/ClassCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
+
+`less `[`cxx/ClassCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
 ```c++
 typedef enum CnsMode : char {
 	cnsModeBool, cnsModeChar, cnsModeInt, cnsModeUint, cnsModeFloat, cnsModeDouble,
@@ -1978,20 +1990,21 @@ public:
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<float>, cnsModeVectorFloat)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::vector<double>, cnsModeVectorDouble)\
 	SUSUWU_CNS_SETUP_SYNAPSES(INPUT_TYPEDEF, INPUT_MODE, std::string, cnsModeString)\
-    /* @pre @code isInitialized() @endcode */\
-	virtual const bool processToBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0;}\
-	virtual const char processToChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0;}\
-	virtual const int processToInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0;}\
-	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeUint == outputMode); return 0;}\
-	virtual const float processToFloat(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeFloat == outputMode); return 0;}\
-	virtual const double processToDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 0;}\
-	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorBool == outputMode); return {};}\
-	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorChar == outputMode); return {};}\
-	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorInt == outputMode); return {};}\
-	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorUint == outputMode); return {};}\
-	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorFloat == outputMode); return {};}\
-	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const {assert((INPUT_MODE) == inputMode && cnsModeVectorDouble == outputMode); return {};}\
-	virtual const std::string processToString(const INPUT_TYPEDEF &input) const {auto val = processToVectorChar(input); return std::string(&val[0], val.size());}
+    \
+	/* @pre @code isInitialized() @endcode */\
+	virtual const bool processToBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeBool == outputMode); return 0; }\
+	virtual const char processToChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeChar == outputMode); return 0; }\
+	virtual const int processToInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeInt == outputMode); return 0; }\
+	virtual const unsigned int processToUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeUint == outputMode); return 0; }\
+	virtual const float processToFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeFloat == outputMode); return 0; }\
+	virtual const double processToDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeDouble == outputMode); return 0; }\
+	virtual const std::vector<bool> processToVectorBool(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorBool == outputMode); return {}; }\
+	virtual const std::vector<char> processToVectorChar(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorChar == outputMode); return {}; }\
+	virtual const std::vector<int> processToVectorInt(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorInt == outputMode); return {}; }\
+	virtual const std::vector<unsigned int> processToVectorUint(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorUint == outputMode); return {}; }\
+	virtual std::vector<float> processToVectorFloat(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorFloat == outputMode); return {}; }\
+	virtual const std::vector<double> processToVectorDouble(const INPUT_TYPEDEF &input) const { assert((INPUT_MODE) == inputMode && cnsModeVectorDouble == outputMode); return {}; }\
+	virtual const std::string processToString(const INPUT_TYPEDEF &input) const { auto val = processToVectorChar(input); return std::string(&val[0], val.size()); }
 	SUSUWU_TEMPLATE_WORKAROUND(cnsModeBool, bool)
 	SUSUWU_TEMPLATE_WORKAROUND(cnsModeChar, char)
 	SUSUWU_TEMPLATE_WORKAROUND(cnsModeInt, int)
@@ -2035,7 +2048,8 @@ typedef class ApxrCns : public Cns {
 } ApxrCns;
 #endif /* USE_APXR_CNS */
 ```
-`less` [cxx/ClassCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.cxx)
+
+`less `[`cxx/ClassCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.cxx)
 ```c++
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
@@ -2120,7 +2134,8 @@ typedef class ApxrCns : Cns {
  */
 } ApxrCns;
 ```
-`less` [cxx/VirusAnalysis.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
+
+`less `[`cxx/VirusAnalysis.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
 ```c++
 /* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
 typedef enum VirusAnalysisHook : unsigned char {
@@ -2256,7 +2271,8 @@ void produceVirusFixCns(
  * @pre @code cns.isInitialized() @endcode */
 const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = virusFixCns);
 ```
-`less` [cxx/VirusAnalysis.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx)
+
+`less `[`cxx/VirusAnalysis.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx)
 ```c++
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
@@ -2673,7 +2689,8 @@ const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns
 	return cns.processToString(file.bytecode);
 }
 ```
-`less` [cxx/main.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
+
+`less `[`cxx/main.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_hxx
@@ -2710,7 +2727,8 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* def __cplusplus */
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
-`less` [cxx/main.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx) #With boilerplate
+
+`less `[`cxx/main.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.cxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
 #ifndef INCLUDES_cxx_main_cxx
@@ -2839,7 +2857,7 @@ For comparison; `produceVirusFixCns()` with `cnsVirusFix()` is close to assistan
 
 Have used `class Cns` to implement assistant demo through `produceAssistantCns()`, `assistantCnsProcess()` and  `assistantCnsLoopProcess()`:
 
-`less` [cxx/AssistantCns.hxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
+`less `[`cxx/AssistantCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```c++
 /* (Work-in-progress) assistant bots with artificial CNS. */
 extern Cns assistantCns;
@@ -2885,7 +2903,8 @@ const std::string assistantCnsProcess(const Cns &cns, const std::string &bytecod
  * @pre @code cns.isInitialized() @encode */
 void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 ```
-`less` [cxx/AssistantCns.cxx](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
+
+`less `[`cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
 ```c++
 /* (Work-in-progress) assistants which use `class Cns` (artificial neural tissue). */
 Cns assistantCns;
