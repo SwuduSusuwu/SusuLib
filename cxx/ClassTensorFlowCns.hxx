@@ -5,7 +5,9 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassTensorFlowCns_hxx
 #define INCLUDES_cxx_ClassTensorFlowCns_hxx
+#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /* This is the most close to fit-for-use */
 #include "ClassCns.hxx" /* Cns */
+#include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassNumeral.hxx" /* numeralDenormalization() numeralNormalization() NumeralNormalizers::fromTuple */
 #include "ClassObject.hxx" /* ObjectMode ToObjectMode SUSUWU_PURE_VIRTUAL_DEFAULTS() */
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NOOP SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW SUSUWU_WARNING */
@@ -522,10 +524,17 @@ public:
 		return std::to_string(oTensors[0].matrix<CoefficientDefaultType /* `std::string` gives "INVALID_ARGUMENT: Inconsistent values" */>()(0, 0)); /* TODO: tokens, which map into sentences */
 	}
 
+	/* store the connectome (the synapse coefficients and biases); serialize from `TensorFlowCns::coefficients` (or `TensorFlowCns::graphDef`), into `modelPath`.
+	 * @throw std::runtime_error */
+	void dumpTo(const ClassIoPath &modelPath) const SUSUWU_OVERRIDE;
+	/* load the connectome (the synapse coefficients and biases); deserialize into `TensorFlowCns::const` (or `TensorFlowCns::graphDef`), from `modelPath`.
+	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
+	void loadFrom(const ClassIoPath &modelPath) SUSUWU_OVERRIDE;
+
 protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-classes) */
 	tensorflow::Session* session = SUSUWU_NULLPTR;
 	tensorflow::Scope root; /* TODO: If not used after init, move this into `setupRootScope()` */
-	tensorflow::GraphDef graphDef; /* TODO: If not used after init, move this into `setupRootScope()`. */
+	tensorflow::GraphDef graphDef; /* TODO: If not used after init, move this into `setupRootScope()`. Can `dumpTo` use? */
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS
 	tensorflow::Tensor coefficients = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)})); /* connectome coefficients ("synaptic strengths") */
 #	if SUSUWU_CNS_USE_BIAS
