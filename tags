@@ -190,6 +190,7 @@ INCLUDES_cxx_ClassSha2_cxx	cxx/ClassSha2.cxx	/^#define INCLUDES_cxx_ClassSha2_cx
 INCLUDES_cxx_ClassSha2_hxx	cxx/ClassSha2.hxx	/^#define INCLUDES_cxx_ClassSha2_hxx$/;"	d
 INCLUDES_cxx_ClassSys_cxx	cxx/ClassSys.cxx	/^#define INCLUDES_cxx_ClassSys_cxx$/;"	d	file:
 INCLUDES_cxx_ClassSys_hxx	cxx/ClassSys.hxx	/^#define INCLUDES_cxx_ClassSys_hxx$/;"	d
+INCLUDES_cxx_ClassTensorFlowCns_cxx	cxx/ClassTensorFlowCns.cxx	/^#define INCLUDES_cxx_ClassTensorFlowCns_cxx$/;"	d	file:
 INCLUDES_cxx_ClassTensorFlowCns_hxx	cxx/ClassTensorFlowCns.hxx	/^#define INCLUDES_cxx_ClassTensorFlowCns_hxx$/;"	d
 INCLUDES_cxx_Macros_cxx	cxx/Macros.cxx	/^#define INCLUDES_cxx_Macros_cxx$/;"	d	file:
 INCLUDES_cxx_Macros_hxx	cxx/Macros.hxx	/^#define INCLUDES_cxx_Macros_hxx$/;"	d
@@ -666,6 +667,8 @@ SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^	SUSUWU_TEMPLATE_WORKAROUND(char)$
 SUSUWU_TEMPLATE_WORKAROUND	cxx/ClassCns.hxx	/^#	define SUSUWU_TEMPLATE_WORKAROUND(/;"	d
 SUSUWU_TENSORFLOWCNS_INIT_SCOPE	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /;"	d
 SUSUWU_TENSORFLOWCNS_LOGITS	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOWCNS_LOGITS /;"	d
+SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	cxx/ClassTensorFlowCns.cxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d	file:
+SUSUWU_TENSORFLOWCNS_PROTOBUF_FS	cxx/ClassTensorFlowCns.hxx	/^#define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /;"	d
 SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM	cxx/ClassTensorFlowCns.hxx	/^#	define SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM /;"	d
 SUSUWU_TEST_BASH	sh/Macros.sh	/^SUSUWU_TEST_BASH() ( #\/* Usage: `s\/exit ${STATUS}\/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?;/;"	f
 SUSUWU_TEST_OUTPUT	sh/make.sh	/^SUSUWU_TEST_OUTPUT() { #\/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-e/;"	f
@@ -723,6 +726,7 @@ Susuwu	cxx/ClassSha2.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/ClassSha2.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/ClassSys.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/ClassSys.hxx	/^namespace Susuwu {$/;"	n
+Susuwu	cxx/ClassTensorFlowCns.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/ClassTensorFlowCns.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/Macros.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/Macros.hxx	/^namespace Susuwu { \/* Is good practice to wrap all of a project's functions namespaces to preve/;"	n
@@ -945,6 +949,7 @@ dataarray	c/rfc6234/shatest.c	/^		const char *dataarray[5];$/;"	m	struct:hmachas
 datalength	c/rfc6234/shatest.c	/^		int datalength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
 desiredLossThreshold	cxx/ClassCns.hxx	/^	float desiredLossThreshold = 0.01; \/* return (success) from `setupSynapses()` before `training/;"	m	class:Susuwu::Cns	typeref:typename:float
 dumpTo	cxx/ClassCns.hxx	/^	virtual void dumpTo(const ClassIoPath &modelPath) const { throw std::runtime_error("ClassCns::d/;"	f	class:Susuwu::Cns	typeref:typename:void
+dumpTo	cxx/ClassTensorFlowCns.cxx	/^void TensorFlowCns::dumpTo(const ClassIoPath &modelPath) const { \/* TODO: the implementation is/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 endif	README.md	/^  - [Indent multi-level macros as `#if X # if S ,,, # endif #endif`](https:\/\/stackoverflow.com/;"	h	section:Contributor conventions/rules""_C_/_C++_ source
 equals	cxx/ClassCns.hxx	/^	const bool equals(const Object &obj) const SUSUWU_OVERRIDE { return this->getClass().operator==/;"	f	class:Susuwu::Cns	typeref:typename:const bool
 equals	cxx/ClassObject.hxx	/^	virtual const bool equals(const Object &obj) const { return this == &obj; } \/* Java's contract/;"	f	class:Susuwu::Object	typeref:typename:const bool
@@ -1049,6 +1054,7 @@ listProduceSignature	cxx/ClassResultList.hxx	/^const std::tuple<typename List::v
 listToHashes	cxx/ClassResultList.hxx	/^void listToHashes(const List &list \/* ResultList::bytecodes or ResultList::hex*\/, List2 &hashe/;"	f	namespace:Susuwu	typeref:typename:void
 listsIntersect	cxx/ClassResultList.hxx	/^const bool listsIntersect(const List &list, const List &list2) {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 loadFrom	cxx/ClassCns.hxx	/^	virtual void loadFrom(const ClassIoPath &modelPath) { throw std::runtime_error("ClassCns::loadF/;"	f	class:Susuwu::Cns	typeref:typename:void
+loadFrom	cxx/ClassTensorFlowCns.cxx	/^void TensorFlowCns::loadFrom(const ClassIoPath &modelPath) { \/* TODO: the implementation is in /;"	f	class:Susuwu::TensorFlowCns	typeref:typename:void
 loss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
 macrosDeclarationAttributes	cxx/Macros.cxx	/^SUSUWU_CONSTEXPR static const bool macrosDeclarationAttributes() SUSUWU_EXPECTS(true) SUSUWU_ENS/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_CONSTEXPR const bool	file:
 macrosNoReturn	cxx/Macros.cxx	/^SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} \/* NOLINT(concurrency-mt-unsafe): is un/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_NORETURN void	file:
