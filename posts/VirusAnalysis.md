@@ -2697,7 +2697,7 @@ public:
 		tape.Watch({coefficientsVar, biasesVar});
 #endif /* def TENSORFLOW_HAS_GRADIENTTAPE */
 		tensorflow::Output loss, grad;
-		auto scaleNum = tensorflow::ops::Const(root, 1.0f)
+		auto scaleNum = tensorflow::ops::Const(root, 1.0f);
 		if(objectModeBool == outputMode) { /* binary classification loop */
 			auto unkClass = SigmoidCrossEntropyWithLogits(root, logits, labels);
 			loss = unkClass.loss;
@@ -2718,7 +2718,7 @@ public:
 			grad = tensorflow::ops::Subtract(root, logits /* TODO: should this use `relu`? */, labels); /* shape: [batchSize, outputDim] */
 			scaleNum = tensorflow::ops::Const(root, 2.0f); /* `.loss` is `^ 2`, so `.backprop` is `* 1/2`. This is so `scale` does not require the factor of `2` (which would not suit other formulas). */
 		}
-		loss = tensorflow::ops::Mean(root, loss, 0);
+		loss = tensorflow::ops::Mean(root.WithOpName("loss"), loss, 0);
 
 		/* Gradients (last argument, `delta`, to `tensorflow::ops::ApplyGradientDescent` */
 //		auto gradients = tensorflow::ops::Gradients(root, {loss}, {coefficients SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA biases}); /* gives `error: no member named 'Gradients' in namespace 'tensorflow::ops'` */
@@ -2778,25 +2778,43 @@ public:
 	template<class CoefficientType, class Input, class Output>
 	void setupSynapsesImpl(const std::vector<std::tuple<Input /* "input" */, Output /* "label" */>> &inputsToOutputs, size_t trainingIterations) {
 		const size_t inputCount = inputsToOutputs.size();
+		const size_t validationCount = (1 < inputCount) ? (inputCount * validationFactor) : 0;
+		const size_t trainingCount = inputCount - validationCount;
 		const auto inputDim = static_cast<DimSz>(inputNeurons); /* TODO: assert `1` for base types? */
 		const auto outputDim = static_cast<DimSz>(outputNeurons); /* TODO: assert `1` for base types? */
 		assert(ToObjectMode<Input>::value == inputMode);
 		setInitialized(false);
-		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientType /* implicit conversion from `Input` to prevent "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({static_cast<DimSz>(inputCount), static_cast<DimSz>(inputDim)})) /* backpropagation's `x` axis, which TensorFlow calls "input" */,
-			expectedOutputTensor(DataTypeToEnum<CoefficientType /* implicit conversion from `Output` */>::value, tensorflow::TensorShape({static_cast<DimSz>(inputCount), static_cast<DimSz>(inputDim)})) /* backpropagation's `y` axis, which TensorFlow calls "label" */;
+		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientType /* implicit conversion from `Input` to prevent "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({static_cast<DimSz>(trainingCount), static_cast<DimSz>(inputDim)})) /* backpropagation's `x` axis, which TensorFlow calls "input" */,
+			inputTensor2(DataTypeToEnum<CoefficientType /* implicit conversion from `Input` */>::value, tensorflow::TensorShape({static_cast<DimSz>(validationCount), static_cast<DimSz>(inputDim)})) /* validation holdout values */,
+			expectedOutputTensor(DataTypeToEnum<CoefficientType /* implicit conversion from `Output` */>::value, tensorflow::TensorShape({static_cast<DimSz>(trainingCount), static_cast<DimSz>(inputDim)})) /* backpropagation's `y` axis, which TensorFlow calls "label" */,
+			expectedOutputTensor2(DataTypeToEnum<CoefficientType /* implicit conversion from `Output` */>::value, tensorflow::TensorShape({static_cast<DimSz>(validationCount), static_cast<DimSz>(inputDim)})) /* validation holdout values */;
 
-		auto inputTensorMapped = inputTensor.matrix<CoefficientType /* implicit conversion from `Input` */>();
-		auto expectedOutputTensorMapped = expectedOutputTensor.matrix<CoefficientType /* implicit conversion from `Output` */>();
+		auto inputTensorMapped = inputTensor.matrix<CoefficientType /* implicit conversion from `Input` */>(),
+			inputTensorMapped2 = inputTensor2.matrix<CoefficientType /* implicit conversion from `Input` */>();
+		auto expectedOutputTensorMapped = expectedOutputTensor.matrix<CoefficientType /* implicit conversion from `Output` */>(),
+			expectedOutputTensorMapped2 = expectedOutputTensor2.matrix<CoefficientType /* implicit conversion from `Output` */>();
+#ifdef SUSUWU_CNS_SHUFFLE
+		auto shuffledInputs = inputsToOutputs; /* TODO: shuffle without duplicate, since some training sets use more than half of RAM resources */
+		std::shuffle(shuffledInputs.begin(), shuffledInputs.end(), std::default_random_engine(/* `std::random_devices()` or constant (for reproducible results) */));
+		auto inputsToOutputsIt = shuffledInputs.cbegin();
+#else /* else !def SUSUWU_CNS_SHUFFLE */
+		auto inputsToOutputsIt = inputsToOutputs.cbegin(); /* assume that `inputsToOutputs` is pre-shuffled, or that `inputsToOutputs` was produced to not have clustered data (not have 1 type of samples in the first half and another type of samples in the second, which would make the training samples unmatched to the validation samples) */
+#endif /* !def SUSUWU_CNS_SHUFFLE */
+
 		inputNormsStorage = NumeralNormalizers::fromTuple<0>(inputsToOutputs);
-#if SUSUWU_CLASSCNS_SEPARATE_NORMS
+#if SUSUWU_CNS_SEPARATE_NORMS
 		outputNormsStorage = NumeralNormalizers::fromTuple<1>(inputsToOutputs);
-#endif /* !SUSUWU_CLASSCNS_SEPARATE_NORMS */
+#endif /* !SUSUWU_CNS_SEPARATE_NORMS */
 		NumeralNormalizersReciprocal inputNormsRecip(inputNorms()),
 			outputNormsRecip(outputNorms());
-		for(size_t i = 0; i < inputCount; ++i) {
-			inputTensorMapped(i, 0 /* TODO: for versions of `setupSynapses` where `std::tuple` holds `std::vector`s, replace 0 with `std::vector` index, and loop */) = numeralNormalization(std::get<0>(inputsToOutputs[i]), inputNormsRecip); /* Training input */
-			expectedOutputTensorMapped(i, 0) = numeralNormalization(std::get<1>(inputsToOutputs[i]), outputNormsRecip); /* Expected output */
+		for(size_t i = 0; i < trainingCount; ++i, ++inputsToOutputsIt) {
+			inputTensorMapped(i, 0 /* TODO: for versions of `setupSynapses` where `std::tuple` holds `std::vector`s, replace 0 with `std::vector` index, and loop */) = numeralNormalization(std::get<0>(*inputsToOutputsIt), inputNormsRecip); /* Training input */
+			expectedOutputTensorMapped(i, 0) = numeralNormalization(std::get<1>(*inputsToOutputsIt), outputNormsRecip); /* Expected training output */
 		}
+		for(size_t i = 0; i < validationCount; ++i, ++inputsToOutputsIt) {
+			inputTensorMapped2(i, 0) = numeralNormalization(std::get<0>(*inputsToOutputsIt), inputNormsRecip); /* Validation input */
+			expectedOutputTensorMapped2(i, 0) = numeralNormalization(std::get<1>(*inputsToOutputsIt), outputNormsRecip); /* Expected validation output */
+		} /* TODO: use `std::shuffle` (or similar formula to shuffle `inputsToOutputs`) if overfitting results from localized clusters */
 
 		/* Define the neural network architecture */
 		restructureConnectomeImpl<CoefficientType>(); /* TODO: move `Scope` construction into this? Move `GraphDef` construction into this? */
@@ -2807,20 +2825,36 @@ public:
 		if(0 == trainingIterations) {
 			trainingIterations = 1000; /* TODO: use input specifics (and available host resources?) to compute best value */
 		}
+		const std::vector<std::string> outputTensors = {"loss"};
 		for(size_t epoch = 0; epoch < trainingIterations; ++epoch) {
 			std::vector<tensorflow::Tensor> outputs;
-			const tensorflow::Status status = session->Run(
+			tensorflow::Status status = session->Run(
 				{
 					{"input", inputTensor},
 					{"labels", expectedOutputTensor}
 				},
-				{/* outputTensors */},
+				(0 == validationCount) ? outputTensors : std::vector<std::string>(),
 				{"optimizerCoefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "optimizerBiases")},
-				&outputs /* TODO: unused, remove? */
+				(0 == validationCount) ? &outputs : SUSUWU_NULLPTR
 			);
 			if(!status.ok()) {
-				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + __func__ + "() { const tensorflow::Status status = session->Run({{\"input\", inputTensor}, {\"labels\", expectedOutputTensor}, {}, {\"optimizerCoefficients\" " + "" SUSUWU_CNS_IF_BIAS(", \"optimizerBiases\"") + "}, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } } }"));
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + __func__ + "() { const tensorflow::Status status = session->Run({{\"input\", inputTensor}, {\"labels\", expectedOutputTensor}, {" + ((0 == validationCount) ? "\"loss\"" : "") + "}, {\"optimizerCoefficients\" " + "" SUSUWU_CNS_IF_BIAS(", \"optimizerBiases\"") + "}, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } } }"));
 			}
+			float lossVal;
+			if(0 == validationCount) {
+				lossVal = outputs[0].scalar<float>()();
+			} else {
+				status = session->Run(
+					{
+						{"input", inputTensor2},
+						{"labels", expectedOutputTensor2}
+					},
+					outputTensors, {}, &outputs);
+				if(!status.ok()) {
+					throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::setupSynapses() { const tensorflow::Status status = session->Run({{\"inputs\", inputTensor2}, {\"labels\", expectedOutputTensor2}}, {\"loss\"}, {}, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } }"));
+				}
+				lossVal = outputs[0].scalar<float>()(); /* TODO: use for eager stop */
+							}
 		}
 		setupSynapsesPostProcess();
 	}
