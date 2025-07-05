@@ -179,6 +179,8 @@ INCLUDES_cxx_ClassCns_cxx	cxx/ClassCns.cxx	/^#define INCLUDES_cxx_ClassCns_cxx$/
 INCLUDES_cxx_ClassCns_hxx	cxx/ClassCns.hxx	/^#define INCLUDES_cxx_ClassCns_hxx$/;"	d
 INCLUDES_cxx_ClassIo_cxx	cxx/ClassIo.cxx	/^#define INCLUDES_cxx_ClassIo_cxx$/;"	d	file:
 INCLUDES_cxx_ClassIo_hxx	cxx/ClassIo.hxx	/^#define INCLUDES_cxx_ClassIo_hxx$/;"	d
+INCLUDES_cxx_ClassNumeral_cxx	cxx/ClassNumeral.cxx	/^#define INCLUDES_cxx_ClassNumeral_cxx$/;"	d	file:
+INCLUDES_cxx_ClassNumeral_hxx	cxx/ClassNumeral.hxx	/^#define INCLUDES_cxx_ClassNumeral_hxx$/;"	d
 INCLUDES_cxx_ClassObject_cxx	cxx/ClassObject.cxx	/^#define INCLUDES_cxx_ClassObject_cxx$/;"	d	file:
 INCLUDES_cxx_ClassObject_hxx	cxx/ClassObject.hxx	/^#define INCLUDES_cxx_ClassObject_hxx$/;"	d
 INCLUDES_cxx_ClassPortableExecutable_hxx	cxx/ClassPortableExecutable.hxx	/^#define INCLUDES_cxx_ClassPortableExecutable_hxx$/;"	d
@@ -235,6 +237,16 @@ Minimum requirements to use `./sh/` scripts:	README.md	/^## Minimum requirements
 Mix visuals plus sounds into `.mp4`	posts/TranscodeMuxHowto.md	/^## Mix visuals plus sounds into `.mp4`$/;"	s	chapter:Howto
 Neural resources	VirusAnalysis.md	/^## Neural resources$/;"	s	chapter:Post, with resources
 Neural resources	posts/VirusAnalysis.md	/^## Neural resources$/;"	s	chapter:Post, with resources
+NumeralAccum	cxx/ClassNumeral.hxx	/^typedef long double NumeralAccum;$/;"	t	namespace:Susuwu	typeref:typename:long double
+NumeralNormalizers	cxx/ClassNumeral.hxx	/^	NumeralNormalizers(const NumeralAccum avg = 0.0, const NumeralAccum mag = 1.0) : average(avg), /;"	f	struct:Susuwu::NumeralNormalizers	typeref:typename:Susuwu::NumeralNormalizers
+NumeralNormalizers	cxx/ClassNumeral.hxx	/^	NumeralNormalizers(const std::vector<Numeral> &nums) : average(numeralAverage(nums)), magnitude/;"	f	struct:Susuwu::NumeralNormalizers
+NumeralNormalizers	cxx/ClassNumeral.hxx	/^typedef struct NumeralNormalizers : public Object {$/;"	s	namespace:Susuwu
+NumeralNormalizers	cxx/ClassNumeral.hxx	/^} NumeralNormalizers;$/;"	t	namespace:Susuwu	typeref:struct:Susuwu::NumeralNormalizers
+NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	NumeralNormalizersReciprocal(const NumeralAccum avg = 0.0, const NumeralAccum magRecip = 1.0) :/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
+NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	NumeralNormalizersReciprocal(const std::vector<Numeral> &nums) : average(numeralAverage(nums)),/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
+NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	explicit NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normaliz/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
+NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^typedef struct NumeralNormalizersReciprocal : public Object { \/* is as `NumeralNormalizers`, ex/;"	s	namespace:Susuwu
+NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^} NumeralNormalizersReciprocal;$/;"	t	namespace:Susuwu	typeref:struct:Susuwu::NumeralNormalizersReciprocal
 Object	cxx/ClassObject.hxx	/^typedef class Object : public Class { \/* Port of `java.lang.Object`. *\/$/;"	c	namespace:Susuwu
 Object	cxx/ClassObject.hxx	/^} Object;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Object
 ObjectCloneAs	cxx/ClassObject.hxx	/^typedef enum ObjectCloneAs : unsigned char { \/* Is extra (not part of Java); accomodates the nu/;"	g	namespace:Susuwu	typeref:typename:unsigned char
@@ -699,6 +711,8 @@ Susuwu	cxx/ClassCns.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/ClassCns.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/ClassIo.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/ClassIo.hxx	/^namespace Susuwu {$/;"	n
+Susuwu	cxx/ClassNumeral.cxx	/^namespace Susuwu {$/;"	n	file:
+Susuwu	cxx/ClassNumeral.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/ClassObject.cxx	/^namespace Susuwu {$/;"	n	file:
 Susuwu	cxx/ClassObject.hxx	/^namespace Susuwu {$/;"	n
 Susuwu	cxx/ClassPortableExecutable.hxx	/^namespace Susuwu {$/;"	n
@@ -849,6 +863,7 @@ assistantCnsProcessXhtml	cxx/AssistantCns.cxx	/^void assistantCnsProcessXhtml(Re
 assistantCnsResponseDelimiter	cxx/AssistantCns.cxx	/^std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResp/;"	v	namespace:Susuwu	typeref:typename:std::string
 assistantCnsTests	cxx/AssistantCns.cxx	/^const bool assistantCnsTests() {$/;"	f	namespace:Susuwu	typeref:typename:const bool
 assistantCnsTestsNoexcept	cxx/AssistantCns.hxx	/^static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistan/;"	f	namespace:Susuwu	typeref:typename:const bool
+average	cxx/ClassNumeral.hxx	/^	NumeralAccum average, magnitude;$/;"	m	struct:Susuwu::NumeralNormalizers	typeref:typename:NumeralAccum
 backprop	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	m	struct:Susuwu::TensorFlowCnsLoss	typeref:typename:tensorflow::Output
 biases	cxx/ClassTensorFlowCns.hxx	/^	tensorflow::Tensor biases = tensorflow::Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({s/;"	m	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::Tensor
 blockSize	c/rfc6234/sha.h	/^		int blockSize;              \/* block size of SHA being used *\/$/;"	m	struct:HMACContext	typeref:typename:int
@@ -941,6 +956,8 @@ extrabits	c/rfc6234/shatest.c	/^		int extrabits;$/;"	m	struct:hash::__anond9b948
 fileOffset	cxx/ClassResultList.hxx	/^	BytecodeOffset fileOffset;$/;"	m	struct:Susuwu::ResultListSignatureMatch	typeref:typename:BytecodeOffset
 finalize	cxx/ClassObject.hxx	/^	virtual void finalize() {$/;"	f	class:Susuwu::Object	typeref:typename:void
 findhash	c/rfc6234/shatest.c	/^int findhash(const char *argv0, const char *opt)$/;"	f	typeref:typename:int
+fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizers fromTuple(const std::vector<std::tuple<Numeral, Numeral>> &nums/;"	f	struct:Susuwu::NumeralNormalizers	typeref:typename:const NumeralNormalizers
+fromTuple	cxx/ClassNumeral.hxx	/^	static const NumeralNormalizersReciprocal fromTuple(const std::vector<std::tuple<Numeral, Numer/;"	f	struct:Susuwu::NumeralNormalizersReciprocal	typeref:typename:const NumeralNormalizersReciprocal
 getClass	cxx/ClassObject.hxx	/^	const Class &getClass() const { return *this; }$/;"	f	class:Susuwu::Object	typeref:typename:const Class &
 getObjectSize	cxx/ClassObject.hxx	/^	virtual const size_t getObjectSize() const { return sizeof(*this); \/* sum(sizeof({vptr, data m/;"	f	class:Susuwu::Instrumentation	typeref:typename:const size_t
 getParameterCount	cxx/ClassTensorFlowCns.hxx	/^	const size_t getParameterCount() SUSUWU_OVERRIDE {$/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:const size_t
@@ -1029,6 +1046,7 @@ macrosDeclarationAttributes	cxx/Macros.cxx	/^SUSUWU_CONSTEXPR static const bool 
 macrosNoReturn	cxx/Macros.cxx	/^SUSUWU_NORETURN static void macrosNoReturn() {exit(0);} \/* NOLINT(concurrency-mt-unsafe): is un/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_NORETURN void	file:
 macrosNoUniqueAddressTest	cxx/Macros.cxx	/^static void macrosNoUniqueAddressTest() {$/;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:void	file:
 macrosTestsNoexcept	cxx/Macros.cxx	/^const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {$/;"	f	namespace:Susuwu	typeref:typename:const int
+magnitude	cxx/ClassNumeral.hxx	/^	NumeralAccum average, magnitude;$/;"	m	struct:Susuwu::NumeralNormalizers	typeref:typename:NumeralAccum
 main	c/rfc6234/shatest.c	/^int main(int argc, char **argv)$/;"	f	typeref:typename:int
 main	cxx/main.cxx	/^SusuwuUnitTestsBitmask main(int argc, const char **args) {$/;"	f	typeref:typename:SusuwuUnitTestsBitmask
 manualReviewCaches	cxx/VirusAnalysis.cxx	/^std::map<ResultListHash, VirusAnalysisResult> hashAnalysisCaches, signatureAnalysisCaches, stati/;"	v	namespace:Susuwu	typeref:typename:std::map<ResultListHash,VirusAnalysisResult>
@@ -1037,6 +1055,23 @@ neuronsPerLayer	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, 
 notify	cxx/ClassObject.hxx	/^	virtual void notify() {}$/;"	f	class:Susuwu::Object	typeref:typename:void
 notifyAll	cxx/ClassObject.hxx	/^	virtual void notifyAll() {}$/;"	f	class:Susuwu::Object	typeref:typename:void
 numberExtrabits	c/rfc6234/shatest.c	/^		int numberExtrabits;$/;"	m	struct:hash::__anond9b948bd0108	typeref:typename:int	file:
+numeralAverage	cxx/ClassNumeral.hxx	/^const NumeralAccum numeralAverage(const std::vector<Numeral> &nums) {$/;"	f	namespace:Susuwu	typeref:typename:const NumeralAccum
+numeralAverage	cxx/ClassNumeral.hxx	/^const NumeralAccum numeralAverage(const std::vector<std::tuple<Numeral, Numeral>> &nums) {$/;"	f	namespace:Susuwu	typeref:typename:const NumeralAccum
+numeralBalancedMagnitude	cxx/ClassNumeral.hxx	/^const Numeral numeralBalancedMagnitude(const std::vector<Numeral> &nums, const NumeralAccum aver/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralBalancedMagnitude	cxx/ClassNumeral.hxx	/^const Numeral numeralBalancedMagnitude(const std::vector<std::tuple<Numeral, Numeral>> &nums, co/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralDenormalization	cxx/ClassNumeral.hxx	/^const NumeralNormalizers numeralDenormalization(std::vector<Numeral> &nums) {$/;"	f	namespace:Susuwu	typeref:typename:const NumeralNormalizers
+numeralDenormalization	cxx/ClassNumeral.hxx	/^inline const Numeral numeralDenormalization(const Numeral num, const NumeralNormalizers &normali/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralDenormalization	cxx/ClassNumeral.hxx	/^inline const Numeral numeralDenormalization(const Numeral num, const NumeralNormalizersReciproca/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralDenormalization	cxx/ClassNumeral.hxx	/^void numeralDenormalization(std::vector<Numeral> &nums, const NumeralNormalizers &normalizers) {$/;"	f	namespace:Susuwu	typeref:typename:void
+numeralDenormalization	cxx/ClassNumeral.hxx	/^void numeralDenormalization(std::vector<Numeral> &nums, const NumeralNormalizersReciprocal &norm/;"	f	namespace:Susuwu	typeref:typename:void
+numeralMagnitude	cxx/ClassNumeral.hxx	/^const Numeral numeralMagnitude(const std::vector<Numeral> &nums) {$/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralMagnitude	cxx/ClassNumeral.hxx	/^const Numeral numeralMagnitude(const std::vector<std::tuple<Numeral, Numeral>> &nums) {$/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralNormalization	cxx/ClassNumeral.hxx	/^const NumeralNormalizersReciprocal numeralNormalization(std::vector<Numeral> &nums) {$/;"	f	namespace:Susuwu	typeref:typename:const NumeralNormalizersReciprocal
+numeralNormalization	cxx/ClassNumeral.hxx	/^inline const Numeral numeralNormalization(const Numeral num, const NumeralNormalizers &normalize/;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralNormalization	cxx/ClassNumeral.hxx	/^inline const Numeral numeralNormalization(const Numeral num, const NumeralNormalizersReciprocal /;"	f	namespace:Susuwu	typeref:typename:const Numeral
+numeralNormalization	cxx/ClassNumeral.hxx	/^void numeralNormalization(std::vector<Numeral> &nums, const NumeralNormalizers &normalizers) {$/;"	f	namespace:Susuwu	typeref:typename:void
+numeralNormalization	cxx/ClassNumeral.hxx	/^void numeralNormalization(std::vector<Numeral> &nums, const NumeralNormalizersReciprocal &normal/;"	f	namespace:Susuwu	typeref:typename:void
+numeralRamp	cxx/ClassNumeral.hxx	/^inline const Numeral numeralRamp(const Numeral num, const Numeral ramp = std::numeric_limits<Num/;"	f	namespace:Susuwu	typeref:typename:const Numeral
 objectCloneAsCoW	cxx/ClassObject.hxx	/^	objectCloneAsCoW            = 8  \/* [Copy-on-Write](https:\/\/wikipedia.org\/wiki\/Copy-on-wri/;"	e	enum:Susuwu::ObjectCloneAs
 objectCloneAsDeep	cxx/ClassObject.hxx	/^	objectCloneAsDeep           = 1, \/* Recursive `new` *\/ \/* [If overload `operator new`, set `/;"	e	enum:Susuwu::ObjectCloneAs
 objectCloneAsNone	cxx/ClassObject.hxx	/^	objectCloneAsNone           = 0, \/* `!isCloneabble()` *\/$/;"	e	enum:Susuwu::ObjectCloneAs
@@ -1066,6 +1101,7 @@ okmlength	c/rfc6234/shatest.c	/^		int okmlength;$/;"	m	struct:hkdfhash	typeref:t
 operator !=	cxx/ClassObject.hxx	/^	virtual bool operator!=(const Class &obj) const SUSUWU_FINAL { return !this->operator==(obj); }/;"	f	class:Susuwu::Class	typeref:typename:bool
 operator &	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator&(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 operator ==	cxx/ClassTensorFlowCns.hxx	/^	bool operator==(const Class &obj) const SUSUWU_OVERRIDE { \/* NOLINT(fuchsia-overloaded-operato/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:bool
+operator NumeralNormalizers	cxx/ClassNumeral.hxx	/^	explicit operator NumeralNormalizers() const { return { average, 1 \/ magnitudeReciprocal }; }$/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
 operator |	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 outputMode	cxx/ClassCns.hxx	/^	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:ObjectMode
 outputNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
