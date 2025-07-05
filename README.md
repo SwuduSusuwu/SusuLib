@@ -77,6 +77,11 @@
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
     - TODO: internet (`socket`, `Winsock2`).
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassNumeral.hxx`](./cxx/ClassNumeral.hxx) is to numerals (such as `int`s and `float`s) as `./cxx/ClassResultList.hxx` is to substrs (such as `std::string` and `std::stringview`):
+  - Functions of scalars to new scalar values; `numeralRamp()`.
+  - Functions of vectors / tensors to scalar values; `numeralAverage()`, `numeralMagnitude()`, `numeralBalancedMagnitude()`.
+  - Structures which store those values; `struct NumeralNormalizers`, `struct NumeralNormalizersReciprocal`.
+  - Functions which use those to transform vectors / tensors; `numeralNormalization()`, `numeralDenormalization()`.
 - [`./cxx/ClassSha2.hxx`](./cxx/ClassSha2.hxx) is
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
   - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
