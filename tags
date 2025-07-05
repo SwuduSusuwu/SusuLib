@@ -87,6 +87,8 @@
 !_TAG_ROLE_DESCRIPTION!Sh!heredoc	endmarker	/end marker/
 !_TAG_ROLE_DESCRIPTION!Sh!script	loaded	/loaded/
 !_TAG_ROLE_DESCRIPTION!Yaml!anchor	alias	/alias/
+**IMU** as **GPS** / magnetometer substitute	posts/ArduinoElegooTools.md	/^## **IMU** as **GPS** \/ magnetometer substitute$/;"	s	chapter:Accelerometer / gyroscope (**IMU**)
+**IMU** as kinematic collision detection	posts/ArduinoElegooTools.md	/^## **IMU** as kinematic collision detection$/;"	s	chapter:Accelerometer / gyroscope (**IMU**)
 1	SECURITY.md	/^[^1]: Asof [commmit 7a9f52b2301f16807485b6701bec883404b4bd29](https:\/\/github.com\/SwuduSusuwu\//;"	n	section:Security Policy""Errata/footnotes
 2	SECURITY.md	/^[^2]: Asof [commmit 36fa8a54a2a56d6e5bf21899980b48b462c15bde](https:\/\/github.com\/SwuduSusuwu\//;"	n	section:Security Policy""Errata/footnotes
 3	SECURITY.md	/^[^3]: Asof [commmit a40d1ff013f3007384e4ed025d0e402364d189cb](https:\/\/github.com\/SwuduSusuwu\//;"	n	section:Security Policy""Errata/footnotes
@@ -94,6 +96,7 @@
 ADDTO2_temp	c/rfc6234/sha384-512.c	/^static uint32_t ADDTO2_temp;$/;"	v	typeref:typename:uint32_t	file:
 ADDTO4_temp	c/rfc6234/sha384-512.c	/^static uint32_t ADDTO4_temp, ADDTO4_temp2;$/;"	v	typeref:typename:uint32_t	file:
 ADDTO4_temp2	c/rfc6234/sha384-512.c	/^static uint32_t ADDTO4_temp, ADDTO4_temp2;$/;"	v	typeref:typename:uint32_t	file:
+Accelerometer / gyroscope (**IMU**)	posts/ArduinoElegooTools.md	/^# Accelerometer \/ gyroscope (**IMU**)$/;"	c
 Affiliates	README.md	/^### Affiliates$/;"	S	section:Contributor conventions/rules""Sponsor
 ApxrCns	cxx/ClassCns.cxx	/^typedef class ApxrCns : Cns {$/;"	c	namespace:Susuwu	file:
 ApxrCns	cxx/ClassCns.cxx	/^} ApxrCns;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::ApxrCns	file:
@@ -102,14 +105,12 @@ ApxrCns	cxx/ClassCns.hxx	/^} ApxrCns;$/;"	t	namespace:Susuwu	typeref:class:Susuw
 Beta test/`experimental` builds	README.md	/^## Beta test\/`experimental` builds$/;"	s	chapter:How to contribute
 BytecodeOffset	cxx/ClassResultList.hxx	/^typedef ptrdiff_t BytecodeOffset; \/* all tests of `ResultListBytecode` should return `{Bytecode/;"	t	namespace:Susuwu	typeref:typename:ptrdiff_t
 Bytecodes	cxx/ClassResultList.hxx	/^	typedef std::vector<ResultListBytecode> Bytecodes;$/;"	t	struct:Susuwu::ResultList	typeref:typename:std::vector<ResultListBytecode>
-C++ (Arduino-style) Utils	posts/ArduinoElegooTools.md	/^## C++ (Arduino-style) Utils$/;"	s	chapter:Utils: Shared Functions for C++ and Python
-C++ Example	posts/ArduinoElegooTools.md	/^## C++ Example$/;"	s	chapter:Unified Modular Robot Controller Example
-C++ Example (MPU6050, 3D)	posts/ArduinoElegooTools.md	/^## C++ Example (MPU6050, 3D)$/;"	s	chapter:IMU (Accelerometer / Gyroscope)
 CXXFLAGS	VirusAnalysis.md	/^[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https:\/\/swudususuwu.substac/;"	n	chapter:Intro
 CXXFLAGS	posts/VirusAnalysis.md	/^[^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https:\/\/swudususuwu.substac/;"	n	chapter:Intro
 Ch_temp1	c/rfc6234/sha384-512.c	/^static uint32_t Ch_temp1[2], Ch_temp2[2], Ch_temp3[2];$/;"	v	typeref:typename:uint32_t[2]	file:
 Ch_temp2	c/rfc6234/sha384-512.c	/^static uint32_t Ch_temp1[2], Ch_temp2[2], Ch_temp3[2];$/;"	v	typeref:typename:uint32_t[2]	file:
 Ch_temp3	c/rfc6234/sha384-512.c	/^static uint32_t Ch_temp1[2], Ch_temp2[2], Ch_temp3[2];$/;"	v	typeref:typename:uint32_t[2]	file:
+Circuitboard / CPU lists	posts/ArduinoElegooTools.md	/^## Circuitboard \/ CPU lists$/;"	s	chapter:Parts & kits lists
 Class	cxx/ClassObject.hxx	/^typedef class Class : public Instrumentation { \/* Port of `java.lang.Class`. *\/ \/* NOLINT(cpp/;"	c	namespace:Susuwu
 Class	cxx/ClassObject.hxx	/^} Class;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Class
 ClassIoBytecode	cxx/ClassIo.hxx	/^typedef ClassIoPath ClassIoBytecode; \/* Uses `std::string` for bytecode (versus `std::vector`) /;"	t	namespace:Susuwu	typeref:typename:ClassIoPath
@@ -139,14 +140,17 @@ Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corrupt
 Corrupted	c/rfc6234/sha.h	/^		int Corrupted;              \/* Cumulative corruption code *\/$/;"	m	struct:HMACContext	typeref:typename:int
 DataTypeToEnum	ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
 DataTypeToEnum	cxx/ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	s	namespace:Susuwu
-Depth-image to point cloud (Python)	posts/ArduinoElegooTools.md	/^## Depth-image to point cloud (Python)$/;"	s	chapter:Howto produce point clouds
+Depth-image to point cloud	posts/ArduinoElegooTools.md	/^## Depth-image to point cloud$/;"	s	chapter:Howto produce point clouds
+Different forms (and placements) of servos	posts/ArduinoElegooTools.md	/^## Different forms (and placements) of servos$/;"	s	chapter:Parts & kits lists
 DimSz	ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
 DimSz	cxx/ClassTensorFlowCns.hxx	/^	typedef tensorflow::int64 \/* decltype(tensorflow::TensorShapeRep({}).num_elements()) *\/ DimSz/;"	t	class:Susuwu::TensorFlowCns	typeref:typename:tensorflow::int64
 Disclaimer	posts/ArduinoElegooTools.md	/^## Disclaimer$/;"	s	chapter:Licenses
 Download	README.md	/^## Download$/;"	s	chapter:How to use this
 Errata/footnotes	SECURITY.md	/^## Errata\/footnotes$/;"	s	chapter:Security Policy
 Escrow	README.md	/^### Escrow$/;"	S	section:Contributor conventions/rules""Sponsor
+External resources	posts/ArduinoElegooTools.md	/^# External resources$/;"	c
 External resources	posts/TranscodeMuxHowto.md	/^# External resources$/;"	c
+Group route pseudocode	posts/ArduinoElegooTools.md	/^## Group route pseudocode$/;"	s	chapter:Howto route
 HASHCOUNT	c/rfc6234/shatest.c	/^#define HASHCOUNT /;"	d	file:
 HKDFContext	c/rfc6234/sha.h	/^typedef struct HKDFContext {$/;"	s
 HKDFContext	c/rfc6234/sha.h	/^} HKDFContext;$/;"	t	typeref:struct:HKDFContext
@@ -158,8 +162,10 @@ Hashes	cxx/ClassResultList.hxx	/^	typedef std::unordered_set<ResultListHash> Has
 How to contribute	README.md	/^# How to contribute$/;"	c
 How to use this	README.md	/^# How to use this$/;"	c
 Howto	posts/TranscodeMuxHowto.md	/^# Howto$/;"	c
+Howto produce distortion coefficients	posts/ArduinoElegooTools.md	/^# Howto produce distortion coefficients$/;"	c
 Howto produce point clouds	posts/ArduinoElegooTools.md	/^# Howto produce point clouds$/;"	c
 Howto route	posts/ArduinoElegooTools.md	/^# Howto route$/;"	c
+Howto use coefficients for distortion correction	posts/ArduinoElegooTools.md	/^## Howto use coefficients for distortion correction$/;"	s	chapter:Howto produce distortion coefficients
 Howto use point clouds to route	posts/ArduinoElegooTools.md	/^## Howto use point clouds to route$/;"	s	chapter:Howto produce point clouds
 HsomCns	cxx/ClassCns.cxx	/^typedef class HsomCns : Cns { \/* TODO. ( https:\/\/stackoverflow.com\/questions\/3286448\/calli/;"	c	namespace:Susuwu	file:
 HsomCns	cxx/ClassCns.cxx	/^} HsomCns;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::HsomCns	file:
@@ -170,7 +176,6 @@ IF_SUSUWU_SH_FILE	cxx/Macros.hxx	/^#	define IF_SUSUWU_SH_FILE(/;"	d
 IF_SUSUWU_SH_FILE_LINE_OR_FUNC	cxx/Macros.hxx	/^#	define IF_SUSUWU_SH_FILE_LINE_OR_FUNC(/;"	d
 IF_SUSUWU_SH_FUNC	cxx/Macros.hxx	/^#	define IF_SUSUWU_SH_FUNC(/;"	d
 IF_SUSUWU_SH_LINE	cxx/Macros.hxx	/^#	define IF_SUSUWU_SH_LINE(/;"	d
-IMU (Accelerometer / Gyroscope)	posts/ArduinoElegooTools.md	/^# IMU (Accelerometer \/ Gyroscope)$/;"	c
 INCLUDES_cxx_AssistantCns_cxx	cxx/AssistantCns.cxx	/^#define INCLUDES_cxx_AssistantCns_cxx$/;"	d	file:
 INCLUDES_cxx_AssistantCns_hxx	cxx/AssistantCns.hxx	/^#define INCLUDES_cxx_AssistantCns_hxx$/;"	d
 INCLUDES_cxx_ClassCns_cxx	cxx/ClassCns.cxx	/^#define INCLUDES_cxx_ClassCns_cxx$/;"	d	file:
@@ -210,8 +215,10 @@ Length_High	c/rfc6234/sha.h	/^		uint32_t Length_High;               \/* Message 
 Length_Low	c/rfc6234/sha.h	/^		uint32_t Length_Low;                \/* Message length in bits *\/$/;"	m	struct:SHA1Context	typeref:typename:uint32_t
 Length_Low	c/rfc6234/sha.h	/^		uint32_t Length_Low;                \/* Message length in bits *\/$/;"	m	struct:SHA256Context	typeref:typename:uint32_t
 Licenses	posts/ArduinoElegooTools.md	/^# Licenses$/;"	c
+Limbed _Arduino_/_Elegoo_ robot code	posts/ArduinoElegooTools.md	/^## Limbed _Arduino_\/_Elegoo_ robot code$/;"	s	chapter:Howto route
 ListFormat	cxx/ClassResultList.hxx	/^typedef enum ListFormat : char {$/;"	g	namespace:Susuwu	typeref:typename:char
 ListFormat	cxx/ClassResultList.hxx	/^} ListFormat;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ListFormat
+Lists from **Claude-3-Haiku**	posts/ArduinoElegooTools.md	/^## Lists from **Claude-3-Haiku**$/;"	s	chapter:Parts & kits lists
 MacrosCxx11InheritanceTest	cxx/Macros.cxx	/^class MacrosCxx11InheritanceTest {$/;"	c	namespace:Susuwu::__anona3432b6d0111	file:
 MacrosCxx11InheritanceTestSubclass	cxx/Macros.cxx	/^class MacrosCxx11InheritanceTestSubclass : MacrosCxx11InheritanceTest {$/;"	c	namespace:Susuwu::__anona3432b6d0111	file:
 MacrosCxx11NullptrTest	cxx/Macros.cxx	/^SUSUWU_CONSTEXPR static const bool MacrosCxx11NullptrTest(decltype(       NULL)    \/* `int`    /;"	f	namespace:Susuwu::__anona3432b6d0111	typeref:typename:SUSUWU_CONSTEXPR const bool	file:
@@ -235,8 +242,10 @@ Object	cxx/ClassObject.hxx	/^typedef class Object : public Class { \/* Port of `
 Object	cxx/ClassObject.hxx	/^} Object;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Object
 ObjectCloneAs	cxx/ClassObject.hxx	/^typedef enum ObjectCloneAs : unsigned char { \/* Is extra (not part of Java); accomodates the nu/;"	g	namespace:Susuwu	typeref:typename:unsigned char
 ObjectCloneAs	cxx/ClassObject.hxx	/^} ObjectCloneAs;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ObjectCloneAs
-Optical flow to point cloud (Python)	posts/ArduinoElegooTools.md	/^## Optical flow to point cloud (Python)$/;"	s	chapter:Howto produce point clouds
+Optical flow processing of visuals into point cloud (computes z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (computes z-axis)$/;"	s	chapter:Howto produce point clouds
+Optical flow processing of visuals into point cloud (limited; static z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (limited; static z-axis)$/;"	s	chapter:Howto produce point clouds
 Options/setup	README.md	/^## Options\/setup$/;"	s	chapter:How to use this
+Own lists	posts/ArduinoElegooTools.md	/^## Own lists$/;"	s	chapter:Parts & kits lists
 PRINTBASE64	c/rfc6234/shatest.c	/^#define PRINTBASE64 /;"	d	file:
 PRINTFAIL	c/rfc6234/shatest.c	/^#define PRINTFAIL /;"	d	file:
 PRINTHEX	c/rfc6234/shatest.c	/^#define PRINTHEX /;"	d	file:
@@ -244,6 +253,7 @@ PRINTNONE	c/rfc6234/shatest.c	/^#define PRINTNONE /;"	d	file:
 PRINTPASSFAIL	c/rfc6234/shatest.c	/^#define PRINTPASSFAIL /;"	d	file:
 PRINTRAW	c/rfc6234/shatest.c	/^#define PRINTRAW /;"	d	file:
 PRINTTEXT	c/rfc6234/shatest.c	/^#define PRINTTEXT /;"	d	file:
+Parts & kits lists	posts/ArduinoElegooTools.md	/^# Parts & kits lists$/;"	c
 PortableExecutable	cxx/ClassPortableExecutable.hxx	/^	PortableExecutable(ClassIoPath path_, ClassIoBytecode bytecode_) : path(std::move(path_)), byte/;"	f	class:Susuwu::PortableExecutable
 PortableExecutable	cxx/ClassPortableExecutable.hxx	/^	explicit PortableExecutable(ClassIoPath path_ = "") : path(std::move(path_)) {}$/;"	f	class:Susuwu::PortableExecutable	typeref:typename:Susuwu::PortableExecutable
 PortableExecutable	cxx/ClassPortableExecutable.hxx	/^typedef class PortableExecutable : public Object {$/;"	c	namespace:Susuwu
@@ -258,8 +268,6 @@ Produce `.gif`	posts/TranscodeMuxHowto.md	/^## Produce `.gif`$/;"	s	chapter:Howt
 Produce `.m4a`	posts/TranscodeMuxHowto.md	/^## Produce `.m4a`$/;"	s	chapter:Howto
 Produce `.mp4`	posts/TranscodeMuxHowto.md	/^## Produce `.mp4`$/;"	s	chapter:Howto
 Progress	c/README.md	/^# Progress$/;"	c
-Pseudocode for Camera Distortion Correction	posts/ArduinoElegooTools.md	/^# Pseudocode for Camera Distortion Correction$/;"	c
-Pseudocode for Estimating Lens Distortion Coefficients	posts/ArduinoElegooTools.md	/^# Pseudocode for Estimating Lens Distortion Coefficients$/;"	c
 PureVirtual	cxx/Macros.cxx	/^	const bool PureVirtual() const SUSUWU_OVERRIDE {return true;}; \/* Notice: `final` is not allow/;"	f	class:Susuwu::__anona3432b6d0111::MacrosCxx11InheritanceTestSubclass	typeref:typename:const bool	file:
 Purposes	.ssh/README.md	/^# Purposes$/;"	c
 Purposes	README.md	/^# Purposes$/;"	c
@@ -268,9 +276,6 @@ Purposes	cxx/README.md	/^# Purposes$/;"	c
 Purposes	hooks/README.md	/^# Purposes$/;"	c
 Purposes	posts/README.md	/^# Purposes$/;"	c
 Purposes	sh/README.md	/^# Purposes$/;"	c
-Python Example	posts/ArduinoElegooTools.md	/^## Python Example$/;"	s	chapter:Unified Modular Robot Controller Example
-Python Example (with pyfirmata or other serial comms)	posts/ArduinoElegooTools.md	/^## Python Example (with pyfirmata or other serial comms)$/;"	s	chapter:IMU (Accelerometer / Gyroscope)
-Python Utils	posts/ArduinoElegooTools.md	/^## Python Utils$/;"	s	chapter:Utils: Shared Functions for C++ and Python
 Questions to viewers	posts/AlbatrossCNS.md	/^# Questions to viewers$/;"	c
 RANDOMCOUNT	c/rfc6234/shatest.c	/^#define RANDOMCOUNT /;"	d	file:
 ROTR_temp1	c/rfc6234/sha384-512.c	/^static uint32_t ROTR_temp1[2], ROTR_temp2[2];$/;"	v	typeref:typename:uint32_t[2]	file:
@@ -683,10 +688,6 @@ Signatures	cxx/ClassResultList.hxx	/^	typedef std::vector<ResultListSignature> S
 Source code	VirusAnalysis.md	/^# Source code$/;"	c
 Source code	posts/VirusAnalysis.md	/^# Source code$/;"	c
 Sponsor	README.md	/^## Sponsor$/;"	s	chapter:Contributor conventions/rules
-Step 1: Capture known points and observed points	posts/ArduinoElegooTools.md	/^# Step 1: Capture known points and observed points$/;"	c
-Step 2: Initialize coefficients	posts/ArduinoElegooTools.md	/^# Step 2: Initialize coefficients$/;"	c
-Step 3: Compute error for each point	posts/ArduinoElegooTools.md	/^# Step 3: Compute error for each point$/;"	c
-Step 4: Optimize coefficients based on errors	posts/ArduinoElegooTools.md	/^# Step 4: Optimize coefficients based on errors$/;"	c
 SubClass	cxx/ClassObject.cxx	/^class SubClass : public Class { SUSUWU_CLASS_DEFAULTS(SubClass) };$/;"	c	namespace:Susuwu::__anonf22f36750111	file:
 SubClassWithBaseSubobject	cxx/Macros.cxx	/^	class SubClassWithBaseSubobject : public Zero {public: bool boo = true;};$/;"	c	function:Susuwu::__anona3432b6d0111::macrosNoUniqueAddressTest	file:
 SubClassWithMemberObject	cxx/ClassObject.cxx	/^class SubClassWithMemberObject : public Class { public: SUSUWU_CLASS_DEFAULTS(SubClassWithMember/;"	c	namespace:Susuwu::__anonf22f36750111	file:
@@ -784,14 +785,13 @@ USHAMaxHashSizeBits	c/rfc6234/sha.h	/^		SHA512HashSizeBits = 512, USHAMaxHashSiz
 USHAReset	c/rfc6234/usha.c	/^int USHAReset(USHAContext *context, enum SHAversion whichSha)$/;"	f	typeref:typename:int
 USHAResult	c/rfc6234/usha.c	/^int USHAResult(USHAContext *context,$/;"	f	typeref:typename:int
 USHA_Max_Message_Block_Size	c/rfc6234/sha.h	/^		USHA_Max_Message_Block_Size = SHA512_Message_Block_Size,$/;"	e	enum:__anoncf2b51e20203
-Unified Modular Robot Controller Example	posts/ArduinoElegooTools.md	/^# Unified Modular Robot Controller Example$/;"	c
-Utils: Shared Functions for C++ and Python	posts/ArduinoElegooTools.md	/^# Utils: Shared Functions for C++ and Python$/;"	c
 VISUAL_IN_EXTENSIONLESS	sh/Transcode.sh	/^VISUAL_IN_EXTENSIONLESS() ( echo "${TRANSCODE_VISUAL_IN%.*}" )$/;"	f
 VirusAnalysisFun	cxx/VirusAnalysis.hxx	/^typedef const VirusAnalysisResult (*VirusAnalysisFun)(const PortableExecutable &file, const Resu/;"	t	namespace:Susuwu	typeref:typename:const VirusAnalysisResult (*)(const PortableExecutable & file,const ResultListHash & fileHash)
 VirusAnalysisHook	cxx/VirusAnalysis.hxx	/^typedef enum VirusAnalysisHook : unsigned char {$/;"	g	namespace:Susuwu	typeref:typename:unsigned char
 VirusAnalysisHook	cxx/VirusAnalysis.hxx	/^} VirusAnalysisHook;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::VirusAnalysisHook
 VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^typedef enum VirusAnalysisResult : char { \/* TODO? All other cases convert to `bool(true)` unle/;"	g	namespace:Susuwu	typeref:typename:char
 VirusAnalysisResult	cxx/VirusAnalysis.hxx	/^} VirusAnalysisResult; \/* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == /;"	t	namespace:Susuwu	typeref:enum:Susuwu::VirusAnalysisResult
+Wheeled _Arduino_/_Elegoo_ robot code	posts/ArduinoElegooTools.md	/^## Wheeled _Arduino_\/_Elegoo_ robot code$/;"	s	chapter:Howto route
 With	VirusAnalysis.md	/^`less` [`cxx\/main.cxx`](..\/cxx\/main.cxx) #With boilerplate$/;"	h	chapter:Source code
 With	VirusAnalysis.md	/^`less` [`cxx\/main.hxx`](..\/cxx\/main.hxx) #With boilerplate$/;"	h	chapter:Source code
 With	posts/VirusAnalysis.md	/^`less `[`cxx\/main.cxx`](https:\/\/github.com\/SwuduSusuwu\/SusuLib\/blob\/trunk\/cxx\/main.cxx)/;"	h	chapter:Source code
@@ -808,6 +808,7 @@ _Markdown_	README.md	/^## _Markdown_$/;"	s	chapter:Contributor conventions/rules
 _SHA_H_	c/rfc6234/sha.h	/^#define _SHA_H_$/;"	d
 _SHA_PRIVATE__H	c/rfc6234/sha-private.h	/^#define _SHA_PRIVATE__H$/;"	d
 _SHA_enum_	c/rfc6234/sha.h	/^#define _SHA_enum_$/;"	d
+_TensorFlow_: static image to point clouds	posts/ArduinoElegooTools.md	/^## _TensorFlow_: static image to point clouds$/;"	s	chapter:Howto produce point clouds
 __anon73fa30250111	cxx/VirusAnalysis.cxx	/^namespace { \/* [misc-use-anonymouse-namespace] *\/$/;"	n	namespace:Susuwu	file:
 __anon73fa30250202	cxx/VirusAnalysis.cxx	/^		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { \/* NOLINT(cppcoreguidel/;"	f	function:Susuwu::virusAnalysisHook	file:
 __anon8f7309390111	cxx/ClassResultList.cxx	/^namespace { \/* [misc-use-anonymouse-namespace] *\/$/;"	n	namespace:Susuwu	file:
@@ -1011,7 +1012,6 @@ isInitialized	cxx/ClassObject.hxx	/^	virtual const bool isInitialized() const { 
 isPlainOldData	cxx/ClassObject.hxx	/^	virtual const bool isPlainOldData() const { return !(usesDynamicAllocations() || usesFilesystem/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 isPureVirtual	cxx/ClassObject.hxx	/^	virtual const bool isPureVirtual() const { return false; } \/* in case the compiler does not re/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 isRelatedTo	cxx/ClassObject.hxx	/^	SUSUWU_INLINE const bool isRelatedTo(const Class &obj) const { return (this->isInstance(obj) ||/;"	f	class:Susuwu::Class	typeref:typename:SUSUWU_INLINE const bool
-k1, k2, k3, p1, p2 = optimizeCoefficients(errors)	posts/ArduinoElegooTools.md	/^# k1, k2, k3, p1, p2 = optimizeCoefficients(errors)$/;"	c
 k_opad	c/rfc6234/sha.h	/^		unsigned char k_opad[USHA_Max_Message_Block_Size];$/;"	m	struct:HMACContext	typeref:typename:unsigned char[]
 keyarray	c/rfc6234/shatest.c	/^		const char *keyarray[5];$/;"	m	struct:hmachash	typeref:typename:const char * [5]	file:
 keylength	c/rfc6234/shatest.c	/^		int keylength[5];$/;"	m	struct:hmachash	typeref:typename:int[5]	file:
