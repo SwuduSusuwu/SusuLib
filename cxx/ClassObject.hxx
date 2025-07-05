@@ -6,13 +6,14 @@
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
 #include "ClassIo.hxx" /* classIoHexStr gsl::owner */
-#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX17 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CONSTEXPR SUSUWU_CXX11 SUSUWU_CXX17 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp memcpy */
 #include <new> /* ::operator new */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
+#include <vector> /* std::vector */
 
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
@@ -34,6 +35,40 @@ typedef enum ObjectMode : char {
 	objectModeString
 #endif /* def SUSUWU_CXX17 else */
 } ObjectMode;
+template<class Q>
+struct ToObjectMode; /* Usage: `template<class Type>\nObjectMode objectMode = ToObjectMode<Type>::value;` */
+// typedef struct ToObjectMode { static ObjectMode value; } ToObjectMode; /* TODO: fix `error: expected ';' after struct` */
+template<>
+struct ToObjectMode<bool> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeBool; };
+template<>
+struct ToObjectMode<char> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeChar; };
+enum ObjectEnum {};
+template<>
+struct ToObjectMode<enum ObjectEnum> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeEnum; };
+template<>
+struct ToObjectMode<int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeInt; };
+template<>
+struct ToObjectMode<unsigned int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeUint; };
+template<>
+struct ToObjectMode<float> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeFloat; };
+template<>
+struct ToObjectMode<double> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeDouble; };
+template<>
+struct ToObjectMode<std::vector<bool>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorBool; };
+template<>
+struct ToObjectMode<std::vector<char>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorChar; };
+template<>
+struct ToObjectMode<std::vector<enum ObjectEnum>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorEnum; };
+template<>
+struct ToObjectMode<std::vector<int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorInt; };
+template<>
+struct ToObjectMode<std::vector<unsigned int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorUint; };
+template<>
+struct ToObjectMode<std::vector<float>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorFloat; };
+template<>
+struct ToObjectMode<std::vector<double>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorDouble; };
+template<>
+struct ToObjectMode<std::string> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeString; };
 
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
