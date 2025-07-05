@@ -239,6 +239,7 @@ Object	cxx/ClassObject.hxx	/^typedef class Object : public Class { \/* Port of `
 Object	cxx/ClassObject.hxx	/^} Object;$/;"	t	namespace:Susuwu	typeref:class:Susuwu::Object
 ObjectCloneAs	cxx/ClassObject.hxx	/^typedef enum ObjectCloneAs : unsigned char { \/* Is extra (not part of Java); accomodates the nu/;"	g	namespace:Susuwu	typeref:typename:unsigned char
 ObjectCloneAs	cxx/ClassObject.hxx	/^} ObjectCloneAs;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ObjectCloneAs
+ObjectEnum	cxx/ClassObject.hxx	/^enum ObjectEnum {};$/;"	g	namespace:Susuwu
 ObjectMode	cxx/ClassObject.hxx	/^typedef enum ObjectMode : char {$/;"	g	namespace:Susuwu	typeref:typename:char
 ObjectMode	cxx/ClassObject.hxx	/^} ObjectMode;$/;"	t	namespace:Susuwu	typeref:enum:Susuwu::ObjectMode
 Optical flow processing of visuals into point cloud (computes z-axis)	posts/ArduinoElegooTools.md	/^## Optical flow processing of visuals into point cloud (computes z-axis)$/;"	s	chapter:Howto produce point clouds
@@ -762,6 +763,21 @@ TensorFlowCnsLoss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss 
 TensorFlowCnsLoss	cxx/ClassTensorFlowCns.hxx	/^typedef struct TensorFlowCnsLoss { tensorflow::Output loss, backprop; } \/* `decltype(tensorflow/;"	t	namespace:Susuwu	typeref:struct:Susuwu::TensorFlowCnsLoss
 This	VirusAnalysis.md	/^`less` [`cxx\/ClassObject.cxx`](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject/;"	h	chapter:Source code
 This	posts/VirusAnalysis.md	/^`less `[`cxx\/ClassObject.cxx`](..\/cxx\/ClassObject.cxx) #This is just unit tests. `ClassObject/;"	h	chapter:Source code
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<bool> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeBool; };$/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<char> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeChar; };$/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<double> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeDouble; };$/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<enum ObjectEnum> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeEnum/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<float> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeFloat; };$/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeInt; };$/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::string> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeString; /;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<bool>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVe/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<char>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVe/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<double>> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<enum ObjectEnum>> { static SUSUWU_CONSTEXPR ObjectMode value = o/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<float>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeV/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVec/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<unsigned int>> { static SUSUWU_CONSTEXPR ObjectMode value = obje/;"	s	namespace:Susuwu
+ToObjectMode	cxx/ClassObject.hxx	/^struct ToObjectMode<unsigned int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeUint; }/;"	s	namespace:Susuwu
 ToObjectMode	cxx/ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	s	namespace:Susuwu
 USHABlockSize	c/rfc6234/usha.c	/^int USHABlockSize(enum SHAversion whichSha)$/;"	f	typeref:typename:int
 USHAContext	c/rfc6234/sha.h	/^typedef struct USHAContext {$/;"	s
@@ -1168,6 +1184,21 @@ usesDynamicAllocations	cxx/ClassObject.hxx	/^	virtual const bool usesDynamicAllo
 usesFilesystem	cxx/ClassObject.hxx	/^	virtual const bool usesFilesystem() const { \/* if(uses functions suchas {`fopen`, `new`}) { re/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 usesNetwork	cxx/ClassObject.hxx	/^	virtual const bool usesNetwork() const { \/* if(uses functions suchas {`socket`}) { return true/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
 usesThreads	cxx/ClassObject.hxx	/^	virtual const bool usesThreads() const { \/* if(uses functions suchas {`pthread`}) { return tru/;"	f	class:Susuwu::Instrumentation	typeref:typename:const bool
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<bool> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeBool; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<char> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeChar; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<double> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeDouble; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<enum ObjectEnum> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeEnum/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<float> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeFloat; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeInt; };$/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::string> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeString; /;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<bool>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVe/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<char>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVe/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<double>> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<enum ObjectEnum>> { static SUSUWU_CONSTEXPR ObjectMode value = o/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<float>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeV/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVec/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<std::vector<unsigned int>> { static SUSUWU_CONSTEXPR ObjectMode value = obje/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
+value	cxx/ClassObject.hxx	/^struct ToObjectMode<unsigned int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeUint; }/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
 value	cxx/ClassTensorFlowCns.hxx	/^struct DataTypeToEnum { static SUSUWU_CONSTEXPR tensorflow::DataType value = tensorflow::DataTyp/;"	m	struct:Susuwu::DataTypeToEnum	typeref:typename:SUSUWU_CONSTEXPR tensorflow::DataType
 value	cxx/ClassTensorFlowCns.hxx	/^struct ToObjectMode<tensorflow::tstring> { static SUSUWU_CONSTEXPR ObjectMode value = objectMode/;"	m	struct:Susuwu::ToObjectMode	typeref:typename:SUSUWU_CONSTEXPR ObjectMode
 virusAnalyses	cxx/VirusAnalysis.cxx	/^std::vector<VirusAnalysisFun> virusAnalyses = {hashAnalysis, signatureAnalysis, staticAnalysis, /;"	v	namespace:Susuwu	typeref:typename:std::vector<VirusAnalysisFun>
