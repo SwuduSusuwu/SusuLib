@@ -468,6 +468,40 @@ typedef enum ObjectMode : char {
 	objectModeString
 #endif /* def SUSUWU_CXX17 else */
 } ObjectMode;
+template<class Q>
+struct ToObjectMode; /* Usage: `template<class Type>\nObjectMode objectMode = ToObjectMode<Type>::value;` */
+// typedef struct ToObjectMode { static ObjectMode value; } ToObjectMode; /* TODO: fix `error: expected ';' after struct` */
+template<>
+struct ToObjectMode<bool> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeBool; };
+template<>
+struct ToObjectMode<char> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeChar; };
+enum ObjectEnum {};
+template<>
+struct ToObjectMode<enum ObjectEnum> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeEnum; };
+template<>
+struct ToObjectMode<int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeInt; };
+template<>
+struct ToObjectMode<unsigned int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeUint; };
+template<>
+struct ToObjectMode<float> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeFloat; };
+template<>
+struct ToObjectMode<double> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeDouble; };
+template<>
+struct ToObjectMode<std::vector<bool>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorBool; };
+template<>
+struct ToObjectMode<std::vector<char>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorChar; };
+template<>
+struct ToObjectMode<std::vector<enum ObjectEnum>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorEnum; };
+template<>
+struct ToObjectMode<std::vector<int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorInt; };
+template<>
+struct ToObjectMode<std::vector<unsigned int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorUint; };
+template<>
+struct ToObjectMode<std::vector<float>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorFloat; };
+template<>
+struct ToObjectMode<std::vector<double>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorDouble; };
+template<>
+struct ToObjectMode<std::string> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeString; };
 
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
