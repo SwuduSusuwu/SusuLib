@@ -6,6 +6,7 @@ GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #/* `git` does not set `${GI
 if [ ! "$(realpath -q ./)" = "$(realpath -q "${GIT_ROOT}")" ]; then
 	GIT_ROOT_USE="${GIT_ROOT}" #/* If current path is not root, add root path */
 fi
+
 SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
 	echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
 }
@@ -20,13 +21,13 @@ SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
 }
 SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
 
-SUSUWU_COMPILE_JSON_PATH_="$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json" # [`clang-tidy` compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration)
+SUSUWU_COMPILE_JSON_PATH_="$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json" #/* [`clang-tidy` compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration) */
 SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
 	export SUSUWU_NEW_BUILD SUSUWU_RELINK SUSUWU_COMPILE_JSON_PATH
 	if [ true = "${1}" ]; then #/* If is first build, or passed `--rebuild`, or global headers `touch`d;
 		SUSUWU_NEW_BUILD=true    # * build "${OBJDIR}${OUTPUT}",
 		SUSUWU_RELINK=true       # * build "${BINDIR}${OUTPUT}",
-		SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" # *and produce compilation database. */
+		SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" # * plus produce compilation database. */
 	else                                    #/* If is built;
 		SUSUWU_NEW_BUILD=false                # * don't clobber,
 		SUSUWU_RELINK=false                   # * don't clobber,
