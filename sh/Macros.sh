@@ -23,10 +23,11 @@ SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param [...]" "$@";
 SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwanted-param" "$@")"`. [This processes params passed to `${0}`.] */
 	PARAM=${1}; shift;
 	NEW_PARAMS=""
-	SUSUWU_SH_REMOVE_PARAM_FOUND=1
+	SUSUWU_SH_REMOVE_PARAM_FOUND=1 #/* `false` */
 	for PARAM_W in "$@"; do
-		if [ "${PARAM}" != "${PARAM_W}" ]; then
-			SUSUWU_SH_REMOVE_PARAM_FOUND=0
+		if [ "${PARAM}" = "${PARAM_W}" ]; then
+			SUSUWU_SH_REMOVE_PARAM_FOUND=0 #/* `true` */
+		else
 			if [ -z "${NEW_PARAMS}" ]; then
 				NEW_PARAMS="${PARAM_W}"
 			elif [ -n "${NEW_PARAMS}" ]; then
@@ -35,7 +36,7 @@ SUSUWU_SH_REMOVE_PARAM() ( #/* Usage: `echo "$(SUSUWU_SH_REMOVE_PARAM "--unwante
 		fi
 	done
 	echo "${NEW_PARAMS}"
-	return ${SUSUWU_SH_REMOVE_PARAM_FOUND}
+	return ${SUSUWU_SH_REMOVE_PARAM_FOUND} #/* allows use as `if $(SUSUWU_SH_REMOVE_PARAM "--unwanted-param" "$@"); then` */
 )
 SUSUWU_STATIC_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW_CONSTANT; then EXPERIMENTAL_CODE(); fi`. Is fast (versus `SUSUWU_IS_PREVIEW()`, but must hardcode for production (or release) versus "experimental" (or "preview") branches. */
 	return 1 #/* TODO: for "experimental" (or "preview") branches, `return 0` */
@@ -267,14 +268,12 @@ SUSUWU_SH_NOTICE() ( SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Notice: "; )
 SUSUWU_SH_DEBUG() ( SUSUWU_SH_USE2 "${SUSUWU_SH_BLUE}" "Debug: "; )
 
 SUSUWU_SH_QUOTE() { #/* Usage: `SUSUWU_SH_QUOTE "<type-of-quote [...]>" "<code | quote>" ["<optional original color>"])"`. */
-#	if [ "${1% }" != "${1}" ]; then #if [ ${1} != "${1}" ]; then #/* analogous to `if [ "${1#}" -gt 1 ]; then` */
-#		echo "SUSUWU_SH_QUOTE: multiple modes"
-#	fi #/* TODO: figure out why noneof those conditions will do as supposed to. */
+	for SUSUWU_SH_QUOTE_W in ${1}; do continue; done
+	if [ "${SUSUWU_SH_QUOTE_W}" != "${1}" ]; then #	if [ "${1% }" != "${1}" ]; then #if [ ${1} != "${1}" ]; then #/* analogous to `if [ "${1#}" -gt 1 ]; then` */
+		SUSUWU_PRINT "SUSUWU_SH_QUOTE()" "$(SUSUWU_SH_DEBUG)" "Multiple modes: \${1}='$(SUSUWU_SH_QUOTE "CURRENT" "${1}")'"
+	fi
 	SUSUWU_SH_QUOTE_Q="${2}"
 	for SUSUWU_SH_QUOTE_W in ${1}; do
-		if [ "${SUSUWU_SH_QUOTE_Q}" != "${2}" ]; then
-			SUSUWU_PRINT "SUSUWU_SH_QUOTE()" "$(SUSUWU_SH_DEBUG)" "Multiple modes: \${1}='$(SUSUWU_SH_QUOTE "CURRENT" "${1}")'"
-		fi
 		SUSUWU_SH_QUOTE_Q="$(SUSUWU_SH_QUOTE_SUB "${SUSUWU_SH_QUOTE_W}" "${SUSUWU_SH_QUOTE_Q}" "${3}")" #/* TODO: pass "" for <optional original color> unless this is the last cycle of the `do` */
 	done
 	echo "${SUSUWU_SH_QUOTE_Q}"
@@ -391,7 +390,8 @@ SUSUWU_LOCAL_WORKSPACE_PATH() ( #/* Usage: `"$(SUSUWU_LOCAL_WORKSPACE_PATH)/comp
 	dirname "$(git rev-parse --absolute-git-dir 2>/dev/null)"
 )
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
-	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #/* remote branch */
+	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" # | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #/* remote branch */
+	)"; DEFAULT_BRANCH="${DEFAULT_BRANCH#$(git remote)/}" #/* remote branch */ /* `sed -n` replaced with substitution */
 	if [ -z "${DEFAULT_BRANCH}" ]; then #/* if `git remote` not found */
 		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #/* local branch; if you update this, update `README.md#git`. */
 	fi
@@ -414,13 +414,12 @@ SUSUWU_PRODUCTION_USE() ( #/* Usage: `SUSUWU_PRODUCTION_USE ["<default branch>"]
 )
 
 SUSUWU_TEST_BASH() ( #/* Usage: `s/exit ${STATUS}/${STATUS} && SUSUWU_TEST_BASH && STATUS=$?; exit ${STATUS}/` */
-		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" # In case user wants to disable this (or this crashed on last execution).
 	if command -v "bash" >/dev/null && [ -z "${BASH_VERSION}" ]; then #/* If system has `bash`, && this is not an infinite loop (`${0}` not executed though `bash`) ...
 		BASH_PATH="${0}.bash" # * ... , path for `bash` version of this. */
 		SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_TEST_BASH()" "${BASH_PATH}" #/* Stop if user disabled this (or if this crashed on last execution). */
 		SUSUWU_PRINT "SUSUWU_TEST_BASH()" "$(SUSUWU_SH_NOTICE)" "Will produce $(SUSUWU_SH_QUOTE "CODE" "${BASH_PATH}") to test $(SUSUWU_SH_QUOTE "CODE" "/bin/bash"). Execute $(SUSUWU_SH_QUOTE "CODE" "touch '${BASH_PATH}'") to disable this."
 		cp "${0}" "${BASH_PATH}" || exit 1
-		if sed 's|/bin/sh|/bin/bash|' -i'' "${BASH_PATH}"; then #/* If produced `/bin/bash` version... */
+		if sed 's|#!/bin/sh$|#!/bin/bash|' -i'' "${BASH_PATH}"; then #/* If produced `/bin/bash` version... */
 			#shellcheck disable=SC2016 #/* This is not supposed to "expand". */
 			sed 's|^\s*SUSUWU_BUILD_OBJECTS[^#]*|$(SUSUWU_S=true; \0) |' -i'' "${BASH_PATH}" #/* ... , silence subsequent `SUSUWU_BUILD_OBJECTS()` ... */
 			#shellcheck disable=SC2016 #/* This is not supposed to "expand". */
