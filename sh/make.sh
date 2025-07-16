@@ -244,8 +244,10 @@ SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [T
 SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
 #shellcheck disable=SC2068
 	for SUSUWU_PROCESS_INCLUDES_SOURCE_ in $@; do
-		SUSUWU_PROCESS_INCLUDES_OBJECT_="${OBJDIR}$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" .hxx).o" #/* `basename`'s second param removes suffix */
-		SUSUWU_PROCESS_INCLUDES_SRCCXX_="$(dirname "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")/$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" .hxx).cxx" #/* `basename`'s second param removes suffix */
+#		SUSUWU_PROCESS_INCLUDES_SRCS_="$(SUSUWU_STR_TOKEN_FIRST "$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")" ".")"
+		SUSUWU_PROCESS_INCLUDES_SRCS_="$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_%.*}")" #/* `%.*` removes suffix, analogous to `| rev | cut -d '.' -f2- | rev` */
+		SUSUWU_PROCESS_INCLUDES_OBJECT_="${OBJDIR}${SUSUWU_PROCESS_INCLUDES_SRCS_}.o"
+		SUSUWU_PROCESS_INCLUDES_SRCCXX_="$(dirname "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")/${SUSUWU_PROCESS_INCLUDES_SRCS_}.cxx"
 		if [ -n "$(find "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" -newer "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" 2>/dev/null)" ] && [ -e "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" ]; then #/* `-n`: not nil, `-e`: exists. */
 			SUSUWU_REBUILD_OUTPUT "$(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_SOURCE_}") (which is a common $(SUSUWU_SH_QUOTE "CODE" "#include")) is newer than $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_OBJECT_}")"
 			break
@@ -289,7 +291,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 	SUSUWU_ECHO_COMMANDS true
 #shellcheck disable=SC2068 #/* `"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'" */
 	for LOCAL_SOURCE in $@; do
-		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
+		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE%.*}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `%.*` removes suffix */
 #shellcheck disable=SC2166 #/* With `set -x`, the `[] || []` form prints 2 commands */
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
 				SUSUWU_COMPILE_COMMAND "$(pwd)" "${LOCAL_SOURCE}" "${LOCAL_BUILD} ${LOCAL_BUILDFLAGS} -c ${LOCAL_SOURCE} -o ${LOCAL_OBJECT}" || { #/* TODO: figure out how to quote `${LOCAL_BUILD}`, `${LOCAL_SOURCE}` `${LOCAL_OBJECT}` */
