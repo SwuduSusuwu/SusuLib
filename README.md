@@ -20,7 +20,8 @@
 
 # Purposes
 <https://github.com/SwuduSusuwu/SusuLib/> as a whole is: [computer-related blog posts](./posts/) and modular {[`Susuwu::*`, `susuwu*`](./cxx/), [`SUSUWU_*`](./sh/)} code about those posts.
-- \[Notice\] Moved this repo to <https://github.com/SwuduSusuwu/SusuLib/> ([since the focus shifted from blog posts to source code](https://github.com/SwuduSusuwu/SusuLib/discussions/58).)
+- \[Notice\] Moved from <https://github.com/SwuduSusuwu/SubStack/> to <https://github.com/SwuduSusuwu/SusuLib/> ([since the focus shifted from blog posts to source code](https://github.com/SwuduSusuwu/SusuLib/discussions/58).)
+  - <https://github.com/SwuduSusuwu/SusuPosts/tree/preview/posts/> stages posts for <https://SwuduSusuwu.SubStack.com/> (which includes [`./posts/`](./posts/) plus posts which are not about artificial neural tissue, antiviruses, assistants, or autonomous tools).
 - \[Notice\] Plan to move {`Susuwu::*`, `susuwu*`, `SUSUWU_*`} to {`SusuLib::*`, `susulib*`, `SUSULIB_*`}.
 
 [`./.ssh/`](./.ssh/) is to [use signatures / certificates](#signaturecertificate).
