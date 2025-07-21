@@ -3,6 +3,7 @@
 #ifndef INCLUDES_cxx_ClassTensorFlowCns_hxx
 #define INCLUDES_cxx_ClassTensorFlowCns_hxx
 #include "ClassCns.hxx" /* Cns */
+#include "ClassNumeral.hxx" /* numeralDenormalization() numeralNormalization() NumeralNormalizers::fromTuple */
 #include "ClassObject.hxx" /* ObjectMode ToObjectMode SUSUWU_PURE_VIRTUAL_DEFAULTS() */
 #include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW SUSUWU_WARNING */
 #ifdef SUSUWU_USE_TENSORFLOW
@@ -284,10 +285,16 @@ public:
 			expectedOutputTensor(DataTypeToEnum<CoefficientType /* implicit conversion from `Output` */>::value, tensorflow::TensorShape({static_cast<DimSz>(inputCount), static_cast<DimSz>(inputDim)})) /* backpropagation's `y` axis, which TensorFlow calls "label" */;
 
 		auto inputTensorMapped = inputTensor.matrix<CoefficientType /* implicit conversion from `Input` */>();
-		auto expectedOutputTensorMapped = expectedOutputTensor.matrix<CoefficientType /* implicit conversion from `Output` */>();
+		auto expectedOutputTensorMapped = expectedOutputTensor.matrix<CoefficientType /* implicit conversion from `Output` */Output>();
+		inputNormsStorage = NumeralNormalizers::fromTuple<0>(inputsToOutputs);
+#if SUSUWU_CLASSCNS_SEPARATE_NORMS
+		outputNormsStorage = NumeralNormalizers::fromTuple<1>(inputsToOutputs);
+#endif /* !SUSUWU_CLASSCNS_SEPARATE_NORMS */
+		NumeralNormalizersReciprocal inputNormsRecip(inputNorms()),
+			outputNormsRecip(outputNorms());
 		for(size_t i = 0; i < inputCount; ++i) {
-			inputTensorMapped(i, 0 /* TODO: for versions of `setupSynapses` where `std::tuple` holds `std::vector`s, replace 0 with `std::vector` index, and loop */) = std::get<0>(inputsToOutputs[i]); /* Training input */
-			expectedOutputTensorMapped(i, 0) = std::get<1>(inputsToOutputs[i]); /* Expected output */
+			inputTensorMapped(i, 0 /* TODO: for versions of `setupSynapses` where `std::tuple` holds `std::vector`s, replace 0 with `std::vector` index, and loop */) = numeralNormalization(std::get<0>(inputsToOutputs[i]), inputNormsRecip); /* Training input */
+			expectedOutputTensorMapped(i, 0) = numeralNormalization(std::get<1>(inputsToOutputs[i]), outputNormsRecip); /* Expected output */
 		}
 
 		/* Define the neural network architecture */
@@ -368,18 +375,18 @@ public:
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	const float processToFloat(const float &input) const SUSUWU_OVERRIDE {
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType /* If `CoefficientDefaultType` switches to `double`, `float` could give "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({1, 1}));
-		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = input;
+		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = numeralNormalization(input, inputNorms());
 		auto oTensors = processToImpl<CoefficientDefaultType, float>(inputTensor, __func__);
-		return static_cast<float>(oTensors[0].matrix<CoefficientDefaultType /* `float` */>()(0, 0));
+		return static_cast<float>(numeralDenormalization(oTensors[0].matrix<CoefficientDefaultType /* `float` */>()(0, 0), outputNorms()));
 	}
 
 	/* Also known as "forwardpropagation" or "inference". `int` version.
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	const int processToInt(const int &input) const SUSUWU_OVERRIDE {
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType /* `int` gives "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({1, 1}));
-		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = input;
+		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = numeralNormalization(input, inputNorms());
 		auto oTensors = processToImpl<CoefficientDefaultType, int>(inputTensor, __func__);
-		return static_cast<int>(oTensors[0].matrix<CoefficientDefaultType /* `int` */>()(0, 0));
+		return static_cast<int>(numeralDenormalization(oTensors[0].matrix<CoefficientDefaultType /* `int` */>()(0, 0), outputNorms()));
 	}
 
 	/* Also known as "forwardpropagation" or "inference". `std::string` version. */

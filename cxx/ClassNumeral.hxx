@@ -100,8 +100,8 @@ typedef struct NumeralNormalizersReciprocal : public Object { /* is as `NumeralN
 		const NumeralAccum avg = numeralAverage<tupleIndex>(nums);
 		return NumeralNormalizersReciprocal(avg, 1 / numeralBalancedMagnitude<tupleIndex>(nums, avg));
 	}
-	explicit NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normalizers.average), magnitudeReciprocal(1 / normalizers.magnitude) {}
-	explicit operator NumeralNormalizers() const { return { average, 1 / magnitudeReciprocal }; }
+	NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normalizers.average), magnitudeReciprocal(1 / normalizers.magnitude) {}
+	operator NumeralNormalizers() const { return { average, 1 / magnitudeReciprocal }; }
 } NumeralNormalizersReciprocal;
 /* NOLINTEND(google-explicit-constructor,hicpp-explicit-conversions) */
 

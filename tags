@@ -243,8 +243,8 @@ NumeralNormalizers	cxx/ClassNumeral.hxx	/^	NumeralNormalizers(const std::vector<
 NumeralNormalizers	cxx/ClassNumeral.hxx	/^typedef struct NumeralNormalizers : public Object {$/;"	s	namespace:Susuwu
 NumeralNormalizers	cxx/ClassNumeral.hxx	/^} NumeralNormalizers;$/;"	t	namespace:Susuwu	typeref:struct:Susuwu::NumeralNormalizers
 NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	NumeralNormalizersReciprocal(const NumeralAccum avg = 0.0, const NumeralAccum magRecip = 1.0) :/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
+NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normalizers.avera/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
 NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	NumeralNormalizersReciprocal(const std::vector<Numeral> &nums) : average(numeralAverage(nums)),/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
-NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^	explicit NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normaliz/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
 NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^typedef struct NumeralNormalizersReciprocal : public Object { \/* is as `NumeralNormalizers`, ex/;"	s	namespace:Susuwu
 NumeralNormalizersReciprocal	cxx/ClassNumeral.hxx	/^} NumeralNormalizersReciprocal;$/;"	t	namespace:Susuwu	typeref:struct:Susuwu::NumeralNormalizersReciprocal
 Object	cxx/ClassObject.hxx	/^typedef class Object : public Class { \/* Port of `java.lang.Object`. *\/$/;"	c	namespace:Susuwu
@@ -1103,7 +1103,7 @@ okmlength	c/rfc6234/shatest.c	/^		int okmlength;$/;"	m	struct:hkdfhash	typeref:t
 operator !=	cxx/ClassObject.hxx	/^	virtual bool operator!=(const Class &obj) const SUSUWU_FINAL { return !this->operator==(obj); }/;"	f	class:Susuwu::Class	typeref:typename:bool
 operator &	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator&(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 operator ==	cxx/ClassTensorFlowCns.hxx	/^	bool operator==(const Class &obj) const SUSUWU_OVERRIDE { \/* NOLINT(fuchsia-overloaded-operato/;"	f	class:Susuwu::TensorFlowCns	typeref:typename:bool
-operator NumeralNormalizers	cxx/ClassNumeral.hxx	/^	explicit operator NumeralNormalizers() const { return { average, 1 \/ magnitudeReciprocal }; }$/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
+operator NumeralNormalizers	cxx/ClassNumeral.hxx	/^	operator NumeralNormalizers() const { return { average, 1 \/ magnitudeReciprocal }; }$/;"	f	struct:Susuwu::NumeralNormalizersReciprocal
 operator |	cxx/VirusAnalysis.hxx	/^static const VirusAnalysisHook operator|(VirusAnalysisHook x,  VirusAnalysisHook s) {return stat/;"	f	namespace:Susuwu	typeref:typename:const VirusAnalysisHook
 outputMode	cxx/ClassCns.hxx	/^	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;$/;"	m	class:Susuwu::Cns	typeref:typename:ObjectMode
 outputNeurons	cxx/ClassCns.hxx	/^	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;$/;"	m	class:Susuwu::Cns	typeref:typename:size_t
