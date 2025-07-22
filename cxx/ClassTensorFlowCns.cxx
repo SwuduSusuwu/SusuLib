@@ -219,8 +219,8 @@ const bool classTensorFlowCnsTests() {
 	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1000.0, 1000.0, 1.0, /* 70.774782 ... */ 107.8262, processToFloatLambda) || (success = false); /* (average == 0, std == 1000) */
 	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2.0, 0.001, /* 0.072054 ... */ 0.118012, processToFloatLambda) || (success = false); /* (average == 1, std == 1) */
 	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2000.0, 1.0, /* 70.698730 ... */ 117.921631, processToFloatLambda) || (success = false); /* (average == 1000, std == 1000) */
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 2242, processToIntLambda) || (success = false);
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 2552, processToIntLambda) || (success = false);
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 251, processToIntLambda) || (success = false);
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 564, processToIntLambda) || (success = false);
 	return success;
 }
 

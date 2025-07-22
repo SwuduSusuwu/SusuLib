@@ -3131,7 +3131,7 @@ public:
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	template<class CoefficientType, class Output>
 	const std::vector<tensorflow::Tensor> processToImpl(const tensorflow::Tensor &inputTensor, const std::string &func) const {
-		if(ToObjectMode<Output>::value != outputMode) {
+		if(ToObjectMode<Output>::value != outputMode && "processToInt" != func) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + func + "() { outputMode == " + std::to_string(outputMode) + "; outputMode != " + std::to_string(ToObjectMode<Output>::value) + " /* ToObjectMode<Output>::value */; }"));
 		}
 //		initScopeRootForward<Input, Output>(DataTypeToEnum<CoefficientType>::value); /* TODO: uncomment if `root` is set to `mutable` */
@@ -3158,6 +3158,7 @@ public:
 	/* Also known as "forwardpropagation" or "inference". `int` version.
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	const int processToInt(const int &input) const SUSUWU_OVERRIDE {
+		return static_cast<int>(processToFloat(static_cast<float>(input))); /* TODO: figure out the reason that the code below has outputs stuck, plus how to improve */
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType /* `int` gives "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({1, 1}));
 		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = static_cast<CoefficientDefaultType>(numeralNormalization(input, inputNorms()));
 		auto oTensors = processToImpl<CoefficientDefaultType, int>(inputTensor, __func__);
@@ -3383,8 +3384,8 @@ const bool classTensorFlowCnsTests() {
 	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(-1000.0, 1000.0, 1.0, /* 70.774782 ... */ 107.8262, processToFloatLambda) || (success = false); /* (average == 0, std == 1000) */
 	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2.0, 0.001, /* 0.072054 ... */ 0.118012, processToFloatLambda) || (success = false); /* (average == 1, std == 1) */
 	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, float, float>(0.0, 2000.0, 1.0, /* 70.698730 ... */ 117.921631, processToFloatLambda) || (success = false); /* (average == 1000, std == 1000) */
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 2242, processToIntLambda) || (success = false);
-	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 2552, processToIntLambda) || (success = false);
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(-1000, 1000, 1, /* TODO: reduce this */ 251, processToIntLambda) || (success = false);
+	classTensorFlowCnsTestLinear<TensorFlowCns::CoefficientDefaultType, int, int>(0, 2000, 1, /* TODO: reduce this */ 564, processToIntLambda) || (success = false);
 	return success;
 }
 ```
