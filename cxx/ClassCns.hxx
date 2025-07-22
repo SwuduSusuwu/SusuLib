@@ -360,8 +360,8 @@ const bool classCnsTests(const bool cnsIsValueObject, const bool cnsSubHasDumpTo
 		}
 	}
 	std::vector<struct ClassCnsTestsLinearArgus<int, CnsSubCoefficient>> testsLinearIntArgus = {
-		{2.0, 0.0, /* 1.563975  */ 2242, -1000, 1000, 1},
-		{2.0, 0.0, /* 2.443702  */ 2552,  0,    2000, 1},
+		{2.0, 0.0, /* 1.563975  */ 251,  -1000, 1000, 1},
+		{2.0, 0.0, /* 2.443702  */ 564,   0,    2000, 1},
 		{1.0, 2.0, /* 0.015350  */ 1066, -1000, 1000, 1}  /* TODO: for all `index`, `output` is stuck at `64`. What to do? */
 	};           /* `lossVal` */ /* TODO: reduce integer-version `epsilons` */
 	for(const auto &argus: testsLinearIntArgus) {

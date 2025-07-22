@@ -2683,8 +2683,8 @@ const bool classCnsTests(const bool cnsIsValueObject, const bool cnsSubHasDumpTo
 		}
 	}
 	std::vector<struct ClassCnsTestsLinearArgus<int, CnsSubCoefficient>> testsLinearIntArgus = {
-		{2.0, 0.0, /* 1.563975  */ 2242, -1000, 1000, 1},
-		{2.0, 0.0, /* 2.443702  */ 2552,  0,    2000, 1},
+		{2.0, 0.0, /* 1.563975  */ 251,  -1000, 1000, 1},
+		{2.0, 0.0, /* 2.443702  */ 564,   0,    2000, 1},
 		{1.0, 2.0, /* 0.015350  */ 1066, -1000, 1000, 1}  /* TODO: for all `index`, `output` is stuck at `64`. What to do? */
 	};           /* `lossVal` */ /* TODO: reduce integer-version `epsilons` */
 	for(const auto &argus: testsLinearIntArgus) {
@@ -3303,7 +3303,7 @@ public:
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	template<class CoefficientType, class Output>
 	const std::vector<tensorflow::Tensor> processToImpl(const tensorflow::Tensor &inputTensor, const std::string &func) const {
-		if(ToObjectMode<Output>::value != outputMode) {
+		if(ToObjectMode<Output>::value != outputMode && "processToInt" != func) {
 			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + func + "() { outputMode == " + std::to_string(outputMode) + "; outputMode != " + std::to_string(ToObjectMode<Output>::value) + " /* ToObjectMode<Output>::value */; }"));
 		}
 //		initScopeRootForward<Input, Output>(DataTypeToEnum<CoefficientType>::value); /* TODO: uncomment if `root` is set to `mutable` */
@@ -3330,6 +3330,7 @@ public:
 	/* Also known as "forwardpropagation" or "inference". `int` version.
 	 * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 	const int processToInt(const int &input) const SUSUWU_OVERRIDE {
+		return static_cast<int>(processToFloat(static_cast<float>(input))); /* TODO: figure out the reason that the code below has outputs stuck, plus how to improve */
 		tensorflow::Tensor inputTensor(DataTypeToEnum<CoefficientDefaultType /* `int` gives "INVALID_ARGUMENT: Inconsistent values" */>::value, tensorflow::TensorShape({1, 1}));
 		inputTensor.matrix<CoefficientDefaultType>()(0, 0) = static_cast<CoefficientDefaultType>(numeralNormalization(input, inputNorms()));
 		auto oTensors = processToImpl<CoefficientDefaultType, int>(inputTensor, __func__);
