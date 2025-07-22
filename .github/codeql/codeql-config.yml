@@ -1,0 +1,4 @@
+name: "CodeQL config"
+
+paths-ignore:
+  - '/c/rfc6234'
