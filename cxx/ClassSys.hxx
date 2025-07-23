@@ -99,7 +99,7 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) SUSU
 
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests();
-static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
+static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSysTests, "classSysTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */

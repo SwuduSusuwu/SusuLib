@@ -70,7 +70,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	}
 	return true;
 }
-const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSha2Tests, "classSha2Tests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */

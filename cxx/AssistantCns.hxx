@@ -22,7 +22,7 @@ extern std::string assistantCnsResponseDelimiter;
  * @throw std::logic_error
  * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
-static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistantCnsTests, "assistantCnsTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 /* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
