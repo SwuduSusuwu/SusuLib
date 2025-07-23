@@ -2146,7 +2146,7 @@ typedef class ApxrCns : Cns {
 
 `less `[`cxx/VirusAnalysis.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
 ```c++
-/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus [artificial *central nervous systems*](./ClassCns.hxx) (such as [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)) */
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
 	virusAnalysisHookQuery   = 0,      /* return present hooks (as enum) */
@@ -2870,7 +2870,7 @@ Have used `class Cns` to implement assistant demo through `produceAssistantCns()
 ******************************************
 `less `[`cxx/AssistantCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```c++
-/* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
+/* (Work-in-progress) system which uses tuples of inputs (questions, or document titles) plus solutions (answers, or documents), to setup artificial neural tissue (such as [**HSOM**](https://github.com/SwuduSusuwu/SusuLib/blob/5eff71e6486562b1d5c7b349618fba9634d479cd/cxx/ClassCns.cxx#L11-L81) or [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)), which then uses new inputs to produce new solutions (similar to _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])") */
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
 
@@ -2917,7 +2917,6 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 
 `less `[`cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx)
 ```c++
-/* (Work-in-progress) assistants which use `class Cns` (artificial neural tissue). */
 Cns assistantCns;
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",

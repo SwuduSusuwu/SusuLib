@@ -12,7 +12,7 @@
 #include <map> /* std::map */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
-/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus [artificial *central nervous systems*](./ClassCns.hxx) (such as [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)) */
 namespace Susuwu {
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */

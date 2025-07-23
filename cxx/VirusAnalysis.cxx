@@ -29,7 +29,7 @@
 #include <processthreadsapi.h> /* CreateProcessA BOOL DWORD LPCSTR LPPROCESS_INFORMATION LPSECURITY_ATTRIBUTES LPSTARTUPINFOA LPSTR LPVOID */
 #endif /* elif DEFINED(SUSUWU_WIN32) */
 #include <vector> /* std::vector */
-/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus [artificial *central nervous systems*](./ClassCns.hxx) (such as [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)) */
 namespace Susuwu {
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
