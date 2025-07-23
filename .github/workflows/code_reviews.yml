@@ -1,0 +1,46 @@
+name: Lint and Static Analysis
+
+on:
+  push:
+    branches: [preview]
+  pull_request:
+    branches: [preview]
+
+permissions:
+  contents: read
+
+jobs:
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install remark-lint
+        run: |
+          npm install -g remark-cli remark-preset-lint-recommended
+      - name: Run remark-lint
+        run: |
+          npx remark . --use remark-preset-lint-recommended
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        run: |
+          find . -type f -name "*.sh" -print0 | xargs -0 shellcheck
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cppcheck
+        run: sudo apt-get install -y cppcheck
+      - name: Run cppcheck
+        run: |
+          cppcheck --language=c++ --force --check-level=exhaustive --enable=all --inconclusive --error-exitcode=1 --suppress=missingIncludeSystem --suppress=unusedFunction --inline-suppr cxx
+         # since TensorFlow requires C++17, `--std=c++11` is not used
+
