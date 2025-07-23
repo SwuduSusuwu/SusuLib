@@ -2402,27 +2402,27 @@ const bool virusAnalysisHookTests() {
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
 	if(virusAnalysisHookExec != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookNewFile);
 	if(virusAnalysisHookNewFile != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookNewFile)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookClear);
 	if(virusAnalysisHookDefault != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookExec | virusAnalysisHookNewFile);
 	if((virusAnalysisHookExec | virusAnalysisHookNewFile) != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisExec | virusAnalysisHookNewFile)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookClear | originalHookStatus);
 	if(originalHookStatus != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear | originalHookStatus)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	return true;
 }
@@ -2449,7 +2449,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 	}
 	if(virusAnalysisHookExec & hookStatus) {
 #ifdef SUSUWU_POSIX
-		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */
+		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */ /* cppcheck-suppress constParameter */
 			return static_cast<int>(virusAnalysisImpl(PortableExecutable(pathname)));
 		};
 		classSysKernelSetHook(execv, lambdaScanExecv);
@@ -2583,7 +2583,7 @@ const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const R
 	} catch (...) {
 		auto syscallsUsed = importedFunctionsList(file);
 		std::sort(syscallPotentialDangers.begin(), syscallPotentialDangers.end());
-		std::sort(syscallsUsed.begin(), syscallsUsed.end());
+		std::sort(syscallsUsed.begin(), syscallsUsed.end()); /* cppcheck-suppress knownEmptyContainer */
 		if(listsIntersect(syscallPotentialDangers, syscallsUsed)) {
 			return staticAnalysisCaches[fileHash] = virusAnalysisRequiresReview;
 		}
