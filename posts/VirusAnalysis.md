@@ -1378,7 +1378,8 @@ const bool classSysSetRoot(bool root) {
 #	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
-			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = SUSUWU_NULLPTR;
+			const char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */;
+			char *sudoUidStrIt = SUSUWU_NULLPTR;
 			if(SUSUWU_NULLPTR == sudoUidStr) {
 				SUSUWU_WARNING("classSysSetRoot(false) {(SUSUWU_NULLPTR == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
