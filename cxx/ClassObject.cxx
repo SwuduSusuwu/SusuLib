@@ -11,7 +11,6 @@
 //#include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
 namespace Susuwu {
-const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classObjectTests, "classObjectTests()"); }
 namespace { /* [misc-use-anonymous-namespace] */
 static const bool classIsValid(const Class *clas) {
 	bool result = true;
@@ -217,6 +216,7 @@ const bool classObjectTests() {
 	delete newClass;
 	return result;
 }
+const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classObjectTests, "classObjectTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 
 }; /* namespace Susuwu */
 #endif /* SUSUWU_UNIT_TESTS */

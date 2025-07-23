@@ -209,7 +209,7 @@ const bool classIoTests() {
 	return true;
 }
 /* NOLINTEND(google-runtime-int) */
-const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }
+const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */

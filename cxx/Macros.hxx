@@ -195,7 +195,7 @@
 namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
 #endif /* ifdef __cplusplus */
 #if SUSUWU_UNIT_TESTS
-const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+const int macrosTestsNoexcept() SUSUWU_NOEXCEPT; /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)

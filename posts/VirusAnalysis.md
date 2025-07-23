@@ -1115,7 +1115,7 @@ const bool classIoTests() {
 
 	return true;
 }
-const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }
+const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
@@ -1197,7 +1197,7 @@ const bool classSysKernelSetHook(Func func, Lambda callback) {
 }
 
 template<typename Func, typename... Args>
-auto templateCatchAll(Func func, const std::string &funcName, Args... args) SUSUWU_NOEXCEPT -> const decltype(func(args...)) {
+auto templateCatchAll(Func func, const std::string &funcName, Args... args) SUSUWU_NOEXCEPT -> const decltype(func(args...)) { /* cppcheck-suppress throwInNoexceptFunction */
 	try {
 		return func(args...);
 	} catch (const std::exception &w) {
@@ -1210,7 +1210,7 @@ auto templateCatchAll(Func func, const std::string &funcName, Args... args) SUSU
 
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests();
-static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSysTests, "classSysTests()");}
+static const bool classSysTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSysTests, "classSysTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
@@ -1485,7 +1485,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	}
 	return true;
 }
-const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSha2Tests, "classSha2Tests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
@@ -1507,7 +1507,7 @@ typedef struct ResultList : public Object { /* Lists of {metadata, executables (
 
 #if SUSUWU_UNIT_TESTS
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
-static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 template<class List>
@@ -2177,10 +2177,10 @@ void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list);
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
-static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 const bool virusAnalysisInitTests(const ClassIoPath path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
-static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
@@ -2870,7 +2870,7 @@ extern std::string assistantCnsResponseDelimiter;
  * @throw std::logic_error
  * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
-static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistantCnsTests, "assistantCnsTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 /* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
