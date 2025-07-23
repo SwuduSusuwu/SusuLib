@@ -54,10 +54,10 @@ void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list);
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
-static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 const bool virusAnalysisInitTests(const ClassIoPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
-static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"

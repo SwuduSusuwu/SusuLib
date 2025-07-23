@@ -38,7 +38,7 @@ typedef struct ResultList : public Object { /* Lists of {metadata, executables (
 
 #if SUSUWU_UNIT_TESTS
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
-static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 template<class List>
