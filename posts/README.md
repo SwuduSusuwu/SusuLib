@@ -15,4 +15,5 @@
 - [`./posts/SimdGpgpuTpu.md`](./SimdGpgpuTpu.md) is a preview post about [**SIMD**](https://wikipedia.org/wiki/SIMD), [**GPGPU**](https://wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units) and [**TPU**](https://wikipedia.org/wiki/Tensor_Processing_Unit) implementations of formulas, which has to do with [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/AlbatrossCNS.md`](./AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
+- [`./posts/CnsCompress.md`](./CnsCompress.md) says how to use clones of human Central Nervous Systems to do [sensor fusion](https://wikipedia.org/wiki/Sensor_fusion) + compression + decompression (which is [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2)).
 

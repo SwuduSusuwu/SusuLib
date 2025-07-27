@@ -35,6 +35,7 @@
 - [`./posts/SimdGpgpuTpu.md`](./posts/SimdGpgpuTpu.md) is a preview post about **SIMD**, **GPU** and **TPU** implementations of formulas, which has to do with [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
+- [`./posts/CnsCompress.md`](./posts/CnsCompress.md) says how to use clones of human Central Nervous Systems to do [sensor fusion](https://wikipedia.org/wiki/Sensor_fusion) + compression + decompression (which is [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2)).
 
 [`./build.sh`](./build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). \[View [Options/setup](#optionssetup) for options.\]
 
