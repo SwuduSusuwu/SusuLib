@@ -49,13 +49,13 @@ You could input such as [Fanuc's videos of somewhat-autonomous robots](https://y
 
 ## Related posts
 - [\[Preview\] How to use _FLOSS_ code to produce autonomous _Arduino_/_Elegoo_ tools](./ArduinoElegooTools.md)
-- [How to improve how fast desktops/laptops/phones execute code](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
+- [How to improve how fast desktops/laptops/phones execute code](./SimdGpgpuTpu.md)
 - [Neural resources](./VirusAnalysis.md#neural-resources)
 
 Previous posts about artificial neural tissue:
 - [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
-- [Albatross performs lots of neural processes per neural volume versus humans, howto base artificial neural networks off of albatross](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural)
+- [Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.](./AlbatrossCNS.md)
 - [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
-- [Virus analysis tools should use functional analysis + sandboxes + artificial CNS (central nervous systems)](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
+- [Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved](./VirusAnalysis.md)
 - [Want this physical form gone; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
 
