@@ -6,6 +6,7 @@ Howto process *1024\*1280@60fps* (*standard definition*, *2.6 gigabits-per-secon
 
 # Table of Contents
 - [Discussion](#Discussion)
+  - [Compression plus synthesis](#Compression-plus-synthesis)
 - [Synopsis + similar posts](#synopsis--similar-posts)
 
 ******************************************
@@ -53,6 +54,7 @@ Because the `arxiv.org` pages do not list compression ratios, have doubts that t
 
 ______
 
+## Compression plus synthesis
 Expected compression ratios for this: process *1024\*1280@60fps* (*standard definition*, *2.6 gigabits-per-second*) into compressed structures (such as text) which just use a *few kilobits-per-second*, then reproduce the originals from thus compressed structures (with small [perceptual losses](https://deepai.org/machine-learning-glossary-and-terms/perceptual-loss-function).)
 - So compression is around "2,600,000 to 2" (as opposed to [`x264` which is at best “700 to 2”](https://stackoverflow.com/questions/5024114/suggested-compression-ratio-with-h-264)).
 
