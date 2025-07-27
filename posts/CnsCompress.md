@@ -71,6 +71,9 @@ Those compression ratio guesses are based on the amount of visuals which human c
 - [\[Preview\] How to produce general-use autonomous tools through calculus (continuous formulas), + use TensorFlow for synthesis of close-to-human consciousness.](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)
 - [How to improve how fast desktops/laptops/phones execute code](./SimdGpgpuTpu.md)
 - [`../SusuPosts/posts/Tensorflow_produces_meshes.md`](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Tensorflow_produces_meshes.md) discusses how to give simple textual descriptions to `tensorflow` to produce meshes (produce edges plus vertices).
+- [*Microsoft*'s "*Project Muse*"](https://www.microsoft.com/en-us/research/blog/introducing-muse-our-first-generative-ai-model-designed-for-gameplay-ideation/) uses artificial neural networks to "guess" the rest of some segment of motion picture. Instead of resolution compression, *Muse* is temporal compression (the examples show that *Muse* can compress motion pictures to a ninth of their original length, then decompress thus into the original motion pictures).
+  - *Muse*'s "temporal compression" is more close to `CnsCompress.md` "symbolic/conceptual compression" than `x264`'s "resolution compression" is.
+  - To use *Microsoft*'s *Muse* for educational [synthesis](#Compression-plus-synthesis), all you must do is produce the first few seconds of the new mode: *Muse* will "guess" how to finish thus.
 
 Previous posts about artificial neural tissue:
 - [Destructive (scan uses nanoscopic decomposition) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
