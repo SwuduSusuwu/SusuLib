@@ -48,12 +48,12 @@ Expected compression ratios: parse inputs of 1024*1280@60fps (2.6gbps), output t
 You could input such as [Fanuc's videos of somewhat-autonomous robots](https://youtu.be/7lI-PY7InV8), convert to text, add stuff to the text such as "Plus produces X", the CNS would produce videos that show Fanuc's robots produce for us. Or you could use [videos of how to mass produce robots](https://youtu.be/hLDbRm-98cs), have the CNS convert thus to text, and add to the text such as "Next, instead of standalone robot arms, produces robots with 2 arms + 2 legs" and the CNS would produce videos of how to mass produce this.
 
 ## Related posts
-- [How to improve how fast desktops/laptops/phones execute code](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops)
+- [How to improve how fast desktops/laptops/phones execute code](./SimdGpgpuTpu.md)
 - [Neural resources](./VirusAnalysis.md#neural-resources)
 
 Previous posts about artificial neural tissue:
 - [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
-- [Albatross performs lots of neural processes per neural volume versus humans, howto base artificial neural networks off of albatross](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural)
+- [Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.](./AlbatrossCNS.md)
 - [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
-- [Virus analysis tools should use functional analysis + sandboxes + artificial CNS (central nervous systems)](https://swudususuwu.substack.com/p/howto-produce-better-virus-scanners)
+- [Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved](./VirusAnalysis.md)
 - [Want this physical form gone; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
