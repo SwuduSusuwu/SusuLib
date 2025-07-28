@@ -54,6 +54,9 @@ nice ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -i "/storage/emulated/0
 ```
 \[*Notice*: `-c copy` is not compatible with `-filter_complex`; unless you want to reincode the visuals (slow), is 2 steps to do this\]
 
+## Produce minimal (all black) "video" section (for programs which require "videos") muxed to music
+`nice ffmpeg -i "/storage/emulated/0/Sounds/demux.m4a" -f lavfi -i color=c=black:s=1920x1080 -c:v libx264 -c:a copy -shortest "/storage/emulated/0/Visuals/mux.mp4`
+
 ## Produce `.gif`
 Suppose you wish to produce a *10fps* HD `.gif` from the first *24* seconds of `visual.mp4`:
 ```sh
