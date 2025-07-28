@@ -15,6 +15,7 @@ Tools compatible with this howto:
 - [Howto](#howto)
   - [Produce `.mp4`](#produce-mp4)
   - [Produce `.m4a`](#produce-m4a)
+    - [Null "video" section muxed to sounds](#null-video-section-muxed-to-sounds)
     - [Concat multiple `.m4a`s](#concat-multiple-m4as)
   - [Mix visuals + sounds into `.mp4`](#mix-visuals-plus-sounds-into-mp4)
   - [Produce `.gif`](#produce-gif)
@@ -48,6 +49,11 @@ To demux sounds (into `demux.m4a`); pass `-ss 4` to skip *4* seconds, pass `-t 2
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Download/sounds.mp4 -ss 4 -t 2:00 -map 0:a:0 -c copy "/storage/emulated/0/Sounds/demux.m4a"
 ```
+
+### Null "video" section muxed to sounds
+To mux minimal (all black) "video" section (for programs which require "videos") with an `.m4a`, into `music.mp4`:
+`nice ffmpeg -i "/storage/emulated/0/Sounds/demux.m4a" -f lavfi -i color=c=black:s=1920x1080 -c:v libx264 -c:a copy -shortest "/storage/emulated/0/Visuals/music.mp4`
+
 
 ### Concat multiple `.m4a`s
 To [concat](https://trac.ffmpeg.org/wiki/Concatenate) the `.m4a` stream (from `visuals.mp4`) with `demux.m4a` (assumes similar codecs used), into `concat.m4a`:
