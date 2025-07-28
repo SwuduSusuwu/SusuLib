@@ -76,7 +76,7 @@ TRANSCODE_MP4_OUT="$(VISUAL_IN_EXTENSIONLESS)${TRANSCODE_MP4_CONTAINER}"
 TRANSCODE_MP4_SOUND_OUT_PATH="$(VISUAL_IN_EXTENSIONLESS)_$(basename "$(SOUND_IN_EXTENSIONLESS)")${TRANSCODE_MP4_CONTAINER}"
 if [ -z "${1}" ] || [ "-h" = "${1}" ] || [ "--help" = "${1}" ]; then
 	echo "Usage: ${0} \"<path-to-input-visuals>\" \"[<optional-path-to-input-sounds>]\""
-	exit 1
+	return 1
 fi
 
 TRANSCODE_MP4_OUT_PATH="${TRANSCODE_OUT_VISUALS}${TRANSCODE_MP4_OUT}"
@@ -145,7 +145,7 @@ if ${TRANSCODE_GIF_ENABLED}; then
 		fi
 	fi
 fi
-exit 0
+return 0
 
 #nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_IN_SOUNDS}Susuwu/Swudo Susuwu's organs 2024.02.16 1242ss431t932.ogg" -stream_loop  -1 -i "${TRANSCODE_IN_SOUNDS}nu/UU! NYA! [GHbPK0Ymjw0].m4a" -filter_complex amix=inputs=2:duration=shortest "${TRANSCODE_IN_SOUNDS}Susuwu/Swudo Susuwu's organs 2024.02.16 1242ss431t932+UuNya.opus"
 
