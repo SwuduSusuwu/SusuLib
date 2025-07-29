@@ -136,7 +136,7 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems (such as Win32) with multiple commands */ }"));
 	}
 	const int status = system(argvS[0].c_str());
-	if(status) {
+	if(status) { /* cppcheck-suppress duplicateBranch */
 		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(!CreateProcess(...)) { /* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...); }}}");
 	} else {
 		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(CreateProcess(...)) { /* started, blocking */ }}}");
