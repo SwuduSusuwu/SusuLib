@@ -76,7 +76,7 @@ auto classSysKernelCallback(Args... args) -> decltype(func(args...)) {
  * @pre @code classSysHasRoot() @endof */
 template<typename Func, typename Lambda>
 const bool classSysKernelSetHook(Func func, Lambda callback) {
-	if(classSysHasRoot()) {
+	if(classSysHasRoot()) { /* cppcheck-suppress knownConditionTrueFalse */
 		SUSUWU_WARNING("classSysKernelSetHook: TODO");
 //		return true; /* TODO: hook `func` */
 	} else {
