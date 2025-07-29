@@ -470,7 +470,6 @@ public:
 				}
 				lossVal = outputs[0].scalar<float>()();
 			}
-			std::string printBestLoss = ""; /* don't print, unless pathological */
 			static const size_t printoutAmount = 4; /* minimumAbs desired printouts */
 			const float lossValAbs = std::abs(lossVal);
 			bool printout = false;
@@ -483,6 +482,7 @@ public:
 				printout = true;
 			}
 			if(lossValAbs < desiredLossThreshold) { break; }
+			std::string printBestLoss = ""; /* don't print, unless pathological */ /* cppcheck-suppress variableScope */
 			const float currentDelta = bestLossAbs - lossValAbs;
 			if(currentDelta > minLossDelta) {
 				bestLoss = lossVal;
