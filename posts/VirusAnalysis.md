@@ -1250,7 +1250,7 @@ const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::v
 	std::vector<char *> argv;
 	const std::vector<std::string> argvSmutable = {argvS.cbegin(), argvS.cend()};
 	argv.reserve(argvSmutable.size() + 1);
-	//for(auto x : argvSmutable) { /* with `fsanitize=address` this triggers "stack-use-after-scope" */
+	/* Do not remove `&`. `for(auto x : argvSmutable)` with `fsanitize=address` triggers `stack-use-after-scope` */
 	for(const auto &x: argvSmutable /* auto x = argvSmutable.cbegin(); argvSmutable.cend() != x; ++x */) {
 		argv.push_back(const_cast<char *>(x.c_str()));
 	}
@@ -1278,7 +1278,7 @@ const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::v
 	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
 	if(1 != argvS.size()) {
-		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */");
+		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems (such as Win32) with multiple commands */ }");
 		return -1;
 	}
 	STARTUPINFO si;
@@ -1298,11 +1298,11 @@ const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::v
 		&si,     /* Pointer to STARTUPINFO structure */
 		&pi)     /* Pointer to PROCESS_INFORMATION structure */
 	) {
-		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, non-blocking }}}");
+		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(CreateProcess(...)) { /* started, non-blocking */ }}}");
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	} else {
-		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(!CreateProcess(...)) { /* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...); }}}");
 	}
 	return 0;
 #endif /* ndef SUSUWU_POSIX */
@@ -1335,13 +1335,13 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
 	if(1 != argvS.size()) {
-		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */"));
+		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems (such as Win32) with multiple commands */ }"));
 	}
 	const int status = system(argvS[0].c_str());
 	if(status) {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(!CreateProcess(...)) { /* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...); }}}");
 	} else {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, blocking }}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(CreateProcess(...)) { /* started, blocking */ }}}");
 	}
 	return status;
 #endif /* ndef SUSUWU_POSIX */
