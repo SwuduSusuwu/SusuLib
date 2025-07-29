@@ -113,14 +113,14 @@ public:
 		const tensorflow::SessionOptions sessionOptions;
 		const tensorflow::Status status = tensorflow::NewSession(sessionOptions, &session);
 		if(!status.ok()) {
-			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "() { (!tensorflow::NewSession(sessionOptions, &session).ok()) { status.ToString() == \"" + status.ToString() + "\"; } }"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, this->getName() + "() { (!tensorflow::NewSession(sessionOptions, &session).ok()) { status.ToString() == \"" + status.ToString() + "\"; } }"));
 		}
 	}
 	TensorFlowCns(const TensorFlowCns &obj) : Cns(obj), root(tensorflow::Scope::NewRootScope()) {
 		const tensorflow::SessionOptions sessionOptions;
 		const tensorflow::Status status = tensorflow::NewSession(sessionOptions, &session);
 		if(!status.ok()) {
-			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "() { (!tensorflow::NewSession(sessionOptions, &session).ok()) { status.ToString() == \"" + status.ToString() + "\"; } }"));
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, this->getName() + "() { (!tensorflow::NewSession(sessionOptions, &session).ok()) { status.ToString() == \"" + status.ToString() + "\"; } }"));
 		}
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS
 		this->coefficients = obj.coefficients;
