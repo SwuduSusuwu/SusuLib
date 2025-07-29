@@ -1193,8 +1193,18 @@ public:
 typedef class PortableExecutableBytecode : public PortableExecutable {
 public:
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::PortableExecutableBytecode) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
-	explicit PortableExecutableBytecode(ClassIoPath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
+	explicit PortableExecutableBytecode(ClassIoPath path_);
 } PortableExecutableBytecode;
+```
+
+`less `[`cxx/ClassPortableExecutable.hxx`](../cxx/ClassPortableExecutable.hxx)
+```c++
+PortableExecutableBytecode::PortableExecutableBytecode(ClassIoPath path_) : PortableExecutable(std::move(path_)) {
+	std::ifstream input(path);
+	if(input.good()) {
+		bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+	}
+}
 ```
 
 `less `[`cxx/ClassSys.hxx`](../cxx/ClassSys.hxx)
