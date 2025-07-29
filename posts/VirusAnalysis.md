@@ -560,9 +560,9 @@ public:
 	virtual gsl::owner<Object *> cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
-		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
-		memcpy(clone, static_cast<const void *>(this), getObjectSize());
-		return static_cast<Object *>(clone);
+		auto clonePtr = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
+		memcpy(clonePtr, static_cast<const void *>(this), getObjectSize());
+		return static_cast<Object *>(clonePtr);
 	}
 #if SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match". */
 	virtual const bool equals(const Object &obj) const { return this == &obj; } /* Java's contract requires you to override this version of `equals` */
