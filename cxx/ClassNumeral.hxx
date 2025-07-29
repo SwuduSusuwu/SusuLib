@@ -79,9 +79,9 @@ const Numeral numeralBalancedMagnitude(const std::vector<std::tuple<Numeral, Num
 /* NOLINTBEGIN(google-explicit-constructor,hicpp-explicit-conversions) */
 typedef struct NumeralNormalizers : public Object {
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::NumeralNormalizers) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
-	NumeralNormalizers(const NumeralAccum avg = 0.0, const NumeralAccum mag = 1.0) : average(avg), magnitude(mag) {} /* NOLINT(bugprone-easily-swappable-parameters); overzealous heuristic */
+	NumeralNormalizers(const NumeralAccum avg = 0.0, const NumeralAccum mag = 1.0) : average(avg), magnitude(mag) {} /* NOLINT(bugprone-easily-swappable-parameters); overzealous heuristic */ /* cppcheck-suppress noExplicitConstructor */
 	template<typename Numeral>
-	NumeralNormalizers(const std::vector<Numeral> &nums) : average(numeralAverage(nums)), magnitude(numeralBalancedMagnitude(nums, average)) {}
+	NumeralNormalizers(const std::vector<Numeral> &nums) : average(numeralAverage(nums)), magnitude(numeralBalancedMagnitude(nums, average)) {} /* cppcheck-suppress noExplicitConstructor */
 	template<std::size_t tupleIndex, typename Numeral>
 	static const NumeralNormalizers fromTuple(const std::vector<std::tuple<Numeral, Numeral>> &nums) {
 		const NumeralAccum avg = numeralAverage<tupleIndex>(nums);
@@ -92,15 +92,15 @@ typedef struct NumeralNormalizers : public Object {
 typedef struct NumeralNormalizersReciprocal : public Object { /* is as `NumeralNormalizers`, except `magnitude` is replaced with `magnitudeReciprocal` */
 	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::NumeralNormalizersReciprocal) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 	NumeralAccum average, magnitudeReciprocal;
-	NumeralNormalizersReciprocal(const NumeralAccum avg = 0.0, const NumeralAccum magRecip = 1.0) : average(avg), magnitudeReciprocal(magRecip) {} /* NOLINT(bugprone-easily-swappable-parameters); overzealous heuristic */
+	NumeralNormalizersReciprocal(const NumeralAccum avg = 0.0, const NumeralAccum magRecip = 1.0) : average(avg), magnitudeReciprocal(magRecip) {} /* NOLINT(bugprone-easily-swappable-parameters); overzealous heuristic */ /* cppcheck-suppress noExplicitConstructor */
 	template<typename Numeral>
-	NumeralNormalizersReciprocal(const std::vector<Numeral> &nums) : average(numeralAverage(nums)), magnitudeReciprocal(1 / numeralBalancedMagnitude(nums, average)) {}
+	NumeralNormalizersReciprocal(const std::vector<Numeral> &nums) : average(numeralAverage(nums)), magnitudeReciprocal(1 / numeralBalancedMagnitude(nums, average)) {} /* cppcheck-suppress noExplicitConstructor */
 	template<std::size_t tupleIndex, typename Numeral>
 	static const NumeralNormalizersReciprocal fromTuple(const std::vector<std::tuple<Numeral, Numeral>> &nums) {
 		const NumeralAccum avg = numeralAverage<tupleIndex>(nums);
 		return NumeralNormalizersReciprocal(avg, 1 / numeralBalancedMagnitude<tupleIndex>(nums, avg));
 	}
-	NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normalizers.average), magnitudeReciprocal(1 / normalizers.magnitude) {}
+	NumeralNormalizersReciprocal(const NumeralNormalizers &normalizers) : average(normalizers.average), magnitudeReciprocal(1 / normalizers.magnitude) {} /* cppcheck-suppress noExplicitConstructor */
 	operator NumeralNormalizers() const { return { average, 1 / magnitudeReciprocal }; }
 } NumeralNormalizersReciprocal;
 /* NOLINTEND(google-explicit-constructor,hicpp-explicit-conversions) */
