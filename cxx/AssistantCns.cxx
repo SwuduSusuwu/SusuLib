@@ -105,7 +105,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
 			decltype(question) response = "";
 			auto responses = assistantCnsProcessResponses(localXhtml);
-			if(!responses.empty()) {
+			if(!responses.empty()) { /* cppcheck-suppress knownConditionTrueFalse */
 				questionsOrNull.hashes.insert(questionSha2);
 				questionsOrNull.bytecodes.push_back(question);
 				size_t responseCount = 0;
@@ -180,7 +180,7 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */)
 	std::string input;
 	while(std::cin >> input) {
 		std::vector<std::string> responses = explodeToList(cns.processToString(input), assistantCnsResponseDelimiter);
-		std::string response;
+		std::string response; /* cppcheck-suppress unusedVariable */
 		if(responses.size() > 1) {
 			int responseNumber = 1;
 			for(const auto &it : responses) {
