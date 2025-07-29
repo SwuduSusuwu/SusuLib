@@ -179,7 +179,7 @@ static const bool classTensorFlowCnsTestLinear(const Input min, const Input max,
 
 #if SUSUWU_CNS_IS_VALUE_OBJECT /* test that `process()` follows `const` method rules, and that `equals()` and `hashCode` do what those are supposed to do */
 			assert(cns.equals(cns2));
-			assert(cns.hashCode() == cns2.hashCode());
+			assert(cns.hashCode() == cns2.hashCode()); /* cppcheck-suppress knownConditionTrueFalse */
 #endif /* SUSUWU_CNS_IS_VALUE_OBJECT */
 		}
 
