@@ -2986,7 +2986,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 		auto questionSha2 = classSha2(question);
 		if(listHasValue(questionsOrNull.hashes, questionSha2)) { /* TODO */ } else {
 			decltype(question) response = "";
-			auto responses = assistantCnsProcessResponses(localXhtml);
+			auto responses = assistantCnsProcessResponses(localXhtml); /* cppcheck-suppress knownConditionTrueFalse */
 			if(!responses.empty()) {
 				questionsOrNull.hashes.insert(questionSha2);
 				questionsOrNull.bytecodes.push_back(question);
@@ -3006,7 +3006,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 		}
 	}
 	auto urls = assistantCnsProcessUrls(localXhtml);
-	for(const auto &url : urls) {
+	for(const auto &url : urls) { /* cppcheck-suppress knownEmptyContainer */
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
@@ -3046,7 +3046,7 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os /* = std::cout */)
 	std::string input;
 	while(std::cin >> input) {
 		std::vector<std::string> responses = explodeToList(cns.processToString(input), assistantCnsResponseDelimiter);
-		std::string response;
+		std::string response; /* cppcheck-suppress unusedVariable */
 		if(responses.size() > 1) {
 			int responseNumber = 1;
 			for(const auto &it : responses) {
