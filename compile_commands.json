@@ -36,6 +36,11 @@
 	},
 	{
 		"directory": "/home/runner/work/SusuLib/SusuLib",
+		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassPortableExecutable.cxx -o ./obj/ClassPortableExecutable.o",
+		"file": "./cxx/ClassPortableExecutable.cxx"
+	},
+	{
+		"directory": "/home/runner/work/SusuLib/SusuLib",
 		"command": "clang++  -g -Og -fno-omit-frame-pointer -std=c++11 -fsanitize=address -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment  -Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic -c ./cxx/ClassResultList.cxx -o ./obj/ClassResultList.o",
 		"file": "./cxx/ClassResultList.cxx"
 	},
