@@ -136,15 +136,15 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 }
 
 #ifdef BOOST_VERSION
-#	include <boost/property_tree/ptree.hpp>
-#	include <boost/property_tree/xml_parser.hpp>
+#	include <boost/property_tree/ptree.hpp> /* boost::property_tree::ptree */
+#	include <boost/property_tree/xml_parser.hpp> /* BOOST_FOREACH read_xml */
 #elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
-#	include <pugixml.hpp>
+#	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
 #endif /* !def USE_PUGIXML */
 const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {
 	std::vector<ClassIoPath> urls;
 #ifdef BOOST_VERSION
-	boost::property_tree::ptree pt;
+	boost::property_tree::ptree pt; /* <https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser> <https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk> */
 	read_xml(localXhtml, pt);
 	BOOST_FOREACH(
 			boost::property_tree::ptree::value_type &v,
@@ -170,7 +170,7 @@ const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localX
 		SUSUWU_WARNING("assistantCnsProcessUrls(.localXhtml = \"" + localXhtml + "\"): { (!doc.load_file(localXhtml.c_str())) }");
 	}
 #else /* else !def USE_PUGIXML */
-#	pragma message("TODO: process XHTML without `Boost` or `pugixml`")
+#	pragma message("TODO: process XHTML without `Boost` or `pugixml`") /* TODO: fall back to regular expression (such as <https://www.boost.io/libraries/regex/> <https://github.com/boostorg/regex>) */
 #endif /* !def USE_PUGIXML */
 	return urls;
 }

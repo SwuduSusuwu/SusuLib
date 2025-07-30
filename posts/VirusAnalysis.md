@@ -3952,8 +3952,12 @@ Have used `class Cns` to implement assistant demo through `produceAssistantCns()
 
 `less `[`cxx/AssistantCns.hxx`](../cxx/AssistantCns.hxx)
 ```c++
-/* (Work-in-progress) assistant bots with artificial CNS. */
+/* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern std::string assistantCnsResponseDelimiter;
 
 #if SUSUWU_UNIT_TESTS
@@ -3972,18 +3976,18 @@ static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateC
 extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
 
 /* @throw std::bad_alloc
- * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new  synthesis).
+ * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new message synthesis).
  * If no responses, `0 == responsesOrNull.bytecodes[x].size()` (ignore).
  * `questionsOrNull.signatures[x] = Universal Resource Locator`
- * @code classSha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
+ * @code sha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts = assistantCnsDefaultHosts);
-void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &filepath = "index.xhtml");
-const std::vector<ClassIoPath> ParseUrls(const FilePath &filepath = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
-const ClassIoBytecode ParseQuestion(const ClassIoPath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
-const std::vector<ClassIoBytecode> ParseResponses(const ClassIoPath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml = "index.xhtml");
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* returns list of Uniform Resource Identifiers from `localXhtml` */
+const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
+const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 
 /* @pre `questionsOrNull` maps to `responsesOrNull`,
- * `0 == questionsOrNull.bytecodes[x].size()` for new  synthesis (empty question has responses),
+ * `0 == questionsOrNull.bytecodes[x].size()` for new assistant synthesis (empty question has responses),
  * `0 == responsesOrNull.bytecodes[x].size()` if should not respond (question does not have answers).
  * @post Can use `assistantCnsProcess(cns, text)` @code cns.isInitialized() @endcode */
 void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, Cns &cns);
@@ -4000,7 +4004,11 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 `less `[`cxx/AssistantCns.cxx`](../cxx/AssistantCns.cxx)
 ```c++
 /* (Work-in-progress) assistants which use `class Cns` (artificial neural tissue). */
+#ifdef SUSUWU_USE_TENSORFLOW
+TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
 	"https://superuser.com",
@@ -4063,7 +4071,7 @@ void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &re
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts) {
 	for(const auto &host : hosts) {
 #ifndef SUSUWU_POSIX
-		SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
+    SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
 		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
 		execvex("wget '" + host + "' -Oindex.xhtml");
@@ -4111,25 +4119,74 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 }
 
 #ifdef BOOST_VERSION
-#	include <boost/property_tree/ptree.hpp>
-#	include <boost/property_tree/xml_parser.hpp>
-#endif /* BOOST_VERSION */
+#	include <boost/property_tree/ptree.hpp> /* boost::property_tree::ptree */
+#	include <boost/property_tree/xml_parser.hpp> /* BOOST_FOREACH read_xml */
+#elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
+#	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
+#endif /* !def USE_PUGIXML */
 const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {
 	std::vector<ClassIoPath> urls;
 #ifdef BOOST_VERSION
-	boost::property_tree::ptree pt;
+	boost::property_tree::ptree pt; /* <https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser> <https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk> */
 	read_xml(localXhtml, pt);
 	BOOST_FOREACH(
 			boost::property_tree::ptree::value_type &v,
 			pt.get_child("html.a href"))
 		urls.push_back(v.second.data());
-#else /* else !BOOST_VERSION */
-#	pragma message("TODO: process XHTML without `Boost`")
-#endif /* else !BOOST_VERSION */
+#elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+#	ifdef ASSISTANTCNS_LIMIT_TO_TOP_LEVEL
+		for(pugi::xml_node node = doc.child("html").child("body").child("a"); node; node = node.next_sibling("a")) {
+			if(node.attribute("href")) {
+				urls.push_back(node.attribute("href").value());
+			}
+		} /* limited to direct descendants of `<body>` */
+#	else /* !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
+		const pugi::xpath_node_set links = doc.select_nodes("//a[@href]");
+		for(const auto &link : links) {
+			urls.push_back(link.node().attribute("href").value());
+		}
+#	endif /* else !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
+	} else {
+		SUSUWU_WARNING("assistantCnsProcessUrls(.localXhtml = \"" + localXhtml + "\"): { (!doc.load_file(localXhtml.c_str())) }");
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without `Boost` or `pugixml`") /* TODO: fall back to regular expression (such as <https://www.boost.io/libraries/regex/> <https://github.com/boostorg/regex>) */
+#endif /* !def USE_PUGIXML */
 	return urls;
 }
-const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {return "";} /* TODO */
-const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {return {};} /* TODO */
+const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {
+#if defined(USE_PUGIXML)
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+		pugi::xpath_node question = doc.select_node("//div[@class='question']"); /* TODO: if there is still no Web Consortium standard which marks questions, hardcode values for popular resources which graduates use (such as for StackOverflow), or implement heuristics to use */
+		if(question) {
+			return question.node().child_value();
+		}
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without pugixml")
+#endif /* !def USE_PUGIXML */
+	return "";
+}
+const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {
+	std::vector<ClassIoBytecode> responses;
+#if defined(USE_PUGIXML)
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+		for(pugi::xpath_node_set responseSet = doc.select_nodes("//div[@class='response']") /* TODO: if there is still no Web Consortium standard which marks answers, hardcode values for popular resources which graduates use (such as for StackOverflow), or implement heuristics to use */; auto& response : responseSet) {
+			responses.push_back(response.node().child_value());
+		}
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without pugixml")
+#endif /* !def USE_PUGIXML */
+	return responses;
+}
 
 const std::string assistantCnsProcess(const Cns &cns, const ClassIoBytecode &bytecode) {
 	return cns.processToString(bytecode);
