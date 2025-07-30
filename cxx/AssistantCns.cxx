@@ -7,6 +7,7 @@
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* execvex */
+#include "ClassWebBrowse.hxx" /* classWebBrowseProcessUrls */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -23,10 +24,6 @@ std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://superuser.com",
 	"https://www.quora.com"
 };
-double assistantCnsMaxRequestsPerSecondPerHost = 2;   /* TODO: limit `wget` through this */
-double assistantCnsMaxRequestsPerSecondGlobal = 2000; /* TODO: limit `wget` through this */
-double assistantCnsMaxBitsPerSecondPerHost = 2000000; /* TODO: limit `wget` through this */
-double assistantCnsMaxBitsPerSecondGlobal = 42000000; /* TODO: limit `wget` through this */
 std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResponses>");
 
 #if SUSUWU_UNIT_TESTS
@@ -119,7 +116,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 		}
 	}
 	auto urls = assistantCnsProcessUrls(localXhtml);
-	for(const auto &url : urls) { /* cppcheck-suppress knownEmptyContainer */
+	for(const auto &url : urls) {
 		if(!listHasValue(questionsOrNull.signatures, url) && !listHasValue(noRobots, url)) {
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
@@ -131,23 +128,8 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 	}
 }
 
-#ifdef BOOST_VERSION
-#	include <boost/property_tree/ptree.hpp>
-#	include <boost/property_tree/xml_parser.hpp>
-#endif /* BOOST_VERSION */
 const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml) {
-	std::vector<ClassIoPath> urls;
-#ifdef BOOST_VERSION
-	boost::property_tree::ptree pt;
-	read_xml(localXhtml, pt);
-	BOOST_FOREACH(
-			boost::property_tree::ptree::value_type &v,
-			pt.get_child("html.a href"))
-		urls.push_back(v.second.data());
-#else /* else !BOOST_VERSION */
-#	pragma message("TODO: process XHTML without `Boost`")
-#endif /* else !BOOST_VERSION */
-	return urls;
+	return classWebBrowseProcessUrls(localXhtml);
 }
 const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml) {return "";} /* TODO */
 const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml) {return {};} /* TODO */

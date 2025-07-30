@@ -31,10 +31,6 @@ static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateC
  * Github is special; [has compressed downloads of repositories for such uses](https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github)
  */
 extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
-extern double assistantCnsMaxRequestsPerSecondPerHost; /* TODO: limit `wget` through this */
-extern double assistantCnsMaxRequestsPerSecondGlobal;  /* TODO: limit `wget` through this */
-extern double assistantCnsMaxBitsPerSecondPerHost;     /* TODO: limit `wget` through this */
-extern double assistantCnsMaxBitsPerSecondGlobal;      /* TODO: limit `wget` through this */
 
 /* @throw std::bad_alloc
  * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new message synthesis).
@@ -43,7 +39,7 @@ extern double assistantCnsMaxBitsPerSecondGlobal;      /* TODO: limit `wget` thr
  * @code classSha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts = assistantCnsDefaultHosts);
 void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml = "index.xhtml");
-const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml");
 const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 
