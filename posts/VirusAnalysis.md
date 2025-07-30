@@ -1124,6 +1124,7 @@ const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(clas
 
 `less `[`cxx/ClassPortableExecutable.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```c++
+typedef std::string PortableExecutableFunctionSig;
 typedef class PortableExecutable : public Object {
 /* TODO: union of actual Portable Executable (Microsoft) + ELF (Linux) specifications */
 public:
@@ -1131,6 +1132,7 @@ public:
 	explicit PortableExecutable(ClassIoPath path_ = "") : path(std::move(path_)) {}
 	PortableExecutable(ClassIoPath path_, ClassIoBytecode bytecode_) : path(std::move(path_)), bytecode(std::move(bytecode_)) {} /* TODO: NOLINT(bugprone-easily-swappable-parameters) */
 /*TODO: overload on typedefs which map to the same types:	PortableExecutable(const ClassIoPath &path_, const std::string &hex_) : path(path_), hex(hex_) {} */
+	const std::vector<PortableExecutableFunctionSig> importedFunctionsList() const;
 	const ClassIoPath path; /* Suchas "C:\Program.exe" or "/usr/bin/library.so" */ /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) */
 	ClassIoBytecode bytecode; /* compiled programs; bytecode */
 	std::string hex; /* `hexdump(path)`, hexadecimal, for C string functions */
@@ -1145,6 +1147,14 @@ public:
 
 `less `[`cxx/ClassPortableExecutable.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.cxx)
 ```c++
+const std::vector<PortableExecutableFunctionSig> PortableExecutable::importedFunctionsList() const {
+	static_cast<void>(bytecode); /* silences `[functionStatic]`, plus hints how to implement this */
+	return {}; /* fixes crash, until `importedFunctionsList` is implemented/finished */
+	/* TODO: process [“Portable Executable” for Win32](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format https://wikipedia.org/wiki/Portable_Executable),
+	 * [“Extended Linker Format” for Linux / Unix](https://wikipedia.org/wiki/Executable_and_Linkable_Format),
+	 * for lists of libs (`.dll`'s / .`so`s) plus functions (the new version of `syscall`s) which the executable uses.
+	 */
+}
 PortableExecutableBytecode::PortableExecutableBytecode(ClassIoPath path_) : PortableExecutable(std::move(path_)) {
 	std::ifstream input(path);
 	if(input.good()) {
@@ -2224,8 +2234,8 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 
 /* Static analysis */
 /* @throw bad_alloc */
-const std::vector<std::string> importedFunctionsList(const PortableExecutable &file);
-extern std::vector<std::string> syscallPotentialDangers;
+const std::vector<PortableExecutableFunctionSig> importedFunctionsList(const PortableExecutable &file);
+extern std::vector<PortableExecutableFunctionSig> syscallPotentialDangers;
 const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* if(intersection(importedFunctionsList(file), dangerFunctionsList)) {return RequiresReview;} return Continue;` */
 
 /* Analysis sandbox */
@@ -2296,7 +2306,7 @@ const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = v
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
 Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
-std::vector<std::string> syscallPotentialDangers = {
+std::vector<PortableExecutableFunctionSig> syscallPotentialDangers = {
 	"memopen", "fwrite", "socket", "GetProcAddress", "IsVmPresent"
 };
 std::vector<std::string> stracePotentialDangers = {"write(*)"};
@@ -2568,21 +2578,15 @@ void produceAbortListSignatures(const ResultList &passList, ResultList &abortLis
 	} /* The most simple signature is a substring, but some analyses use regexes. */
 }
 
-const std::vector<std::string> importedFunctionsList(const PortableExecutable &file) {
-	return {}; /* fixes crash, until importedFunctionsList is implemented/finished */
-/* TODO
- * Resources; “Portable Executable” for Windows ( https://learn.microsoft.com/en-us/windows/win32/debug/pe-format https://wikipedia.org/wiki/Portable_Executable ,
- * “Extended Linker Format” for most others such as UNIX/Linuxes ( https://wikipedia.org/wiki/Executable_and_Linkable_Format ),
- * shows how to analyse lists of libraries(.DLL's/.SO's) the SW uses,
- * plus what functions (new syscalls) the SW can goto through `jmp`/`call` instructions.
+const std::vector<PortableExecutableFunctionSig> importedFunctionsList(const PortableExecutable &file) {
+	return file.importedFunctionsList(); /* List of lib functions which the SW `call`s (or `jmp`s to). */
+/* TODO: use [**x86** instruction list for _Intel_+_AMD_](https://wikipedia.org/wiki/x86),
+ * plus [**arm64** instruction list for most tablets+smartphones](https://wikipedia.org/wiki/aarch64),
+ * to produce lists of OS functions the SW uses without libs; `int`s (or `syscall`s) to.
+ * Plus, instructions lists show how to parse which arguments the SW gives to functions/syscalls (simple for constant arguments such as `push 0x2; call function;`,
+ * but if SW uses registers/addresses as arguments (such as `push eax; push [address]; call [address2];`) must guess what is `[eax]`/`[address]`/`[address2]` (or use `strace` or such debug tools).
  *
- * "x86" instruction list for Intel/AMD ( https://wikipedia.org/wiki/x86 ),
- * "aarch64" instruction list for most smartphones/tablets ( https://wikipedia.org/wiki/aarch64 ),
- * shows how to analyse what OS functions the SW goes to without libraries (through `int`/`syscall`, old; most new SW uses `jmp`/`call`.)
- * Plus, instructions lists show how to analyse what args the apps/SW pass to functions/syscalls (simple for constant args such as "push 0x2; call functions;",
- * but if registers/addresses as args such as "push eax; push [address]; call [address2];" must guess what is *"eax"/"[address]"/"[address2]", or use sandboxes.
- *
- * https://www.codeproject.com/Questions/338807/How-to-get-list-of-all-imported-functions-invoked shows how to analyse dynamic loads of functions (if do this, `syscallPotentialDangers[]` does not include `GetProcAddress()`.)
+ * If this tool [parses `GetProcAddress` arguments to know which functions are used](https://www.codeproject.com/Questions/338807/How-to-get-list-of-all-imported-functions-invoked), `syscallPotentialDangers[]` does not have to include `GetProcAddress()`.
  */
 }
 
@@ -2593,7 +2597,7 @@ const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const R
 	} catch (...) {
 		auto syscallsUsed = importedFunctionsList(file);
 		std::sort(syscallPotentialDangers.begin(), syscallPotentialDangers.end());
-		std::sort(syscallsUsed.begin(), syscallsUsed.end()); /* cppcheck-suppress knownEmptyContainer */
+		std::sort(syscallsUsed.begin(), syscallsUsed.end());
 		if(listsIntersect(syscallPotentialDangers, syscallsUsed)) {
 			return staticAnalysisCaches[fileHash] = virusAnalysisRequiresReview;
 		}

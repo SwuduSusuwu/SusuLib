@@ -83,8 +83,8 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 
 /* Static analysis */
 /* @throw bad_alloc */
-const std::vector<std::string> importedFunctionsList(const PortableExecutable &file);
-extern std::vector<std::string> syscallPotentialDangers;
+const std::vector<PortableExecutableFunctionSig> importedFunctionsList(const PortableExecutable &file);
+extern std::vector<PortableExecutableFunctionSig> syscallPotentialDangers;
 const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* if(intersection(importedFunctionsList(file), dangerFunctionsList)) {return RequiresReview;} return Continue;` */
 
 /* Analysis sandbox */
