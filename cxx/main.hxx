@@ -22,12 +22,14 @@ static const int susuwuUnitTestsClassSha2Bit =
 	1 << 5; /*  32: `ClassSha2.hxx:classSha2TestsNoexcept()` */
 static const int susuwuUnitTestsClassResultListBit =
 	1 << 6; /*  64: `ClassResultList.hxx:classResultListTestsNoexcept()` */
+static const int susuwuUnitTestsClassWebBrowseBit =
+	1 << 7; /*  64: `ClassWebBrowse.hxx:classWebBrowseTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit =
-	1 << 7; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
+	1 << 8; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit =
-	1 << 8; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
+	1 << 9; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
 static const int susuwuUnitTestsClassTensorFlowCnsBit =
-	1 << 9; /* 512: `ClassTensorFlowCns.hxx:classTensorFlowCnsTestsNoexcept()` */
+	1 << 10; /* 512: `ClassTensorFlowCns.hxx:classTensorFlowCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 #ifdef __cplusplus

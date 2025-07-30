@@ -49,6 +49,9 @@
   - modular template (can use on all containers such as `std::vector`, `std::map` or `std::list`) `list*()` functions (such as `listMaxSize()`, `listDumpTo()`, `listLoadFrom()`, `listToHashes()`, `listIntersections()`, `listsIntersect()`, `listFindValue()`, `listHasValue()`, `listFindSubstr()`, `listHasSubstr()`, `listProduceSignature()` (`produceAbortListSignatures` uses this), `listFindSignatureOfValue()`, `listHasSignatureOfValue()` (`signatureAnalysis()` uses this), `explodeToList` (`./cxx/AssistantCns.cxx` uses this),
   produce unique signature, compare file against list of signatures), most of which were produced for antivirus signature analysis.
   - `classResultListsTests()`, or `classResultListsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassWebBrowse.hxx`](./cxx/ClassWebBrowse.hxx) is
+  - `classWebBrowseProcessUrls()`
+  - `classWebBrowseTests()`, or `classWebBrowseTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/VirusAnalysis.hxx`](./VirusAnalysis.hxx) is
   - store / load functions {`virusAnalysisInit()`, `virusAnalysisDumpTo()`, `virusAnalysisLoadFrom()`}. Allows hosts to produce databases which clients use.
   - modular helper functions {`produceAbortListSignatures()` (for `signatureAnalysis()` use), `importedFunctionsList()` (work-in-progress, `staticAnalysis()` uses this), `straceOutputsAnalysis()` (work-in-progress, `sandboxAnalysis()` uses this), `produceAnalysisCns()` (for `cnsAnalysis()` use), `produceVirusFixCns()` (for `cnsVirusFix()` use)},

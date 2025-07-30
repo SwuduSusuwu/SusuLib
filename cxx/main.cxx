@@ -11,6 +11,7 @@
 #ifdef SUSUWU_USE_TENSORFLOW
 #	include "ClassTensorFlowCns.hxx" /* classTensorFlowCnsTestsNoexcept */
 #endif /* def SUSUWU_USE_TENSORFLOW */
+#include "ClassWebBrowse.hxx" /* classWebBrowseTestsNoexcept */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_USE_TENSORFLOW */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
@@ -82,6 +83,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	} else {
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassResultListBit;
+	}
+	std::cout << "classWebBrowseTestsNoexcept" << std::flush;
+	if(classWebBrowseTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassWebBrowseBit;
 	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
 	if(virusAnalysisTestsNoexcept()) {

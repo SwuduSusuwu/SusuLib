@@ -2159,6 +2159,67 @@ const bool classResultListTests() {
 #endif /* SUSUWU_UNIT_TESTS */
 ```
 
+`less `[`cxx/ClassWebBrowse.hxx`](../cxx/ClassWebBrowse.hxx)
+```c++
+/* Abstractions used to web browse */
+const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml); /* returns list of Uniform Resource Identifiers from `localXhtml` */
+
+#if SUSUWU_UNIT_TESTS
+/* @throw std::runtime_error */
+const bool classWebBrowseTests();
+const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
+```
+
+`less `[`cxx/ClassWebBrowse.cxx`](../cxx/ClassWebBrowse.cxx)
+```c++
+#ifdef BOOST_VERSION
+#	include <boost/property_tree/ptree.hpp> /* boost::property_tree::ptree */
+#	include <boost/property_tree/xml_parser.hpp> /* BOOST_FOREACH read_xml */
+#elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
+#	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
+#endif /* !def USE_PUGIXML */
+const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml) {
+	std::vector<ClassIoPath> urls;
+#ifdef BOOST_VERSION
+	boost::property_tree::ptree pt; /* <https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser> <https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk> */
+	read_xml(localXhtml, pt);
+	BOOST_FOREACH(
+			boost::property_tree::ptree::value_type &v,
+			pt.get_child("html.a href"))
+		urls.push_back(v.second.data());
+#elif defined(USE_PUGIXML) /* !def BOOST_VERSION */
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
+	if(result) {
+#	ifdef ASSISTANTCNS_LIMIT_TO_TOP_LEVEL
+		for(pugi::xml_node node = doc.child("html").child("body").child("a"); node; node = node.next_sibling("a")) {
+			if(node.attribute("href")) {
+				urls.push_back(node.attribute("href").value());
+			}
+		} /* limited to direct descendants of `<body>` */
+#	else /* !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
+		const pugi::xpath_node_set links = doc.select_nodes("//a[@href]");
+		for(const auto &link : links) {
+			urls.push_back(link.node().attribute("href").value());
+		}
+#	endif /* else !def ASSISTANTCNS_LIMIT_TO_TOP_LEVEL */
+	} else {
+		SUSUWU_WARNING("classWebBrowseProcessUrls(.localXhtml = \"" + localXhtml + "\"): { (!doc.load_file(localXhtml.c_str())) }");
+	}
+#else /* else !def USE_PUGIXML */
+#	pragma message("TODO: process XHTML without `Boost` or `pugixml`") /* TODO: fall back to regular expression (such as <https://www.boost.io/libraries/regex/> <https://github.com/boostorg/regex>) */
+#endif /* !def USE_PUGIXML */
+	return urls;
+}
+
+#if SUSUWU_UNIT_TESTS
+/* @throw std::runtime_error */
+const bool classWebBrowseTests() { return true; } /* TODO */
+const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classWebBrowseTests, "classWebBrowseTests()"); }
+#endif /* SUSUWU_UNIT_TESTS */
+```
+
 `less `[`cxx/ClassCns.hxx`](../cxx/ClassCns.hxx)
 ```c++
 #ifndef SUSUWU_CNS_VALUE_SEMANTICS
@@ -3786,6 +3847,7 @@ const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns
 `less `[`cxx/main.hxx`](../cxx/main.hxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+#pragma once
 #ifndef INCLUDES_cxx_main_hxx
 #define INCLUDES_cxx_main_hxx
 #ifdef __cplusplus
@@ -3808,16 +3870,20 @@ static const int susuwuUnitTestsClassSha2Bit =
 	1 << 5; /*  32: `ClassSha2.hxx:classSha2TestsNoexcept()` */
 static const int susuwuUnitTestsClassResultListBit =
 	1 << 6; /*  64: `ClassResultList.hxx:classResultListTestsNoexcept()` */
+static const int susuwuUnitTestsClassWebBrowseBit =
+	1 << 7; /*  64: `ClassWebBrowse.hxx:classWebBrowseTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit =
-	1 << 7; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
+	1 << 8; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit =
-	1 << 8; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
+	1 << 9; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
+static const int susuwuUnitTestsClassTensorFlowCnsBit =
+	1 << 10; /* 512: `ClassTensorFlowCns.hxx:classTensorFlowCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 #ifdef __cplusplus
 } /* extern "C" { */
-SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* def __cplusplus */
+SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
 
@@ -3833,7 +3899,11 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysTestsNoexcept */
-#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* classTensorFlowCnsTestsNoexcept */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "ClassWebBrowse.hxx" /* classWebBrowseTestsNoexcept */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_USE_TENSORFLOW */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #endif /* SUSUWU_UNIT_TESTS */
@@ -3860,7 +3930,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	}
 	const bool consoleHasInput = classIoGetConsoleInput();
 	if(consoleHasInput) {
-		classIoSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/ClassIo.hxx` fails. Notice: this move assumes that the tests above won't block on input */
+		classIoSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/Classio.hxx` fails. Notice: this move assumes that the tests above won't block on input */
 	}
 	if(true == classIoGetConsoleInput()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
@@ -3905,6 +3975,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassResultListBit;
 	}
+	std::cout << "classWebBrowseTestsNoexcept" << std::flush;
+	if(classWebBrowseTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassWebBrowseBit;
+	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
 	if(virusAnalysisTestsNoexcept()) {
 		std::cout << "pass" << std::endl;
@@ -3922,6 +3999,15 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
+#	ifdef SUSUWU_USE_TENSORFLOW
+	std::cout << "classTensorFlowCnsTestsNoexcept" << std::flush;
+	if(classTensorFlowCnsTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassTensorFlowCnsBit;
+	}
+#	endif /* def SUSUWU_USE_TENSORFLOW */
 #else /* else !SUSUWU_UNIT_TESTS */
 	SUSUWU_NOTICE('`' + std::string(Susuwu::classIoGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
 #endif /* else !SUSUWU_UNIT_TESTS */
