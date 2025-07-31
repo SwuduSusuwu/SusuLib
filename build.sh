@@ -33,8 +33,8 @@ C_SOURCE_PATH="./c/" #/* Usage: replace with directory root for _C_ source code 
 CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source code */
 
 
-SUSUWU_PROCESS_S $@ #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
-SUSUWU_PROCESS_VERBOSE $@ #/* Usage: `./build.sh --verbose`. Enables `SUSUWU_SH_DEBUG` ("Debug:") messages, forces `set -x`. */
+SUSUWU_PROCESS_S "$@" #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
+SUSUWU_PROCESS_VERBOSE "$@" #/* Usage: `./build.sh --verbose`. Enables `SUSUWU_SH_DEBUG` ("Debug:") messages, forces `set -x`. */
 SUSUWU_PRODUCTION_USE "${THIS_DEFAULT_BRANCH}"
 SUSUWU_PROCESS_MINGW "$@" #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
