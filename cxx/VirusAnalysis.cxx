@@ -208,7 +208,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 	}
 	if(virusAnalysisHookExec & hookStatus) {
 #ifdef SUSUWU_POSIX
-		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */ /* cppcheck-suppress constParameter */
+		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */
 			return static_cast<int>(virusAnalysisImpl(PortableExecutable(pathname)));
 		};
 		classSysKernelSetHook(execv, lambdaScanExecv);
