@@ -155,7 +155,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--debug")") is slow (use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_QUOTE "PROPOSED" "--release")") to improve how fast $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_PATH_UNAMBIGUOUS "\${BINDIR}/\${OUTPUT}")") executes)."
 		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
-		if [ true = ${USE_FSAN} ]; then
+		if [ true = "${USE_FSAN}" ]; then
 			CFLAGS="${CFLAGS} ${FLAGS_FSAN}"
 			CXXFLAGS="${CXXFLAGS} ${FLAGS_FSAN}"
 			LDFLAGS="${LDFLAGS} ${FLAGS_FSAN}"
@@ -300,7 +300,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 				SUSUWU_STATUS=$?
 				SUSUWU_ECHO_COMMANDS false
 				SUSUWU_BUILD_OBJECT_ERROR_CODE="$(SUSUWU_SH_QUOTE "CODE" "${LOCAL_BUILD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). "
-				if [ true = ${SUSUWU_ABORT_ON_FIRST_ERROR} ]; then
+				if [ true = "${SUSUWU_ABORT_ON_FIRST_ERROR}" ]; then
 					SUSUWU_PRINT "SUSUWU_BUILD_OBJECTS()" "$(SUSUWU_SH_ERROR)" "${SUSUWU_BUILD_OBJECT_ERROR_CODE}[Due to $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_QUOTE "CURRENT" "--abort-on-first-error")"), this is fatal.]"
 					exit 1
 				else
@@ -334,7 +334,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-execution>]; exit $?` */
 	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${SUSUWU_RELINK} ]; then
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
-			if [ true = ${SUSUWU_S} ]; then
+			if [ true = "${SUSUWU_S}" ]; then
 				"${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
 			else
 				"${BINDIR}${OUTPUT}"
@@ -344,7 +344,7 @@ SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OU
 				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). Do $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
 				return 1
 			fi
-			if [ true = ${SUSUWU_S} ]; then
+			if [ true = "${SUSUWU_S}" ]; then
 				wine "${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
 			else
 				wine "${BINDIR}${OUTPUT}"
