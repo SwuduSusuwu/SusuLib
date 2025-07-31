@@ -112,7 +112,7 @@ SUSUWU_STR_TOKEN_FIRST() ( #/* Usage: `SUSUWU_STR_TOKEN_FIRST "<input>" "<delimi
 #[ "uwu\033q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu\033q\033mukyu" "\\033")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 #[ "uwu$'\033'q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu$'\033'q$'\033'mukyu" $'\033')" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 SUSUWU_STR_TOKEN_LAST() ( #/* Usage: `SUSUWU_STR_TOKEN_LAST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all after last <delimiter>. */
-	RESULT="${1#*${2}}" #/* `RESULT` is all after first <delimiter>` */
+	RESULT="${1#*"${2}"}" #/* `RESULT` is all after first <delimiter>` */
 	if [ "${RESULT}" != "${1}" ]; then         #/* if `RESULT` is not the input, 1 or more <delimiter> was found,
 		SUSUWU_STR_TOKEN_LAST "${RESULT}" "${2}" # * so search for next <delimiter>. */
 	else
