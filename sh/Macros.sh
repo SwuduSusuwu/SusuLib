@@ -361,12 +361,15 @@ SUSUWU_PRINT() ( #/* Usage: `SUSUWU_PRINT ["<optional caller-name>"] "$(SUSUWU_S
 	esac
 	NEW_MESSAGE="[${SUSUWU_SH_FILE:+"$0:"}${SUSUWU_SH_LINE:+"${LINENO}:"}${SUSUWU_SH_FILE_OR_LINE:+" "}${LEVEL}"
 	if [ "true" = "${SUSUWU_SH_FUNC}" ]; then
+#shellcheck disable=SC3028 #/* if `SUSUWU_SH_HAS_FUNCNAME`, console supports this */
 		if [ -n "${CALLER_FUNC}" ]; then
+#shellcheck disable=SC2038 #/* if `SUSUWU_SH_HAS_FUNCNAME`, console supports this */
 			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${CALLER_FUNC}: ")"
 		elif [ "${SUSUWU_SH_HAS_FUNCNAME_RESULT}" -eq 0 ] && [ "${#FUNCNAME}" -ge 2 ]; then
-#shellcheck disable=SC2039 #if `SUSUWU_SH_HAS_FUNCNAME`, console supports this
+#shellcheck disable=SC2039,SC3028,SC3054 #/* if `SUSUWU_SH_HAS_FUNCNAME`, console supports this */
 			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${FUNCNAME[1]}(): ")"
 		elif [ -n "${KSH_VERSION}" ]; then
+#shellcheck disable=SC2296 #/* if `${KSH_VERSION}`, console supports this */
 			NEW_MESSAGE="${NEW_MESSAGE}$(SUSUWU_SH_QUOTE "FUNCTION" "${.sh.fun}: ")"
 		fi
 	fi
