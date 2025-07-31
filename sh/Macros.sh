@@ -391,7 +391,7 @@ SUSUWU_LOCAL_WORKSPACE_PATH() ( #/* Usage: `"$(SUSUWU_LOCAL_WORKSPACE_PATH)/comp
 )
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
 	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" # | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #/* remote branch */
-	)"; DEFAULT_BRANCH="${DEFAULT_BRANCH#$(git remote)/}" #/* remote branch */ /* `sed -n` replaced with substitution */
+	)"; DEFAULT_BRANCH="${DEFAULT_BRANCH#"$(git remote)/"}" #/* remote branch */ /* `sed -n` replaced with substitution */
 	if [ -z "${DEFAULT_BRANCH}" ]; then #/* if `git remote` not found */
 		DEFAULT_BRANCH="$(git branch --sort=-refname | grep -o -m1 '\b\(main\|master\|trunk\)\b')" #/* local branch; if you update this, update `README.md#git`. */
 	fi
