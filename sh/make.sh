@@ -323,7 +323,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	if [ false = ${SUSUWU_RELINK} ]; then
 		SUSUWU_STATUS=0
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Reused $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
-	elif [ 0 -eq ${SUSUWU_STATUS} ]; then
+	elif [ 0 -eq "${SUSUWU_STATUS}" ]; then
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Produced $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	else
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${LD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). [If errors include \"ld... $(SUSUWU_SH_QUOTE "STDERR" "unknown file type")\" or \"ld... $(SUSUWU_SH_QUOTE "STDERR" "undefined symbol __asan_")*\"; remove intermediate objects ($(SUSUWU_SH_QUOTE "CODE" "rm \"${OBJDIR}\"*.o")). Use $(SUSUWU_SH_QUOTE "CODE" "${0} ${SUSUWU_SH_CONSOLE_PARAMS} $(SUSUWU_SH_QUOTE "PROPOSED" "--rebuild")") to remove plus continue.]"
@@ -332,7 +332,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 }
 
 SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-execution>]; exit $?` */
-	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${SUSUWU_RELINK} ]; then
+	if [ 0 -eq "${SUSUWU_STATUS}" ] || [ false = ${SUSUWU_RELINK} ]; then
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
 			if [ true = "${SUSUWU_S}" ]; then
 				"${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
@@ -351,7 +351,7 @@ SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OU
 			fi
 		fi
 		SUSUWU_STATUS=$?
-		if [ 0 -eq ${SUSUWU_STATUS} ]; then
+		if [ 0 -eq "${SUSUWU_STATUS}" ]; then
 			SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_SUCCESS)" "$(SUSUWU_SH_QUOTE "CODE" "${BINDIR}${OUTPUT}") returned status SusuwuUnitTestsBitmask($(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"))."
 		else
 			SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${BINDIR}${OUTPUT}") returned status SusuwuUnitTestsBitmask($(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"))."
@@ -370,7 +370,7 @@ SUSUWU_FORMAT() ( #/* TODO */
 SUSUWU_DOCS() ( #/* TODO */
 	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which is analogous to \`make docs\`, and will use tools such as $(SUSUWU_SH_QUOTE "CODE" "sphinx") or $(SUSUWU_SH_QUOTE "CODE" "doxygen"))"
 )
-SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}")) ]`. Is just for internal use. */
+SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq "$(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}"))" ]`. Is just for internal use. */
 	if [ ! -d "${1}" ]; then
 		return 1
 	fi
