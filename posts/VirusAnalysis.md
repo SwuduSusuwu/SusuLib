@@ -2627,6 +2627,11 @@ public:
 	}
 	void setLayersOfNeurons(size_t x) SUSUWU_OVERRIDE { /* sets connectome "hidden layer" count */
 		if(x != layersOfNeurons) {
+			if(1 < layersOfNeurons) {
+#if !SUSUWU_CNS_USE_MLP
+				/*throw std::runtime_error*/SUSUWU_WARNING(getName() + "::setLayersOfNeurons(.x = " + std::to_string(x) + ") { (1 < layersOfNeurons) { /* TODO: `SUSUWU_CNS_USE_MLP` */ } }")/*) TODO: `throw`? */;
+#endif /* ndef SUSUWU_CNS_USE_MLP */
+			}
 			layersOfNeurons = x;
 			restructureConnectome();
 		}
