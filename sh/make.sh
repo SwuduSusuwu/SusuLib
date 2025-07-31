@@ -281,7 +281,7 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 	else
 		SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_ERROR)" "\"ctags not found\"; use $(SUSUWU_SH_QUOTE "CODE" "apt install ctags")."
 	fi
-	return ${SUSUWU_STATUS};
+	return "${SUSUWU_STATUS}"
 )
 SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
 	LOCAL_BUILD=${1}
@@ -328,7 +328,7 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	else
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${LD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). [If errors include \"ld... $(SUSUWU_SH_QUOTE "STDERR" "unknown file type")\" or \"ld... $(SUSUWU_SH_QUOTE "STDERR" "undefined symbol __asan_")*\"; remove intermediate objects ($(SUSUWU_SH_QUOTE "CODE" "rm \"${OBJDIR}\"*.o")). Use $(SUSUWU_SH_QUOTE "CODE" "${0} ${SUSUWU_SH_CONSOLE_PARAMS} $(SUSUWU_SH_QUOTE "PROPOSED" "--rebuild")") to remove plus continue.]"
 	fi
-	return ${SUSUWU_STATUS}
+	return "${SUSUWU_STATUS}"
 }
 
 SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-execution>]; exit $?` */
@@ -357,7 +357,7 @@ SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OU
 			SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${BINDIR}${OUTPUT}") returned status SusuwuUnitTestsBitmask($(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"))."
 		fi
 	fi
-	return ${SUSUWU_STATUS}
+	return "${SUSUWU_STATUS}"
 }
 
 SUSUWU_TODO_LIST() ( #/* Usage: `SUSUWU_TODO_LIST "NameOfTool" "what to expect from future versions"` */
