@@ -1,9 +1,9 @@
-*[Calculus](https://wikipedia.org/wiki/Calculus) to produce best 2 [orthographic projection](https://wikipedia.org/wiki/Orthographic_projection)s (2D [previews](https://wikipedia.org/wiki/Viewport)) -- of [3D mesh](https://wikipedia.org/wiki/Polygon_mesh)es -- such that you can use projections to do [reconstruction of meshes](https://wikipedia.org/wiki/3D_reconstruction)*
+**[Calculus](https://wikipedia.org/wiki/Calculus) to produce best 2 [orthographic projection](https://wikipedia.org/wiki/Orthographic_projection)s (2D [previews](https://wikipedia.org/wiki/Viewport)) -- of [3D mesh](https://wikipedia.org/wiki/Polygon_mesh)es -- such that you can use projections to do [reconstruction of meshes](https://wikipedia.org/wiki/3D_reconstruction)**
 
 
-[[This post allows all uses](https://swudususuwu.substack.com/p/formula-to-produce-2-orthographic)]
+\[[This post allows all uses](https://swudususuwu.substack.com/p/formula-to-produce-2-orthographic)\]
 
-[Anthropic’s Assistant](https://poe.com/s/aIw9g8FvWdIEj0fUfvdL) (+ own research to do manual insertion of [URLs](https://wikipedia.org/wiki/URL) to more resources) is source of responses.
+[_Anthropic_’s _Assistant_](https://poe.com/s/aIw9g8FvWdIEj0fUfvdL) (+ own research to do manual insertion of [URLs](https://wikipedia.org/wiki/URL) to more resources) is source of responses.
 
 Q: _[https://wikipedia.org/wiki/3D_projection](https://wikipedia.org/wiki/3D_projection)_
 
@@ -159,4 +159,4 @@ Q: _Your example is 3 fixed rotations (or a head-on view plus 2 fixed rotations)
 
     The advantage of this approach is that it determines the two most informative 2D views based on the object's actual geometric shape, rather than using a fixed set of views. This can provide a more comprehensive representation of the 3D object's form, allowing users to better [deduce its geometric attributes](https://wikipedia.org/wiki/3D_reconstruction).
 
-Resources have to do with rasterization, which has uses with: [OuroborosSinCos.md](OuroborosSinCos.md)
+Resources have to do with rasterization, which has uses with: [`./OuroborosSinCos.md`](./OuroborosSinCos.md)
