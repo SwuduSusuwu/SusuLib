@@ -10,9 +10,9 @@ cd ./SusuLib/cxx && git switch preview && git pull --rebase && ls
 ```
 To [contribute](https://github.com/SwuduSusuwu/SusuLib?tab=readme-ov-file#how-to-contribute) to this, submit [new pull requests](https://github.com/SwuduSusuwu/SusuLib/pulls) which reference <https://github.com/SwuduSusuwu/SusuLib/issues/2>.
 
-- [`cxx/ClassResultList.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.cxx) has correspondances to [neocortex](https://wikipedia.org/wiki/Neocortex). which is what humans use as databases.
-- [`cxx/VirusAnalysis.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.cxx) + [`cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.cxx) uses correspondances to [_Broca's area_](https://wikipedia.org/wiki/Broca's_area) (produces language through recursive processes), [_Wernicke’s area_](https://wikipedia.org/wiki/Wernicke's_area) (parses languages through [recursive](https://wikipedia.org/wiki/recursion) processes), plus [hippocampus](https://wikipedia.org/wiki/Hippocampus) (integration to the neocortex + [imagination](https://wikipedia.org/wiki/Procedural_generation) through numerous regions).
-- [`cxx/ClassCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.cxx) (which can use "backends" (implementations) such as [`tensorflow`](https://github.com/tensorflow/tensorflow), [`apxr_run`](https://github.com/Rober-t/apxr_run) or [`HSOM`](https://github.com/CarsonScott/HSOM)) is a [pure-virtual](https://en.cppreference.com/book/intro/abstract_classes) general-purpose [emulations (heuristic approximates)](https://wikipedia.org/wiki/emulation) of neural tissue.
+- [`cxx/ClassResultList.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassResultList.cxx) has correspondances to [neocortex](https://wikipedia.org/wiki/Neocortex). which is what humans use as databases.
+- [`cxx/AssistantCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/AssistantCns.cxx) uses correspondances to [_Broca's area_](https://wikipedia.org/wiki/Broca's_area) (produces language through recursive processes), [_Wernicke’s area_](https://wikipedia.org/wiki/Wernicke's_area) (parses languages through [recursive](https://wikipedia.org/wiki/recursion) processes), plus [hippocampus](https://wikipedia.org/wiki/Hippocampus) (integration to the neocortex + [imagination](https://wikipedia.org/wiki/Procedural_generation) through numerous regions).
+- [`cxx/ClassCns.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassCns.cxx) (which can use "backends" (implementations) such as [`tensorflow`](https://github.com/tensorflow/tensorflow), [`apxr_run`](https://github.com/Rober-t/apxr_run) or [`HSOM`](https://github.com/CarsonScott/HSOM)) is a [pure-virtual](https://en.cppreference.com/book/intro/abstract_classes) general-purpose [emulations (heuristic approximates)](https://wikipedia.org/wiki/emulation) of neural tissue.
 
 <https://www.deviantart.com/dreamup> has some equivalences to how [visual cortex](https://wikipedia.org/wiki/Visual_cortex) + _Broca's area_ + hippocampus + text inputs = [texture generation](https://wikipedia.org/wiki/Procedural_generation) + [mesh generation](https://wikipedia.org/wiki/Mesh_generation) outputs.
 
@@ -40,7 +40,7 @@ Don't know if the 2 `arxiv.org` documents (\[1\]\[2\]) are about finished progra
 - \[1\] [A Computationally Efficient Neural Video Compression Accelerator Based on a Sparse CNN-Transformer Hybrid Network](https://arxiv.org/html/2312.10716v1)
 - \[2\] [Advances In Video Compression System Using Deep Neural Network: A Review And Case Studies](https://arxiv.org/abs/2101.06341)
 
-If not, for [sponsorship](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#sponsor) (or [escrow](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#escrow)) will produce this.
+If not, for [sponsorship](https://github.com/SwuduSusuwu/SusuLib/blob/preview/README.md#sponsor) (or [escrow](https://github.com/SwuduSusuwu/SusuLib/blob/preview/README.md#escrow)) will produce this.
 
 Because the `arxiv.org` pages do not list compression ratios, have doubts that those researchers have narrowed down specifics of what to do, but if someone has produced this, won't waste resources to reproduce this.
 
@@ -51,11 +51,11 @@ Expected compression ratios for this: parse inputs of 1024\*1280@60fps (2.6gbps)
 - Or input such as [this show about simple autonomous tools which mass-produce simple autonomous tools](https://youtu.be/hLDbRm-98cs), once processed, can accept inserts such as `As opposed to the standalone robotic arms shown, produces tools with locomotive systems + 2 arms`, which will output a show about such improved tools.
 
 ## Synopsis + related posts/resources
-- [Neural resources](./VirusAnalysis.md#neural-resources)
+- [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
 
 Previous posts about artificial neural tissue:
-- [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
-- [Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.](./AlbatrossCNS.md)
-- [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
-- [Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved](./VirusAnalysis.md)
+- [Destructive (scan uses nanoscopic decomposition) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
 - [Want this physical form gone; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
+- [Neural resources](./VirusAnalysis.md#neural-resources)
+- [Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.](./AlbatrossCNS.md)
+
