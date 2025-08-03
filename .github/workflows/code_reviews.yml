@@ -20,10 +20,10 @@ jobs:
           node-version: 20
       - name: Install remark-lint
         run: |
-          npm install -g remark-cli remark-preset-lint-recommended
+          npm install -g remark-cli remark-footnotes remark-preset-lint-recommended
       - name: Run remark-lint
         run: |
-          npx remark . --use remark-preset-lint-recommended
+          npx remark . --frail --use remark-footnotes --use remark-preset-lint-recommended
 
   shellcheck:
     runs-on: ubuntu-latest
