@@ -1618,4 +1618,5 @@ To improve torque (allow servo motors to lift more pounds of load), you can [cou
 - [_CV2_ `calcOpticalFlowFarneback`](https://docs.opencv.org/4.x/d4/dee/tutorial_optical_flow.html#autotoc_md1162)
 - [_MathWorks_ `opticalFlowFarneback`](https://www.mathworks.com/help/vision/ref/opticalflowfarneback.html)
 - [_Consumer Depth Cameras for Computer Vision: Research Topics and Applications (Advances in Computer Vision and Pattern Recognition)_](https://www.amazon.com/Consumer-Depth-Cameras-Computer-Vision/dp/1447146395)
+- [_Sakura School Simulator_ howto](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/SakuraSchoolHowto.md) shows artist depictions of such tools, plus a synopsis with more references to such.
 
