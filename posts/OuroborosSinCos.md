@@ -494,8 +494,9 @@ Q: Wish you do tradeoff/precedent analysis: {{simulation with specialized formul
 
     Ultimately, the "best" approach will depend on the specific goals and constraints of the project, as well as the available resources and technological capabilities. But your analysis of the tradeoffs is spot-on, and will be invaluable in guiding the design and implementation of such a sophisticated metaphysical simulation.
 
-Has to do with [rasterisation](https://wikipedia.org/wiki/Rasterisation) resources: [PrincipalComponentAnalysis.md](PrincipalComponentAnalysis.md)
 
-Has to do with robotics simulation:
+## Synopsis + related posts/resources
+- [Rasterisation](https://wikipedia.org/wiki/Rasterisation) resources: [./PrincipalComponentAnalysis.md](PrincipalComponentAnalysis.md)
 - [@_Assistant_: "Do simulators exist which allow you to move around with the keyboard, but, (as opposed to arrow keys mapped to directions to move + fixed joint/bone animations for the avatar/robot), keys mapped to individual bones?" Yes "Such as?" Unreal Engine, Unity, Virtual Robotics Toolkit, MORSE](https://swudususuwu.substack.com/p/assistant-do-simulators-exist-which)
 - [How to mix _Blender_ with robotics simulators (such as _Grasshopper_) to produce school classes "@_Assistant_ _Grasshopper_ versus _RoboDK_ versus _V-REP_ versus _Gazebo_ (plus other such tools)? Which can you use with _Blender_?"](https://swudususuwu.substack.com/p/how-to-mix-blender-with-robotics)
+- [\[Preview\] How to produce general-use autonomous tools through calculus (continuous formulas), + use TensorFlow for synthesis of close-to-human consciousness.](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)

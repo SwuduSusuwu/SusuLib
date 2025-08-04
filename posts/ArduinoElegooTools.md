@@ -1611,6 +1611,7 @@ To improve torque (allow servo motors to lift more pounds of load), you can [cou
   - [`../SusuPosts/blob/preview/posts/Ultrasound_Pointclouds.md`](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Ultrasound_Pointclouds.md#q-2) is "**Ultrasound acoustic tools (+ source code which measures echos of numerous transducers to produce volumetric pointclouds of surfaces)**".
   - [`../SusuPosts/blob/preview/posts/Laser_Pointclouds.md`](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Laser_Pointclouds.md) is: "**Laser tools (+ source code, which measures reflections to produce volumetric pointclouds of surfaces)**"
 - [\[Preview\] Have computers do most of central nervous system, such as thalamus, auditory cortex, visual cortices, homunculus](./CnsCompress.md)
+- [\[Preview\] How to produce general-use autonomous tools through calculus (continuous formulas), + use TensorFlow for synthesis of close-to-human consciousness.](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)
 - [SubStack post which has list of related posts at bottom](https://swudususuwu.substack.com/p/how-to-mix-blender-with-robotics)
 - [Pseudocode (+ some _Arduino_/_Elegoo_ code) from _Assistant_, which plans tasks, plus sends signals to servos](https://poe.com/s/bkHWeb6vWGFf3CdUzIch)
 - [_NumPy_ + _CV2_ + _TensorFlow_ code from _Assistant_, which produces point clouds (for obstacle avoidance)](https://poe.com/s/sx1MuZzPcLy3p9u0elpq)

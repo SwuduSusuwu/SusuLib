@@ -3383,5 +3383,7 @@ This post was about general methods to produce virus analysis tools, which do no
 - Can have small local sandboxes (that just run for a few seconds) + small CNS (just billions of neurons with hundreds of layers, versus the trillions of neurons with thousands of layers of cortices that antivirus hosts would use for this), which forward suspicious executables to remote hosts for extra review.
 - Allows reuses of workflows which an existent analysis tool has -- can just add (small) local sandboxes (or just add artificial CNS to antivirus hosts for extra analysis).
 
-Alternative CNS structure: [based on albatross](./AlbatrossCNS.md) (includes numerous resources, about all sorts of natural/artificial neural tissue).
+Subsequent resources:
+- Alternative CNS structure: [based on albatross](./AlbatrossCNS.md) (includes numerous resources, about all sorts of natural/artificial neural tissue).
+- [\[Preview\] How to produce general-use autonomous tools through calculus (continuous formulas), *+ use TensorFlow for synthesis of close-to-human consciousness.*](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)
 
