@@ -499,3 +499,5 @@ Has to do with [rasterisation](https://wikipedia.org/wiki/Rasterisation) resourc
 Has to do with robotics simulation:
 - [@_Assistant_: "Do simulators exist which allow you to move around with the keyboard, but, (as opposed to arrow keys mapped to directions to move + fixed joint/bone animations for the avatar/robot), keys mapped to individual bones?" Yes "Such as?" Unreal Engine, Unity, Virtual Robotics Toolkit, MORSE](https://swudususuwu.substack.com/p/assistant-do-simulators-exist-which)
 - [How to mix _Blender_ with robotics simulators (such as _Grasshopper_) to produce school classes "@_Assistant_ _Grasshopper_ versus _RoboDK_ versus _V-REP_ versus _Gazebo_ (plus other such tools)? Which can you use with _Blender_?"](https://swudususuwu.substack.com/p/how-to-mix-blender-with-robotics)
+- [_Sakura School Simulator_ howto](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/SakuraSchoolHowto.md)
+
