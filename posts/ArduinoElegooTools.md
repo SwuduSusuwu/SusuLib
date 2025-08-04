@@ -1195,6 +1195,7 @@ Supplemental resources (which have use for all structural support formulas):
 # External resources
 - [_Assistant_ lists consensus formulas and efficient synchronization protocols for obstacle avoidance through planned routes](https://poe.com/s/7ro9aNEONpb3GiQ9SyWE)
 - [\[Preview\] Have computers do most of central nervous system, such as thalamus, auditory cortex, visual cortices, homunculus](./CnsCompress.md)
+- [\[Preview\] How to produce general-use autonomous tools through calculus (continuous formulas), + use TensorFlow for synthesis of close-to-human consciousness.](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)
 - [SubStack post which has list of related posts at bottom](https://swudususuwu.substack.com/p/how-to-mix-blender-with-robotics)
 - [Pseudocode (+ some _Arduino_/_Elegoo_ code) from _Assistant_, which plans tasks and controls motor output](https://poe.com/s/bkHWeb6vWGFf3CdUzIch)
 - [_NumPy_ + _CV2_ + _TensorFlow_ code from _Assistant_, which produces point clouds (for obstacle avoidance)](https://poe.com/s/sx1MuZzPcLy3p9u0elpq)

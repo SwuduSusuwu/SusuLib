@@ -231,7 +231,7 @@ Numerous problems (such as starvation, overpopulation, pandemics) have solutions
 - [Destructive (scan uses molecular decomposition of tissue) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
 - [_How to have this physical form gone; transhumanism / posthumanism._ Lots of tools have possible use to transplant human neural tissue into robotic tools or computers](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
 
-[How to produce general-use autonomous tools through calculus (continuous formulas), + use _TensorFlow_ for synthesis of close-to-human consciousness.](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
+[How to produce general-use autonomous tools through calculus (continuous formulas), + use _TensorFlow_ for synthesis of close-to-human consciousness.](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)
  is a thesis about how computers can execute synthesis of human neural tissue, which suggests that computers can house human consciousness.
 
 As “[*Integration Theory of Consciousness*](https://www.conscious-robots.com/2009/07/28/information-integration-theory-of-consciousness/)” shows how qualia/consciousness follow from (complex) groups of mass,
