@@ -42,12 +42,12 @@ const ClassIoPath classIoGetOwnPath() {
 	return static_cast<ClassIoPath>(&path[0]); /* causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
-	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
+	const size_t nSize = 65536 /* GetModuleFileName(hModule, SUSUWU_NULLPTR, 0) */;
 	static const std::string getModuleFileNameReturn = "classIoGetOwnPath(): { HMODULE hModule = GetModuleHandle(nullptr); size_t nSize = GetModuleFileName(hModule, nullptr, 0); (nSize == " SUSUWU_SH_PURPLE;
 	if(0 < nSize) {
 		char *const lpFilename = new char[nSize];
 		const size_t result = GetModuleFileName(hModule, lpFilename, nSize);
-		if(nSize == result) {
+		if(nSize >= /* == */ result) {
 			return ClassIoPath(lpFilename);
 		} else {
 			SUSUWU_ERROR(getModuleFileNameReturn + std::to_string(nSize) + SUSUWU_SH_DEFAULT "); char *const lpFilename = new char[nSize]; (GetModuleFileName(hModule, lpFileName, nSize) == " SUSUWU_SH_PURPLE + std::to_string(result) + SUSUWU_SH_DEFAULT " /* expected `== nSize` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
