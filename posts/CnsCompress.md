@@ -64,3 +64,8 @@ Previous posts about artificial neural tissue:
 - [Neural resources](./VirusAnalysis.md#neural-resources)
 - [Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.](./AlbatrossCNS.md)
 
+Unknown sources (can not discern truth (fitness-to-use) of those) which have to do with neuromorphic computers:
+- [_International Centre for Neuromorphic Systems_](https://www.westernsydney.edu.au/icns)
+- [Neuromorphic Cognitive Systems | _Institute of Neuroinformatics_](https://www.ini.uzh.ch/en/research/groups/ncs.html)
+- [Neuromorphic systems | _NIST_](https://www.nist.gov/programs-projects/neuromorphic-systems)
+
