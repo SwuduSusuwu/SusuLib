@@ -1,6 +1,6 @@
 **Albatross executes more compute per unit of neural volume (opposed to humans); howto base artificial neural systems on albatross neural layout/tissue.**
 
-_[This post](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural) allows all uses._
+\[_[This post](https://swudususuwu.substack.com/p/albatross-performs-lots-of-neural) allows [all uses](https://creativecommons.org/licenses/by/2.0/)_\].
 # Table of contents
 - [Post, with resources](#post-with-resources)
 - [Questions to viewers](#questions-to-viewers)
@@ -21,9 +21,9 @@ Simple artifical neural networks:
 
 \[**Notice:** this post is from March 2024. Asof December 2024 have concluded that the below interpretation was wrong; that computers should not use bird-based, but should use neural systems specific to computers (or based off of human neural tissue.) But this post still has use (as general instruction about neural tissues.)\]
 
-Q: "What CNS regions do albatrosses have?" 
+Q: "What CNS regions do albatrosses have?"
 
-    Albatrosses, as other birds, have CNS that consist of various regions responsible for various functions. While the specific brain regions and their functions may vary among different bird species, including albatrosses, I can provide a general overview of some major brain regions found in avian species: 
+    Albatrosses, as other birds, have CNS that consist of various regions responsible for various functions. While the specific brain regions and their functions may vary among different bird species, including albatrosses, I can provide a general overview of some major brain regions found in avian species:
 
         Telencephalon: This is the largest part of the bird CNS and is responsible for higher cognitive functions. It includes the following regions:
 
@@ -47,13 +47,13 @@ Q: "What CNS regions do albatrosses have?"
 
         Brainstem: Controls lungs, cardiovascular and gut systems, such as humans.
 
-    It's important to note that the specific structure and functions of CNS regions of albatrosses could have unique adaptations as responses to their ecological niche and behaviors. Detailed studies of the physical structures of albatross CNS would offer more data about albatross CNS regions and their functions. 
+    It's important to note that the specific structure and functions of CNS regions of albatrosses could have unique adaptations as responses to their ecological niche and behaviors. Detailed studies of the physical structures of albatross CNS would offer more data about albatross CNS regions and their functions.
 
-Q: "How do birds have so much more intelligence per neural volume versus humans?" 
+Q: "How do birds have so much more intelligence per neural volume versus humans?"
 
-    Pop science teaches us that birds have higher intelligence per neural volume compared to humans, it is essential to clarify that intelligence is a complex and multifaceted concept that cannot be solely determined by brain size or neural volume. The notion that birds have higher intelligence per neural volume is based on the fact that birds, in particular certain bird species, exhibit remarkable cognitive abilities despite their small brains versus mammals suchas humans. 
+    Pop science teaches us that birds have higher intelligence per neural volume compared to humans, it is essential to clarify that intelligence is a complex and multifaceted concept that cannot be solely determined by brain size or neural volume. The notion that birds have higher intelligence per neural volume is based on the fact that birds, in particular certain bird species, exhibit remarkable cognitive abilities despite their small brains versus mammals suchas humans.
 
-    There are a few possible reasons for these differences: 
+    There are a few possible reasons for these differences:
 
         Denseness of CNS and optimizations: Birds have higher neural densities, thus more neurons per volume of CNS tissue. This increased neural density allows for more neural connections and processes per volume of CNS.
 
@@ -65,11 +65,11 @@ Q: "How do birds have so much more intelligence per neural volume versus humans?
 
     Note that it is difficult to compare intelligences across different species, as intelligence manifests through various forms and is influenced from diverse factors. Intelligence is influenced not only from brain size or neural volume but also by factors such as neural architecture, ecological niche, social behavior, and environmental demands. Humans, on the other hand, possess unique cognitive abilities and have developed more complex societies, language, and tools. Although birds are superior at some cognitive tasks, humans have exceptional abilities in areas such as abstract reasoning, comprehension of languages, and cultural innovations.
 
-    To summarize, birds have impressive cognitive abilities relative to their CNS size, but intelligence is a complex idea that is not all based on neural volume. Intelligence is based on various factors, and different species have evolved specialized cognitive skills to suit their ecological and evolutionary purposes. 
+    To summarize, birds have impressive cognitive abilities relative to their CNS size, but intelligence is a complex idea that is not all based on neural volume. Intelligence is based on various factors, and different species have evolved specialized cognitive skills to suit their ecological and evolutionary purposes.
 
-Q: "How to base artificial neural networks off us birds to allow to lower resource use versus ones based off of human cortices?" 
+Q: "How to base artificial neural networks off us birds to allow to lower resource use versus ones based off of human cortices?"
 
-    Is complex to base artificial neural networks off of avian CNS to lower resource usage versus those based on human cortices. Lots of challenges to reuse functions of complex biological systems, here's a few aspects you could consider to develop such networks: 
+    Is complex to base artificial neural networks off of avian CNS to lower resource usage versus those based on human cortices. Lots of challenges to reuse functions of complex biological systems, here's a few aspects you could consider to develop such networks:
 
         Neural architecture: Explore the neural architecture and connection patterns of avian CNS. Birds have specialized CNS regions and neural circuits that allow to process information fast. Lookup how these neural architectures could adapted to artificial neural networks to enhance computational processes.
 
@@ -83,7 +83,7 @@ Q: "How to base artificial neural networks off us birds to allow to lower resour
 
     It's important to note that to produce artificial neural networks based off of avian CNS is an area of active research, and there is much to explore and discover. The area of neuromorphic computers, which wants to produce brain-inspired computer systems, could have use for techniques to produce such networks.
 
-    ​Balance how fast the CPU runs with how complex the desired cognitive abilities, leverage the unique features of avian neural systems and tailor to your computational goals. 
+    Balance how fast the CPU runs with how complex the desired cognitive abilities, leverage the unique features of avian neural systems and tailor to your computational goals.
 
 Q: "Goose and albatross process lots per neural volume versus humans, because birds evolved from dinosaurs and so had longer to optimize neural structures versus mammals, howto base artificial neural networks off of goose or albatross neural networks?"
 
@@ -99,7 +99,7 @@ Q: "Goose and albatross process lots per neural volume versus humans, because bi
 
     However, there are nonstop research efforts to learn from biological neural networks to improve ANNs. [For instance, researchers have developed ALBATROSS, a deep learning model for predicting intrinsically disordered protein ensemble dimensions from sequence1](https://www.biorxiv.org/content/10.1101/2023.05.08.539824v2.full.pdf)[2](https://www.nature.com/articles/s41592-023-02160-y.pdf). This model was named after the bird, but is not a mirror image of the albatross’s neural networks.
 
-    Thus, you could draw inspiration from biological neural networks, but much of the work to produce ANNs consists of computational and mathematical challenges. [It involves selecting the right architecture, activation functions, and learning algorithms to optimize the network’s performance for a specific task3](https://wiki.pathmind.com/neural-network)[4](https://www.javatpoint.com/artificial-neural-network). 
+    Thus, you could draw inspiration from biological neural networks, but much of the work to produce ANNs consists of computational and mathematical challenges. [It involves selecting the right architecture, activation functions, and learning algorithms to optimize the network’s performance for a specific task3](https://wiki.pathmind.com/neural-network)[4](https://www.javatpoint.com/artificial-neural-network).
 
 Q: "Modern artificial neural networks such as Spinnaker are based off human neural networks because humans are the smartest of mammals, but lots of robots can not house enough RAM and CPUs, so as opposed to neuromorphic artificial neural networks based off on humans, how about based off of goose or albatross?"
 
@@ -111,7 +111,7 @@ Q: "Modern artificial neural networks such as Spinnaker are based off human neur
 
     However, the idea of reuse from nature to improve technology has uses. [In fact, there are ongoing research efforts to learn from biological neural networks to improve ANNs3](https://arxiv.org/pdf/2105.05956) [4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/). For instance, researchers look for methods to produce ANNs that use less power, a characteristic of biological neural networks.
 
-    Thus, although to base ANNs on the neural networks of specific animals (such as the goose, or albatrosses) has possible uses, a full clone of avian neural networks is beyond our reach due to our small understanding of these networks and the fundamental differences from biological versus artificial networks. [However, the field of neuromorphic engineering continues to draw inspiration from biology to improve the design and efficiency of ANNs3](https://arxiv.org/pdf/2105.05956) [4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/) [1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/). 
+    Thus, although to base ANNs on the neural networks of specific animals (such as the goose, or albatrosses) has possible uses, a full clone of avian neural networks is beyond our reach due to our small understanding of these networks and the fundamental differences from biological versus artificial networks. [However, the field of neuromorphic engineering continues to draw inspiration from biology to improve the design and efficiency of ANNs3](https://arxiv.org/pdf/2105.05956) [4](https://cmte.ieee.org/futuredirections/2021/08/21/mimicking-the-brain-to-support-ai-neuromorphic-neural-networks/) [1](http://apt.cs.manchester.ac.uk/projects/SpiNNaker/).
 
 Versus humans
 
@@ -156,7 +156,7 @@ As opposed to lab-robots that run simple macros:
 
 (All responses you message go towards future posts unless you ask to remain anonymous.)
 
-# Responses from viewers 
+# Responses from viewers
 From responses to this:
 
     AIs already do this
@@ -192,7 +192,7 @@ Once scientists map the neural networks of albatrosses, simple to map the neural
 Once programmers produce parrot-CNS-based neural networks, simple to produce albatross-CNS-based neural networks (or vice versa) for us.
 
 
-    No, my post/point was, you couldn't possibly know what it's like to be an albatross let alone what it's thinking; so all you can ever do is just guess, however much data you process 
+    No, my post/point was, you couldn't possibly know what it's like to be an albatross let alone what it's thinking; so all you can ever do is just guess, however much data you process
 
 To know an albatross's thoughts,
 just attach thousands of electrodes to an albatross's neurons.
@@ -203,7 +203,7 @@ From what have read of neuroscience, this is how lots of scientists* figure stuf
 [https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3535686/](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3535686/)
 [https://www.nature.com/articles/s41565-024-01609-1](https://www.nature.com/articles/s41565-024-01609-1)
 
-    IOW the implication is, how could we tell if AI is conscious? 
+    IOW the implication is, how could we tell if AI is conscious?
 
 How could you figure out if robots (or humans) have consciousness?
 
@@ -215,7 +215,7 @@ From neuroscience: what quantizes this is "[Integration Theory of Consciousness]
 
     Would that mean you understand what is so sexy about Tracey Albatross?
 
-    Even a quantum leap in the number of electrodes per neuron, 1-1, IOW, this is the neuron that went "phoar"; wouldn't explain why it thought a sexy thought. 
+    Even a quantum leap in the number of electrodes per neuron, 1-1, IOW, this is the neuron that went "phoar"; wouldn't explain why it thought a sexy thought.
 
 Simple, you produce definitions of "sexy thoughts" through calculus.
 To figure out how animals form particular thoughts:
@@ -249,23 +249,9 @@ whereas the artificial neural networks this post discusses would count as consci
 # Related posts
 Previous post of this series:
 [Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
-[Swudu Susuwu](https://substack.com/profile/212411425-swudu-susuwu)
-·
-Mar 7
-Program general purpose robots as autonomous tools through calculus. Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness
-
-[Use DFS/BFS/IDDFS to run close to continuous functions as calculus General artificial intelligence allows autonomous robots to produce complex goods Edit to suit your needs Use/reuse without attributions Possible to produce general purpose robos as autonomous tools, + close-to-human consciousness. Kuka/Facteon/Fanuc can't work outdoors or as carpenters …](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
-[Read full story](https://swudususuwu.substack.com/p/program-general-purpose-robots-autonomous)
 
 Due to understanding of human's consciousness, could undo problems of overpopulation and food shortages, if lots of us become uploads of consciousness (as opposed to below article of how to move whole CNS to robots):
-[Want this physical form gone so won’t be forced to have E with everyone else from now on; am jealous of robots](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
-[Swudu Susuwu](https://substack.com/profile/212411425-swudu-susuwu)
-·
-Mar 5
-Want this physical form gone so won’t be forced to have E with everyone else from now on; am jealous of robots
-
 [Want this meatbag gone once and for all. The problem is just, how to do so with small funds? If you had a million dollars, here is how to transplant your CNS to robots: Lookup maps of human CNS, produce a robot to replace all of your PNS (biological muscles and sensors) with mechanical servos/motors/actuators and sensors,](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
-[Read full story](https://swudususuwu.substack.com/p/want-this-physical-form-gone-so-wont)
 
 As “Integration Theory of Consciousness” shows how qualia/consciousness follow from (complex) groups of mass,
 
@@ -279,7 +265,3 @@ new calculus shows how information has equivalences to mass:
 
 Next of this series:
 [Destructive (unreversible) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
-[Swudu Susuwu](https://substack.com/profile/212411425-swudu-susuwu)
-·
-Apr 4
-
