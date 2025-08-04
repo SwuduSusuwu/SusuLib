@@ -243,3 +243,8 @@ new calculus shows how information has equivalences to mass:
 - [https://pubs.aip.org/aip/sci/article/2022/9/091111/2849001/A-proposed-experimental-test-for-the-mass-energy](https://pubs.aip.org/aip/sci/article/2022/9/091111/2849001/A-proposed-experimental-test-for-the-mass-energy)
 - [https://www.mdpi.com/2078-2489/13/11/540](https://www.mdpi.com/2078-2489/13/11/540)
 
+Unknown sources (can not discern truth (fitness-to-use) of those) which have to do with neuromorphic computers:
+- [_International Centre for Neuromorphic Systems_](https://www.westernsydney.edu.au/icns)
+- [Neuromorphic Cognitive Systems | _Institute of Neuroinformatics_](https://www.ini.uzh.ch/en/research/groups/ncs.html)
+- [Neuromorphic systems | _NIST_](https://www.nist.gov/programs-projects/neuromorphic-systems)
+
