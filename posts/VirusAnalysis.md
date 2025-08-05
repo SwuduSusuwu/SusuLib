@@ -1197,13 +1197,25 @@ inline const ClassSysUSeconds classSysUSecondClock() {
 /* `std::array<char *>argv = argvS; argv += NULL; envp = envpS + NULL: pid_t pid = fork(); if(-1 != pid) {pid || (envpS.empty() ? execv(argv[0], &argv[0]) : execve(argv[0], &argv[0], &envp[0]));} return pid;`
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const pid_t execvesFork(/* const std::string &pathname, -- `execve` requires `&pathname == &argv[0]` */ const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {}) SUSUWU_NOEXCEPT;
-static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
+static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {
+	return execvesFork({
+#ifndef SUSUWU_WIN32
+			"/bin/sh", "-c",
+#endif /* ndef SUSUWU_WIN32 */
+			toSh});
+}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
  * @throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"))
  * @throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) // TODO: non-POSIX systems with multiple commands
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
-static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
+static const int execvex(const std::string &toSh) {
+	return execves({
+#ifndef SUSUWU_WIN32
+			"/bin/sh", "-c",
+#endif /* ndef SUSUWU_WIN32 */
+			toSh});
+}
 
 /* #if SUSUWU_POSIX, `return (0 == geteuid());` #elif SUSUWU_WIN32 `return IsUserAnAdmin();` #endif `return false;` */
 const bool classSysHasRoot();
