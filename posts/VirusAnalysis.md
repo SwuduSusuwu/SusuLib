@@ -1439,10 +1439,18 @@ const bool classSysSetRoot(bool root) {
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
-	std::cout << "	execves(): " << std::flush;
-	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
-	std::cout << "	execvex(): " << std::flush;
-	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
+	std::cout << "	execves({\"/bin/echo\", \"passes\"}) " << std::flush;
+	int exitCode = execves({"/bin/echo", "passes"});
+	if(EXIT_SUCCESS != exitCode) {
+		retval = false;
+		std::cout << "== " << std::to_string(exitCode) << std::endl;
+	}
+	std::cout << "	execvex(\"/bin/echo passes\") " << std::flush;
+	exitCode = execvex("/bin/echo passes") {
+	if(EXIT_SUCCESS != exitCode) {
+		retval = false;
+		std::cout << "== " << std::to_string(exitCode) << std::endl;
+	}
 	return retval;
 }
 #endif /* SUSUWU_UNIT_TESTS */
