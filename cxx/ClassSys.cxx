@@ -132,14 +132,13 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
-	if(1 != argvS.size()) {
-		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems (such as Win32) with multiple commands */ }"));
+	std::string execution;
+	for(const auto &w : argvS) {
+		execution += (execution.empty() ? w : (std::string(" ") + w));
 	}
-	const int status = system(argvS[0].c_str());
+	const int status = system(execution.c_str());
 	if(status) { /* cppcheck-suppress duplicateBranch */
 		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(!CreateProcess(...)) { /* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...); }}}");
-	} else {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(CreateProcess(...)) { /* started, blocking */ }}}");
 	}
 	return status;
 #endif /* ndef SUSUWU_POSIX */
