@@ -2,7 +2,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassSys_hxx
 #define INCLUDES_cxx_ClassSys_hxx
-#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_IF_CPLUSPLUS SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERROR SUSUWU_NOEXCEPT SUSUWU_IF_CPLUSPLUS SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32 */
 #include SUSUWU_IF_CPLUSPLUS(<cerrno>, <errno.h>) /* errno EFAULT ENOMEM */
 #include <chrono> /* std::chrono */
 #include <exception> /* std::exception */
@@ -51,13 +51,25 @@ static const pid_t execvesFork(const std::vector<std::string> &argvS = {}, const
 		return -1;
 	}
 }
-static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {return execvesFork({"/bin/sh", "-c", toSh});}
+static const pid_t execvexFork(const std::string &toSh) SUSUWU_NOEXCEPT {
+	return execvesFork({
+#ifndef SUSUWU_WIN32
+			"/bin/sh", "-c",
+#endif /* ndef SUSUWU_WIN32 */
+			toSh});
+}
 /* `pid_t pid = execvesFork(argvS, envpS); int status; waitpid(pid, &wstatus, 0); return wstatus;}`
  * @throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: -1 == execvesFork()"))
  * @throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) // TODO: non-POSIX systems with multiple commands
  * @pre @code (-1 != access(argvS[0], X_OK) @endcode */
 const int execves(const std::vector<std::string> &argvS = {}, const std::vector<std::string> &envpS = {});
-static const int execvex(const std::string &toSh) {return execves({"/bin/sh", "-c", toSh});}
+static const int execvex(const std::string &toSh) {
+	return execves({
+#ifndef SUSUWU_WIN32
+			"/bin/sh", "-c",
+#endif /* ndef SUSUWU_WIN32 */
+			toSh});
+}
 
 /* #if SUSUWU_POSIX, `return (0 == geteuid());` #elif SUSUWU_WIN32 `return IsUserAnAdmin();` #endif `return false;` */
 const bool classSysHasRoot();
