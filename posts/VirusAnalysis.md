@@ -2008,12 +2008,15 @@ const bool classResultListTests() {
 `less `[`cxx/ClassWebBrowse.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassWebBrowse.hxx)
 ```c++
 /* Abstractions used to web browse */
-extern bool classWebBrowseUseIfModifiedSince; /* TODO: Does what `wget -N` does. */
-extern double classWebBrowseMaxRequestsPerSecondPerHost; /* TODO: limit `wget` through this */
-extern double classWebBrowseMaxRequestsPerSecondGlobal;  /* TODO: limit `wget` through this */
-extern double classWebBrowseMaxBitsPerSecondPerHost;     /* TODO: limit `wget` through this */
-extern double classWebBrowseMaxBitsPerSecondGlobal;      /* TODO: limit `wget` through this */
+extern bool classWebBrowseUseIfModifiedSince; /* Does what `wget -N` does. Notice: incompatible with `.localOutput`. Notice: depends on accurate system unix clock. */
+extern double classWebBrowseMaxRequestsPerSecondPerHost; /* Does what `wget -w 1/classWebBrowseMaxRequestsPerSecondPerHost` does. TODO: measure per-host use across threads. */
+extern double classWebBrowseMaxRequestsPerSecondGlobal; /* TODO: limit `wget` through this */
+extern double classWebBrowseMaxBitsPerSecondPerHost; /* Does what `wget --limit-rate=1/classWebBrowseMaxBitsPerSecondPerHost` does. TODO: measure per-host use across threads. */
+extern double classWebBrowseMaxBitsPerSecondGlobal;     /* TODO: limit `wget` through this */
+extern ClassIoPath classWebBrowseDownloadDir; /* Does what `wget -P classWebBrowseDownloadDir` does. Notice: does not wrap with "" for you. */
+typedef int ClassWebBrowseStatus; /* [Uses `wget` status codes](https://www.gnu.org/software/wget/manual/html_node/Exit-Status.html), except if limit is exceeded with `asynchronousMax`, which gives `return EXIT_FAILURE;` */
 
+const ClassWebBrowseStatus classWebBrowseWget(const ClassIoPath &uniformResourceLocator, const ClassIoPath &localOutput, bool asynchronousMax = false); /* return execvex("wget \"" + uniformResourceLocator + '"' + (localOutput ? " -O \"" + localOutput + '"' : (classWebBrowseDownloadDir ? (" -P " + classWebBrowseDownloadDir) : "")) + " --limit-rate=" + std::to_string(classWebBrowseMaxBitsPerSecondPerHost / CHAR_BIT) + " -w " + std::to_string(1 / classWebBrowseMaxRequestsPerSecondPerHost) + (classWebBrowseUseIfModifiedSince ? " -N" : "")); */
 const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml); /* returns list of Uniform Resource Identifiers from `localXhtml` */
 
 #if SUSUWU_UNIT_TESTS
@@ -2032,11 +2035,32 @@ const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT;
 #	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
 #endif /* !def SUSUWU_USE_PUGIXML */
 
-bool classWebBrowseUseIfModifiedSince = true; /* TODO. Does what `wget -N` does. */
-double classWebBrowseMaxRequestsPerSecondPerHost = 2;   /* TODO: limit `wget` through this */
+bool classWebBrowseUseIfModifiedSince = true; /* Does what `wget -N` does. Notice: depends on accurate system unix clock */
+double classWebBrowseMaxRequestsPerSecondPerHost = 2; /* Does what `wget -w 1/classWebBrowseMaxRequestsPerSecondPerHost` does. TODO: measure per-host use across threads. */
 double classWebBrowseMaxRequestsPerSecondGlobal = 2000; /* TODO: limit `wget` through this */
-double classWebBrowseMaxBitsPerSecondPerHost = 2000000; /* TODO: limit `wget` through this */
+double classWebBrowseMaxBitsPerSecondPerHost = 2000000; /* Does what `wget --limit-rate=1/classWebBrowseMaxBitsPerSecondPerHost` does. TODO: measure per-host use across threads. */
 double classWebBrowseMaxBitsPerSecondGlobal = 42000000; /* TODO: limit `wget` through this */
+ClassIoPath classWebBrowseDownloadDir = "downloads/"; /* Does what `wget -P classWebBrowseDownloadDir` does. Notice: does not wrap with "" for you. */
+
+const ClassWebBrowseStatus classWebBrowseWget(const ClassIoPath &uniformResourceLocator, const ClassIoPath &localOutput, const bool asynchronousMax) {
+	std::string execution = "wget \"" + uniformResourceLocator + "\" --limit-rate=" + std::to_string(classWebBrowseMaxBitsPerSecondPerHost / CHAR_BIT) + " -w " + std::to_string(1 / classWebBrowseMaxRequestsPerSecondPerHost);
+	if(!localOutput.empty()) {
+		execution += (" -O " + localOutput);
+	} else if(!classWebBrowseDownloadDir.empty()) { /* [exclusive, since `-O` uses console redirection](https://stackoverflow.com/questions/55473784/is-it-possible-to-run-wget-using-both-o-and-p-options-together) */
+		execution += (" -P " + classWebBrowseDownloadDir);
+	}
+	if(classWebBrowseUseIfModifiedSince) {
+		execution += " -N";
+	}
+	const int statusCode = execvex(execution);
+#ifdef SUSUWU_WIN32
+#	pragma message("TODO: downloads without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm)")
+	if(EXIT_SUCCESS != statusCode) {
+		SUSUWU_WARNING("classWebBrowseWget(.uniformResourceLocator = \"" + uniformResourceLocator + "\", .localOutput = \"" + localOutput + "\") { const int statusCode = execvex(execution); statusCode == std::to_string(statusCode); /* Suggestion: install [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */ }");
+	}
+#endif /* def SUSUWU_WIN32 */
+	return statusCode;
+}
 
 const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml) {
 	std::vector<ClassIoPath> urls;

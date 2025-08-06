@@ -89,7 +89,7 @@
   produce unique signature, compare file against list of signatures), most of which were produced for antivirus signature analysis.
   - `classResultListsTests()`, or `classResultListsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassWebBrowse.hxx`](./cxx/ClassWebBrowse.hxx) is
-  - `classWebBrowseProcessUrls()`
+  - `classWebBrowseWget()`, `classWebBrowseProcessUrls()`
   - `classWebBrowseTests()`, or `classWebBrowseTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/VirusAnalysis.hxx`](./cxx/VirusAnalysis.hxx) is
   - store / load functions {`virusAnalysisInit()`, `virusAnalysisDumpTo()`, `virusAnalysisLoadFrom()`}. Allows hosts to produce databases which clients use.
