@@ -23,6 +23,10 @@ std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://superuser.com",
 	"https://www.quora.com"
 };
+double assistantCnsMaxRequestsPerSecondPerHost = 2;   /* TODO: limit `wget` through this */
+double assistantCnsMaxRequestsPerSecondGlobal = 2000; /* TODO: limit `wget` through this */
+double assistantCnsMaxBitsPerSecondPerHost = 2000000; /* TODO: limit `wget` through this */
+double assistantCnsMaxBitsPerSecondGlobal = 42000000; /* TODO: limit `wget` through this */
 std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResponses>");
 
 #if SUSUWU_UNIT_TESTS

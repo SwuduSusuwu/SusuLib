@@ -2946,11 +2946,16 @@ const bool assistantCnsTests();
 static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistantCnsTests, "assistantCnsTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
-/* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
- * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )
- * Github is a special case; has compressed downloads of repositories ( https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github )
+/* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses. `extern`s are set in `AssistantCns.cxx`.
+ * To downloads those as datasets, ensure to register with services such as <https://dash.cloudflare.com/?to=/:account/configurations/verified-bots>
+ * Wikipedia is special; [has compressed downloads of databases for such uses](https://wikipedia.org/wiki/Wikipedia:Database_download)
+ * Github is special; [has compressed downloads of repositories for such uses](https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github)
  */
 extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
+extern double assistantCnsMaxRequestsPerSecondPerHost; /* TODO: limit `wget` through this */
+extern double assistantCnsMaxRequestsPerSecondGlobal;  /* TODO: limit `wget` through this */
+extern double assistantCnsMaxBitsPerSecondPerHost;     /* TODO: limit `wget` through this */
+extern double assistantCnsMaxBitsPerSecondGlobal;      /* TODO: limit `wget` through this */
 
 /* @throw std::bad_alloc
  * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new message synthesis).
@@ -2986,6 +2991,10 @@ std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://superuser.com",
 	"https://www.quora.com"
 };
+double assistantCnsMaxRequestsPerSecondPerHost = 2;   /* TODO: limit `wget` through this */
+double assistantCnsMaxRequestsPerSecondGlobal = 2000; /* TODO: limit `wget` through this */
+double assistantCnsMaxBitsPerSecondPerHost = 2000000; /* TODO: limit `wget` through this */
+double assistantCnsMaxBitsPerSecondGlobal = 42000000; /* TODO: limit `wget` through this */
 std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResponses>");
 
 #if SUSUWU_UNIT_TESTS
