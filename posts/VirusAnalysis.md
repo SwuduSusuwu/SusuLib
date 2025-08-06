@@ -3158,8 +3158,8 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 #ifndef SUSUWU_POSIX
 		SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
-		execvex("wget '" + host + "' -Oindex.xhtml");
+		classWebBrowseWget(host + "/robots.txt", "robots.txt");
+		classWebBrowseWget(host, "index.xhtml");
 		questionsOrNull.signatures.push_back(host);
 		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
@@ -3196,7 +3196,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-			execvex("wget '" + url + "' -O" + localXhtml);
+			classWebBrowseWget(url, localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}

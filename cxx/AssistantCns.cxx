@@ -6,8 +6,7 @@
 #include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath */
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
-#include "ClassSys.hxx" /* execvex */
-#include "ClassWebBrowse.hxx" /* classWebBrowseProcessUrls */
+#include "ClassWebBrowse.hxx" /* classWebBrowseProcessUrls classWebBrowseWget */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -86,8 +85,8 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 #ifndef SUSUWU_POSIX
 		SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-		execvex("wget '" + host + "/robots.txt' -Orobots.txt");
-		execvex("wget '" + host + "' -Oindex.xhtml");
+		classWebBrowseWget(host + "/robots.txt", "robots.txt");
+		classWebBrowseWget(host, "index.xhtml");
 		questionsOrNull.signatures.push_back(host);
 		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
 	}
@@ -124,7 +123,7 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-			execvex("wget '" + url + "' -O" + localXhtml);
+			classWebBrowseWget(url, localXhtml);
 			questionsOrNull.signatures.push_back(url);
 			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
 		}
