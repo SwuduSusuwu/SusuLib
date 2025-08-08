@@ -76,6 +76,7 @@
 #	endif /* (199901 <= __cplusplus) */
 #	if 201102 < __cplusplus
 #		define SUSUWU_CXX11
+#		include <atomic> /* std::atomic */ /* NOLINT(misc-include-cleaner): is used if `SUSUWU_ATOMIC` is used */
 #	endif /* (201102 < __cplusplus) */
 #	if 201402 <= __cplusplus
 #		define SUSUWU_CXX14
@@ -164,6 +165,7 @@
 #	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
+#	define SUSUWU_ATOMIC(U) std::atomic<U>
 #else /* SUSUWU_CXX11 else */
 #	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
 #	define SUSUWU_DEFAULT {} /* allows default constructors/destructors. TODO: default operators? */
@@ -171,6 +173,7 @@
 #	define SUSUWU_FINAL /* No-op */
 #	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
 #	define SUSUWU_OVERRIDE /* No-op */
+#	define SUSUWU_ATOMIC(U) U /* TODO: warn? Abort? */
 #endif /* SUSUWU_CXX11 else */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
