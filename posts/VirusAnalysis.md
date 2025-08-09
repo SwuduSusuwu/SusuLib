@@ -3127,10 +3127,12 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 #ifndef SUSUWU_POSIX
 		SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-		classWebBrowseWget(host + "/robots.txt", "robots.txt");
-		classWebBrowseWget(host, "index.xhtml");
+		classWebBrowseWget(host + "/robots.txt", "");
+		classWebBrowseWget(host, "");
+		const ClassIoPath hostDownloadPath = classWebBrowseDownloadDir + "index.html"; /* TODO: some hosts give `.xhtml` or `.htm`, deduce this */
 		questionsOrNull.signatures.push_back(host);
-		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
+		SUSUWU_WARNING("assistantCnsDownloadHosts: { /* TODO: deduce `ClassIoPath hostDownloadPath;` from `classWebBrowseWget(\"" + host + "\", \"\");` */}");
+		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, hostDownloadPath);
 	}
 }
 void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml) {
@@ -3165,9 +3167,11 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-			classWebBrowseWget(url, localXhtml);
+			const ClassIoPath thisLocalXhtml = classWebBrowseDownloadDir + "path_todo";
+			classWebBrowseWget(url, thisLocalXhtml);
 			questionsOrNull.signatures.push_back(url);
-			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
+			SUSUWU_WARNING("assistantCnsProcessXhtml: { /* TODO: parse `auto urls = assistantCnsProcessUrls(\"" + localXhtml + "\";` into `ClassIoPath thisLocalXhtml;` */}");
+			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, thisLocalXhtml);
 		}
 	}
 }
