@@ -3158,10 +3158,12 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 #ifndef SUSUWU_POSIX
 		SUSUWU_WARNING("assistantCnsDownloadHosts: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-		classWebBrowseWget(host + "/robots.txt", "robots.txt");
-		classWebBrowseWget(host, "index.xhtml");
+		classWebBrowseWget(host + "/robots.txt", "");
+		classWebBrowseWget(host, "" /* if `localOutput` is used, can't use `classWebBrowseDownloadDir` */);
+		const ClassIoPath localDocumentSource = classWebBrowseDownloadDir + "index.html"; /* TODO: some hosts give `.xhtml` or `.htm`, deduce this */
 		questionsOrNull.signatures.push_back(host);
-		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, "index.xhtml");
+		SUSUWU_WARNING("assistantCnsDownloadHosts: { /* TODO: [deduce `ClassIoPath localDocumentSource;` from `classWebBrowseWget(\"" + host + "\", \"\");`](https://poe.com/s/QpjvvHmETSVP6K4wRiU5) */}");
+		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localDocumentSource);
 	}
 }
 void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml) {
@@ -3196,9 +3198,11 @@ void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responses
 #ifndef SUSUWU_POSIX
 			SUSUWU_WARNING("assistantCnsProcessXhtml: {#ifndef SUSUWU_POSIX /* TODO: without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm) */}");
 #endif /* ndef SUSUWU_POSIX */
-			classWebBrowseWget(url, localXhtml);
+			const ClassIoPath localDocumentSource = classWebBrowseDownloadDir + "path_todo.tmp";
+			classWebBrowseWget(url, localDocumentSource);
 			questionsOrNull.signatures.push_back(url);
-			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localXhtml);
+			SUSUWU_WARNING("assistantCnsProcessXhtml: { /* TODO: parse `auto urls = assistantCnsProcessUrls(\"" + localXhtml + "\";` into `ClassIoPath localDocumentSource;` */}");
+			assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localDocumentSource);
 		}
 	}
 }
