@@ -73,7 +73,7 @@ SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH 
 	esac
 )
 SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN=\"$(SUSUWU_UNAMBIGUOUS_PATH "${USRBIN}")\"` */
-	if [ "$(realpath -q "${1}")" != "${1}" ]; then #/* If relative path,
+	if [ "$(realpath -q "${1}")" != "${1}" ]; then #/* If not absolute path,
 		SUSUWU_PATH_AFFIX_DOTSLASH "${1}"            # * ... ensure path starts with "./". */
 	else
 		echo "${1}"
