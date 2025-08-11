@@ -59,10 +59,10 @@ SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; the
 	fi
 	SUSUWU_STATIC_IS_PREVIEW #/* Use hardcoded value. */
 )
-SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")"` */
+SUSUWU_PATH_SUFFIX_SLASH() { #/* Usage: `OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")"` */
 	echo "${1%/}/" #/* Use "%/" to remove potential slash, then append slash. */
-)
-SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")"` */
+}
+SUSUWU_PATH_AFFIX_DOTSLASH() { #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")"` */
 	case "${1}" in
 		./*)          #/* If original has "./", */
 			echo "${1}" # * use original, */
@@ -71,7 +71,7 @@ SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH 
 			echo "./${1}" # * ... affix "./". */
 			;;            # * ... continue. */
 	esac
-)
+}
 SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN=\"$(SUSUWU_UNAMBIGUOUS_PATH "${USRBIN}")\"` */
 	if [ "$(realpath -q "${1}")" != "${1}" ]; then #/* If not absolute path,
 		SUSUWU_PATH_AFFIX_DOTSLASH "${1}"            # * ... ensure path starts with "./". */
@@ -99,13 +99,13 @@ SUSUWU_ESCAPE_SPACES() ( #/* Usage: `SUSUWU_OBJECTLIST="${SUSUWU_OBJECTLIST} $(S
 	done
 	echo "${NEW_PATH}"
 )
-SUSUWU_ESCAPE_QUOTED() ( #/* Usage: `echo "\"param\": \"$(SUSUWU_ESCAPE_QUOTED "${VALUE}")\"" >> out.json`. */
+SUSUWU_ESCAPE_QUOTED() { #/* Usage: `echo "\"param\": \"$(SUSUWU_ESCAPE_QUOTED "${VALUE}")\"" >> out.json`. */
 	echo "$@" | sed 's/"/\\"/g' | sed 's/\\/\\\\/g'
-)
+}
 
-SUSUWU_STR_TOKEN_FIRST() ( #/* Usage: `SUSUWU_STR_TOKEN_FIRST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all before last <delimiter>. */
+SUSUWU_STR_TOKEN_FIRST() { #/* Usage: `SUSUWU_STR_TOKEN_FIRST "<input>" "<delimiter>". Purpose: splits <input> on <delimiter>, returns all before last <delimiter>. */
 	echo "${1%"${2}"*}" #/* TODO: allow <delimiter>="\033". */
-) #/* Analogous to echo "${1}" | sed "s/\(${2}[^${2}]*\)\$//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001 */
+} #/* Analogous to echo "${1}" | sed "s/\(${2}[^${2}]*\)\$//" #shellcheck disable=SC2001 #https://www.shellcheck.net/wiki/SC2001 */
 [ "uwu" = "$(SUSUWU_STR_TOKEN_FIRST "uwu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 [ "uwu:q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu:q:mukyu" ":")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
 [ "uwu^q" = "$(SUSUWU_STR_TOKEN_FIRST "uwu^q^mukyu" "^")" ] || echo "[$0: SUSUWU_STR_TOKEN_FIRST(): Error: logic_error; test failed.]"
@@ -211,9 +211,9 @@ SUSUWU_SH_HAS_256COLOR_CONSOLE() ( #/* Usage: `if SUSUWU_SH_HAS_256COLOR_CONSOLE
 )
 export SUSUWU_SH_USE_PUSH_DEFAULT="${SUSUWU_SH_DEFAULT}"
 export SUSUWU_SH_USE_PUSH_RESET_WHITE="${SUSUWU_SH_RESET_WHITE}"
-SUSUWU_SH_USE_PUSH_DEBUG() ( #/* Usage: `SUSUWU_SH_USE_PUSH_DEBUG "${FUNCNAME}" "<arg>" "<step>"` */
+SUSUWU_SH_USE_PUSH_DEBUG() { #/* Usage: `SUSUWU_SH_USE_PUSH_DEBUG "${FUNCNAME}" "<arg>" "<step>"` */
 	${SUSUWU_VERBOSE} && printf "[Debug: ${SUSUWU_SH_LIGHT_CYAN}${1}${SUSUWU_SH_WHITE}(\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\"): ${3} ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_DEFAULT${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\", ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_RESET_WHITE${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\", ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_USE_PUSH_DEFAULT${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\", ${SUSUWU_SH_LIGHT_CYAN}SUSUWU_SH_USE_PUSH_RESET_WHITE${SUSUWU_SH_WHITE}=\"${SUSUWU_SH_GREEN}%s${SUSUWU_SH_WHITE}\"]\n" "${2}" "${SUSUWU_SH_DEFAULT}" "${SUSUWU_SH_RESET_WHITE}" "${SUSUWU_SH_USE_PUSH_DEFAULT}" "${SUSUWU_SH_USE_PUSH_RESET_WHITE}" >&2
-)
+}
 SUSUWU_SH_USE_PUSH() { #/* Usage: `SUSUWU_SH_USE_PUSH "${SUSUWU_SH_<attribute>}" && SUSUWU_SH_USE "${SUSUWU_SH_<attribute>}" "<message>" ["${SUSUWU_SH_RESET_WHITE}"] && SUSUWU_SH_USE_POP`. Purpose: nested `SUSUWU_SH_USE`. */
 	if SUSUWU_STATIC_IS_PREVIEW; then
 		SUSUWU_SH_USE_PUSH_DEBUG "SUSUWU_SH_USE_PUSH" "${1}" "Pushing:"
