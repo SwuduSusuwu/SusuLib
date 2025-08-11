@@ -60,11 +60,7 @@ SUSUWU_IS_PREVIEW() ( #/* Usage; `if SUSUWU_IS_PREVIEW ["<default branch>"]; the
 	SUSUWU_STATIC_IS_PREVIEW #/* Use hardcoded value. */
 )
 SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")"` */
-	DIR=${1}
-	if [ "${DIR}" = "${DIR%/}" ]; then #/* "%/" removes slash; if equal after this,
-		DIR="${DIR}/"                    # * ... original doesn't have '/', append '/'. */
-	fi
-	echo "${DIR}" #/* return with slash */
+	echo "${1%/}/" #/* Use "%/" to remove potential slash, then append slash. */
 )
 SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")"` */
 	DIR=${1}
