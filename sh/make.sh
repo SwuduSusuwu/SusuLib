@@ -41,10 +41,10 @@ SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
 	fi
 }
 SUSUWU_SET_NEW_BUILD false
-SUSUWU_HAS_PARTIAL_JSON() ( #/* Usage: `if $(SUSUWU_HAS_PARTIAL_JSON "compile_commands.json"); then RESUME_JSON_BUILD... ` */
+SUSUWU_HAS_PARTIAL_JSON() { #/* Usage: `if $(SUSUWU_HAS_PARTIAL_JSON "compile_commands.json"); then RESUME_JSON_BUILD... ` */
 	[ "[" = "$(head -c1 "${1}")" ] && [ "}," = "$(tail -c3 "${1}")" ] #	[ "]" != "$(tail -c2 "${1}")" ]
 	return $?
-)
+}
 SUSUWU_COMPILE_COMMAND() { #/* Usage: `SUSUWU_COMPILE_COMMAND "<directory>" "<file>" ["<command>" | <arguments>...]"`. Allows to echo commands ( + produce `./${SUSUWU_COMPILE_JSON_PATH}`). */
 	if [ "/dev/null" != "${SUSUWU_ECHO_COMMANDS_TO}" ]; then
 		SUSUWU_PRINT "SUSUWU_COMPILE_COMMAND()" "$(SUSUWU_SH_NOTICE)" "${3}" #"${SUSUWU_ECHO_COMMANDS_TO}" #/* TODO: redirection */
