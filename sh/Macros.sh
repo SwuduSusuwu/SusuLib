@@ -63,15 +63,14 @@ SUSUWU_PATH_SUFFIX_SLASH() ( #/* Usage: `OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${O
 	echo "${1%/}/" #/* Use "%/" to remove potential slash, then append slash. */
 )
 SUSUWU_PATH_AFFIX_DOTSLASH() ( #/* Usage: `BINDIR="$(SUSUWU_PATH_AFFIX_DOTSLASH "${BINDIR}")"` */
-	DIR=${1}
-	case "${DIR}" in
-		./*) #/* If original has "./", */
-			;; #/* ... continue. */
-		*)               #/* If default (if original doesn't match "./"),
-			DIR="./${DIR}" # * ... affix "./". */
-			;;
+	case "${1}" in
+		./*)          #/* If original has "./", */
+			echo "${1}" # * use original, */
+			;;          # * ... continue. */
+		*)              #/* If default (if original doesn't match "./"),
+			echo "./${1}" # * ... affix "./". */
+			;;            # * ... continue. */
 	esac
-	echo "${DIR}" #/* return with dot slash. */
 )
 SUSUWU_PATH_UNAMBIGUOUS() ( #/* Usage: `echo "USRBIN=\"$(SUSUWU_UNAMBIGUOUS_PATH "${USRBIN}")\"` */
 	if [ "$(realpath -q "${1}")" != "${1}" ]; then #/* If relative path,
