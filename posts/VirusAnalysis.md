@@ -2012,8 +2012,9 @@ extern bool classWebBrowseUseIfModifiedSince; /* Does what `wget -N` does. Notic
 extern double classWebBrowseMaxRequestsPerSecondPerHost; /* Does what `wget -w 1/classWebBrowseMaxRequestsPerSecondPerHost` does. TODO: measure per-host use across threads. */
 extern double classWebBrowseMaxRequestsPerSecondGlobal; /* TODO: limit `wget` through this */
 extern double classWebBrowseMaxBitsPerSecondPerHost; /* Does what `wget --limit-rate=1/classWebBrowseMaxBitsPerSecondPerHost` does. TODO: measure per-host use across threads. */
-extern double classWebBrowseMaxBitsPerSecondGlobal;     /* TODO: limit `wget` through this */
+extern double classWebBrowseMaxBitsPerSecondGlobal; /* Assumes that all instances of `classWebBrowseWget()` use `classWebBrowseMaxBitsPerSecondPerHost`. TODO: measure true connection use. */
 extern ClassIoPath classWebBrowseDownloadDir; /* Does what `wget -P classWebBrowseDownloadDir` does. Notice: does not wrap with "" for you. */
+extern SUSUWU_ATOMIC(double) classWebBrowseBitsPerSecondGlobalUsed;
 typedef int ClassWebBrowseStatus; /* [Uses `wget` status codes](https://www.gnu.org/software/wget/manual/html_node/Exit-Status.html), except if limit is exceeded with `asynchronousMax`, which gives `return EXIT_FAILURE;` */
 
 const ClassWebBrowseStatus classWebBrowseWget(const ClassIoPath &uniformResourceLocator, const ClassIoPath &localOutput, bool asynchronousMax = false); /* return execvex("wget \"" + uniformResourceLocator + '"' + (localOutput ? " -O \"" + localOutput + '"' : (classWebBrowseDownloadDir ? (" -P " + classWebBrowseDownloadDir) : "")) + " --limit-rate=" + std::to_string(classWebBrowseMaxBitsPerSecondPerHost / CHAR_BIT) + " -w " + std::to_string(1 / classWebBrowseMaxRequestsPerSecondPerHost) + (classWebBrowseUseIfModifiedSince ? " -N" : "")); */
@@ -2039,8 +2040,9 @@ bool classWebBrowseUseIfModifiedSince = true; /* Does what `wget -N` does. Notic
 double classWebBrowseMaxRequestsPerSecondPerHost = 2; /* Does what `wget -w 1/classWebBrowseMaxRequestsPerSecondPerHost` does. TODO: measure per-host use across threads. */
 double classWebBrowseMaxRequestsPerSecondGlobal = 2000; /* TODO: limit `wget` through this */
 double classWebBrowseMaxBitsPerSecondPerHost = 2000000; /* Does what `wget --limit-rate=1/classWebBrowseMaxBitsPerSecondPerHost` does. TODO: measure per-host use across threads. */
-double classWebBrowseMaxBitsPerSecondGlobal = 42000000; /* TODO: limit `wget` through this */
+double classWebBrowseMaxBitsPerSecondGlobal = 42000000; /* Assumes that all instances of `classWebBrowseWget()` use `classWebBrowseMaxBitsPerSecondPerHost`. TODO: measure true connection use. */
 ClassIoPath classWebBrowseDownloadDir = "downloads/"; /* Does what `wget -P classWebBrowseDownloadDir` does. Notice: does not wrap with "" for you. */
+SUSUWU_ATOMIC(double) classWebBrowseBitsPerSecondGlobalUsed(0);
 
 const ClassWebBrowseStatus classWebBrowseWget(const ClassIoPath &uniformResourceLocator, const ClassIoPath &localOutput, const bool asynchronousMax) {
 	std::string execution = "wget \"" + uniformResourceLocator + "\" --limit-rate=" + std::to_string(classWebBrowseMaxBitsPerSecondPerHost / CHAR_BIT) + " -w " + std::to_string(1 / classWebBrowseMaxRequestsPerSecondPerHost);
@@ -2052,7 +2054,20 @@ const ClassWebBrowseStatus classWebBrowseWget(const ClassIoPath &uniformResource
 	if(classWebBrowseUseIfModifiedSince) {
 		execution += " -N";
 	}
+	double thisBitsPerSecond = classWebBrowseMaxBitsPerSecondPerHost;
+	while(thisBitsPerSecond + classWebBrowseBitsPerSecondGlobalUsed > classWebBrowseMaxBitsPerSecondGlobal) {
+		if(asynchronousMax) {
+			thisBitsPerSecond = classWebBrowseMaxBitsPerSecondGlobal - classWebBrowseBitsPerSecondGlobalUsed;
+			if(0 == thisBitsPerSecond) {
+				SUSUWU_DEBUG("classWebBrowseWget(.uniformResourceLocator = \"" + uniformResourceLocator + "\", .localOutput = \"" + localOutput + "\") { (classWebBrowseMaxBitsPerSecondGlobal == classWebBrowseBitsPerSecondGlobalUsed) { return EXIT_FAILURE; } }");
+				return EXIT_FAILURE;
+			}
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
+	}
+	classWebBrowseBitsPerSecondGlobalUsed = classWebBrowseBitsPerSecondGlobalUsed + thisBitsPerSecond; /* fixes "error: no viable overloaded '+='" */
 	const int statusCode = execvex(execution);
+	classWebBrowseBitsPerSecondGlobalUsed = classWebBrowseBitsPerSecondGlobalUsed - thisBitsPerSecond; /* fixes "error: no viable overloaded '-='" */
 #ifdef SUSUWU_WIN32
 #	pragma message("TODO: downloads without [`wget` for _Windows_](https://gnuwin32.sourceforge.net/packages/wget.htm)")
 	if(EXIT_SUCCESS != statusCode) {

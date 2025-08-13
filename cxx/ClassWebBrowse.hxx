@@ -6,7 +6,7 @@
 #ifndef INCLUDES_cxx_ClassWebBrowse_hxx
 #define INCLUDES_cxx_ClassWebBrowse_hxx
 #include "ClassIo.hxx" /* ClassIoPath */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_ATOMIC SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include <vector> /* std::vector */
 /* Abstractions used to web browse */
 namespace Susuwu {
@@ -14,8 +14,9 @@ extern bool classWebBrowseUseIfModifiedSince; /* Does what `wget -N` does. Notic
 extern double classWebBrowseMaxRequestsPerSecondPerHost; /* Does what `wget -w 1/classWebBrowseMaxRequestsPerSecondPerHost` does. TODO: measure per-host use across threads. */
 extern double classWebBrowseMaxRequestsPerSecondGlobal; /* TODO: limit `wget` through this */
 extern double classWebBrowseMaxBitsPerSecondPerHost; /* Does what `wget --limit-rate=1/classWebBrowseMaxBitsPerSecondPerHost` does. TODO: measure per-host use across threads. */
-extern double classWebBrowseMaxBitsPerSecondGlobal;     /* TODO: limit `wget` through this */
+extern double classWebBrowseMaxBitsPerSecondGlobal; /* Assumes that all instances of `classWebBrowseWget()` use `classWebBrowseMaxBitsPerSecondPerHost`. TODO: measure true connection use. */
 extern ClassIoPath classWebBrowseDownloadDir; /* Does what `wget -P classWebBrowseDownloadDir` does. Notice: does not wrap with "" for you. */
+extern SUSUWU_ATOMIC(double) classWebBrowseBitsPerSecondGlobalUsed;
 typedef int ClassWebBrowseStatus; /* [Uses `wget` status codes](https://www.gnu.org/software/wget/manual/html_node/Exit-Status.html), except if limit is exceeded with `asynchronousMax`, which gives `return EXIT_FAILURE;` */
 
 const ClassWebBrowseStatus classWebBrowseWget(const ClassIoPath &uniformResourceLocator, const ClassIoPath &localOutput, bool asynchronousMax = false); /* return execvex("wget \"" + uniformResourceLocator + '"' + (localOutput ? " -O \"" + localOutput + '"' : (classWebBrowseDownloadDir ? (" -P " + classWebBrowseDownloadDir) : "")) + " --limit-rate=" + std::to_string(classWebBrowseMaxBitsPerSecondPerHost / CHAR_BIT) + " -w " + std::to_string(1 / classWebBrowseMaxRequestsPerSecondPerHost) + (classWebBrowseUseIfModifiedSince ? " -N" : "")); */
