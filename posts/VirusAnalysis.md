@@ -29,7 +29,7 @@ To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnal
 [^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
 # Source code
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE), allows all uses.
-
+******************************************
 `less `[`cxx/Macros.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled [color codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C0_controls) + unused [**OSC**](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls) codes
 ```c++
 /* Miscellaneous macros */
@@ -441,6 +441,7 @@ const int macrosTestsNoexcept() SUSUWU_NOEXCEPT {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
+******************************************
 
 `less `[`cxx/ClassObject.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.hxx)
 ```c++
@@ -596,6 +597,7 @@ public:
 ```
 
 `less `[`cxx/ClassObject.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassObject.cxx) #This is just unit tests. `ClassObject.hxx` has all which has actual use.
+******************************************
 
 `less `[`cxx/ClassIo.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassIo.hxx)
 ```c++
@@ -1118,6 +1120,7 @@ const bool classIoTests() {
 const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
+******************************************
 
 `less `[`cxx/ClassPortableExecutable.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassPortableExecutable.hxx)
 ```c++
@@ -1138,6 +1141,7 @@ public:
 	explicit PortableExecutableBytecode(ClassIoPath path_) : PortableExecutable(std::move(path_)) { std::ifstream input(path); if(input.good()) { bytecode = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()); } }
 } PortableExecutableBytecode;
 ```
+******************************************
 
 `less `[`cxx/ClassSys.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSys.hxx)
 ```c++
@@ -1411,6 +1415,7 @@ const bool classSysTests() {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
+******************************************
 
 `less `[`cxx/ClassSha2.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassSha2.hxx)
 ```c++
@@ -1487,6 +1492,7 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
 #endif /* SUSUWU_UNIT_TESTS */
 ```
+******************************************
 
 `less `[`cxx/ClassResultList.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassResultList.hxx)
 ```c++
@@ -1927,6 +1933,7 @@ const bool classResultListTests() {
 }
 #endif /* SUSUWU_UNIT_TESTS */
 ```
+******************************************
 
 `less `[`cxx/ClassCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
 ```c++
@@ -2134,6 +2141,7 @@ typedef class ApxrCns : Cns {
  */
 } ApxrCns;
 ```
+******************************************
 
 `less `[`cxx/VirusAnalysis.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/VirusAnalysis.hxx)
 ```c++
@@ -2689,6 +2697,7 @@ const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns
 	return cns.processToString(file.bytecode);
 }
 ```
+******************************************
 
 `less `[`cxx/main.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
 ```c++
@@ -2857,7 +2866,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 For comparison; `produceVirusFixCns()` with `cnsVirusFix()` is close to assistants (such as _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])" or _Anthropic_'s "[_Claude-3-Haiku_](https://poe.com/Claude-3-Haiku)"), since all of them are general use artificial neural tissues which trains on couples of problems (questions, or programs infected with viruses) which map to solutions (answers, or original programs) to learn how to compute such solutions (for new problems) on their own.
 
 Have used `class Cns` to implement assistant demo through `produceAssistantCns()`, `assistantCnsProcess()` and  `assistantCnsLoopProcess()`:
-
+******************************************
 `less `[`cxx/AssistantCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```c++
 /* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
