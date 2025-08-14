@@ -62,9 +62,9 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	if(0 == hash.size()) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`0 == classSha2(std::string()).size();"));
 	} else if(hashStrTrue.size() != hashStrCompute.size() && classSha256 == classSha2) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`"));
 	} else if(hashStrTrue.size() != hashStrCompute.size()) {
-		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`");
+		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`");
 	} else if(hashStrTrue != hashStrCompute) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
 	}
