@@ -2693,6 +2693,7 @@ const ClassIoBytecode cnsVirusFix(const PortableExecutable &file, const Cns &cns
 `less `[`cxx/main.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/main.hxx) #With boilerplate
 ```c++
 /* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+#pragma once
 #ifndef INCLUDES_cxx_main_hxx
 #define INCLUDES_cxx_main_hxx
 #ifdef __cplusplus
@@ -2723,8 +2724,8 @@ static const int susuwuUnitTestsAssistantCnsBit =
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 #ifdef __cplusplus
 } /* extern "C" { */
-SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* def __cplusplus */
+SusuwuUnitTestsBitmask main(int argc, const char **args);
 #endif /* ndef INCLUDES_cxx_main_hxx */
 ```
 
@@ -2859,7 +2860,7 @@ Have used `class Cns` to implement assistant demo through `produceAssistantCns()
 
 `less `[`cxx/AssistantCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/AssistantCns.hxx)
 ```c++
-/* (Work-in-progress) assistant bots with artificial CNS. */
+/* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
 extern Cns assistantCns;
 extern std::string assistantCnsResponseDelimiter;
 
@@ -2879,18 +2880,18 @@ static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCa
 extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
 
 /* @throw std::bad_alloc
- * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new  synthesis).
+ * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new message synthesis).
  * If no responses, `0 == responsesOrNull.bytecodes[x].size()` (ignore).
  * `questionsOrNull.signatures[x] = Universal Resource Locator`
  * @code classSha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts = assistantCnsDefaultHosts);
-void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &filepath = "index.xhtml");
-const std::vector<ClassIoPath> ParseUrls(const FilePath &filepath = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
-const ClassIoBytecode ParseQuestion(const ClassIoPath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
-const std::vector<ClassIoBytecode> ParseResponses(const ClassIoPath &filepath = "index.xhtml"); /* TODO: regex or XML parser */
+void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml = "index.xhtml");
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
+const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
+const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 
 /* @pre `questionsOrNull` maps to `responsesOrNull`,
- * `0 == questionsOrNull.bytecodes[x].size()` for new  synthesis (empty question has responses),
+ * `0 == questionsOrNull.bytecodes[x].size()` for new assistant synthesis (empty question has responses),
  * `0 == responsesOrNull.bytecodes[x].size()` if should not respond (question does not have answers).
  * @post Can use `assistantCnsProcess(cns, text)` @code cns.isInitialized() @endcode */
 void produceAssistantCns(const ResultList &questionsOrNull, const ResultList &responsesOrNull, Cns &cns);
@@ -3124,7 +3125,7 @@ Just as (if humans grew trillions of neurons plus thousands of layers of cortice
   - outputs = EOF/null (if is infection that can not revert to fresh executables,) or else outputs = fresh executables;
 - To setup synapses, must have access to huge sample databases (such as _Virustotal_'s access.)
 
-_Github_ [has lots of _FLOSS_ simulators of neural tissue](https://github.com/topics/artificial-neural-network) which have uses to program virus analysis tools (or assistants such as [_LLaMA 2_](https://www.llama.com/llama2/) or [_Grok-2__](https://www.segmind.com/models/grok-2])) but which do not have [sufficient integration / interconnectedness to house human consciousness](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42):
+_Github_ [has lots of _FLOSS_ simulators of neural tissue](https://github.com/topics/artificial-neural-network) which have uses to program virus analysis tools (or assistants such as [_LLaMA 2_](https://www.llama.com/llama2/) or [_Grok-2_](https://www.segmind.com/models/grok-2])) but which do not have [sufficient integration / interconnectedness to house human consciousness](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42):
 
 - [_HSOM_](https://github.com/CarsonScott/HSOM) (`git clone https://github.com/CarsonScott/HSOM.git`, license is _FLOSS_) is a simple Python neural map.
   - [`./src/examples/`](https://github.com/Rober-t/apxr_run/blob/master/src/examples/) has examples of howto setup as artificial CNS.
@@ -3146,7 +3147,7 @@ This post was about general methods to produce virus analysis tools, which do no
 - For systems with lots of resources, can use local sandboxes/CNS.
 - For systems with less resources, can submit samples (of unknown executables) to remote hosts (which perform analysis.)
 - Can have small local sandboxes (that just run for a few seconds) + small CNS (just billions of neurons with hundreds of layers, versus the trillions of neurons with thousands of layers of cortices that antivirus hosts would use for this), which forward suspicious executables to remote hosts for extra review.
-- Allows reuses of workflows which an existant analysis tool has -- can just add (small) local sandboxes (or just add artificial CNS to antivirus hosts for extra analysis).
+- Allows reuses of workflows which an existent analysis tool has -- can just add (small) local sandboxes (or just add artificial CNS to antivirus hosts for extra analysis).
 
 Alternative CNS structure: [based on albatross](./AlbatrossCNS.md) (includes numerous resources, about all sorts of natural/artificial neural tissue).
 
