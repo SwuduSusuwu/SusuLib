@@ -52,6 +52,7 @@ TRANSCODE_USE_GIFSICLE="true" #Compression improved
 TRANSCODE_GIFSICLE_BATCH="true" #`--batch` (overwrite original).
 TRANSCODE_GIFSICLE_CONTAINER=".gifsicle" #Unused with `--batch`
 TRANSCODE_USE_IMAGEMAGICK="true" #Increases size and encode time, but dither (and color palette) improved
+TRANSCODE_IMAGEMAGICK_MISC="-layers optimize" #Flags for all modes
 TRANSCODE_IMAGEMAGICK_CONTAINER=".magick" #Suffix which marks `magick` versions.
 if ${TRANSCODE_USE_IMAGEMAGICK}; then
 	TRANSCODE_GIF_CONTAINER="${TRANSCODE_IMAGEMAGICK_CONTAINER}${TRANSCODE_GIF_CONTAINER}"
@@ -133,7 +134,7 @@ if ${TRANSCODE_GIF_ENABLED}; then
 #shellcheck disable=SC2086 #Those `_COMMAND`s are supposed to expand into arguments.
 		if ${TRANSCODE_USE_IMAGEMAGICK}; then
 #shellcheck disable=SC2046 #Can't quote variables with arguments.
-			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 ${TRANSCODE_GIF_FPS_COMMAND} ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" ${TRANSCODE_GIF_DURATION_COMMAND} -f image2pipe -vcodec ppm - | convert -delay $((100 / TRANSCODE_GIF_FPS)) - "${TRANSCODE_GIF_OUT_PATH}"
+			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 ${TRANSCODE_GIF_FPS_COMMAND} ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" ${TRANSCODE_GIF_DURATION_COMMAND} -f image2pipe -vcodec ppm - | convert ${TRANSCODE_IMAGEMAGICK_MISC} -delay $((100 / TRANSCODE_GIF_FPS)) - "${TRANSCODE_GIF_OUT_PATH}"
 			command -v "convert" || echo "${0}: Error: \`convert\` not found. Execute \`pkg install imagemagick\`"
 		else
 			nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_VISUAL_IN}" -map 0:v:0 ${TRANSCODE_GIF_COMPLEX} ${TRANSCODE_GIF_PIX_FMT_COMMAND} ${TRANSCODE_GIF_FPS_COMMAND} ${TRANSCODE_GIF_RESOLUTION_COMMAND} -ss "${TRANSCODE_GIF_SKIP}" ${TRANSCODE_GIF_DURATION_COMMAND} "${TRANSCODE_GIF_OUT_PATH}"
