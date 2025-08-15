@@ -48,10 +48,10 @@ TRANSCODE_GIF_FPS="10" #Suits most uses. Slower looks worse, higher increases fi
 #TRANSCODE_GIF_COMPLEX="-filter_complex \"${TRANSCODE_GIF_FILTER_FPS}scale=500:-1:flags=lanczos,split[v1][v2]; [v1]palettegen=stats_mode=full [palette];[v2]palette]paletteuse=dither=sierra2_4a\"" #Palettes&dithering improved
 #TRANSCODE_GIF_RESOLUTION="600x270" #{"2400x1080", "1200x540", "600x270"} #producees interpolation artifacts, unless source resolution is multiple of output resolution #Replace `<width>x` with `-1:`, to autoscale (since `2400x1080` and `1920x1080` are both common).
 TRANSCODE_GIF_RESOLUTION="-1:270" #{"2400x1080", "1200x540", "600x270"} #producees interpolation artifacts, unless source resolution is multiple of output resolution #Replace `<width>x` with `-1:`, to autoscale (since `2400x1080` and `1920x1080` are both common).
-TRANSCODE_USE_GIFSICLE="true" #Compression improved
+TRANSCODE_USE_GIFSICLE="$(command -v "gifsicle" >/dev/null)" #Small increase of execution `time`. Compression improved (`stat` size reduced).
 TRANSCODE_GIFSICLE_BATCH="true" #`--batch` (overwrite original).
 TRANSCODE_GIFSICLE_CONTAINER=".gifsicle" #Unused with `--batch`
-TRANSCODE_USE_IMAGEMAGICK="true" #Increases size and encode time, but dither (and color palette) improved
+TRANSCODE_USE_IMAGEMAGICK="$(command -v "convert" >/dev/null)" #Increases `stat` size plus execution `time`, but improves dither (plus color palette bitmaps).
 TRANSCODE_IMAGEMAGICK_MISC="-layers optimize" #Flags for all modes
 TRANSCODE_IMAGEMAGICK_CONTAINER=".magick" #Suffix which marks `magick` versions.
 if ${TRANSCODE_USE_IMAGEMAGICK}; then
