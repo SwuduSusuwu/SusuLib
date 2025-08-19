@@ -350,8 +350,9 @@ const bool classCnsTests(const bool cnsIsValueObject, const bool cnsSubHasDumpTo
 		{2.0, 0.0, /* 0.072094  ... */ 0.1180462, -1.0,   1.0,	0.001}, /* "normalization" (average == 0, std == 1), most simple to learn */
 		{2.0, 0.0, /* 70.774782 ... */ 107.8262, -1000.0, 1000.0, 1.0}, /* (average == 0, std == 1000) */
 		{2.0, 0.0, /* 0.072054  ... */ 0.118012,   0.0,   2.0,	0.001}, /* (average == 1, std == 1) */
-		{2.0, 0.0, /* 70.698730 ... */ 117.921631, 0.0,   2000.0, 1.0}  /* (average == 1000, std == 1000) */
-	};           /* absLoss min...*/ /* ..max */
+		{2.0, 0.0, /* 70.698730 ... */ 117.921631, 0.0,   2000.0, 1.0}, /* (average == 1000, std == 1000) */
+		{1.0, 2.0, /* 0.??????  ... */ 0.1180462, -1.0,   1.0,	0.001}  /* "normalization" (average == 0, std == 1), most simple to learn */ /* losVal 0.012395 */
+	};           /* absLoss min.. */ /* ..max */
 	for(const auto &argus: testsLinearFloatArgus) {
 		if(!classCnsTestsLinear<CnsSub, CnsSubCoefficient, float, float>(abortOnFirstError, argus.coefficient, argus.bias, argus.epsilon, argus.min, argus.max, argus.step, processToFloatLambda, cnsIsValueObject, cnsSubHasDumpTo)) {
 			if(abortOnFirstError) { return false; }
@@ -359,9 +360,10 @@ const bool classCnsTests(const bool cnsIsValueObject, const bool cnsSubHasDumpTo
 		}
 	}
 	std::vector<struct ClassCnsTestsLinearArgus<int, CnsSubCoefficient>> testsLinearIntArgus = {
-		{2.0, 0.0, /* 1.563975 ... */ 2242, -1000, 1000, 1},
-		{2.0, 0.0, /* 2.443702 ... */ 2552,  0,    2000, 1}
-	};           /* `lossVal`    */ /* TODO: reduce integer-version `epsilons` */
+		{2.0, 0.0, /* 1.563975  */ 2242, -1000, 1000, 1},
+		{2.0, 0.0, /* 2.443702  */ 2552,  0,    2000, 1},
+		{1.0, 2.0, /* 0.015350  */ 1066, -1000, 1000, 1}  /* TODO: for all `index`, `output` is stuck at `64`. What to do? */
+	};           /* `lossVal` */ /* TODO: reduce integer-version `epsilons` */
 	for(const auto &argus: testsLinearIntArgus) {
 		if(!classCnsTestsLinear<CnsSub, CnsSubCoefficient, int, int>(abortOnFirstError, argus.coefficient, argus.bias, argus.epsilon, argus.min, argus.max, argus.step, processToIntLambda, cnsIsValueObject, cnsSubHasDumpTo)) {
 			if(abortOnFirstError) { return false; }
