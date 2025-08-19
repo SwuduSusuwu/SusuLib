@@ -2568,13 +2568,13 @@ typedef class ApxrCns : public Cns {
 #endif /* USE_APXR_CNS */
 
 template <class CnsSub, typename CnsSubCoefficient, class Input, class Output, typename Process>
-static const bool classCnsTestLinear(const Input min, const Input max, const Input step, const CnsSubCoefficient epsilon /* For now, `epsilon` is best result known (so that regressions trigger debug messages) */, Process process, const bool cnsIsValueObject, const bool cnsSubHasDumpTo) {
+static const bool classCnsTestsLinear(const bool abortOnFirstError, const CnsSubCoefficient coefficient, const CnsSubCoefficient bias, const CnsSubCoefficient epsilon, const Input min, const Input max, const Input step, Process process, const bool cnsIsValueObject, const bool cnsSubHasDumpTo) {
 	bool success = true;
-	const std::string debugMessage = "classCnsTests(.min = " + std::to_string(min) + ", .max = " + std::to_string(max) + ", .step = " + std::to_string(step) + ", .epsilon == " + std::to_string(epsilon) + ") { ";
+	const std::string debugMessage = "classCnsTests(.coefficient == " + std::to_string(coefficient) + ", .bias == " + std::to_string(bias) + ", .epsilon == " + std::to_string(epsilon) + ", .min = " + std::to_string(min) + ", .max = " + std::to_string(max) + ", .step = " + std::to_string(step) + ") { ";
 	std::vector<std::tuple<Input, Output>> inputsToOutputs;
 //	 epsilon = std::numeric_limits<CnsSubCoefficient>::epsilon /* TODO: [compute most accurate possible values](https://github.com/copilot/share/c056538e-08c0-8822-9001-720924696114) */
 	for(Input input = min; max >= input; input += step) {
-		inputsToOutputs.push_back({input, input * 2});
+		inputsToOutputs.push_back({input, input * coefficient + bias});
 	}
 	CnsSub cnsSub;
 	Cns &cns = cnsSub;
@@ -2660,9 +2660,9 @@ static const bool classCnsTestLinear(const Input min, const Input max, const Inp
 	return success;
 }
 template<class Input, class CnsSubCoefficient>
-struct ClassCnsTestsLinearArgus {
+struct ClassCnsTestsLinearArgus { /* for internal use */
+	CnsSubCoefficient coefficient, bias, epsilon; /* For now, `epsilon` is best result known (so that regressions trigger debug messages) */
 	Input min; Input max; Input step;
-	CnsSubCoefficient epsilon; /* For now, `epsilon` is best result known (so that regressions trigger debug messages) */
 };
 template<class CnsSub, class CnsSubCoefficient>
 const bool classCnsTests(const bool cnsIsValueObject, const bool cnsSubHasDumpTo) {
@@ -2671,23 +2671,23 @@ const bool classCnsTests(const bool cnsIsValueObject, const bool cnsSubHasDumpTo
 	std::function<const float(const Cns &, const float)> processToFloatLambda = [](const Cns &cns, const float x) { return cns.processToFloat(x); };
 	std::function<const int(const Cns &, const int)> processToIntLambda = [](const Cns &cns, const int x) { return cns.processToInt(x); };
 	std::vector<struct ClassCnsTestsLinearArgus<float, CnsSubCoefficient>> testsLinearFloatArgus = {
-		{-1.0,    1.0,    0.001, /* 0.072094 ...  */  0.1180462}, /* "normalization" (average == 0, std == 1), most simple to learn */
-		{-1000.0, 1000.0, 1.0,   /* 70.774782 ... */ 107.8262  }, /* (average == 0, std == 1000) */
-		{ 0.0,    2.0,    0.001, /* 0.072054 ...  */  0.118012 }, /* (average == 1, std == 1) */
-		{ 0.0,    2000.0, 1.0,   /* 70.698730 ... */ 117.921631}  /* (average == 1000, std == 1000) */
-	};                         /* absLoss min...*/ /* ..max */
+		{2.0, 0.0, /* 0.072094  ... */ 0.1180462, -1.0,   1.0,	0.001}, /* "normalization" (average == 0, std == 1), most simple to learn */
+		{2.0, 0.0, /* 70.774782 ... */ 107.8262, -1000.0, 1000.0, 1.0}, /* (average == 0, std == 1000) */
+		{2.0, 0.0, /* 0.072054  ... */ 0.118012,   0.0,   2.0,	0.001}, /* (average == 1, std == 1) */
+		{2.0, 0.0, /* 70.698730 ... */ 117.921631, 0.0,   2000.0, 1.0}  /* (average == 1000, std == 1000) */
+	};           /* absLoss min...*/ /* ..max */
 	for(const auto &argus: testsLinearFloatArgus) {
-		if(!classCnsTestsLinear<CnsSub, CnsSubCoefficient, float, float>(abortOnFirstError, argus.min, argus.max, argus.step, argus.epsilon, processToFloatLambda, cnsIsValueObject, cnsSubHasDumpTo)) {
+		if(!classCnsTestsLinear<CnsSub, CnsSubCoefficient, float, float>(abortOnFirstError, argus.coefficient, argus.bias, argus.epsilon, argus.min, argus.max, argus.step, processToFloatLambda, cnsIsValueObject, cnsSubHasDumpTo)) {
 			if(abortOnFirstError) { return false; }
 			success = false;
 		}
 	}
 	std::vector<struct ClassCnsTestsLinearArgus<int, CnsSubCoefficient>> testsLinearIntArgus = {
-		{-1000, 1000, 1, /* 1.563975 ... */ 2242},
-		{ 0   , 2000, 1, /* 2.443702 ... */ 2552}
-	};                 /* `lossVal`    */ /* TODO: reduce integer-version `epsilons` */
+		{2.0, 0.0, /* 1.563975 ... */ 2242, -1000, 1000, 1},
+		{2.0, 0.0, /* 2.443702 ... */ 2552,  0,    2000, 1}
+	};           /* `lossVal`    */ /* TODO: reduce integer-version `epsilon`s */
 	for(const auto &argus: testsLinearIntArgus) {
-		if(!classCnsTestsLinear<CnsSub, CnsSubCoefficient, int, int>(abortOnFirstError, argus.min, argus.max, argus.step, argus.epsilon, processToIntLambda, cnsIsValueObject, cnsSubHasDumpTo)) {
+		if(!classCnsTestsLinear<CnsSub, CnsSubCoefficient, int, int>(abortOnFirstError, argus.coefficient, argus.bias, argus.epsilon, argus.min, argus.max, argus.step, processToIntLambda, cnsIsValueObject, cnsSubHasDumpTo)) {
 			if(abortOnFirstError) { return false; }
 			success = false;
 		}
