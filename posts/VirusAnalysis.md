@@ -1189,8 +1189,8 @@ extern const char **classSysArgs;
  * @post @code (0 < classSysArgc && SUSUWU_NULLPTR != classSysArgs && SUSUWU_NULLPTR != classSysArgs[0] */
 const bool classSysInit(int argc, const char **args);
 
-typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysUSeconds;
-inline const ClassSysUSeconds classSysUSecondClock() {
+typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysMuSeconds;
+inline const ClassSysMuSeconds classSysMuSecondClock() {
 	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
@@ -1527,9 +1527,9 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const size_t benchmarkSz = 65536; /* 65536 == 2^16 == 64kb */
 	const char nulls[benchmarkSz] = {0}; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this was used to allow zero-initialism semantics with no runtime cost */
 	const std::string nullStr(static_cast<const char *>(nulls), &nulls[benchmarkSz]);
-	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
+	const ClassSysMuSeconds tsDrift = classSysMuSecondClock(), ts2Drift = classSysMuSecondClock() - tsDrift, ts = classSysMuSecondClock();
 	const ClassIoHash hash = classSha2(nullStr);
-	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
+	const ClassSysMuSeconds ts2 = classSysMuSecondClock() - ts2Drift;
 	const std::string hashStrCompute = (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") + classIoHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {

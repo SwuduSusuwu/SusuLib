@@ -31,8 +31,8 @@ extern const char **classSysArgs;
  * @post @code (0 < classSysArgc && SUSUWU_NULLPTR != classSysArgs && SUSUWU_NULLPTR != classSysArgs[0] */
 const bool classSysInit(int argc, const char **args);
 
-typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysUSeconds;
-inline const ClassSysUSeconds classSysUSecondClock() {
+typedef decltype(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) ClassSysMuSeconds;
+inline const ClassSysMuSeconds classSysMuSecondClock() {
 	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
