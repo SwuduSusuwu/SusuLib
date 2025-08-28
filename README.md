@@ -2,6 +2,9 @@
 
 *Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
 - This `preview` branch is for [beta tests](#beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
+- Until <https://github.com/SwuduSusuwu/SusuLib/discussions/70> is closed, no `git commit`s can `merge` into the `trunk` branch (due to the prohibition against use of `git rebase` for the `trunk` branch). To use those `git commit`s (which are otherwise "set to go" into the `trunk` branch), use `git switch new`.
+  - The [`new`](https://github.com/SwuduSusuwu/SusuLib/blob/new/) branch is the subset of the `preview` branch which stops just before [commit 7c4f7521e @`README.md`; preview versus trunk branch use.](https://github.com/SwuduSusuwu/SusuLib/commit/7c4f7521eb3c51fd46e14dc30698ef8ded2b4768). That `git commit` marks the start of the subset of the `preview` branch which is unstable, plus which is subject to much use of `git rebase`. That `git commit` will receive a new hash on each `git push` to the `new` branch, but the `commit` "name"/"message" will stick to "@`README.md`; preview versus trunk branch use.".
+  - To switch to the most new (but finished) source code, use `git switch new`.
 # Table of Contents
 - [Purposes](#purposes)
 - [How to use this](#how-to-use-this)
