@@ -393,6 +393,20 @@ SUSUWU_LOCAL_WORKSPACE_PATH() ( #/* Usage: `"$(SUSUWU_LOCAL_WORKSPACE_PATH)/comp
 	git rev-parse --absolute-git-dir >/dev/null 2>&1 || return 1
 	dirname "$(git rev-parse --absolute-git-dir 2>/dev/null)"
 )
+SUSUWU_CURRENT_PROJECT() ( #/* Usage: `echo "$(SUSUWU_CURRENT_PROJECT ["<fallback>"])"` */
+	THIS_PROJECT="$(git config --get remote."$(git remote)".url | sed 's/.*\/\([^\/]*\).git/\1/')"
+	if [ -z "${THIS_PROJECT}" ]; then
+		THIS_PROJECT="$(git rev-parse --show-toplevel | xargs basename)" #/* similar to `q=$(pwd); echo ${q##*/}`, but can use from subdirs */
+	fi
+	if [ -z "${THIS_PROJECT}" ]; then
+		THIS_PROJECT="${1}" #/* use "<fallback>" */
+	fi
+	if [ -n "${THIS_PROJECT}" ]; then
+		echo "${THIS_PROJECT}"
+		return 0
+	fi
+	return 1
+)
 SUSUWU_DEFAULT_BRANCH() ( #/* Usage: `echo "$(SUSUWU_DEFAULT_BRANCH ["<fallback>"])"` */
 	DEFAULT_BRANCH="$(git symbolic-ref -q --short "refs/remotes/$(git remote)/HEAD" # | sed -n "s/$(git remote)\/\(.*\)/\1/p")" #/* remote branch */
 	)"; DEFAULT_BRANCH="${DEFAULT_BRANCH#"$(git remote)/"}" #/* remote branch */ /* `sed -n` replaced with substitution */
