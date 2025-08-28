@@ -19,7 +19,7 @@ SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
 		SUSUWU_INCLUDE_ERROR "${SUSUWU_INCLUDE_PATH}" "is not executable"
 	fi
 }
-SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
+SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_CURRENT_PROJECT SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
 
 SUSUWU_COMPILE_JSON_PATH_="$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json" #/* [`clang-tidy` compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration) */
 SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
@@ -63,7 +63,7 @@ SUSUWU_COMPILE_JSON_PATH_FOUND() ( #/* Usage: `if SUSUWU_COMPILE_JSON_PATH_ERROR
 		return 1
 	fi
 )
-SUSUWU_LOCAL_WORKSPACE_JSON() ( #/* Usage: `git pull && SUSUWU_LOCAL_WORKSPACE_PATH_JSON && clang-tidy ${CXX_SOURCE_PATH}`. Is 'LLVM ERROR: Cannot chdir into "/home/runner/work/SusuLib/SusuLib"!' fix (replaces `${{ github.workspace }}` with `$(pwd)`) */
+SUSUWU_LOCAL_WORKSPACE_JSON() ( #/* Usage: `git pull && SUSUWU_LOCAL_WORKSPACE_PATH_JSON && clang-tidy ${CXX_SOURCE_PATH}`. Is 'LLVM ERROR: Cannot chdir into "/home/runner/work/$(SUSUWU_CURRENT_PROJECT)/$(SUSUWU_CURRENT_PROJECT)"!' fix (replaces `${{ github.workspace }}` with `$(pwd)`) */
 	if ! SUSUWU_COMPILE_JSON_PATH_FOUND "SUSUWU_LOCAL_WORKSPACE_JSON()"; then
 		return $?
 	fi
@@ -77,7 +77,8 @@ SUSUWU_GITHUB_WORKSPACE_JSON() ( #/* Usage: `echo "SUSUWU_GITHUB_WORKSPACE_JSON"
 	JSON_BACKUP_SUFFIX=".bak" #/* TODO; remove, since this is restored with `SUSUWU_LOCAL_WORKSPACE_PATH`? */
 	JSON_BACKUP_PATH="${SUSUWU_COMPILE_JSON_PATH_}${JSON_BACKUP_SUFFIX}"
 	if SUSUWU_PATH_SHOULD_NOT_EXIST "SUSUWU_GITHUB_WORKSPACE_JSON()" "${JSON_BACKUP_PATH}"; then
-		sed 's|"directory": "\([^"]\+\)"|"directory": "/home/runner/work/SusuLib/SusuLib"|g' -i"${JSON_BACKUP_SUFFIX}" "${SUSUWU_COMPILE_JSON_PATH_}" && {
+		CURRENT_PROJECT="$(SUSUWU_CURRENT_PROJECT "SusuLib")"
+		sed "s|\"directory\": \"\([^\"]\+\)\"|\"directory\": \"/home/runner/work/${CURRENT_PROJECT}/${CURRENT_PROJECT}\"|g" -i"${JSON_BACKUP_SUFFIX}" "${SUSUWU_COMPILE_JSON_PATH_}" && {
 			git add -f "${SUSUWU_COMPILE_JSON_PATH_}"
 			rm "${JSON_BACKUP_PATH}" #/* `mv "${JSON_BACKUP_PATH}" "${SUSUWU_COMPILE_JSON_PATH_}"` causes "error: cannot rebase: You have unstaged changes." */
 		}
