@@ -17,7 +17,7 @@ Tools compatible with this howto:
   - [Produce `.m4a`](#produce-m4a)
   - [Mix visuals + sounds into `.mp4`](#mix-visuals-plus-sounds-into-mp4)
   - [Produce `.gif`](#produce-gif)
-- [External resources](#external-resources)
+- [Synopsis](#synopsis)
 
 # Howto
 You can use [`../sh/Transcode.sh`](../sh/Transcode.sh) to do all of this for you; what follows is the manual route.
@@ -75,7 +75,7 @@ Optimization (lossless compression, such as: duplicate frames and duplicate pale
 nice gifsicle -O2 "/storage/emulated/0/Visuals/visual.gif" --batch
 ```
 
-# External resources
+# Synopsis
 Lists of commands&options which `ffmpeg` can use:
 - [ffmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
 - [complete list of `ffmpeg` flags / commands](https://gist.github.com/tayvano/6e2d456a9897f55025e25035478a3a50#file-gistfile1-txt)
