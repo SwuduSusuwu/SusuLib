@@ -15,6 +15,7 @@ Tools compatible with this howto:
 - [Howto](#howto)
   - [Produce `.mp4`](#produce-mp4)
   - [Produce `.m4a`](#produce-m4a)
+    - [Concat multiple `.m4a`s](#concat-multiple-m4as)
   - [Mix visuals + sounds into `.mp4`](#mix-visuals-plus-sounds-into-mp4)
   - [Produce `.gif`](#produce-gif)
 - [Synopsis](#synopsis)
@@ -47,6 +48,24 @@ To demux sounds (into `demux.m4a`); pass `-ss 4` to skip *4* seconds, pass `-t 2
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Download/sounds.mp4 -ss 4 -t 2:00 -map 0:a:0 -c copy "/storage/emulated/0/Sounds/demux.m4a"
 ```
+
+### Concat multiple `.m4a`s
+To [concat](https://trac.ffmpeg.org/wiki/Concatenate) the `.m4a` stream (from `visuals.mp4`) with `demux.m4a` (assumes similar codecs used), into `concat.m4a`:
+```sh
+echo "file '/storage/emulated/0/Visuals/visuals.mp4'" > ./sources
+echo "file '/storage/emulated/0/Sounds/demux.m4a'" >> ./sources
+nice ffmpeg -f concat -safe 0 -i "sources" -c copy -map 0:a:0 "/storage/emulated/0/Sounds/concat.m4a"
+```
+- \[*Notice*: `-safe 0` is just for absolute paths\]
+- \[*Notice*: replace `-map 0:a:0` with `-map 0:v:0` to concat visuals\]
+
+******
+
+Must "re-encode" for sources with separate codecs used (such as if `demux.m4a` uses [*Advanced Audio Codec*](https://en.wikipedia.org/wiki/Advanced_Audio_Codec) but `visuals.mp4` uses [*Opus*](https://opus-codec.org/comparison/)):
+```sh
+ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -i "/storage/emulated/0/Sounds/demux.m4a" -filter_complex [0:a][1:a]concat=n=2:v=0:a=1 "/storage/emulated/0/Sounds/concat.m4a"
+```
+- \[*Notice*: switch `:a` with `:v` to concat visuals\]
 
 ## Mix visuals plus sounds into `.mp4`
 Now `demux.m4a` is *2* minutes, but `visuals.m4a` is much longer; pass `-stream_loop -1` to mux sounds (as loop) to match `visuals.mp4`, into `mux.mp4`:
