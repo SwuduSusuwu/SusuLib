@@ -1,6 +1,6 @@
 **[`ffmpeg`](https://github.com/FFmpeg/FFmpeg) is [FLOSS](https://wikipedia.org/wiki/FLOSS) (no cost), plus is the best tool to transcode/trim/demux/mux. `ffmpeg` is on [_Windows_](https://wikipedia.org/wiki/Windows)&[_Linux_](https://wikipedia.org/wiki/Linux)&[_Android OS_](https://wikipedia.org/wiki/Android_(operating_system))&[_iOS_](https://wikipedia.org/wiki/iOS)&[_OSX_](https://wikipedia.org/wiki/OSX).**
 
-\[This post allows all uses.\] Is [now on SubStack](https://swudususuwu.substack.com/p/ffmpeg-is-floss-no-cost-mux-tool).
+\[This post (which [is also on *SubStack*](https://swudususuwu.substack.com/p/ffmpeg-is-floss-no-cost-mux-tool)) allows [all uses](https://creativecommons.org/licenses/by/2.0/).\]
 
 Tools compatible with this howto:
 - For `/bin/sh`: `apt install ffmpeg`
@@ -10,6 +10,7 @@ Tools compatible with this howto:
 - For _iOS_: [https://shaunhevey.com/posts/how-to-use-ffmpeg-on-ios/](https://shaunhevey.com/posts/how-to-use-ffmpeg-on-ios/).
 - For _OSX_: `brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-libass --with-libvorbis --with-libvpx --with-opus` (or [alternatives](https://superuser.com/questions/624561/install-ffmpeg-on-os-x/624562#624562)).
 - For _Windows_: [_FFmpeg_ - Official app in the _Microsoft Store_](https://apps.microsoft.com/detail/9nb2flx7x7wg?hl=en-za&gl=ZA).
+
 # Table of Contents
 - [Howto](#howto)
   - [Produce `.mp4`](#produce-mp4)
@@ -17,6 +18,7 @@ Tools compatible with this howto:
   - [Mix visuals + sounds into `.mp4`](#mix-visuals-plus-sounds-into-mp4)
   - [Produce `.gif`](#produce-gif)
 - [External resources](#external-resources)
+
 # Howto
 You can use [`../sh/Transcode.sh`](../sh/Transcode.sh) to do all of this for you; what follows is the manual route.
 \[*Notice*: versus stock _Android_, have moved default paths `/Music/` to `/Sounds/`, `/Movies/` to `/Visuals/`.\]
@@ -24,6 +26,7 @@ You can use [`../sh/Transcode.sh`](../sh/Transcode.sh) to do all of this for you
 \[*Notice*: if `/storage/emulated/0/` (directory root) is not found, replace with `/sdcard/`.\]
 
 \[*Notice*: Can use examples with _FFmpeg Media Encoder_ or _Termux_ as-is (use absolute paths).\]
+
 ## Produce `.mp4`
 Example `visuals.mp4` was *4gb*, to compress to *224mb* used:
 ```sh
@@ -38,24 +41,25 @@ Suppose you want to mux `sounds.mp4` with `visuals.mp4`,
 but you want to skip `sounds.mp4`’s *4* second intro, plus limit output to *2* minutes:
 
 ## Produce `.m4a`
-To demux sounds, pass `-ss 4` to skip *4* seconds, pass `-t 2:00` to output *2* minutes, pass `-map 0:a:0` (zero-indexed) to demux first input as sounds, pass `-c copy` for instant process, output as `.m4a`:
+To demux sounds (into `demux.m4a`); pass `-ss 4` to skip *4* seconds, pass `-t 2:00` to output *2* minutes, pass `-map 0:a:0` (zero-indexed) to demux first input as sounds, pass `-c copy` for instant process (not reencode):
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Download/sounds.mp4 -ss 4 -t 2:00 -map 0:a:0 -c copy "/storage/emulated/0/Sounds/demux.m4a"
 ```
+
 ## Mix visuals plus sounds into `.mp4`
-Now `demux.m4a` is *2* minutes, but `visuals.m4a` is much longer; pass `-stream_loop -1` to mux sounds as loop  to match `visuals.mp4`:
+Now `demux.m4a` is *2* minutes, but `visuals.m4a` is much longer; pass `-stream_loop -1` to mux sounds (as loop) to match `visuals.mp4`, into `mux.mp4`:
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux.mp4"
 ```
-Suppose you want the mix the sounds from `visuals.mp4` with the loop from `mux.mp4`:
+Suppose you want the mix the sounds from `visuals.mp4` with `mux.mp4`, into `mux2.mp4`:
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -stream_loop -1 -i "/storage/emulated/0/Sounds/demux.m4a" -map 0:a:0 -map 1:a:0 -filter_complex amix=inputs=2:duration=shortest "/storage/emulated/0/Sounds/demux2.m4a"
 nice ffmpeg -i "/storage/emulated/0/Visuals/visuals.mp4" -i "/storage/emulated/0/Sounds/demux2.m4a" -map 0:v:0 -c copy -map 1:a:0 -shortest "/storage/emulated/0/Visuals/mux2.mp4"
 ```
-\[*Notice*: `-c copy` is not compatible with `-filter_complex`; unless you want to reincode the visuals (slow), is 2 steps to do this\]
+\[*Notice*: `-c copy` is not compatible with `-filter_complex`; unless you want to reencode the visuals (slow), is 2 steps to do this (`demux2.m4a` is an intermediate (temp) file)\]
 
 ## Produce `.gif`
-Suppose you wish to produce a *10fps* HD `.gif` from the first *24* seconds of `visual.mp4`:
+Suppose you wish to produce a 10**FPS** *1080p* `.gif` from the first 24 seconds of `visual.mp4`:
 ```sh
 nice ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920x1080 -t 24 "/storage/emulated/0/Visuals/visual.gif"
 ```
@@ -66,8 +70,9 @@ nice ffmpeg -i "/storage/emulated/0/Visuals/visual.mp4" -map 0:v:0 -r 10 -s 1920
 will use more disk but has dither and palette improved.
 Optimization (lossless compression, such as: duplicate frames and duplicate palettes are reduced) through _Gifsicle_ (`apt install gifsicle`):
 ```sh
-gifsicle -O2 "/storage/emulated/0/Visuals/visual.gif" --batch
+nice gifsicle -O2 "/storage/emulated/0/Visuals/visual.gif" --batch
 ```
+
 # External resources
 Lists of commands&options which `ffmpeg` can use:
 - [ffmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
@@ -81,8 +86,10 @@ How to use extra tools (which `ffmpeg`'s _GPLv2_ version has):
 - [https://www.youtube.com/watch?v=YFgRW58mbG4](https://www.youtube.com/watch?v=YFgRW58mbG4)
 
 `visual.gif` syntax was used to produce:
-- [https://www.deviantart.com/swudususuwu/art/BUD-Robos-hold-you-loop-v0-4-3-2-S-Simulator-1004148092](https://www.deviantart.com/swudususuwu/art/BUD-Robos-hold-you-loop-v0-4-3-2-S-Simulator-1004148092)
-- [https://www.deviantart.com/swudususuwu/art/Sakura-School-Simulator-howto-use-robot-props-loop-1019774750](https://www.deviantart.com/swudususuwu/art/Sakura-School-Simulator-howto-use-robot-props-loop-1019774750)
+- <https://www.deviantart.com/swudususuwu/art/BUD-Robos-hold-you-loop-v0-4-3-2-S-Simulator-1004148092>
+- <https://www.deviantart.com/swudususuwu/art/Sakura-School-Simulator-howto-use-robot-props-loop-1019774750>
+
+******
 
 [_Video Transcoder_ - Apps on _Google_](https://play.google.com/store/apps/details?id=protect.videoeditor) (a visual interface to `ffmpeg`) was cool versus most “_video editor_” apps -- but is not available for new versions of _Android OS_, can not loop (just has trim + convert (which can act as demux) + resize + compress), is slow (can not pass `-c copy` to `ffmpeg`, thus always reincodes inputs.)
 
