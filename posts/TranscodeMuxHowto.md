@@ -23,6 +23,8 @@ Tools compatible with this howto:
 You can use [`../sh/Transcode.sh`](../sh/Transcode.sh) to do all of this for you; what follows is the manual route.
 \[*Notice*: versus stock _Android_, have moved default paths `/Music/` to `/Sounds/`, `/Movies/` to `/Visuals/`.\]
 
+\[*Notice*: `.m4a` is used so that sounds are not reencoded if uploaded to platforms (such as *YouTube*) which use the *Advanced Audio Codec*. If the sounds are not to upload to such platforms, use `.opus`, which causes `ffmpeg` to encode to *Opus*.\]
+
 \[*Notice*: if `/storage/emulated/0/` (directory root) is not found, replace with `/sdcard/`.\]
 
 \[*Notice*: Can use examples with _FFmpeg Media Encoder_ or _Termux_ as-is (use absolute paths).\]
