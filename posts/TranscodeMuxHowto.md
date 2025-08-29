@@ -84,11 +84,11 @@ How to use extra tools (which `ffmpeg`'s _GPLv2_ version has):
 [https://github.com/FFmpeg/FFmpeg/blob/master/LICENSE.md](https://github.com/FFmpeg/FFmpeg/blob/master/LICENSE.md)
 
 `mux.mp4`/`mux2.mp4` syntax was used to produce:
-- [https://www.youtube.com/watch?v=zcqRmYUQKM8](https://www.youtube.com/watch?v=zcqRmYUQKM8)
-- [https://www.youtube.com/watch?v=YFgRW58mbG4](https://www.youtube.com/watch?v=YFgRW58mbG4)
+- [*BUD*, *Arduino Parkour* v0.6.24.62, production + walkthrough + hoverboard tour](https://www.youtube.com/watch?v=3L8tskPqdsM)
+- [Sakura School Simulator, howto import+use props (robot shop class), Swudu Susuwu](https://www.youtube.com/watch?v=YFgRW58mbG4)
 
 `visual.gif` syntax was used to produce:
-- <https://www.deviantart.com/swudususuwu/art/BUD-Robos-hold-you-loop-v0-4-3-2-S-Simulator-1004148092>
+- <https://www.deviantart.com/swudususuwu/art/gif-BUD-Arduino-Parkour-v0-6-24-62-walkthrough-1233444178>
 - <https://www.deviantart.com/swudususuwu/art/Sakura-School-Simulator-howto-use-robot-props-loop-1019774750>
 
 ******
