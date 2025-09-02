@@ -12,6 +12,7 @@
 - [`./sh/make.sh`](./make.sh) is a standalone (just imports `./sh/Macros.sh`) port of [`make`](https://wikipedia.org/wiki/Make_(software)) to `/bin/sh`. `./build.sh` uses this.
   - Exports functions: {`SUSUWU_BUILD_CTAGS()`, `SUSUWU_BUILD_OBJECTS()`, `SUSUWU_BUILD_EXECUTABLE()`, `SUSUWU_DEPENDENCY_INCLUDE()`, `SUSUWU_FIND_INCLUDE()`, `SUSUWU_INSTALL()`, `SUSUWU_INSTALL_PACKAGES()`, `SUSUWU_PROCESS_CLEAN_REBUILD()`, `SUSUWU_PROCESS_MINGW()`, `SUSUWU_PROCESS_RELEASE_DEBUG()`, `SUSUWU_SETUP_BUILD_FLAGS()`, `SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL()`, `SUSUWU_SETUP_CXX()`, `SUSUWU_SETUP_BINDIR()`, `SUSUWU_SETUP_OBJDIR()`, `SUSUWU_SETUP_OUTPUT()`, `SUSUWU_TEST_OUTPUT()`, `SUSUWU_UNINSTALL()`}
 - [`./sh/Includes.sh`](./Includes.sh) {Searches for, installs, does unit tests for} system includes (popular includes such as {`libxml2`, `libtensorflow`}). Most scripts (such as `./build.sh`) which use `./sh/make.sh`, will also use `./sh/Includes.sh` (unless those just use standard **C++** includes).
+  - Exports functions: {`SUSUWU_INCLUDES_LIBPUGIXML()`}
 - [`./sh/Transcode.sh`](./Transcode.sh) is a standalone [`ffmpeg`](https://github.com/FFmpeg/FFmpeg)-based tool which goes with [`./posts/TranscodeMuxHowto.md`](../posts/TranscodeMuxHowto.md).
 
 # Issues/workarounds

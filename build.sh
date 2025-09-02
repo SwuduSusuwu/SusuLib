@@ -53,6 +53,10 @@ SUSUWU_SETUP_OUTPUT "Susuwu" #/* Usage: replace with name of your program */
 SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
+
+SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), USER_FLAGS */
+SUSUWU_INCLUDES_LIBPUGIXML
+
 SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
 #shellcheck disable=SC2119 #Specifics were removed from `SUSUWU_BUILD_CTAGS` call to match `./hooks/pre-commit`.
 SUSUWU_BUILD_CTAGS #/* Usage: `apt install ctags vim && vim -t tagToSearchFor` */

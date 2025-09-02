@@ -23,5 +23,30 @@ SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
 	fi
 }
 #SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_PATH_SHOULD_NOT_EXIST */ #uncomment if not included
-#SUSUWU_INCLUDE "./sh/make.sh" #/* SUSUWU_DEPENDENCY_INCLUDE SUSUWU_INSTALL_PACKAGES */ #uncomment if not included
+#SUSUWU_INCLUDE "./sh/make.sh" #/* SUSUWU_DEPENDENCY_INCLUDE SUSUWU_INSTALL_PACKAGES SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL */ #uncomment if not included
+
+SUSUWU_INCLUDES_LIBPUGIXML() { #/* If can include `libpugixml`, set `-DSUSUWU_USE_PUGIXML` */
+	SUSUWU_INSTALL_PACKAGES "libpugixml-dev" "libpugixml1v5" || { #/* For GitHub / Ubuntu */
+		SUSUWU_INSTALL_PACKAGES "libpugixml" #/* For Termux */
+	}
+	FLAGS_USER_BACKUP="${FLAGS_USER}" #/* Allows to undo `-I` insertion */
+	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libpugixml-dev" "pugixml/src/" "pugixml.hpp" "C++" "sudo apt install libpugixml-dev libpugixml1v5" && ! [ true = "${SUSUWU_INCLUDES_LIBPUGIXML_ERROR}" ]; then #/* If `libpugixml` was found */
+	#	&& ${LD} -llibpugixml #/* /usr/lib/libpugixml.so *?
+		SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH="libpugixmlTest.cxx.tmp"
+		if (SUSUWU_PATH_SHOULD_NOT_EXIST "$0" "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"); then
+			echo "#include <pugixml.hpp>
+	int main() { pugi::xml_document doc; }" > "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"
+	#shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
+			if [ true = "${SUSUWU_INCLUDES_LIBPUGIXML_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "" "-DSUSUWU_USE_PUGIXML=true" "-lpugixml" "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"; then
+				export SUSUWU_INCLUDES_LIBPUGIXML_PASS=true
+				return 0 #/* "success", true */
+			else
+				export SUSUWU_INCLUDES_LIBPUGIXML_ERROR=true
+				FLAGS_USER="${FLAGS_USER_BACKUP}" #/* Undo `-I` insertion */
+			fi
+			rm "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"
+		fi
+	fi
+	return 1 #/* "error", false */
+}
 
