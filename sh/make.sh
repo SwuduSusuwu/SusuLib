@@ -490,4 +490,19 @@ SUSUWU_INSTALL_PACKAGES() ( #/* Usage: `SUSUWU_INSTALL_PACKAGES "<package [packa
 	fi
 	return ${ONE_OR_MORE_PACKAGES_SUCCESS} #/* true if one or more packages installed */
 )
+SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL() { #/* Usage: `SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "<new CFLAGS>" "<new CXXFLAGS>" "<new LDFLAGS>" "<unit test path>" ["<troubleshoot-howto>"] */
+	SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH="${4}"
+	#shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
+	if (${CXX} ${CXXFLAGS} ${2} ${LDFLAGS} ${3} -c "${SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH}"); then #/* TODO: ` 2>/dev/null; then` as soon as difficult-to-parse errors such as `fatal error: "unsupported/Eigen/CXX11/Tensor' file not found" have solutions */
+		SUSUWU_PRINT "SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH}") passed, will enable $(SUSUWU_SH_QUOTE "CODE" "CFLAGS=\"\${CFLAGS} ${1}\""); $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${2}\""); $(SUSUWU_SH_QUOTE "CODE" "LDFLAGS=\"\${LDFLAGS} ${3}\"") ."
+		CFLAGS="${CFLAGS} ${1}"
+		CXXFLAGS="${CXXFLAGS} ${2}"
+		LDFLAGS="${LDFLAGS} ${3}"
+		return 0 #/* true */
+	else
+		SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_STATUS=$?
+		SUSUWU_PRINT "SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${CXXFLAGS} ${2} ${LDFLAGS} ${3} ${SUSUWU_TENSORFLOW_TEST_PATH}") gives $(SUSUWU_SH_QUOTE "CODE" "return $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_STATUS}")"), will not enable $(SUSUWU_SH_QUOTE "CODE" "CFLAGS=\"\${CFLAGS} ${1}\""); $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${2}\""); $(SUSUWU_SH_QUOTE "CODE" "LDFLAGS=\"\${LDFLAGS} ${3}\"") (skipped). To force use, insert $(SUSUWU_SH_QUOTE "CODE" "${2}") into $(SUSUWU_SH_QUOTE "CODE" "$0:FLAGS_USER").${5:+" ${5}"}"
+		return 1 #/* false */
+	fi
+}
 
