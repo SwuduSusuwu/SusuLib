@@ -1,4 +1,4 @@
-**[`ffmpeg`](https://github.com/FFmpeg/FFmpeg) is [FLOSS](https://wikipedia.org/wiki/FLOSS) (no cost), plus is the best tool to transcode/trim/demux/mux. `ffmpeg` is on [_Windows_](https://wikipedia.org/wiki/Windows)&[_Linux_](https://wikipedia.org/wiki/Linux)&[_Android OS_](https://wikipedia.org/wiki/Android_(operating_system))&[_iOS_](https://wikipedia.org/wiki/iOS)&[_macOS_](https://wikipedia.org/wiki/macOS).**
+**[`ffmpeg`](https://github.com/FFmpeg/FFmpeg) is [FLOSS](https://wikipedia.org/wiki/FLOSS) (no cost), plus is the best tool to transcode/trim/demux/mux. `ffmpeg` is on [_**MS** Windows_](https://wikipedia.org/wiki/Windows)&[_Linux_](https://wikipedia.org/wiki/Linux)&[_Android OS_](https://wikipedia.org/wiki/Android_(operating_system))&[_iOS_](https://wikipedia.org/wiki/iOS)&[_macOS_](https://wikipedia.org/wiki/macOS).**
 
 \[This post (which [is also on *SubStack*](https://swudususuwu.substack.com/p/ffmpeg-is-floss-no-cost-mux-tool)) allows [all uses](https://creativecommons.org/licenses/by/2.0/).\]
 
@@ -9,7 +9,7 @@ Tools compatible with this howto:
 - For misc _Linux_ OSs (suchas [_Ubuntu_](https://ubuntu.com/) or [_Android OS_ +_Termux_](https://play.google.com/store/apps/details?id=com.termux)): `apt install ffmpeg`.
 - For _iOS_: [https://shaunhevey.com/posts/how-to-use-ffmpeg-on-ios/](https://shaunhevey.com/posts/how-to-use-ffmpeg-on-ios/).
 - For _macOS_: `brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-libass --with-libvorbis --with-libvpx --with-opus` (or [alternatives](https://superuser.com/questions/624561/install-ffmpeg-on-os-x/624562#624562)).
-- For _Windows_: [_FFmpeg_ - Official app in the _Microsoft Store_](https://apps.microsoft.com/detail/9nb2flx7x7wg?hl=en-za&gl=ZA).
+- For _Microsoft Windows_: [_FFmpeg_ - Official app in the _Microsoft Store_](https://apps.microsoft.com/detail/9nb2flx7x7wg?hl=en-za&gl=ZA).
 
 # Table of Contents
 - [Howto](#howto)
