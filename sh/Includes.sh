@@ -59,7 +59,7 @@ SUSUWU_INCLUDES_LIBXML2() { #/* If can include `libxml2`, set `-DSUSUWU_USE_LIBX
 	FLAGS_USER_BACKUP="${FLAGS_USER}" #/* Allows to undo `-I` insertion */
 	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libxml2-dev" "libxml2/" "libxml/parser.h" "C" "${APTITUDE} libxml2-dev libxml2" && ! [ true = "${SUSUWU_INCLUDES_LIBXML2_ERROR}" ]; then #/* If `libxml2` was found */
 #	&& ${LD} -lxml2 #/* /usr/lib/libxml2.so *?
-		SUSUWU_INCLUDES_LIBXML2_TEST_PATH="libxml2Test.cxx.tmp"
+		SUSUWU_INCLUDES_LIBXML2_TEST_PATH="libxml2Test.cxx"
 		if (SUSUWU_PATH_SHOULD_NOT_EXIST "$0" "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"); then
 			echo "#include <libxml/parser.h> /* xmlDocPtr */
 	int main() { xmlDocPtr doc; return 0; }" > "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
