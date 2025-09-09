@@ -50,3 +50,28 @@ SUSUWU_INCLUDES_LIBPUGIXML() { #/* If can include `libpugixml`, set `-DSUSUWU_US
 	return 1 #/* "error", false */
 }
 
+SUSUWU_INCLUDES_LIBXML2() { #/* If can include `libxml2`, set `-DSUSUWU_USE_LIBXML2` */
+	SUSUWU_INSTALL_PACKAGES "libxml2-dev" || { #/* For GitHub / Ubuntu */
+		SUSUWU_INSTALL_PACKAGES "libxml2" #/* For Termux */
+	}
+	FLAGS_USER_BACKUP="${FLAGS_USER}" #/* Allows to undo `-I` insertion */
+	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libxml2-dev" "libxml2/" "libxml/parser.h" "C" "sudo apt install libxml2-dev libxml2" && ! [ true = "${SUSUWU_INCLUDES_LIBXML2_ERROR}" ]; then #/* If `libxml2` was found */
+	#	&& ${LD} -lxml2 #/* /usr/lib/libxml2.so *?
+		SUSUWU_INCLUDES_LIBXML2_TEST_PATH="libxml2Test.cxx.tmp"
+		if (SUSUWU_PATH_SHOULD_NOT_EXIST "$0" "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"); then
+			echo "#include <libxml/parser.h> /* xmlDocPtr */
+	int main() { xmlDocPtr doc; return 0; }" > "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
+	#shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
+			if [ true = "${SUSUWU_INCLUDES_LIBXML2_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "-DSUSUWU_USE_LIBXML2=true" "-DSUSUWU_USE_LIBXML2=true" "-lxml2" "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"; then
+				export SUSUWU_INCLUDES_LIBXML2_PASS=true
+				return 0 #/* "success", true */
+			else
+				export SUSUWU_INCLUDES_LIBXML2_ERROR=true
+				FLAGS_USER="${FLAGS_USER_BACKUP}" #/* Undo `-I` insertion */
+			fi
+			rm "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
+		fi
+	fi
+	return 1 #/* "error", false */
+}
+

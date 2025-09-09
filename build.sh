@@ -54,8 +54,9 @@ SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 
-SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), USER_FLAGS */
+SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), SUSUWU_INCLUDES_LIBXML2(), USER_FLAGS */
 SUSUWU_INCLUDES_LIBPUGIXML
+SUSUWU_INCLUDES_LIBXML2
 
 SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
 #shellcheck disable=SC2119 #Specifics were removed from `SUSUWU_BUILD_CTAGS` call to match `./hooks/pre-commit`.
