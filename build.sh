@@ -40,7 +40,6 @@ export FLAGS_FSAN="-fsanitize=address -fno-sanitize-recover=all -fsanitize=float
 C_SOURCE_PATH="./c/" #/* Usage: replace with directory root for _C_ source code */
 CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source code */
 
-
 SUSUWU_PROCESS_S "$@" #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
 SUSUWU_PROCESS_VERBOSE "$@" #/* Usage: `./build.sh --verbose`. Enables `SUSUWU_SH_DEBUG` ("Debug:") messages, forces `set -x`. */
 SUSUWU_PRODUCTION_USE "${THIS_DEFAULT_BRANCH}"
@@ -56,9 +55,10 @@ SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
 
-SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), SUSUWU_INCLUDES_LIBXML2(), USER_FLAGS */
+SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), SUSUWU_INCLUDES_LIBXML2(), SUSUWU_INCLUDES_LIBTENSORFLOW(), USER_FLAGS */
 SUSUWU_INCLUDES_LIBPUGIXML
 SUSUWU_INCLUDES_LIBXML2
+SUSUWU_INCLUDES_LIBTENSORFLOW
 
 SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
 #shellcheck disable=SC2119 #Specifics were removed from `SUSUWU_BUILD_CTAGS` call to match `./hooks/pre-commit`.
