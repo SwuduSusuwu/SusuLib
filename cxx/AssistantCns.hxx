@@ -6,14 +6,21 @@
 #include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode */
 #include "ClassResultList.hxx" /* ResultList */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_USE_TENSORFLOW */
 #include <iostream> /* std::cout */
 #include <ostream> /* std::ostream */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
 /* (Work-in-progress) system which uses tuples of inputs (questions, or document titles) plus solutions (answers, or documents), to setup artificial neural tissue (such as [**HSOM**](https://github.com/SwuduSusuwu/SusuLib/blob/5eff71e6486562b1d5c7b349618fba9634d479cd/cxx/ClassCns.cxx#L11-L81) or [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)), which then uses new inputs to produce new solutions (similar to _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])") */
 namespace Susuwu {
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern std::string assistantCnsResponseDelimiter;
 
 #if SUSUWU_UNIT_TESTS

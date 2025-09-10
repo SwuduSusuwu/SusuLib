@@ -3204,7 +3204,11 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 } VirusAnalysisResult; /* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == static_cast<bool>(VirusAnalysisResult));} */
 
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW /* `cxx/ClassTensorFlowCns.hxx` specialization of `class Cns` */
+extern TensorFlowCns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 
 extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
 /* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
@@ -3323,7 +3327,11 @@ const std::string cnsVirusFix(const PortableExecutable &file, const Cns &cns = v
 ```c++
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW /* `cxx/ClassTensorFlowCns.hxx` specialization of `class Cns` */
+TensorFlowCns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<PortableExecutableFunctionSig> syscallPotentialDangers = {
 	"memopen", "fwrite", "socket", "GetProcAddress", "IsVmPresent"
 };
@@ -3918,7 +3926,11 @@ Have used `class Cns` to implement assistant demo through `produceAssistantCns()
 `less `[`cxx/AssistantCns.hxx`](../cxx/AssistantCns.hxx)
 ```c++
 /* (Work-in-progress) system which uses tuples of inputs (questions, or document titles) plus solutions (answers, or documents), to setup artificial neural tissue (such as [**HSOM**](https://github.com/SwuduSusuwu/SusuLib/blob/5eff71e6486562b1d5c7b349618fba9634d479cd/cxx/ClassCns.cxx#L11-L81) or [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)), which then uses new inputs to produce new solutions (similar to _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])") */
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern std::string assistantCnsResponseDelimiter;
 
 #if SUSUWU_UNIT_TESTS
@@ -3968,7 +3980,12 @@ void assistantCnsLoopProcess(const Cns &cns, std::ostream &os = std::cout);
 #if defined(SUSUWU_USE_PUGIXML) /* !def BOOST_VERSION */
 #	include <pugixml.hpp> /* pugi::xml_document pugi::xml_parse_result pugi::xml_node pugi::xpath_node */
 #endif /* !def SUSUWU_USE_PUGIXML */
+#endif /* !def USE_PUGIXML */
+#ifdef SUSUWU_USE_TENSORFLOW
+TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
 	"https://superuser.com",

@@ -7,8 +7,11 @@
 #include "ClassObject.hxx" /* ObjectMode */
 #include "ClassResultList.hxx" /* explodeToList listMaxSize listHasValue ResultList ResultListBytecode resultListDumpTo resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
 #include "ClassWebBrowse.hxx" /* classWebBrowseProcessUrls classWebBrowseWget */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_UNIT_TESTS SUSUWU_USE_TENSORFLOW */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #include <iostream> /* std::cin std::cout */
@@ -21,7 +24,11 @@
 #include <vector> /* std::vector */
 /* (Work-in-progress) system which uses tuples of inputs (questions, or document titles) plus solutions (answers, or documents), to setup artificial neural tissue (such as [**HSOM**](https://github.com/SwuduSusuwu/SusuLib/blob/5eff71e6486562b1d5c7b349618fba9634d479cd/cxx/ClassCns.cxx#L11-L81) or [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)), which then uses new inputs to produce new solutions (similar to _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])") */
 namespace Susuwu { /* NOLINTBEGIN(performance-inefficient-string-concatenation): suggestion triggers `cppcheck`'s `error: syntax error: "' -O" += [syntaxError]` */
+#ifdef SUSUWU_USE_TENSORFLOW
+TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
 	"https://stackoverflow.com",
 	"https://superuser.com",

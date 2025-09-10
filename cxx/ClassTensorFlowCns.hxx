@@ -7,7 +7,8 @@
 #define INCLUDES_cxx_ClassTensorFlowCns_hxx
 #include "ClassCns.hxx" /* Cns */
 #include "ClassObject.hxx" /* ObjectMode ToObjectMode SUSUWU_PURE_VIRTUAL_DEFAULTS() */
-#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_WARNING */
+#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_INFO SUSUWU_INTPTR SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_SH_ERROR SUSUWU_USE_TENSORFLOW SUSUWU_WARNING */
+#ifdef SUSUWU_USE_TENSORFLOW
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
 #if (defined(SUSUWU_CNS_TRUE_RANDOM_INIT) && SUSUWU_CNS_TRUE_RANDOM_INIT) || ( defined(SUSUWU_CNS_HE_INIT) && SUSUWU_CNS_HE_INIT) || ( defined(SUSUWU_CNS_XAVIER_INIT) && SUSUWU_CNS_XAVIER_INIT)
@@ -421,5 +422,6 @@ protected: /* NOLINTBEGIN(cppcoreguidelines-non-private-member-variables-in-clas
 };
 
 }; /* namespace Susuwu */
+#endif /* def SUSUWU_USE_TENSORFLOW */
 #endif /* ndef INCLUDES_cxx_ClassTensorFlowCns_hxx */
 
