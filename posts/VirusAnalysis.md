@@ -19,7 +19,7 @@ Static analysis + sandbox + CNS = 1 second (approx) analysis of **new executable
 (Removed duplicate licenses, `#if` guards, `#include`s, `namespace`s (except files with >=2 `namespace`s), `NOLINTBEGIN`s, `NOLINTEND`s from all except `main.*xx`; follow URLs for whole sources.)
 
 For the most new sources (+ static libs), use apps such as [_iSH_](https://apps.apple.com/us/app/ish-shell/id1436902243) (for _iOS_) or [_Termux_](https://play.google.com/store/apps/details?id=com.termux) (for _Android OS_) to run this:
-`git clone https://github.com/SwuduSusuwu/SusuLib.git && cd ./SusuLib/ && ./build.sh`
+`git clone https://github.com/SwuduSusuwu/SusuLib.git && cd ./SusuLib/ && git switch preview && ./build.sh`
 
 To test certificates, view [`../README.md#signaturecertificate`](../README.md#signaturecertificate) + [this post](https://swudususuwu.substack.com/p/s256_1ywl0ridf6zuex1qazgx1ihgdytfkyf9t97gonfroio).
 

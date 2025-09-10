@@ -1,4 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+
+*Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
+- This `preview` branch is for [beta tests](#beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
 # Table of Contents
 - [Purposes](#purposes)
 - [How to use this](#how-to-use-this)
@@ -169,8 +172,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
-  - Unstable/`experimental` flags:
-    - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
+  - Unstable/`preview` flags:
+    - `-DSUSUWU_EXPERIMENTAL` to enable `experimental` (`preview`, more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
     - `-DSUSUWU_USE_PUGIXML` to use [`libpugixml`](https://github.com/zeux/pugixml) to parse [**XML**](https://wikipedia.org/wiki/XML) / [**DOM**](https://wikipedia.org/wiki/Document_Object_Model); default is unset.
       - Improves [`./cxx/ClassWebBrowse.cxx`](./cxx/ClassWebBrowse.cxx). Improves sections of ([`./cxx/AssistantCns.cxx`](./cxx/AssistantCns.cxx) which use [**XHTML**](https://wikipedia.org/wiki/XHTML)'s **DOM** for `class Cns::setupSynapses`).
