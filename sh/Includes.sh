@@ -134,7 +134,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 	TENSORFLOW_INCLUDE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}" #/* `TENSORFLOW_INCLUDE_PATH=$(SUSUWU_DEPENDENCY_INCLUDE ...)` discards `SUSUWU_DEPENDENCY_INCLUDE`'s changes to env vars */
 	TENSORFLOW_FULL_PATH_PREFIX="${TENSORFLOW_INCLUDE_PATH}third_party/"
 	if [ -n "${TENSORFLOW_INCLUDE_PATH}" ]; then
-		SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:xla" "${TENSORFLOW_PATH_PREFIX}xla/" "xla/" "C++" "https://github.com/openxla/xla.git --depth 1" && {
+		SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:xla" "${TENSORFLOW_PATH_PREFIX}xla/" "xla/" "C++" "git clone https://github.com/openxla/xla.git --depth 1" && {
 			XLA_SOURCE_PATH="${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
 			XLA_PATH_PREFIX="${TENSORFLOW_PATH_PREFIX}xla/third_party/"
 			XLA_FULL_PATH_PREFIX="${TENSORFLOW_FULL_PATH_PREFIX}xla/third_party/"
