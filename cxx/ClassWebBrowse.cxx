@@ -79,10 +79,9 @@ const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &loca
 #ifdef BOOST_VERSION
 	boost::property_tree::ptree pt; /* <https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser> <https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk> */
 	read_xml(localXhtml, pt);
-	BOOST_FOREACH(
-			boost::property_tree::ptree::value_type &v,
-			pt.get_child("html.a href"))
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("html.a href")) {
 		urls.push_back(v.second.data());
+	}
 #elif defined(SUSUWU_USE_PUGIXML) /* !def BOOST_VERSION */
 	pugi::xml_document doc;
 	const pugi::xml_parse_result result = doc.load_file(localXhtml.c_str());
