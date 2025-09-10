@@ -2005,6 +2005,60 @@ const bool classResultListTests() {
 ```
 ******************************************
 
+`less `[`cxx/ClassWebBrowse.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassWebBrowse.hxx)
+```c++
+/* Abstractions used to web browse */
+extern bool classWebBrowseUseIfModifiedSince; /* TODO: Does what `wget -N` does. */
+extern double classWebBrowseMaxRequestsPerSecondPerHost; /* TODO: limit `wget` through this */
+extern double classWebBrowseMaxRequestsPerSecondGlobal;  /* TODO: limit `wget` through this */
+extern double classWebBrowseMaxBitsPerSecondPerHost;     /* TODO: limit `wget` through this */
+extern double classWebBrowseMaxBitsPerSecondGlobal;      /* TODO: limit `wget` through this */
+
+const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml); /* returns list of Uniform Resource Identifiers from `localXhtml` */
+
+#if SUSUWU_UNIT_TESTS
+/* @throw std::runtime_error */
+const bool classWebBrowseTests();
+const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT;
+#endif /* SUSUWU_UNIT_TESTS */
+```
+
+`less `[`cxx/ClassWebBrowse.cxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassWebBrowse.cxx)
+```c++
+#ifdef BOOST_VERSION
+#	include <boost/property_tree/ptree.hpp> /* boost::property_tree::ptree */
+#	include <boost/property_tree/xml_parser.hpp> /* BOOST_FOREACH read_xml */
+#endif /* !def BOOST_VERSION */
+
+bool classWebBrowseUseIfModifiedSince = true; /* TODO. Does what `wget -N` does. */
+double classWebBrowseMaxRequestsPerSecondPerHost = 2;   /* TODO: limit `wget` through this */
+double classWebBrowseMaxRequestsPerSecondGlobal = 2000; /* TODO: limit `wget` through this */
+double classWebBrowseMaxBitsPerSecondPerHost = 2000000; /* TODO: limit `wget` through this */
+double classWebBrowseMaxBitsPerSecondGlobal = 42000000; /* TODO: limit `wget` through this */
+
+const std::vector<ClassIoPath> classWebBrowseProcessUrls(const ClassIoPath &localXhtml) {
+	std::vector<ClassIoPath> urls;
+#ifdef BOOST_VERSION
+	boost::property_tree::ptree pt; /* <https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser> <https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk> */
+	read_xml(localXhtml, pt);
+	BOOST_FOREACH(
+			boost::property_tree::ptree::value_type &v,
+			pt.get_child("html.a href"))
+		urls.push_back(v.second.data());
+#else /* else !def BOOST_VERSION */
+#	pragma message("TODO: process XHTML without `Boost`") /* TODO: fall back to regular expression (such as <https://www.boost.io/libraries/regex/> <https://github.com/boostorg/regex>) */
+#endif /* !def BOOST_VERSION */
+	return urls;
+}
+
+#if SUSUWU_UNIT_TESTS
+/* @throw std::runtime_error */
+const bool classWebBrowseTests() { return true; } /* TODO */
+const bool classWebBrowseTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classWebBrowseTests, "classWebBrowseTests()"); }
+#endif /* SUSUWU_UNIT_TESTS */
+```
+******************************************
+
 `less `[`cxx/ClassCns.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/ClassCns.hxx)
 ```c++
 typedef enum CnsMode : char {
@@ -2789,10 +2843,12 @@ static const int susuwuUnitTestsClassSha2Bit =
 	1 << 5; /*  32: `ClassSha2.hxx:classSha2TestsNoexcept()` */
 static const int susuwuUnitTestsClassResultListBit =
 	1 << 6; /*  64: `ClassResultList.hxx:classResultListTestsNoexcept()` */
+static const int susuwuUnitTestsClassWebBrowseBit =
+	1 << 7; /* 128: `ClassWebBrowse.hxx:classWebBrowseTestsNoexcept()` */
 static const int susuwuUnitTestsVirusAnalysisBit =
-	1 << 7; /* 128: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
+	1 << 8; /* 256: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
 static const int susuwuUnitTestsAssistantCnsBit =
-	1 << 8; /* 256: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
+	1 << 9; /* 512: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
 #ifdef __cplusplus
@@ -2814,6 +2870,7 @@ SusuwuUnitTestsBitmask main(int argc, const char **args);
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysTestsNoexcept */
+#include "ClassWebBrowse.hxx" /* classWebBrowseTestsNoexcept */
 #include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
@@ -2841,7 +2898,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	}
 	const bool consoleHasInput = classIoGetConsoleInput();
 	if(consoleHasInput) {
-		classIoSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/ClassIo.hxx` fails. Notice: this move assumes that the tests above won't block on input */
+		classIoSetConsoleInput(false); /* disable prompts for unit tests. Moved down to prevent `assert` failures if `cxx/Classio.hxx` fails. Notice: this move assumes that the tests above won't block on input */
 	}
 	if(true == classIoGetConsoleInput()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
@@ -2885,6 +2942,13 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	} else {
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassResultListBit;
+	}
+	std::cout << "classWebBrowseTestsNoexcept" << std::flush;
+	if(classWebBrowseTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassWebBrowseBit;
 	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
 	if(virusAnalysisTestsNoexcept()) {
