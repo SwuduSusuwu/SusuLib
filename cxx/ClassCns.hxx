@@ -5,6 +5,7 @@
 #pragma once
 #ifndef INCLUDES_cxx_ClassCns_hxx
 #define INCLUDES_cxx_ClassCns_hxx
+#include "ClassNumeral.hxx" /* NumeralNormalizers */
 #include "ClassObject.hxx" /* Object ObjectMode SUSUWU_PURE_VIRTUAL_DEFAULTS() ToObjectMode */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_INTPTR SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -16,6 +17,9 @@
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 #include <tuple> /* std::tuple */
 #include <vector> /* std::vector */
+#ifndef SUSUWU_CNS_SEPARATE_NORMS
+#	define SUSUWU_CNS_SEPARATE_NORMS false
+#endif /* ndef SUSUWU_CNS_SEPARATE_NORMS */
 
 namespace Susuwu {
 #ifndef SUSUWU_CNS_VALUE_SEMANTICS
@@ -125,7 +129,21 @@ public:
 #	undef SUSUWU_TEMPLATE_WORKAROUND
 	/* NOLINTEND(cppcoreguidelines-macro-usage,misc-unused-parameters) */
 #endif /* !SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
+	const NumeralNormalizers &inputNorms() const {
+		return inputNormsStorage;
+	}
+	const NumeralNormalizers &outputNorms() const {
+#if SUSUWU_CNS_SEPARATE_NORMS
+		return outputNormsStorage;
+#else /* else !SUSUWU_CNS_SEPARATE_NORMS */
+		return inputNormsStorage;
+#endif /* !SUSUWU_CNS_SEPARATE_NORMS */
+	}
 private:
+	NumeralNormalizers inputNormsStorage; /* store inputNorms which `setupSynapses` ("training" / backpropagation) used, so that `processTo*` ("inference" / forwardpropagation) can reuse those */
+#if SUSUWU_CNS_SEPARATE_NORMS
+	NumeralNormalizers outputNormsStorage; /* separate normalization factors for "labels" (for expected output values) */
+#endif /* !SUSUWU_CNS_SEPARATE_NORMS */
 	bool initialized = false;
 	ObjectMode inputMode = objectModeBool, outputMode = objectModeBool;
 	size_t inputNeurons = 0, outputNeurons = 0, layersOfNeurons = 0, neuronsPerLayer = 0;
