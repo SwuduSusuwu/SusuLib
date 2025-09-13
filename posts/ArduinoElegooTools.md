@@ -16,6 +16,8 @@
   - [Howto use point clouds to route](#howto-use-point-clouds-to-route)
 - [Howto produce distortion coefficients](#howto-produce-distortion-coefficients)
   - [Howto use coefficients for distortion correction](#howto-use-coefficients-for-distortion-correction)
+- [Source code which uses **ROS**](#source-code-which-uses-ROS)
+  - [**ROS** fallover prevention](#ROS-fallover-prevention)
 - [Individual components, whole tools](#individual-components-whole-tools)
   - [Stepper motors versus servos](#stepper-motors-versus-servos)
   - [Different types / uses of servos](#different-types--uses-of-servos)
@@ -1152,6 +1154,387 @@ function correctDistortion(image, distortion_coefficients, fx, fy, cx, cy):
 // Step 5: Validate the correction
 validateCorrection(corrected_image)
 ```
+
+# Source code which uses **ROS**
+*Arduino* / *Elegoo* can use [**ROS**](https://github.com/ros2):
+- <https://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup>
+  - <https://microcontrollerslab.com/rosserial-arduino-setup-ros-node/>
+- <https://maker.pro/arduino/tutorial/how-to-use-arduino-with-robot-operating-system-ros>
+- <https://www.instructables.com/ROS-and-an-Arduino-Red-and-Blue-Blink/>
+- <https://automaticaddison.com/how-to-connect-arduino-to-ros/>
+- <https://www.reddit.com/r/ROS/comments/kdvse2/help_getting_started_with_ros2_and_arduino/>
+- <https://robotics.stackexchange.com/questions/71569/how-can-i-use-ros-with-arduino-robot>
+- <https://github.com/DanielFLopez1620/smart_mini_car_robot_ros>
+- <https://github.com/koh43/elegoo_src_ros2>
+
+## **ROS** fallover prevention
+The purpose of this [incomplete](#fallover-prevention-errata) source code is just to give clues on how to use **ROS**.
+
+### Prompt (input / question) to [*Solar-Pro-2*](https://poe.com/Solar-Pro-2)
+Wish that you produce ROS source code which balances an autonomous tool. The autonomous tool has one limb (whose structure is similar to the leg of a human, but with a more simple foot which consists of just a few moveable parts), plus can use gyroscopes, IMUs, or both.
+
+### *Solar-Pro-2*-[produced source code](https://poe.com/s/cwvzX0cILM5tSXF5M45P)
+Below is a ROS (Robot Operating System) implementation for a simplified **autonomous balancing tool** with a single limb (similar to a human leg) and sensor fusion using an IMU. The system will:
+
+1. Use an IMU (e.g., MPU-6050) to get orientation data
+2. Process orientation data using a complementary filter or Madgwick filter
+3. Control the limb's position using a PID controller to maintain balance
+4. Publish joint commands (e.g., for a servo motor at the "knee" or "hip")
+
+******
+
+#### 📁 Directory Structure
+```
+balanced_robot/
+├── launch/
+│   └── balance_robot.launch
+├── nodes/
+│   ├── imu_filter.cpp
+│   ├── balance_controller.cpp
+│   └── joint_publisher.cpp
+├── msg/
+│   └── JointCommand.msg
+├── CMakeLists.txt
+└── package.xml
+```
+
+******
+
+#### 1. **IMU Filter Node (`imu_filter.cpp`)**
+Filters raw IMU data (roll, pitch, yaw) using a **Madgwick filter**.
+
+```cpp
+#include <ros/ros.h>
+#include <sensor_msgs/Imu.h>
+#include "MadgwickAHRS.h"
+
+class ImuFilter {
+public:
+	ImuFilter() : madgwick(0.1f) {} // 0.1 is the sample period
+
+	void imuCallback(const sensor_msgs::Imu::ConstPtr& msg) {
+		float ax = msg->linear_acceleration.x;
+		float ay = msg->linear_acceleration.y;
+		float az = msg->linear_acceleration.z;
+		float gx = msg->angular_velocity.x;
+		float gy = msg->angular_velocity.y;
+		float gz = msg->angular_velocity.z;
+
+		madgwick.update(ax, ay, az, gx, gy, gz);
+		float q0, q1, q2, q3;
+		madgwick.getQuaternion(&q0, &q1, &q2, &q3);
+
+		// Convert quaternion to Euler angles
+		float roll = atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
+		float pitch = asin(2 * (q0 * q2 - q1 * q3));
+		float yaw = atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
+
+		// Publish filtered orientation
+		geometry_msgs::Vector3Stamped orientation;
+		orientation.header = msg->header;
+		orientation.vector.x = roll;
+		orientation.vector.y = pitch;
+		orientation.vector.z = yaw;
+		orientation_pub.publish(orientation);
+	}
+
+private:
+	Madgwick madgwick;
+	ros::Publisher orientation_pub;
+};
+
+int main(int argc, char** argv) {
+	ros::init(argc, argv, "imu_filter");
+	ros::NodeHandle nh;
+
+	ImuFilter filter;
+	ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>("/imu/data", 10, &ImuFilter::imuCallback, &filter);
+	filter.orientation_pub = nh.advertise<geometry_msgs::Vector3Stamped>("/filtered_orientation", 10);
+
+	ros::spin();
+	return 0;
+}
+```
+
+******
+
+#### 2. **Balance Controller Node (`balance_controller.cpp`)**
+Uses **PID control** to balance the limb based on pitch angle.
+
+```cpp
+#include <ros/ros.h>
+#include <geometry_msgs/Vector3Stamped.h>
+#include "balanced_robot/JointCommand.h"
+
+class BalanceController {
+public:
+	BalanceController() : kp(5.0), ki(0.01), kd(0.5), prev_error(0.0), integral(0.0) {}
+
+	void orientationCallback(const geometry_msgs::Vector3Stamped::ConstPtr& msg) {
+		float pitch = msg->vector.y; // Pitch angle from IMU
+		float target_pitch = 0.0;    // Desired angle (upright)
+
+		// PID calculations
+		float error = target_pitch - pitch;
+		integral += error * 0.01;    // Assuming 100Hz update rate
+		float derivative = (error - prev_error) / 0.01;
+		float output = kp * error + ki * integral + kd * derivative;
+
+		// Publish joint command (e.g., servo angle)
+		balanced_robot::JointCommand cmd;
+		cmd.header = msg->header;
+		cmd.joint_name = "hip_joint";
+		cmd.position = output;
+
+		// Limit output to valid joint range (e.g., -45° to +45°)
+		const float MIN_JOINT_ANGLE = -1.0;  // radians
+		const float MAX_JOINT_ANGLE = 1.0;
+		cmd.position = std::max(MIN_JOINT_ANGLE, std::min(MAX_JOINT_ANGLE, output));
+
+		joint_pub.publish(cmd);
+		prev_error = error;
+	}
+
+private:
+	double kp, ki, kd;
+	double prev_error, integral;
+	ros::Publisher joint_pub;
+};
+
+int main(int argc, char** argv) {
+	ros::init(argc, argv, "balance_controller");
+	ros::NodeHandle nh;
+
+	BalanceController controller;
+	ros::Subscriber orientation_sub = nh.subscribe<geometry_msgs::Vector3Stamped>("/filtered_orientation", 10, &BalanceController::orientationCallback, &controller);
+	controller.joint_pub = nh.advertise<balanced_robot::JointCommand>("/joint_command", 10);
+
+	ros::spin();
+	return 0;
+}
+```
+
+******
+
+#### 3. **Joint Publisher Node (`joint_publisher.cpp`)**
+Maps joint commands to motor hardware (e.g., via serial or PWM).
+
+```cpp
+#include <ros/ros.h>
+#include <balanced_robot/JointCommand.h>
+#include <stdio.h>  // For serial communication examples
+
+class JointPublisher {
+public:
+	JointPublisher() {
+		// Initialize hardware (e.g., serial port for servo controller)
+		serial_fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
+		if (serial_fd < 0) {
+			ROS_ERROR("Error opening serial port");
+		} else {
+			configureSerial();
+		}
+	}
+
+	~JointPublisher() {
+		if (serial_fd >= 0) close(serial_fd);
+	}
+
+	void jointCommandCallback(const balanced_robot::JointCommand::ConstPtr& msg) {
+		ROS_INFO("Moving %s to %.2f radians", msg->joint_name.c_str(), msg->position);
+
+		// Example: Send PWM signal to servo (hardware-specific)
+		float pulse_width = mapAngleToPWM(msg->position);
+		char buffer[10];
+		snprintf(buffer, sizeof(buffer), "S%d %.2f\n", jointId(msg->joint_name), pulse_width);
+		write(serial_fd, buffer, strlen(buffer));
+	}
+
+private:
+	int serial_fd;
+
+	void configureSerial() {
+		// Configure serial settings (example for 9600 baud)
+		struct termios tty;
+		tcgetattr(serial_fd, &tty);
+		cfsetospeed(&tty, B9600);
+		cfsetispeed(&tty, B9600);
+		tty.c_cflag |= (CLOCAL | CREAD); // Enable receiver, ignore status lines
+		tty.c_cflag &= ~PARENB;          // No parity
+		tty.c_cflag &= ~CSTOPB;          // 1 stop bit
+		tty.c_cflag &= ~CSIZE;
+		tty.c_cflag |= CS8;              // 8 data bits
+		tty.c_lflag &= (~ICANON | ~ECHO | ~ECHOE | ~ISIG); // Raw mode
+		tty.c_oflag &= ~OPOST;           // Raw output
+		tty.c_cc[VMIN] = 0;              // No blocking read
+		tty.c_cc[VTIME] = 5;             // 0.5s read timeout
+		tcsetattr(serial_fd, TCSANOW, &tty);
+	}
+
+	float mapAngleToPWM(float angle) {
+		// Map [-1.0, 1.0] radians to [1.0, 2.0] ms pulse width
+		return 1.0 + (angle / 1.0) * 1.0;
+	}
+
+	int jointId(const std::string& name) {
+		if (name == "hip_joint") return 1;
+		return -1;
+	}
+};
+
+int main(int argc, char** argv) {
+	ros::init(argc, argv, "joint_publisher");
+	ros::NodeHandle nh;
+
+	JointPublisher publisher;
+	ros::Subscriber cmd_sub = nh.subscribe<balanced_robot::JointCommand>("/joint_command", 10, &JointPublisher::jointCommandCallback, &publisher);
+
+	ros::spin();
+	return 0;
+}
+```
+
+Let's condense the remaining ROS package components while ensuring all critical parts are covered. Below is the minimal yet functional setup for the balancing robot.
+
+******
+
+#### 4. **Custom Message Type (`msg/JointCommand.msg`)**
+```msg
+Header header
+string joint_name
+float64 position  # in radians
+```
+
+******
+
+#### 5. **Launch File (`launch/balance_robot.launch`)**
+```xml
+<launch>
+	<!-- IMU Driver (e.g., MPU-6050) -->
+	<node name="imu_driver" pkg="mpu6050_node" type="mpu6050_node"/>
+
+	<!-- IMU Filter -->
+	<node name="imu_filter" pkg="balanced_robot" type="imu_filter" output="screen"/>
+
+	<!-- Balance Controller -->
+	<node name="balance_controller" pkg="balanced_robot" type="balance_controller" output="screen"/>
+
+	<!-- Joint Publisher (Hardware Interface) -->
+	<node name="joint_publisher" pkg="balanced_robot" type="joint_publisher" output="screen"/>
+</launch>
+```
+
+******
+
+#### 6. **Madgwick Filter Header (`MadgwickAHRS.h`)**
+A lightweight AHRS (Attitude and Heading Reference System) filter for IMU data.
+
+```cpp
+// MadgwickAHRS.h - Portable Inertial and Magnetic Sensor Fusion Algorithm
+// Copyright (C) Mike Wood, Sebastian O'Hara, Andy Straw and Paul Astleyth 2009-2013
+// https://github.com/xioTechnologies/Library-IMU-AHRS
+
+#ifndef MADGWICKAHRS_H
+#define MADGWICKAHRS_H
+
+class Madgwick {
+public:
+	Madgwick(float sampleFreq);
+	void update(float ax, float ay, float az, float gx, float gy, float gz);
+	void getQuaternion(float *q) const { for (int i=0; i<4; i++) q[i] = q[i]; }
+
+private:
+	float beta;        // algorithm gain
+	float q[4];        // quaternion of sensor frame relative to auxiliary frame
+};
+
+#endif
+```
+
+```cpp
+// MadgwickAHRS.cpp
+#include "MadgwickAHRS.h"
+#include <math.h>
+
+Madgwick::Madgwick(float sampleFreq) {
+	beta = sqrt(3.0f / 4.0f) / sampleFreq;  // compute beta
+	for (int i=0; i<4; i++) q[i] = 0.0f;
+	q[3] = 1.0f;
+}
+
+void Madgwick::update(float ax, float ay, float az, float gx, float gy, float gz) {
+	float q0 = q[3], q1 = q[0], q2 = q[1], q3 = q[2];
+	float norm;
+	float hx, hy;
+	float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2q0q2, _2q2mx, _2q2my, _2q3mx, _2q0q3, _2q1q3, _4q0q0, _4q0q1, _4q1q2, _4q2q3, _2q0q1, _2q2q3, q0q0, q1q1, q2q2, q3q3;
+
+	// Normalise accelerometer measurement
+	norm = sqrt(ax*ax + ay*ay + az*az);
+	if (norm > 0.001f) {
+		ax /= norm;
+		ay /= norm;
+		az /= norm;
+	}
+
+	// Auxiliary variables to avoid repeated calculations
+	_2q0mx = 2.0f * q0 * q2 - 2.0f * q1 * q3;
+	_2q0my = 2.0f * q0 * q3 + 2.0f * q1 * q2;
+	_2q0mz = 2.0f * q0 * q1 - 2.0f * q2 * q3;
+	_2q1mx = 2.0f * q1 * q2 + 2.0f * q0 * q3;
+	_2q2mx = 2.0f * q2 * q3 - 2.0f * q0 * q1;
+	_2q2my = 2.0f * q0 * q2 - 2.0f * q1 * q3;
+	_2q3mx = 2. //This line was truncated. TODO: deduce what to use. Best guess: `2.0f * qs2 * q2 + 2.0f * q3 * q3;`
+    _4q0q0 = 4.0f * q0 * q0;
+    _4q0q1 = 2.0f * q0 * q1;
+    _4q0q2 = 2.0f * q0 * q2;
+    _4q1q2 = 2.0f * q1 * q2;
+    _2q0q1 = 2.0f * q0 * q1;
+    _2q2q3 = 2.0f * q2 * q3;
+    q0q0 = q0 * q0;
+    q1q1 = q1 * q1;
+    q2q2 = q2 * q2;
+    q3q3 = q3 * q3;
+
+    // Reference direction of Earth's magnetic field
+    hx = ax * q0q0 + ay * (_2q0q2 + _2q1q3) + az * (_2q0q1 - _2q2q3);
+    hy = ay * q0q0 + az * (_2q0q2 - _2q1q3) + ax * (_2q1q3 + _2q2q0);
+    _2bx = sqrt(hx * hx + hy * hy);
+    _2bz = 2.0f * (2.0f * q0 * q2 - 2.0f * q1 * q3 - ax * q1q1 - ay * q2q2 - az * q3q3 + ax * q3q3 + ay * q1q1 + az * q2q2);
+
+    _4q0q0 = 4.0f * q0 * q0;
+    _4q0q1 = 2.0f * q0 * q1;
+    _4q0q2 = 2.0f * q0 * q2;
+    _4q1q2 = _2q1q2;
+    _2q0q3 = 2.0f * q0 * q3;
+    _2q1q3 = 2.0f * q1 * q3;
+
+    // Gradient descent algorithm
+    float s0 = _4q0q0 + _4q1q1 - _4q2q2 - _4q3q3 + _2q0q2 * gx - _2q0q3 * gy + _2q1q3 * gz - _2bx * q2 + _2bz * q1;
+    float s1 = -2.0f * q1 * q2 + 2.0f * q0 * q3 - _4q0q0 * gx + _4q3q0 * gy - 4.0f * q0q1 * gz + 2.0f * _2bx * q3 - 2.0f * _2bz * q0;
+    float s2 = -2.0f * q0 * q2 - 2.0f * q1 * q3 + _4q0q0 * gy + 4.0f * q0q1 * gx - _4q3q0 * gz - 2.0f * _2bx * q0 + 2.0f * _2bz * q1;
+    float s3 = 2.0f * q0 * q1 - 2.0f * q2 * q3 - _4q0q0 * gz + _4q3q0 * gx + _4q1q2 * gy + _2bx * q1 + _2bz * q0;
+
+    float norm_2 = s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3; // normalise step magnitude
+    float norm = sqrt(norm_2);
+    if (norm == 0.0f) return; // avoid division by zero
+    norm = sqrt(norm);
+    s0 /= norm;
+    s1 /= norm;
+    s2 /= norm;
+    s3 /= norm;
+
+    // Compute rate of change of quaternion
+    q0 += (0.5f - beta) * s0;
+    q1 += (0.5f - beta) * s1;
+    q2 += (0.5f - beta) * s2;
+    q3 += (0.5f - beta) * s3;
+```
+
+### Fallover prevention errata
+Have not tested `Solar-Pro-2`'s source code, plus am not familiar with **ROS**, but most of this seems to do what the prompt asks to do. Exceptions:
+- Guess that `mapAngleToPWM(-1)` will return `0.0` (0 **MS**, which is out of bounds), although `mapAngleToPwm(1)` will return `2.0` (which this function is supposed to).
+- Guess that `void getQuaternion(float *q) const { for (int i=0; i<4; i++) q[i] = q[i]; }` should not reuse the member variable name (`q`, which is [shadowed](https://www.learncpp.com/cpp-tutorial/variable-shadowing-name-hiding/)).
+- The last function was truncated. *Solar-Pro-2*'s context/response window was too short to continue.
 
 # Individual components, whole tools
 From [this discussion with *Claude-3-Haiku*](https://poe.com/s/B2OqwJmkSc4Pah39cKNm) which is about:
