@@ -296,7 +296,7 @@ template<class List, class List2>
 /*	@pre @code !(list.empty() || hashes.full()) @endcode
  *	@post @code !hashes.empty() @endcode */
 void listToHashes(const List &list /* ResultList::bytecodes or ResultList::hex*/, List2 &hashes /* ResultList::hashess */) {
-	SUSUWU_OMP_PRAGMA(omp parallel for) /* TODO: ensure OpenMP won't cause problems if `List` has dependence on previous values (such as if `List`: is sorted, is a binary tree or heap, or is a hashmap) */
+//	SUSUWU_OMP_PRAGMA(omp parallel for) /* Causes `==PID==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (...)\n==PID==The signal is caused by a WRITE memory access.\n...#6 0x... in std::unordered_set<...>\n#7 0x... in void Susuwu::listToHashes<...>*`. Does `hashes` have dependence on previous values (such as if `List2`: is sorted, is a binary tree or heap, or is a hashmap)? */
 	for(const auto &value : list) {
 		hashes.insert(classSha2(value));
 	}
@@ -354,7 +354,7 @@ template<class List>
 const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_iterator> listProduceSignature(const List &list, const typename List::value_type &value) {
 	ptrdiff_t smallest = value.size();
 	auto itBegin = value.cbegin(), itEnd = value.cend();
-	SUSUWU_OMP_PRAGMA(omp parallel for) /* TODO: ensure OpenMP won't cause problems if `List` has dependence on previous values (such as if `List`: is sorted, is a binary tree or heap, or is a hashmap) */
+	SUSUWU_OMP_PRAGMA(omp parallel for) /* constant for loop */
 	for(auto first = itBegin; value.cend() != first; ++first) {
 		for(auto last = value.cend(); first != last; --last) {
 			if((last - first) < smallest) {
