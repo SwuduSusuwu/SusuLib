@@ -12,6 +12,7 @@
   - [Contributor conventions/rules](#contributor-conventionsrules)
     - [_Markdown_](#markdown)
     - [`git`](#git)
+      - [`git tag`](#git-tag)
     - [`sh` source](#sh-source)
     - [_C_/_C++_ source](#cc-source)
   - [Sponsor](#sponsor)
@@ -271,6 +272,13 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
     - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2006).
 - Document unintuitive quirks
   - Most languages group `&&` before `||`, but in `/bin/sh` (plus derivatives, such as `/bin/bash`) `&&` is grouped similar to `||`, [which requires to restructure the code to use the fact that `/bin/sh` is left-associative](https://unix.stackexchange.com/questions/88850/precedence-of-the-shell-logical-operators/88851#88851).
+
+### `git tag`
+`git tag`s use *SemVer 2* ([*Semantic Versioning 2*](https://semver.org/spec/v2.0.0.html)) to mark versions (`git tag <*SemVer*> <commit-hash>`). Annotated tag messages (`git tag -m "message"`) use [*Markdown*](https://github.github.com/gfm/).
+
+Due to concerns of use of the wrong numbers to version the `git commit`s ([*SemVer 2* says those numbers are immutable](https://semver.org/spec/v2.0.0.html#spec-item-3), `git tag` was not used on this repo until now. For now, just the first few `git commit`s have `git tags`: [`git tag -n99 0.1.0` or `git show 0.1.0 --no-patch`](https://github.com/SwuduSusuwu/SusuLib/releases/tag/0.1.0), [`0.0.1`](https://github.com/SwuduSusuwu/SusuLib/releases/tag/0.0.1), [`0.0.0`](https://github.com/SwuduSusuwu/SusuLib/releases/tag/0.0.0), which serve as examples of which `git tag` conventions to use.
+
+Notice: [*StackOverflow* says to use the "v" or "version" prefix](https://stackoverflow.com/questions/21639437/git-flow-release-branches-and-tags-with-or-without-v-prefix), but [`dev.to` says not to](https://dev.to/davidb31/for-version-as-git-tag-use-annotated-tag-not-v-prefix-2i4c), so if scripts are used to parse the `git tag`s of this repo, those scripts should allow [optional "v"](https://semver.org/#is-v123-a-semantic-version) (which stannds for "version-") prefixes (such as future versions `v0.2.2`, `version-0.2.2` or `0.2.2`).
 
 ## _C_/_C++_ source
 Linter: `apt install clang && clang-tidy cxx/*.cxx` (defaults to [`.clang-tidy`](./.clang-tidy) options).
