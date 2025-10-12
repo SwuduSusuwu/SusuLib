@@ -8,7 +8,7 @@
 - [**GPGPU**s (General Purpose Graphics Processor Unit)](#gpgpus-general-purpose-graphics-processor-units)
 - [**TPU**s (Tensor Processor Unit)](#tpus-tensor-processor-units)
 - [Synopsis + related posts](#synopsis--related-posts)
-- [Compiler flags (`CXXFLAGS`)](#cxxflags)
+  - [Compiler flags (`CXXFLAGS`)](#cxxflags)
 
 # Intro
 Since around the year _2002_, the physical [**CMOS**](https://wikipedia.org/wiki/CMOS) limits of transistors have meant that [the **ghz** (gigahertz) of **CPU**'s can not improve](https://forums.tomshardware.com/threads/why-are-we-stuck-at-5-ghz-for-almost-18-years.3718547/), and thus [multicore (also known as **SMP** (_Symmetric Multiprocessing_)) / **SIMD** (_Single Instruction Multiple Data_) is required for throughput to continue to improve](https://poe.com/s/XSpIAY48coBq2rHjIuwQ).
@@ -109,7 +109,9 @@ Unknown sources (can not discern truth (fitness-to-use) of those), which have to
 * [Neuromorphic Cognitive Systems | Institute of Neuroinformatics](https://www.ini.uzh.ch/en/research/groups/ncs.html)
 * [Neuromorphic systems | NIST](https://www.nist.gov/programs-projects/neuromorphic-systems)
 
-# `CXXFLAGS`
+******************************************
+
+## `CXXFLAGS`
 * Some **IDE**s (*Integrated Development Environment*s, such as *Microsoft Visual Studio*) have custom menus (which the user stores compiler flag values into); those values are then sent to the compiler which produces executables.
 * Most *Unix* tools use *Environment Variables* (*envvars*) such as `CXXFLAGS` to store compiler flag values (values such as `-O2`).
   * Most console tools (regardless of **OS**) which do not use *envvars*, use config files (such as `CMakeLists.txt:CMAKE_CXX_FLAGS`) to store compiler flag values.
