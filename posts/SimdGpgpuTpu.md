@@ -1,17 +1,18 @@
-**\[Preview\] How to improve how fast desktops/laptops/phones execute code**
+**How to improve how desktops/laptops/smartphones execute code**
 
-\[[This post](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops) allows [all uses](https://creativecommons.org/licenses/by/2.0/).\] \[This post is a work-in-progress.\]
+\[[This post](./SimdGpgpuTpu.md) is [released through *Creative Commons Generic Attribution 2* (which allows all uses)](https://creativecommons.org/licenses/by/2.0/).\] \[This post is a work-in-progress.\]
 
 # Table of Contents
-- [Intro](#intro)
-- [**SIMD** (Single Instruction Multiple Data)](#simd-single-instruction-multiple-data)
-- [**GPGPU**s (General Purpose Graphics Processor Unit)](#gpgpus-general-purpose-graphics-processor-units)
-- [**TPU**s (Tensor Processor Unit)](#tpus-tensor-processor-units)
-- [Synopsis + related posts](#synopsis--related-posts)
+- [Discussion](#discussion)
+  - [**SIMD** (Single Instruction Multiple Data)](#simd-single-instruction-multiple-data)
+  - [**GPGPU**s (General Purpose Graphics Processor Unit)](#gpgpus-general-purpose-graphics-processor-units)
+  - [**TPU**s (Tensor Processor Unit)](#tpus-tensor-processor-units)
+- [Synopsis + similar posts](#synopsis--similar-posts)
   - [`tensorflow` alternatives](#tensorflow-alternatives)
   - [Compiler flags (`CXXFLAGS`)](#cxxflags)
 
-# Intro
+******************************************
+# Discussion
 Since around the year _2002_, the physical [**CMOS**](https://wikipedia.org/wiki/CMOS) limits of transistors have meant that [the **ghz** (gigahertz) of **CPU**'s can not improve](https://forums.tomshardware.com/threads/why-are-we-stuck-at-5-ghz-for-almost-18-years.3718547/), and thus [multicore (also known as **SMP** (_Symmetric Multiprocessing_)) / **SIMD** (_Single Instruction Multiple Data_) is required for throughput to continue to improve](https://poe.com/s/XSpIAY48coBq2rHjIuwQ).
 
 To improve:
@@ -46,8 +47,8 @@ plus are more abstract, which gives compilers more room to implement the source 
 - <https://devblogs.microsoft.com/cppblog/algorithm-optimizations-advanced-stl-part-2/>
 - <https://stackoverflow.com/questions/6313730/does-const-correctness-give-the-compiler-more-room-for-optimization>
 
-
-# **SIMD** ([_Single Instruction Multiple Data_](https://wikipedia.org/wiki/SIMD))
+******************************************
+## **SIMD** ([_Single Instruction Multiple Data_](https://wikipedia.org/wiki/SIMD))
 **SIMD**-compatible **CPU**s:
 - All 64-bit _Intel_ / _AMD_ **CPU**s allow [**SSE2** (_Streaming SIMD Extensions 2_)](https://wikipedia.org/wiki/SSE2).
 - Most _aarch64_ / _Arm64_ **CPU**s allow [**NEON**](https://wikipedia.org/wiki/ARM_architecture_family#Advanced_SIMD_(NEON)).
@@ -62,7 +63,7 @@ plus are more abstract, which gives compilers more room to implement the source 
     - [_Intel_ says how to use **AMX** for _TensorFlow_](https://www.intel.com/content/www/us/en/developer/articles/technical/accelerate-tensorflow-ml-performance-amx.html).
     - [_TensorFlow_'s blog says how to use **AMX** for _TensorFlow_](https://blog.tensorflow.org/2023/01/optimizing-tensorflow-for-4th-gen-intel-xeon-processors.html).
 - [Comparison of how **AVX2** versus **AVX-512** versus **AMX** _intrinsic functions_  implement 4x4 tensor transpose](https://poe.com/s/nkPauyliePYo5Vl0avi4). Digital _Assistant_'s are not suitable to produce most code (such as code which involves high-level control flow or user interactions), but are suitable to produce specific compute kernels (such as tensor transpose).
-- _Intel Performance Primitives_ (for _Microsoft Windows_ and _Linux_ / _Unix_) includes multiple **SIMD** versions of compute kernels, and uses uses `cpuid` [to do dynamic code dispatch to the most new instruction set compatible with the current **CPU**](https://www.reddit.com/r/simd/comments/6h9xy8/different_simd_codepaths_chosen_at_runtime_based/) (similar to **GCC**'s "function multi-versioning", but specific to _x86_ **CPU**s).
+- [_Intel Performance Primitives_](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html) (for _Microsoft Windows_ plus _Linux_ / _Unix_) includes multiple **SIMD** versions of compute kernels, plus uses uses `cpuid` [to do dynamic code dispatch to the most new instruction set compatible with the current **CPU**](https://www.reddit.com/r/simd/comments/6h9xy8/different_simd_codepaths_chosen_at_runtime_based/) (similar to **GCC**'s "function multi-versioning", but specific to _x86_ **CPU**s).
 - _Solaris_ also uses `cpuid` [to choose the most performant code path (opcodes) which your **CPU** allows](https://device.report/m/69d161d7d4feb288dac686a25cf8ee8019426789f720e509abc6c64558e4edc7) and [has protocols which allow users to force use of advanced opcoodes](https://stackoverflow.com/questions/53210019/override-hwcap-2-in-mapfile-on-solaris-x86-platforms).
 
 **GCC** / **LLVM** / _Clang_ [accept `march=native`](https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#index-march-15) to [recompile programs to use the most advanced opcodes](https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#index-march-15).
@@ -70,7 +71,8 @@ plus are more abstract, which gives compilers more room to implement the source 
   - _ArchLinux_ was produced [to reduce the effort to recompile all packages, with custom flags](https://bbs.archlinux.org/viewtopic.php?id=48957) [(the _Linux_ ecosystem calls programs "packages")](https://bbs.archlinux.org/viewtopic.php?id=48957) to use your **CPU**’s most suitable opcodes (_uops_).
 - New versions of **GCC** / **LLVM** / _Clang_ have flags to produce multiple code **SIMD** versions of compute kernels and use `cpuid` to choose the path which uses the newest opcodes (_uops_) compatible with the current **CPU**, similar to _Intel Performance Primitives_ (except not specific to _x86_ **CPU**s). **GCC**'s version of this is ["function multi-versioning"](https://lwn.net/Articles/691932/)
 
-# **GPGPU**s (General Purpose Graphics Processor Units)
+******************************************
+## **GPGPU**s (General Purpose Graphics Processor Units)
 Auto-parallelization produces threaded (multicore) code (searches for code with lots of loops, distributes those loads across all local **CPU**s or **GPU**s):
 - <https://wikipedia.org/wiki/Automatic_parallelization>
 - <https://www.intel.com/content/www/us/en/developer/articles/technical/automatic-parallelization-with-intel-compilers.html>;  “Adding the `-Qparallel` (_Windows_\*) or `-parallel` (_Linux_\* or _macOS_\*) option to the compile command is the only action required of the programmer. However, successful parallelization is subject to certain conditions”
@@ -79,7 +81,8 @@ Auto-parallelization produces threaded (multicore) code (searches for code with 
 - <https://link.springer.com/chapter/10.1007/978-3-030-64616-5_38> "_LLVM_ Based Parallelization of **C** Programs for **GPU**"
 - <https://stackoverflow.com/questions/41553533/auto-parallelization-of-simple-do-loop-memory-reference-too-complex> (distributes _Fortran_ tasks).
 
-# **TPU**s ([Tensor Processor Units](https://wikipedia.org/wiki/Tensor_Processing_Unit))
+******************************************
+## **TPU**s ([Tensor Processor Units](https://wikipedia.org/wiki/Tensor_Processing_Unit))
 The subset of **ASIC**s ([_Application-Specific Integrated Circuits_](https://wikipedia.org/wiki/Application-specific_integrated_circuit)) known as **TPU**s are processors which are specific to the _tensor_ workloads which the [**SIMD**](#simd-single-instruction-multiple-data) section mentions, such as **AMX**'s tensor transpose _uop_.
 - Most **TPU**s were limited to specific commercial users, but new consumer computers (and some smartphones) include **TPU**s.
   - [Most smartphone **TPU**s sacrifice integer (and float) precision, to reduce die area (square inches) and power use (watts), which limits those to inference use. It is possible that future chips will use some new fused architecture which allows training (back-propagation) + inference (forward-propagation) from shared transistors.](https://poe.com/s/AQwKDX60fOyIEYVprb7h).
@@ -93,7 +96,8 @@ The subset of **ASIC**s ([_Application-Specific Integrated Circuits_](https://wi
   - [_TensorFlow.js_ is still limited to **CPU**s and **GPGPU**s](https://discuss.ai.google.dev/t/can-tfjs-make-use-of-the-tpu-on-a-pixel-6/31842). [New **W3C** standards are required for browsers to support **TPU**s.](https://www.w3.org/TR/webnn/#programming-model-device-selection)
   - [_Assistant_ says how to use _TensorFlow_ on _Pixel 6_'s **edgeTPU**](https://poe.com/s/yVoGIRFdvLOPhknnQ9lH).
 
-# Synopsis + related posts
+******************************************
+# Synopsis + similar posts
 _TensorFlow_'s `MapReduce` (<https://www.tensorflow.org/federated/api_docs/python/tff/backends/mapreduce>) distributes loads across clouds of **CPUs** / **GPGPUs** / **TPUs**.
 The sort of **SW** (programs) which improve the most through use of `MapReduce` is artificial neural tissue (which can distribute execution through billions of processes), such as:
 - [`./posts/ArduinoElegooTools.md`](./ArduinoElegooTools.md)
@@ -124,7 +128,6 @@ Unknown sources (can not discern truth (fitness-to-use) of those), which have to
   > This release supports Caffe, TensorFlow, TensorFlow Lite, and ONNX. Arm NN takes networks from these frameworks, translates them to the internal Arm NN format and then through the Arm Compute Library, deploys them efficiently on Cortex-A CPUs, and, if present, Mali GPUs.
 
 ******************************************
-
 ## `CXXFLAGS`
 * Some **IDE**s (*Integrated Development Environment*s, such as *Microsoft Visual Studio*) have custom menus (which the user stores compiler flag values into); those values are then sent to the compiler which produces executables.
 * Most *Unix* tools use *Environment Variables* (*envvars*) such as `CXXFLAGS` to store compiler flag values (values such as `-O2`).
