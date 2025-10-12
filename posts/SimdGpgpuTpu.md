@@ -8,6 +8,7 @@
 - [**GPGPU**s (General Purpose Graphics Processor Unit)](#gpgpus-general-purpose-graphics-processor-units)
 - [**TPU**s (Tensor Processor Unit)](#tpus-tensor-processor-units)
 - [Synopsis + related posts](#synopsis--related-posts)
+  - [`tensorflow` alternatives](#tensorflow-alternatives)
   - [Compiler flags (`CXXFLAGS`)](#cxxflags)
 
 # Intro
@@ -108,6 +109,19 @@ Unknown sources (can not discern truth (fitness-to-use) of those), which have to
 * [International Centre for Neuromorphic Systems](https://www.westernsydney.edu.au/icns)
 * [Neuromorphic Cognitive Systems | Institute of Neuroinformatics](https://www.ini.uzh.ch/en/research/groups/ncs.html)
 * [Neuromorphic systems | NIST](https://www.nist.gov/programs-projects/neuromorphic-systems)
+
+******************************************
+## `tensorflow` alternatives
+
+[`tensorflow`](https://github.com/tensorflow/tensorflow) alternatives (for systems which do not have packages for [`libtensorflow`](https://github.com/ika-rwth-aachen/libtensorflow_cc)):
+* <https://launchpad.net/ubuntu/oracular/arm64/libfdeep-dev>
+  > frugally-deep is a small header-only library written in modern and pure C++. It supports inference for sequential models and computational graphs with a more complex topology, created with the functional API. It re-implements a small subset of TensorFlow, i.e., the operations needed to support prediction.
+* <https://launchpad.net/ubuntu/oracular/arm64/libxnnpack-dev> + [`libxnnpack0`](https://launchpad.net/ubuntu/oracular/arm64/libxnnpack0)
+  > XNNPACK is a highly optimized library of floating-point neural network inference operators for ARM, WebAssembly, and x86 platforms. XNNPACK is not intended for direct use by deep learning practitioners and researchers; instead it provides low-level performance primitives for accelerating high-level machine learning frameworks, such as TensorFlow Lite, TensorFlow.js, PyTorch, and MediaPipe.
+* <https://launchpad.net/ubuntu/oracular/arm64/libarmnn-dev> (or [`libarmnntfliteparser-dev`](https://launchpad.net/ubuntu/oracular/arm64/libarmnntfliteparser-dev)) + [`libarmnn33t64`](https://launchpad.net/ubuntu/oracular/arm64/libarmnn33t64) (or [`libarmnntfliteparser24t64`](https://launchpad.net/ubuntu/oracular/arm64/libarmnntfliteparser24t64))
+  > Arm NN is a set of tools that enables machine learning workloads on any hardware. It provides a bridge between existing neural network frameworks and whatever hardware is available and supported. On arm architectures (arm64 and armhf) it utilizes the Arm Compute Library to target Cortex-A CPUs, Mali GPUs and Ethos NPUs as efficiently as possible. On other architectures/hardware it falls back to unoptimised functions.
+  >
+  > This release supports Caffe, TensorFlow, TensorFlow Lite, and ONNX. Arm NN takes networks from these frameworks, translates them to the internal Arm NN format and then through the Arm Compute Library, deploys them efficiently on Cortex-A CPUs, and, if present, Mali GPUs.
 
 ******************************************
 
