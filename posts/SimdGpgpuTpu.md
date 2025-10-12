@@ -8,26 +8,27 @@
 - [**GPGPU**s (General Purpose Graphics Processor Unit)](#gpgpus-general-purpose-graphics-processor-units)
 - [**TPU**s (Tensor Processor Unit)](#tpus-tensor-processor-units)
 - [Synopsis + related posts](#synopsis--related-posts)
+- [Compiler flags (`CXXFLAGS`)](#cxxflags)
 
 # Intro
-Since around the year _2002_, the physical [**CMOS**](https://wikipedia.org/wiki/CMOS) limits of transistors have meant that [the **ghz** (gigahertz) of **CPU**'s can not improve](https://forums.tomshardware.com/threads/why-are-we-stuck-at-5-ghz-for-almost-18-years.3718547/), and thus [multicore (**SMP**, also known as _Symmetric Multiprocessing_) / **SIMD** (also known as _Single Instruct Multiple Data_)  is required for throughput to continue to improve](https://poe.com/s/XSpIAY48coBq2rHjIuwQ).
+Since around the year _2002_, the physical [**CMOS**](https://wikipedia.org/wiki/CMOS) limits of transistors have meant that [the **ghz** (gigahertz) of **CPU**'s can not improve](https://forums.tomshardware.com/threads/why-are-we-stuck-at-5-ghz-for-almost-18-years.3718547/), and thus [multicore (also known as **SMP** (_Symmetric Multiprocessing_)) / **SIMD** (_Single Instruction Multiple Data_) is required for throughput to continue to improve](https://poe.com/s/XSpIAY48coBq2rHjIuwQ).
 
 To improve:
 - Switch to **CPU**'s with more cores and new [**SIMD**](#simd-single-instruction-multiple-data) opcodes to use.
-- Switch to **CPU**'s / **GPU**'s / **RAM** which uses more small transistors (lower "**nm**" values), as those have more compute units plus reduce power use.
+- Switch to **CPU**'s / **GPU**'s / **RAM** which uses more small transistors (lower "**nm**" values), as those have more compute units, plus those improve power use.
 - For closed source program use:
   - Search for new versions of programs, which use _OpenMP_ (or which use other such tools which produce **SMP** & **SIMD** code flows).
   - Search for versions which list the newest **CPU** which is not more new than the **CPU** in use.
-  - _Microsoft Windows_ has [WoW64 to execute programs as x32 or x64 based on your current **CPU**](https://wikipedia.org/wiki/WoW64#Performance).
-    - _Linux_'s equivalent is [_Multiarch_](https://help.ubuntu.com/community/MultiArch) (which [is similar to _Microsoft Windows_’ **WoW64**](https://stackoverflow.com/questions/40343790/how-does-a-64b-linux-knows-to-manage-a-32b-application).
-    - If the **CPU** in use supports _64-bit execution_, choose program versions which list "_AMD64_", "_Intel64_", "_x86_64_", "_aarch64_", or "_Arm64_"; those will all use **SIMD** opcodes.
+  - _Microsoft Windows_ has [**WOW64** to execute programs as x32 or x64 based on your current **CPU**](https://wikipedia.org/wiki/WOW64#Performance).
+    - _Linux_'s equivalent is [_MultiArch_](https://help.ubuntu.com/community/MultiArch) (which [is similar to _Microsoft Windows_’ **WOW64**](https://stackoverflow.com/questions/40343790/how-does-a-64b-linux-knows-to-manage-a-32b-application).
+    - If the **CPU** in use supports _64-bit_ execution, choose program versions which list "_AMD64_", "_Intel64_", "_x86_64_", "_aarch64_", or "_Arm64_"; _64-bit_ executables all use **SIMD** opcodes.
 
 - For open source ([**FLOSS**](https://wikipedia.org/wiki/FLOSS)) programs use:
-  - Recompile the source code with `--march=native` (insert into compiler flags) to produce the newest **SIMD** code which the currrent **CPU** can use.
+  - Recompile the source code with `--march=native` (insert into [compiler flags](#cxxflags)) to produce the newest **SIMD** code which the currrent **CPU** can use.
     - **MSVC** (_MicroSoft Visual Compiler_) [has auto-vectorization (produces executables which use **SIMD** opcodes on compatible **CPU**s)](https://devblogs.microsoft.com/cppblog/avx-512-auto-vectorization-in-msvc/).
     - **GCC** (_GNU Compiler Collection_) [also has auto-vectorization](https://gcc.gnu.org/projects/tree-ssa/vectorization.html).
     - _Clang_ / **LLVM** (_Low-Level Virtual Machine_) [also has auto-vectorization](https://llvm.org/devmtg/2014-02/slides/golin-AutoVectorizationLLVM.pdf).
-  - Recompile the source code with `--openmp` (insert into compiler flags), which enables `#pragma omp <command>` (where `<command>` is the specific subset of [_OpenMP_](https://codezup.com/boost-c-performance-openmp-case-study/) to use, such as `parallel` or `simd`).
+  - Recompile the source code with `--openmp` (insert into [compiler flags](#cxxflags)), which enables `#pragma omp <command>` (where `<command>` is the specific subset of [_OpenMP_](https://codezup.com/boost-c-performance-openmp-case-study/) to use, such as `parallel` or `simd`).
     - Improve source code: if the source code does not have **SIMD** directives, ensure the code [is amenable (does not have inter-element dependencies of tensors)](https://stackoverflow.com/questions/70855607/how-to-properly-use-pragma-omp-simd) (remember to consider how the compiler's [_Abstract syntax tree_](https://wikipedia.org/wiki/Abstract_Syntax_Tree) differs from human-readable source code) + insert `#pragma omp simd` above amenable loops, or use [_intrinsic functions_](https://wikipedia.org/wiki/Intrinsic_function) (which allow manual insertion of **SIMD** opcodes).
       - Example: [`strchr` through **SSE2**, plus `strstr` through **SSE4.2**](https://poe.com/s/VV1Smbo3pGiEuLLxeRTp).
       - Example: [tensor transpose through **AVX2**, **AVX-512** and **AMX**](https://poe.com/s/nkPauyliePYo5Vl0avi4).
@@ -97,7 +98,19 @@ The sort of **SW** (programs) which improve the most through use of `MapReduce` 
 - [`./posts/ArduinoElegooTools.md`](./ArduinoElegooTools.md)
 - [`./posts/VirusAnalysis.md`](./VirusAnalysis.md)
 - [`./posts/CnsCompress.md`](./CnsCompress.md)
-- [How to produce general-use autonomous tools through calculus (continuous formulas), + use _TensorFlow_ for synthesis of close-to-human consciousness.](./Autonomous-tools_+_human-consciousness.md)
+- [How to produce general-use autonomous tools through calculus (continuous formulas), + use _TensorFlow_ for synthesis of close-to-human consciousness.](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/Autonomous-tools_+_human-consciousness.md)
 - [`./posts/AlbatrossCNS.md`](./AlbatrossCNS.md)
 - [Destructive (scan uses nanoscopic decomposition) upload of human's consciousness](https://swudususuwu.substack.com/p/destructive-unreversible-upload-of)
+
+******************************************
+
+Unknown sources (can not discern truth (fitness-to-use) of those), which have to do with neuromorphic (bio-inspired [**TPU**](#tpus-tensor-processor-units)) computers:
+* [International Centre for Neuromorphic Systems](https://www.westernsydney.edu.au/icns)
+* [Neuromorphic Cognitive Systems | Institute of Neuroinformatics](https://www.ini.uzh.ch/en/research/groups/ncs.html)
+* [Neuromorphic systems | NIST](https://www.nist.gov/programs-projects/neuromorphic-systems)
+
+# `CXXFLAGS`
+* Some **IDE**s (*Integrated Development Environment*s, such as *Microsoft Visual Studio*) have custom menus (which the user stores compiler flag values into); those values are then sent to the compiler which produces executables.
+* Most *Unix* tools use *Environment Variables* (*envvars*) such as `CXXFLAGS` to store compiler flag values (values such as `-O2`).
+  * Most console tools (regardless of **OS**) which do not use *envvars*, use config files (such as `CMakeLists.txt:CMAKE_CXX_FLAGS`) to store compiler flag values.
 
