@@ -58,7 +58,7 @@
   - `ClassIoPath` (`PortableExecutable`'s constructor argument), `ClassIoBytecode` (`classSha2`'s input argument), `ClassIoHash` (`classSha2`'s return value)
   - modular functions to interact with filesystems {`classIoGetOwnPath()`, `classIoFopenOwnPath()`}
     - console (_Posix_ `/bin/sh` or _Windows_ `cmd``) {`classIoGetConsoleInput()`, `classIoSetConsoleInput()`, `classIoGetConsoleAttributes()`, `classIoConsoleHasAnsiColors()`}
-    - strings (or streams) {`classIoHexOs()`, `classIoHexStr()`, `classIoColoredParamOs()`, `classIoColoredParamStr()`, `classIoIsXdigit()`, `classIoHexitToNibble()`, `classIoHex2Char()`, `classIoDebugIs()`, `classIoHexIs()`, `classIoGetline()`, `classIoCheckChar()`, `classIoCheckSz()`, `classIoCheckStr()`}
+    - strings (or streams) {`classIoEscapeStr()`, `classIoHexOs()`, `classIoHexStr()`, `classIoColoredParamOs()`, `classIoColoredParamStr()`, `classIoIsXdigit()`, `classIoHexitToNibble()`, `classIoHex2Char()`, `classIoDebugIs()`, `classIoHexIs()`, `classIoGetline()`, `classIoCheckChar()`, `classIoCheckSz()`, `classIoCheckStr()`}
 - [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) is
   - `class Instrumentation` (port of [`java.lang.instrument.Instrumentation`](https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html)), `class Class : public Instrumentation` (port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)), `class Object : public Class` (port of [`java.lang.Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html)),
   - `classObjectTests()`, or `classObjectTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).

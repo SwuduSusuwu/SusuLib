@@ -926,6 +926,7 @@ static void classIoCheckStr(const std::string &func, const std::string &expected
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" + SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
 	}
 }
+const std::string classIoEscapeStr(const std::string &strValue, const bool printable /* notice: set to `false` if `strValue` has non-Latin1 codes, or has `"` */, const char *susuwuShCode = "" /* `SUSUWU_SH_*` from `Macros.hxx` */);
 
 #if SUSUWU_UNIT_TESTS
 /* @throw std::runtime_error */
@@ -1061,11 +1062,21 @@ const bool classIoConsoleHasAnsiColors() {
 #	endif /* ndef SUSUWU_SH_SKIP_COLORS_BLACKLIST */
 #endif /* ndef _POSIX_VERSION */
 }
+const std::string classIoEscapeStr(const std::string &strValue, const bool printable /* notice: set to `false` if `strValue` has non-Latin1 codes, or has `"` */, const char *susuwuShCode /* `SUSUWU_SH_*` from `Macros.hxx` */) {
+		const std::string susuwuShCodeStr = susuwuShCode;
+		const std::string susuwuShDefStr = susuwuShCodeStr.size() ? SUSUWU_SH_DEFAULT : "";
+		if(strValue.empty()) {
+			return "\"\"" ;
+		} else if(printable) {
+			return "\"" + susuwuShCodeStr + strValue /* TODO: `echo $strValue | sed 's/"/\\"/' | sed 's/\\/\\\\/'` */ + susuwuShDefStr + "\"";
+		}
+		return susuwuShCodeStr + classIoHexStr(strValue) + susuwuShDefStr;
+}
 
 #if SUSUWU_UNIT_TESTS
 static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printable) {
 	const size_t ss = classIoHexStr(value).size();
-	const std::string escapedValue = (printable ? ('"' + value + '"') : "value");
+	const std::string escapedValue = classIoEscapeStr(value, printable);
 	if(hexSz + SUSUWU_HEX_PREFIX_SZ != ss) {
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexStr(" + escapedValue + ").size() == " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT "; classIoHexStr(" + escapedValue + ").size() != " SUSUWU_SH_GREEN + std::to_string(hexSz) + SUSUWU_SH_DEFAULT ";"));
 	}
@@ -1090,8 +1101,8 @@ static void classIoHexSsStrTest(const std::string &value, const bool printable) 
 	std::string newValue;
 	classIoHexIs(os, newValue);
 	if(value != newValue) {
-		const std::string escapedValue = (printable ? ("\"" SUSUWU_SH_GREEN + value + SUSUWU_SH_DEFAULT "\"") : (SUSUWU_SH_GREEN + classIoHexStr(value) + SUSUWU_SH_DEFAULT));
-		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classIoHexStr(newValue) + SUSUWU_SH_DEFAULT)); /* NOLINT(readability-avoid-nested-conditional-operator): alternatives are much more verbose */
+		const std::string escapedValue = classIoEscapeStr(value, printable, SUSUWU_SH_GREEN);
+		const std::string escapedNewValue = classIoEscapeStr(newValue, printable, SUSUWU_SH_RED);
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "std::string value = " + escapedValue + ", newValue; classIoHexOs(os, value); classIoHexIs(os, newValue); newValue != value; newValue == " + escapedNewValue + ';'));
 	}
 }

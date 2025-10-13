@@ -351,6 +351,7 @@ static void classIoCheckStr(const std::string &func, const std::string &expected
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" + SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
 	}
 }
+const std::string classIoEscapeStr(const std::string &strValue, const bool printable /* notice: set to `false` if `strValue` has non-Latin1 codes, or has `"` */, const char *susuwuShCode = "" /* `SUSUWU_SH_*` from `Macros.hxx` */);
 
 #if SUSUWU_UNIT_TESTS
 /* @throw std::runtime_error */
