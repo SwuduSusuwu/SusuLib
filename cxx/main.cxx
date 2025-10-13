@@ -122,6 +122,9 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 	if(true != Susuwu::classSysInit(argc, args)) {
 		return susuwuUnitTestsClassSysBit;
 	}
+#ifdef SUSUWU_REV_PARSE_HEAD
+	SUSUWU_NOTICE("`$(git rev-parse HEAD)` == `"+ std::string(SUSUWU_REV_PARSE_HEAD) + "`");
+#endif /* SUSUWU_REV_PARSE_HEAD */
 #ifdef SUSUWU_EXPERIMENTAL
 	SUSUWU_WARNING('`' + std::string(Susuwu::classIoGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
 #endif
