@@ -12,4 +12,5 @@
 - [`./posts/AlbatrossCNS.md`](./AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
 - [`./posts/CnsCompress.md`](./CnsCompress.md) says how to use clones of human Central Nervous Systems to do [sensor fusion](https://wikipedia.org/wiki/Sensor_fusion) + compression + decompression (which is [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2)).
+- [`./posts/JavaVersion.md`](./JavaVersion.md) is [*Grok-2*](https://poe.com/Grok-2)'s [conversion](https://poe.com/s/7FJo3HoiAeGs4OhnQId1) of [`./cxx/ClassObject.hxx`](../cxx/ClassObject.hxx) into *Java* source code, which serves as a simple illustration of how *C++* source code [maps to *Java* source code](https://github.com/SwuduSusuwu/SusuLib/issues/10).
 
