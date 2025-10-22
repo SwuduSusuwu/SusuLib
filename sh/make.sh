@@ -1,7 +1,13 @@
 #!/bin/sh
 #
-#/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
-# * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24) */
+# /* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+#  * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./sh/make.sh` (henceforth "*this source code*").
+#  * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+#  * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
+# /* This is an `/usr/bin/make` alternative for `/bin/sh`
+#  * TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24)
+#  */
+
 GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #/* `git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}` */
 if [ ! "$(realpath -q ./)" = "$(realpath -q "${GIT_ROOT}")" ]; then
 	GIT_ROOT_USE="${GIT_ROOT}" #/* If current path is not root, add root path */
