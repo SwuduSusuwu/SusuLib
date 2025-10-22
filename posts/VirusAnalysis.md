@@ -27,8 +27,16 @@ To improve how fast the whole program executes; `CXXFLAGS` should include auto-v
 To improve how fast backpropagation (`Cns::setupSynapses()`, which {`produceAnalysisCns()`, `produceVirusFixCns()`} use) executes, implement `class Cns` with _TensorFlow_'s `MapReduce`. [^MapReduce]
 [^CXXFLAGS]: [^MapReduce]: [How to improve performance of compute](https://swudususuwu.substack.com/p/howto-run-devices-phones-laptops).
 # Source code
-(C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE_GPLv2) or [_Apache 2_](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/LICENSE), allows all uses.
+All of the [sources](../cxx/)  which follow, start with this 4-row attribution notice (except instead of `./cxx/*.*xx`, the `#include` source path (such as `cxx/Macros.hxx`)  is used):
+```c+++
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com).
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/*.*xx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
+```
+
 ******************************************
+
 `less `[`cxx/Macros.hxx`](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/cxx/Macros.hxx) #Removed: disabled [color codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C0_controls) + unused [**OSC**](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls) codes
 ```c++
 /* Miscellaneous macros */
