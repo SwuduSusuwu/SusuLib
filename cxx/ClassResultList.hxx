@@ -18,6 +18,7 @@
 #if SUSUWU_PREFER_CSTR
 #	include <cstring> /* strlen memmem */
 #endif /* SUSUWU_PREFER_CSTR */
+#include <set> /* std::set */
 #include <string> /* std::string */
 #include <tuple> /* std::tuple std::get */
 #include <unordered_set> /* std::unordered_set */
@@ -27,17 +28,21 @@ typedef ClassIoHash ResultListHash;
 typedef ClassIoBytecode ResultListBytecode; /* Should have structure of ClassIoBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
 typedef ClassIoPath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
-typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
-	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
+
+template<class Set> /* Usage: `ResultListBase<std::[unordered_]set<ResultListHash>>` */
+struct ResultListBase : public Object { /* Lists of {metadata, executables (or pages)} */
+	SUSUWU_VIRTUAL_DEFAULTS(ResultListBase) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 /* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
-	typedef std::unordered_set<ResultListHash> Hashes;
+	typedef Set Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;
 	Signatures signatures; /* Smallest substrings (or regexes, or Universal Resource Locators) which can identify `bytecodes`; has uses close to `hashes`, but can match if executables (or pages) have small differences */
 	typedef std::vector<ResultListBytecode> Bytecodes;
 	Bytecodes bytecodes; /* Whole executables (for `VirusAnalysis`) or webpages (for `AssistantCns`); huge disk usage, just load this for signature synthesis (or CNS backpropagation). */
 /* `clang-tidy` on: NOLINTEND(misc-non-private-member-variables-in-classes) */
-} ResultList;
+};
+typedef struct ResultListBase<std::unordered_set<ResultListHash>> ResultList; /* `unordered_set` is the O(1) formula. */
+typedef struct ResultListBase<std::set<ResultListHash>> ResultListSorted; /* `set` is an O(log n) formula, but is deterministic (sorted). */
 
 #if SUSUWU_UNIT_TESTS
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
