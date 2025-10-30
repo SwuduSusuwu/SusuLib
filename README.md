@@ -18,6 +18,7 @@
   - [Sponsor](#sponsor)
     - [Escrow](#escrow)
     - [Affiliates](#affiliates)
+  - [Tools used](#tools-used)
 
 # Purposes
 <https://github.com/SwuduSusuwu/SusuLib/> as a whole is: [computer-related blog posts](./posts/) and modular {[`Susuwu::*`, `susuwu*`](./cxx/), [`SUSUWU_*`](./sh/)} code about those posts.
@@ -376,4 +377,15 @@ If you want proof that your crypto/cash will go to produce specific systems, use
 
 ### Affiliates
 You can use [_Capital 1_'s affiliate program](https://i.capitalone.com/JgR02Y4pE) to allow us to produce more source codes.
+
+## Tools used
+For now, <https://github.com/SwuduSusuwu> just accepts anonymous sponsors. If thus is not suitable, sponsor tools used (which accept more popular sponsorship protocols) such as:
+* *Ubuntu*: <https://documentation.ubuntu.com/project/community/contribute/contribute/> <https://ubuntu.com/download/desktop/thank-you>
+* *AOSP*: <https://source.android.com/docs/setup/contribute>
+  * *Termux*: <https://github.com/sponsors/termux> (<https://termux.dev/en/donate> has numerous protocols for sponsorships).
+* `/bin/sh`: On most systems this uses `dash`: <https://git.kernel.org/pub/scm/utils/dash/dash.git>.
+  * `g++`: <https://github.com/gcc-mirror/gcc?tab=contributing-ov-file> says browse to <https://gcc.gnu.org/contribute.html>.
+  * `clang++`: <https://github.com/llvm/llvm-project?tab=contributing-ov-file> says browse to <https://llvm.org/docs/Contributing.html>.
+  * `java`: <https://github.com/openjdk/jdk?tab=contributing-ov-file> says browse to <https://dev.java/contribute/openjdk/> <https://openjdk.org/guide/>.
+  * `git`: <https://github.com/git/git?tab=contributing-ov-file> says browse to <https://git-scm.com/community#contributing>.
 
