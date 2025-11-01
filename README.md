@@ -368,6 +368,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
 To sponsor this (which allows us to produce more source codes), you can use crypto (such as [**Bitcoin**](https://wikipedia.org/wiki/Bitcoin)) to [produce a one-time-use address](https://poe.com/s/IPhIMyuMY6SnYM0yqEJl) (which you deposit funds into), and send the address&private-key to [a contact which `./SECURITY.md` lists](./SECURITY.md#sensitive-issues).
 - Rather than us publish a send-to address (for a particular protocol), this allows us to accept all forms of crypto.
 - If amount is more than $100 and you don't trust the contact platforms, use [`./.ssh/id_ed25519.pub`](./.ssh/id_ed25519.pub) to [secure those](https://superuser.com/questions/576506/how-to-use-ssh-rsa-public-key-to-encrypt-a-text/1850928#1850928).
+- If crypto is not suitable, you can also send gift card codes or [virtual cards](https://www.forbes.com/advisor/credit-cards/virtual-credit-card-numbers-guide/) to use.
 
 ### Escrow
 If you want proof that your crypto/cash will go to produce specific systems, use [**escrow** services](https://wikipedia.org/wiki/Escrow) (what you send the **escrow** is: crypto/cash, plus contract which references an [open issue which you choose](https://github.com/SwuduSusuwu/SusuLib/issues/)).
