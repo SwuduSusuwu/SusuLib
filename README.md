@@ -192,7 +192,7 @@ To ensure consistent code, submissions of code (such as through [pull requests](
 ## _Markdown_
 `` *.md `` shall use:
 - [_GitHub flavored Markdown_](https://github.github.com/gfm/), which is not just compatible with [_GitHub_](https://github.com) but also:
-  - Has lots of [unit tests](https://wikipedia.org/wiki/Unit_test#Agile). Most of the differences from the original _Markdown_ are just so rules are less ambiguous.
+  - Has numerous [unit tests](https://wikipedia.org/wiki/Unit_test#Agile). Most of the differences from the original _Markdown_ are just so rules are less ambiguous.
   - Is close to the original _Markdown_ (thus compatible with most _Markdown_ tools, such as [`glow`](https://github.com/charmbracelet/glow?tab=readme-ov-file#glow)).
 - [ISO 8601](https://wikipedia.org/wiki/ISO_8601), which
   - Is the most popular national standard format.
@@ -303,7 +303,7 @@ Code rules (lots overlap with _Mozilla Org_'s):
   - Do not perform tasks within `assert()`, due to: the standard says "\[`#if NDEBUG\n#define assert(x) (0)\n#endif`\]".
 
 - Braces, functions:
-  - Do not produce lots of functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SusuLib/issues/10).
+  - Do not produce numerous functions with the same name but different arguments, as such "overloads" make this difficult to [port](https://github.com/SwuduSusuwu/SusuLib/issues/10).
   - Single statement blocks can use the form: `virtual bool hasInstance() { return true; }`.
   - Most common form:
     ```c++
