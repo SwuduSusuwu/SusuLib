@@ -1450,6 +1450,7 @@ const bool classSysSetRoot(bool root) {
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
+	std::cout << '\n'; /* New row, since `classSysTests();` follows `std::cout << "classSysTests():" << std::flush;` in the unit test harness (which expects 1-row results for all tests). TODO: remove tabs (plus use `echo -n`), so result is 1-row? */
 	std::cout << "	execves({\"/bin/echo\", \"passes\"}) " << std::flush;
 	int exitCode = execves({
 #ifndef SUSUWU_WIN32
