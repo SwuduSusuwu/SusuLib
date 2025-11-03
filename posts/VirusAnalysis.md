@@ -4172,7 +4172,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassIoBit;
 	}
-	std::cout << "classSysTestsNoexcept(): " << std::flush;
+	std::cout << "classSysTestsNoexcept():" << std::flush;
 	if(true != classSysTestsNoexcept()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassSysBit;
 	}
