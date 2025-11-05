@@ -228,28 +228,28 @@ Do ["atomic" / granular commits](https://poe.com/s/lnG5yXNXUTl0m8muGjav): if swa
 
 `git commit` message format/syntax:
 - affix "()" onto functions (regardless of number of arguments), such as `function()`, or use the function name (such as `function`) alone.
-- if commit does `git add NewFile`: message has `+\`NewFile\``.
-- if `git rm Exists`: `-\`Exists\``.
-- if `touch Exists && git add Exists`: `@\`Exists\`` or `?\`Exists\``.
-  - Simple wildcards/regex for altered functions: `\`%s/oldFunction()/newFunction()/\``.
-  - '*' is not used as update prefix, since '*' has much other use in _Regex_ (wildcards) & _C++_ (such as block comments, dereferences, or math).
+- if commit does `git add NewFile`: message has `` +`NewFile` ``.
+- if `git rm Exists`: `` -`Exists` ``.
+- if `touch Exists && git add Exists`: `` @`Exists` `` or `` ?`Exists` ``.
+  - Simple wildcards/regex for altered functions: `` `%s/oldFunction()/newFunction()/` ``.
+  - `*` is not used as update prefix, since `*` has much other use in _Regex_ (wildcards) & _C++_ (such as block comments, dereferences, or math).
     - From the root commit through 159940fb8b60b176a38a13cdfbd9393596daa9b5 (Date:   Thu Jul 4 07:56:01 2024 -0700), '@' was the prefix for updates. From then until this commit, '?' was the prefix for updates.
     - From this commit on (this is the successor to commit 0ae6233c02d9e04fca60027b1e32b885eb69bb8a (Date:   Sat Nov 30 17:50:40 2024 -0800)), '@' is (once more) the prefix for updates, due to: it is more common for projects to so use '@'.
-- if `echo "int newFunction() {...}" >> Exists && git add Exists`: `@\`Exists\`:+\`NewFunction()\``.
-- if `git mv OldPath/ NewPath/`: `\`OldPath/\` -> \`NewPath/\`` or `mv OldPath/ NewPath/`.
+- if `echo "int newFunction() {...}" >> Exists && git add Exists`: `` @`Exists`: +`NewFunction()` ``.
+- if `git mv OldPath/ NewPath/`: `` `OldPath/` -> `NewPath/` `` or `` `mv OldPath/ NewPath/` ``.
 - as default branch, choose `master`, `main` or `trunk` (do not have more than 1 of those branches, or [`./Macros.sh:SUSUWU_DEFAULT_BRANCH()`](./Macros.sh) is ambiguous).
 - to indent: use tabs to form blocks, such as:
 ```markdown
 ?`README.md`:
 	?`#How-to-use-this`:
 	Split into:
-		+`## Download`: new; howto clone, howto switch branches.
-		+`## Optionssetup`: "Options/setup"; howto use `./build.sh` (with or without options.)
+		?`## Download`: new; howto clone, howto switch branches.
+		?`## Optionssetup`: "Options/setup"; howto use `./build.sh` (with or without options.)
 	?`#How-to-contribute`,
 	?[Good first issues to contribute to]: (moved into `#How-to-contribute`)
 ```
 
-/[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code/paths.\]
+\[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code / paths.\]
 
 ## `sh` source
 Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
