@@ -227,6 +227,7 @@ Do ["atomic" / granular commits](https://poe.com/s/lnG5yXNXUTl0m8muGjav): if swa
 - Notice: [commit 9eda0ed5ed2abcdcec92c5b265f6e950e1196558 (+`sh/Macros.sh:SUSUWU_SH_{FILE, LINE, FUNC}`)](https://github.com/SwuduSusuwu/SusuLib/commit/9eda0ed5ed2abcdcec92c5b265f6e950e1196558/), and older, used `,` (as opposed to `;`) to delimit the list of commits; those extra `<ref | commit-hash>`'s are not extra comments, but are extra commits. The new format allows comments to include `<commit-hash>`'s plus `,`'s (just not `;`'s).
 
 `git commit` message format/syntax:
+- prefix "./" onto relative paths (such as `./README.md`), so those are not confused with *DNS references* (nor with shortcuts for *Uniform Resource Locators*). Exception: since `git commit` limits `COMMIT_EDITMSG`'s first row to `size() <= 50`, the first row can skip "./".
 - affix "()" onto functions (regardless of number of arguments), such as `function()`, or use the function name (such as `function`) alone.
 - if commit does `git add NewFile`: message has `` +`NewFile` ``.
 - if `git rm Exists`: `` -`Exists` ``.
