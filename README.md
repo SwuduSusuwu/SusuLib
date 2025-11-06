@@ -196,10 +196,16 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
 # How to contribute
 View [documented issues](https://github.com/SwuduSusuwu/SusuLib/issues/) (for ideas on code to contribute, plus so you do not report documented issues.)
 ## Beta tests / `preview` builds
+`git branch`s:
+- [`trunk`](https://github.com/SwuduSusuwu/SusuLib/tree/trunk) publishes what most projects call "releases", with changes limited to what [*SemVer* calls "Patch" revisions](https://semver.org/spec/v2.0.0.html#spec-item-6)
+- [`new`](https://github.com/SwuduSusuwu/SusuLib/tree/new) publishes what most projects call "release candidates", with changes limited to what [*SemVer* calls "Minor" revisions](https://semver.org/spec/v2.0.0.html#spec-item-7)
+- [`preview`](https://github.com/SwuduSusuwu/SusuLib/tree/preview) publishes what most projects call "beta tests", with changes up to what [*SemVer* calls "Major" revisions](https://semver.org/spec/v2.0.0.html#spec-item-8)
+
+How to use the most new sources:
 - `git switch preview && ./build.sh`
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SusuLib/issues/new).
-    - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
+    - Notice: [sensitive issue(s) have this separate mechanism to use](./SECURITY.md#sensitive-issues).
 
 # Contributor conventions / rules
 General comment/message syntax rules:
