@@ -1,7 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 
 *Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
-- This `preview` branch is for [beta tests](#beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
+- This `preview` branch is for [beta tests](#beta-tests--experimental-builds) / [continuous integration](https://google.com?q=continuous-integration-branch).
 - Until <https://github.com/SwuduSusuwu/SusuLib/discussions/70> is closed, no `git commit`s can `merge` into the `trunk` branch (due to the prohibition against use of `git rebase` for the `trunk` branch). To use those `git commit`s (which are otherwise "set to go" into the `trunk` branch), use `git switch new`.
   - The [`new`](https://github.com/SwuduSusuwu/SusuLib/blob/new/) branch is the subset of the `preview` branch which stops just before [commit 7c4f7521e @`README.md`; preview versus trunk branch use.](https://github.com/SwuduSusuwu/SusuLib/commit/7c4f7521eb3c51fd46e14dc30698ef8ded2b4768). That `git commit` marks the start of the subset of the `preview` branch which is unstable, plus which is subject to much use of `git rebase`. That `git commit` will receive a new hash on each `git push` to the `new` branch, but the `commit` "name"/"message" will stick to "@`README.md`; preview versus trunk branch use.".
   - To switch to the most new (but finished) source code, use `git switch new`.
@@ -9,13 +9,13 @@
 - [Purposes](#purposes)
 - [How to use this](#how-to-use-this)
   - [Download](#download)
-  - [Signature/certificate](#signaturecertificate)
-  - [Options/setup](#optionssetup)
+  - [Signatures / certificates](#signatures--certificates)
+  - [Options / setup](#options--setup)
 - [How to contribute](#how-to-contribute)
-  - [Beta test/experimental builds](#beta-testexperimental-builds)
+  - [Betas tests / experimental builds](#beta-tests--experimental-builds)
   - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SusuLib/contribute)
   - [Sensitive issues](./SECURITY.md#sensitive-issues)
-  - [Contributor conventions/rules](#contributor-conventionsrules)
+  - [Contributor conventions / rules](#contributor-conventions--rules)
     - [_Markdown_](#markdown)
     - [`git`](#git)
       - [`git tag`](#git-tag)
@@ -33,7 +33,7 @@
   - <https://github.com/SwuduSusuwu/SusuPosts/tree/preview/posts/> stages posts for <https://SwuduSusuwu.SubStack.com/> (which includes [`./posts/`](./posts/) plus posts which are not about artificial neural tissue, antiviruses, assistants, or autonomous tools).
 - \[Notice\] Plan to move {`Susuwu::*`, `susuwu*`, `SUSUWU_*`} to {`SusuLib::*`, `susulib*`, `SUSULIB_*`}.
 
-[`./.ssh/`](./.ssh/) is to [use signatures / certificates](#signaturecertificate).
+[`./.ssh/`](./.ssh/) is to [use signatures / certificates](#signatures--certificates).
 
 [`./posts/`](./posts/) stages posts (virtual schools) for <https://SwuduSusuwu.SubStack.com/> about: artificial neural tissue, antiviruses, assistants, plus autonomous tools.
 - [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)).
@@ -44,7 +44,7 @@
 - [`./posts/CnsCompress.md`](./posts/CnsCompress.md) says how to use clones of human Central Nervous Systems to do [sensor fusion](https://wikipedia.org/wiki/Sensor_fusion) + compression + decompression (which is [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2)).
 - [`./posts/JavaVersion.md`](./posts/JavaVersion.md) is [*Grok-2*](https://poe.com/Grok-2)'s [conversion](https://poe.com/s/7FJo3HoiAeGs4OhnQId1) of [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx) into *Java* source code, which serves as a simple illustration of how *C++* source code [maps to *Java* source code](https://github.com/SwuduSusuwu/SusuLib/issues/10).
 
-[`./build.sh`](./build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). \[View [Options/setup](#optionssetup) for options.\]
+[`./build.sh`](./build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). \[View [*Options / setup*](#options--setup) for options.\]
 
 [`./sh/`](./sh/) is [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) "scripts" / source code (produced for `./build.sh` and for general use):.
 - [`./sh/Macros.sh`](./sh/Macros.sh) is a standalone lib for common console tasks (can do most of what [ncurses](https://wikipedia.org/wiki/Ncurses) can do). `./build.sh` and `./sh/make.sh` use this.
@@ -63,7 +63,7 @@
 [`./cxx/`](./cxx/) is [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) source code (produced for [`./posts/`](./posts/) and for general use):
 - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) is
   - macros with wrap C++ features/attributes, such as {`SUSUWU_ASSUME`, `SUSUWU_ATOMIC`, `SUSUWU_CONSTEXPR`, `SUSUWU_DEFAULT`, `SUSUWU_DELETE`, `SUSUWU_EXPECTS`, `SUSUWU_ENSURES`, `SUSUWU_FINAL`, `SUSUWU_IF_CPLUSPLUS`, `SUSUWU_NOEXCEPT`, `SUSUWU_NORETURN`, `SUSUWU_NULLPTR`, `SUSUWU_OVERRIDE`, `SUSUWU_STATIC_ASSERT`, `SUSUWU_UNREACHABLE`} which (if used on old compilers, or with options such as `-std=c++11`) are replaced with no-ops or alternatives which have the same use,
-  - macro options (which control the macro constants/macro functions). (View [Options/setup](#optionssetup) for options),
+  - macro options (which control the macro constants/macro functions). (View [*Options / setup*](#options--setup) for options),
   - macro constants, such as `SUSUWU_SH_<color>` (`color` = {`DEFAULT`, `BLACK`, `DARK_GRAY`, `RED`, `LIGHT_RED`, `GREEN`, `LIGHT_GREEN`, `BROWN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `PURPLE`, `LIGHT_PURPLE`, `CYAN`, `LIGHT_CYAN`, `LIGHT_GRAY`, `WHITE`}, if supported, expands to the [_ANSI_ color](https://wikipedia.org/wiki/Ansi_color) codes, else expands to ""),
   - macro functions, such as {`SUSUWU_ERROR`, `SUSUWU_WARNING`, `SUSUWU_INFO`, `SUSUWU_SUCCESS`, which use `SUSUWU_PRINT`}, `SUSUWU_PRINT` (if `__cplusplus`, uses `SUSUWU_CERR`, else uses `SUSUWU_STDERRR`),
   - `macroTestsNoexcept()` (unit tests, with return value for errors).
@@ -131,17 +131,17 @@
 - Languages: Minimum [_C++11_](https://gcc.gnu.org/projects/cxx-status.html#cxx11) (all `CXX` with `201102 <= __cplusplus`,) due to use of `auto`, `class { bool defaultMemberInit = true; };`, `decltype`, `for(value: list) {}`).
   - Other than those 4, most non-[_C++98_](https://gcc.gnu.org/projects/cxx-status.html#cxx98) features were replaced with [`./cxx/Macros.hxx`](./cxx/Macros.hxx) macros (which turn into no-ops if the compile doesn't support those), such as: [`constexpr`, `default`, `final`, `__func__`, `override`, `noexcept`, `nullptr`, `static_assert`](https://gcc.gnu.org/projects/cxx-status.html#cxx11), [`[[no_unique_address]]`](https://gcc.gnu.org/projects/cxx-status.html#cxx20).
   - \[Notice: update [`./c/README.md#progress`](./c/README.md#progress) if you update this list.\]
-  - If _C99_ support would have use; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SusuLib/issues/3)), or [contribute](#contributor-conventionsrules).
-  - If _C++98_ support would have use; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SusuLib/issues/20)), or [contribute](#contributor-conventionsrules).
+  - If _C99_ support would have use; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SusuLib/issues/3)), or [contribute](#contributor-conventions--rules).
+  - If _C++98_ support would have use; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SusuLib/issues/20)), or [contribute](#contributor-conventions--rules).
 ## Download
-Download source with `git clone https://github.com/SwuduSusuwu/SusuLib.git`. If this does not have all the tools you want, you can opt-in to the beta with `git switch experimental` (opt-out with `get switch trunk`).
-## Signature/certificate
+Download source with `git clone https://github.com/SwuduSusuwu/SusuLib.git`. If this does not have all the tools you want, you can opt-in to [beta tests](#beta-tests--experimental-builds) with `git switch experimental` (opt-out with `get switch trunk`).
+## Signatures / certificates
 [`./.ssh/setup.sh`](./.ssh/setup.sh) is to setup `gpg.ssh.allowedSignersFile` (allows to use `git verify <ref>` or `git log --show-signature`).
 - `git verify <ref>` or `git log --show-signature` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SusuLib/commit/1cf751c10ee99dc3ed84e8dc7761358545486550#diff-f6ed156e4bf5c791680662464b94ea5d753f219ee816b385f67870e2c0d7d4c7)
 - You can compare those certificates to [our blog post](https://swudususuwu.substack.com/p/githubcomswudususuwususulibgit-certificate-new) ([new scheduled](https://swudususuwu.substack.com/p/s256_1ywl0ridf6zuex1qazgx1ihgdytfkyf9t97gonfroio)).
 
 \[Notice: This [public crypto](https://docs.gitlab.com/ee/user/project/repository/signed_commits/ssh.html#verify-commits-locally) "signature", is not related to "signature analysis" ([Substr scans](#purposes)).\]
-## Options/setup
+## Options / setup
 Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for distribution into other tools,) plus [_Executable and Linkable Format_](https://wikipedia.org/wiki/Executable_and_Linkable_Format) (`./bin/Susuwu.out`, to do examples/[unit tests](https://wikipedia.org/wiki/Unit_test#Agile) which prove how effective functions execute,) both of which you can redirect with `export OBJDIR=___` (or `export BINDIR=___`.)
 - [`./cxx/main.hxx`](./cxx/main.hxx) has constants to use to interpret `Susuwu.out`'s return values.
 - Console **options** (`./build.sh OPTIONS`): close to [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/html_node/Options-Summary.html);
@@ -195,13 +195,13 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
 
 # How to contribute
 View [documented issues](https://github.com/SwuduSusuwu/SusuLib/issues/) (for ideas on code to contribute, plus so you do not report documented issues.)
-## Beta test/`experimental` builds
+## Beta tests / `experimental` builds
 - `git switch experimental && ./build.sh`
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SusuLib/issues/new).
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.
 
-# Contributor conventions/rules
+# Contributor conventions / rules
 General comment/message syntax rules:
 - If on its own line (alone) the comment refers to the next line. If the next line starts a block of code (such as a function), the comment refers to that whole block of code.
 - If at the end of a line (which has code) the comment refers to that code.

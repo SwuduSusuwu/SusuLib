@@ -1,5 +1,5 @@
 # Security Policy
-Asof 2024-12-24, all [commit signatures](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) values. [./README.md#signaturecertificate](./README.md#signaturecertificate) shows how to test this on your own.
+Asof 2024-12-24, all [commit signatures](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) values. [./README.md#signatures--certificates](./README.md#signatures--certificates) shows how to test this on your own.
 
 Asof 2025-04-09 ([commit a40d1ff013f3007384e4ed025d0e402364d189cb](https://github.com/SwuduSusuwu/SusuLib/commit/a40d1ff013f3007384e4ed025d0e402364d189cb)), [`./.ssh/allowed_signers.old`](./.ssh/allowed_signers.old) holds old certificates[^3] (not known as "compromised"; just no longer used). **TODO**; warn if new commits use old certificates.
 
