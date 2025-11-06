@@ -1,7 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 
 *Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
-- This `preview` branch is for [beta tests](#beta-tests--experimental-builds) / [continuous integration](https://google.com?q=continuous-integration-branch).
+- This `preview` branch is for [beta tests](#beta-tests--preview-builds) / [continuous integration](https://google.com?q=continuous-integration-branch).
 - Until <https://github.com/SwuduSusuwu/SusuLib/discussions/70> is closed, no `git commit`s can `merge` into the `trunk` branch (due to the prohibition against use of `git rebase` for the `trunk` branch). To use those `git commit`s (which are otherwise "set to go" into the `trunk` branch), use `git switch new`.
   - The [`new`](https://github.com/SwuduSusuwu/SusuLib/blob/new/) branch is the subset of the `preview` branch which stops just before [commit 7c4f7521e @`README.md`; preview versus trunk branch use.](https://github.com/SwuduSusuwu/SusuLib/commit/7c4f7521eb3c51fd46e14dc30698ef8ded2b4768). That `git commit` marks the start of the subset of the `preview` branch which is unstable, plus which is subject to much use of `git rebase`. That `git commit` will receive a new hash on each `git push` to the `new` branch, but the `commit` "name"/"message" will stick to "@`README.md`; preview versus trunk branch use.".
   - To switch to the most new (but finished) source code, use `git switch new`.
@@ -12,7 +12,7 @@
   - [Signatures / certificates](#signatures--certificates)
   - [Options / setup](#options--setup)
 - [How to contribute](#how-to-contribute)
-  - [Betas tests / experimental builds](#beta-tests--experimental-builds)
+  - [Beta tests / preview builds](#beta-tests--preview-builds)
   - [Good first issues to contribute to](https://github.com/SwuduSusuwu/SusuLib/contribute)
   - [Sensitive issues](./SECURITY.md#sensitive-issues)
   - [Contributor conventions / rules](#contributor-conventions--rules)
@@ -134,7 +134,7 @@
   - If _C99_ support would have use; ask for this (in [issue #3](https://github.com/SwuduSusuwu/SusuLib/issues/3)), or [contribute](#contributor-conventions--rules).
   - If _C++98_ support would have use; ask for this (in [issue #20](https://github.com/SwuduSusuwu/SusuLib/issues/20)), or [contribute](#contributor-conventions--rules).
 ## Download
-Download source with `git clone https://github.com/SwuduSusuwu/SusuLib.git`. If this does not have all the tools you want, you can opt-in to [beta tests](#beta-tests--experimental-builds) with `git switch experimental` (opt-out with `get switch trunk`).
+Download source with `git clone https://github.com/SwuduSusuwu/SusuLib.git`. If this does not have all the tools you want, you can opt-in to [beta tests](#beta-tests--preview-builds) with `git switch preview` (opt-out with `get switch trunk`).
 ## Signatures / certificates
 [`./.ssh/setup.sh`](./.ssh/setup.sh) is to setup `gpg.ssh.allowedSignersFile` (allows to use `git verify <ref>` or `git log --show-signature`).
 - `git verify <ref>` or `git log --show-signature` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SusuLib/commit/1cf751c10ee99dc3ed84e8dc7761358545486550#diff-f6ed156e4bf5c791680662464b94ea5d753f219ee816b385f67870e2c0d7d4c7)
@@ -176,7 +176,7 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
   - Unstable/`preview` flags:
-    - `-DSUSUWU_EXPERIMENTAL` to enable `experimental` (`preview`, more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
+    - `-DSUSUWU_EXPERIMENTAL` to enable `preview` (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch preview` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
     - `-DSUSUWU_USE_PUGIXML` to use [`libpugixml`](https://github.com/zeux/pugixml) to parse [**XML**](https://wikipedia.org/wiki/XML) / [**DOM**](https://wikipedia.org/wiki/Document_Object_Model); default is unset.
       - Improves [`./cxx/ClassWebBrowse.cxx`](./cxx/ClassWebBrowse.cxx). Improves sections of ([`./cxx/AssistantCns.cxx`](./cxx/AssistantCns.cxx) which use [**XHTML**](https://wikipedia.org/wiki/XHTML)'s **DOM** for `class Cns::setupSynapses`).
@@ -195,8 +195,8 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
 
 # How to contribute
 View [documented issues](https://github.com/SwuduSusuwu/SusuLib/issues/) (for ideas on code to contribute, plus so you do not report documented issues.)
-## Beta tests / `experimental` builds
-- `git switch experimental && ./build.sh`
+## Beta tests / `preview` builds
+- `git switch preview && ./build.sh`
   - View results for symptoms of new issues (hint: look for "Warning:"s or "Error:"s).
   - If you found new issue(s) (which aren't due to misconfigurations in your system), [post new issue(s)](https://github.com/SwuduSusuwu/SusuLib/issues/new).
     - Notice: [sensitive issue(s)](./SECURITY.md#sensitive-issues) have a separate protocol.

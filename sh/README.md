@@ -1,7 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
 
 *Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/sh/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
-- This `preview` branch is for [beta tests](../README.md#beta-tests--experimental-builds) / [continuous integration](https://google.com?q=continuous-integration-branch).
+- This `preview` branch is for [beta tests](../README.md#beta-tests--preview-builds) / [continuous integration](https://google.com?q=continuous-integration-branch).
 # [Table of contents](../README.md#table-of-contents)
 - [Purposes](#purposes)
 - [Issues / workarounds](#issues--workarounds)
@@ -23,5 +23,5 @@ Issues:
 - TODO: [produce alias (such as {`--silent`, `--quiet`} -> `-s`) groups of options/flags, for `SUSUWU_PROCESS_*` functions.](https://github.com/SwuduSusuwu/SusuLib/issues/23)
 - TODO: [map options/flags (which `SUSUWU_PROCESS_*` functions use) to descriptions (for `--help` output.)](https://github.com/SwuduSusuwu/SusuLib/issues/24)
 
-Workaround: [`git switch experimental`](../README.md#beta-tests--experimental-builds)
+Workaround: [`git switch preview`](../README.md#beta-tests--preview-builds)
 
