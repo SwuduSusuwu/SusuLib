@@ -35,7 +35,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
 { /* if the function names (or line numbers) change, update `SECURITY.md` to new values */
-	int susuwuUnitTestsErrno = 0;
+	SusuwuUnitTestsBitmask susuwuUnitTestsErrno = 0;
 #if SUSUWU_UNIT_TESTS
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
@@ -48,7 +48,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
-	const int macrosTestsErrno =  macrosTestsNoexcept();
+	const SusuwuUnitTestsBitmask macrosTestsErrno = macrosTestsNoexcept();
 	if(0 == macrosTestsErrno) {
 		std::cout << "pass" << std::endl;
 	} else {

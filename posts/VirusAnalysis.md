@@ -4071,27 +4071,27 @@ extern "C" { /* progress to https://github.com/SwuduSusuwu/SusuLib/issues/3 , su
 /* `clang-tidy` on: NOLINTBEGIN(hicpp-signed-bitwise) */
 typedef int SusuwuUnitTestsBitmask; /* normal `int`, but used as bitmask (non-zero return value says which tests failed) */
 /* bits in order which tests execute (not ordered included, but order used) */
-static const int susuwuUnitTestsMacrosBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsMacrosBit =
 	1 << 0; /*   1: `Macros.hxx:macrosTestsNoexcept()` */
-static const int susuwuUnitTestsClassObjectBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassObjectBit =
 	1 << 1; /*   2: `ClassObjects.hxx:classObjectsTestsNoexcept()` */
-static const int susuwuUnitTestsClassIoBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassIoBit =
 	1 << 2; /*   4: `ClassIo.hxx:classIoTestsNoexcept()` */
-static const int susuwuUnitTestsConsoleBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsConsoleBit =
 	1 << 3; /*   8: `ClassSys.hxx:classSysSetConsoleInput()` */
-static const int susuwuUnitTestsClassSysBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassSysBit =
 	1 << 4; /*  16: `ClassSys.hxx:classSysTestsNoexcept()` */
-static const int susuwuUnitTestsClassSha2Bit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassSha2Bit =
 	1 << 5; /*  32: `ClassSha2.hxx:classSha2TestsNoexcept()` */
-static const int susuwuUnitTestsClassResultListBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassResultListBit =
 	1 << 6; /*  64: `ClassResultList.hxx:classResultListTestsNoexcept()` */
-static const int susuwuUnitTestsClassWebBrowseBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassWebBrowseBit =
 	1 << 7; /* 128: `ClassWebBrowse.hxx:classWebBrowseTestsNoexcept()` */
-static const int susuwuUnitTestsClassTensorFlowCnsBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsClassTensorFlowCnsBit =
 	1 << 8; /* 256: `ClassTensorFlowCns.hxx:classTensorFlowCnsTestsNoexcept()` */
-static const int susuwuUnitTestsVirusAnalysisBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsVirusAnalysisBit =
 	1 << 9; /* 512: `VirusAnalysis.hxx:virusAnalysisTestsNoexcept()` */
-static const int susuwuUnitTestsAssistantCnsBit =
+static const SusuwuUnitTestsBitmask susuwuUnitTestsAssistantCnsBit =
 	1 << 10; /* 1024: `AssistantCns.hxx:assistantCnsTestsNoexcept()` */
 /* `clang-tidy` off: NOLINTEND(hicpp-signed-bitwise) */
 const SusuwuUnitTestsBitmask susuwuUnitTests();
@@ -4138,7 +4138,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
 { /* if the function names (or line numbers) change, update `SECURITY.md` to new values */
-	int susuwuUnitTestsErrno = 0;
+	SusuwuUnitTestsBitmask susuwuUnitTestsErrno = 0;
 #if SUSUWU_UNIT_TESTS
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
@@ -4151,7 +4151,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
-	const int macrosTestsErrno =  macrosTestsNoexcept();
+	const SusuwuUnitTestsBitmask macrosTestsErrno = macrosTestsNoexcept();
 	if(0 == macrosTestsErrno) {
 		std::cout << "pass" << std::endl;
 	} else {
