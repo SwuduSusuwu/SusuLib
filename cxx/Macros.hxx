@@ -56,7 +56,9 @@
 #endif /* ndef SUSUWU_UNIT_TESTS */
 
 #ifndef SUSUWU_OPENMP /* if no environment flag to use */
-#	if defined(_OPENMP /* `-fopenmp` */) || (defined(__has_include) && __has_include(<omp.h>) /* `clang++` */)
+#	if defined(_OPENMP /* `/fopenmp` or `-fopenmp` */) /* TODO: parse version? ["In implementations that support a preprocessor, the _OPENMP macro name is defined to have the decimal value yyyymm where yyyy and mm are the year and month designations of the version of the OpenMP API that the implementation supports."](https://www.openmp.org/spec-html/5.0/openmpse10.html) */
+#		define SUSUWU_OPENMP true /* supports `#pragma omp <directive>` */
+#	elif (defined(__has_include) && __has_include(<omp.h>) /* `clang++` */)
 #		define SUSUWU_OPENMP true /* supports `#pragma omp <directive>` */
 #	else /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
 #		define SUSUWU_OPENMP false /* `#pragma omp <directive>` can trigger `[-Wunknown-pragma]` */
