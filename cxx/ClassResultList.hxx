@@ -18,6 +18,7 @@
 #if SUSUWU_PREFER_CSTR
 #	include <cstring> /* strlen memmem */
 #endif /* SUSUWU_PREFER_CSTR */
+//#include <mutex> /* std::mutex */
 #include <set> /* std::set */
 #include <string> /* std::string */
 #include <tuple> /* std::tuple std::get */
@@ -33,6 +34,7 @@ template<class Set> /* Usage: `ResultListBase<std::[unordered_]set<ResultListHas
 struct ResultListBase : public Object { /* Lists of {metadata, executables (or pages)} */
 	SUSUWU_VIRTUAL_DEFAULTS(ResultListBase) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 /* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
+//	std::mutex mutexRW; /* Notice: if multiple executors have RW access to this, use `std::lock_down<std::mutex> guard(resultList.mutexRW);` before RW accesses. `mutexRW` is not used for RO accesses. */ /* TODO: fix "copy constructor of 'ResultListBase<std::unordered_set<std::basic_string<char>>>' is implicitly deleted because field 'mutexRW' has a deleted copy constructor" */
 	typedef Set Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;

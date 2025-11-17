@@ -1787,6 +1787,7 @@ typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should re
 template<class Set> /* Usage: `ResultListBase<std::[unordered_]set<ResultListHash>>` */
 struct ResultListBase : public Object { /* Lists of {metadata, executables (or pages)} */
 	SUSUWU_VIRTUAL_DEFAULTS(ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
+//	std::mutex mutexRW; /* Notice: if multiple executors have RW access to this, use `std::lock_down<std::mutex> guard(resultList.mutexRW);` before RW accesses. `mutexRW` is not used for RO accesses. */ /* TODO: fix "copy constructor of 'ResultListBase<std::unordered_set<std::basic_string<char>>>' is implicitly deleted because field 'mutexRW' has a deleted copy constructor" */
 	typedef std::unordered_set<ResultListHash> Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;
