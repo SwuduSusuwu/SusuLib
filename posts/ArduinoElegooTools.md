@@ -902,6 +902,10 @@ point_cloud = create_point_cloud(color_image, depth_map)
 np.savetxt('point_cloud.txt', point_cloud)
 ```
 ## Optical flow processing of visuals into point cloud (computes z-axis)
+*Grok-2* produced [this simplified `g++` version (just a template of optical flow analysis, not suitable to use, but does not require external libs such as `opencv2`)](https://poe.com/s/X7NcH1RmAxhrJJmghTXF), *Solar-Pro-2* produced [this simple `g++` version which uses `calcOpticalFlowFarneback` from `opencv2`](https://poe.com/s/JBMoZAA5SLfEYppQoiap).
+
+**Notice**: what follows is all `python` code [from *Assistant*](https://poe.com/s/sx1MuZzPcLy3p9u0elpq).
+
 Uses [`cv2.calcOpticalFlowFarneback`](https://docs.opencv.org/4.x/d4/dee/tutorial_optical_flow.html#autotoc_md1162) of [_H264_](https://wikipedia.org/wiki/h264) to produce point cloud (computes z-axis)
 ```python
 import cv2
