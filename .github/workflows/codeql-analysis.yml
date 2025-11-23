@@ -3,11 +3,11 @@ name: "Code scanning - action"
 on:
   push:
     branches:
-      - main
+      - trunk
       - preview
   pull_request:
     branches:
-      - main
+      - trunk
       - preview
     paths:
       - 'cxx/**'
