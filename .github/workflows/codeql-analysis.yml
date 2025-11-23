@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - trunk
+      - new
       - preview
   pull_request:
     branches:
       - trunk
+      - new
       - preview
     paths:
       - 'cxx/**'
