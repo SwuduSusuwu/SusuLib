@@ -8,7 +8,7 @@ on:
       - preview
   pull_request:
     branches:
-      - trunk
+#      - trunk #TODO: uncomment, once know how to suppress duplicate tests (for branches such as `preview` which use continuous pull requests)
       - new
       - preview
     paths:
