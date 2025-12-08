@@ -15,7 +15,7 @@ SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "err
 }
 #shellcheck source=./sh/make.sh
 SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
-	SUSUWU_INCLUDE_PATH=${1}; shift #/* So path is not included in source'd scripts `$@` and `$*`. */
+	SUSUWU_INCLUDE_PATH=${1}; shift #/* So path is not included in `source`d scripts `$@` nor `$*`. */
 	if [ ! -e "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}" ]; then
 		SUSUWU_INCLUDE_ERROR "${SUSUWU_INCLUDE_PATH}" "was not found"
 	elif [ ! -x "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}" ] || ! . "${GIT_ROOT}${SUSUWU_INCLUDE_PATH}"; then
