@@ -145,7 +145,7 @@
 Download source with `git clone https://github.com/SwuduSusuwu/SusuLib.git`. If this does not have all the tools you want, you can opt-in to [beta tests](#beta-tests--preview-builds) with `git switch preview` (opt-out with `get switch trunk`).
 ## Signatures / certificates
 [`./.ssh/setup.sh`](./.ssh/setup.sh) is to setup `gpg.ssh.allowedSignersFile` (allows to use `git verify <ref>` or `git log --show-signature`).
-- `git verify <ref>` or `git log --show-signature` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SusuLib/commit/1cf751c10ee99dc3ed84e8dc7761358545486550#diff-f6ed156e4bf5c791680662464b94ea5d753f219ee816b385f67870e2c0d7d4c7)
+- `git verify <ref>` or `git log --show-signature` shall match [`./.ssh/sha256.sig`](./.ssh/sha256.sig) for [new commits](https://github.com/SwuduSusuwu/SusuLib/commit/35be811cc43bfac1b64fb1b8b7db7f11e1b975c8#diff-f6ed156e4bf5c791680662464b94ea5d753f219ee816b385f67870e2c0d7d4c7)
 - You can compare those certificates to [this post](https://swudususuwu.substack.com/p/s256_kz1xw3wo0bpceuvl3qh4nulf0hnll4nnkehiko6zk0).)
 
 \[Notice: This [public crypto](https://docs.gitlab.com/ee/user/project/repository/signed_commits/ssh.html#verify-commits-locally) "signature", is not related to "signature analysis" ([Substr scans](#purposes)).\]
