@@ -39,13 +39,14 @@ SUSUWU_INCLUDES_LIBPUGIXML() { #/* If can include `libpugixml`, set `-DSUSUWU_US
 	int main() { pugi::xml_document doc; }" > "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
 			if [ true = "${SUSUWU_INCLUDES_LIBPUGIXML_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "" "-DSUSUWU_USE_PUGIXML=true" "-lpugixml" "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"; then
+				rm "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"
 				export SUSUWU_INCLUDES_LIBPUGIXML_PASS=true
 				return 0 #/* "success", true */
 			else
+				rm "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"
 				export SUSUWU_INCLUDES_LIBPUGIXML_ERROR=true
 				FLAGS_USER="${FLAGS_USER_BACKUP}" #/* Undo `-I` insertion */
 			fi
-			rm "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"
 		fi
 	fi
 	return 1 #/* "error", false */
@@ -64,13 +65,14 @@ SUSUWU_INCLUDES_LIBXML2() { #/* If can include `libxml2`, set `-DSUSUWU_USE_LIBX
 	int main() { xmlDocPtr doc; return 0; }" > "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
 #shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
 			if [ true = "${SUSUWU_INCLUDES_LIBXML2_PASS}" ] || SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "-DSUSUWU_USE_LIBXML2=true" "-DSUSUWU_USE_LIBXML2=true" "-lxml2" "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"; then
+				rm "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
 				export SUSUWU_INCLUDES_LIBXML2_PASS=true
 				return 0 #/* "success", true */
 			else
+				rm "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
 				export SUSUWU_INCLUDES_LIBXML2_ERROR=true
 				FLAGS_USER="${FLAGS_USER_BACKUP}" #/* Undo `-I` insertion */
 			fi
-			rm "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"
 		fi
 	fi
 	return 1 #/* "error", false */
