@@ -10,6 +10,13 @@
 #  */
 
 export SUSUWU_SH_CONSOLE_PARAMS="$*" #/* For functions which are not passed `$@` */
+if command -v sudo >/dev/null; then
+	export SUSUWU_SUDO="sudo" # /* Usage: `${SUSUWU_SUDO} commands` */
+	export SUSUWU_SUDO_PREFIX="sudo " #/* Usage: `str="${SUSUWU_SUDO_PREFIX} commands"` */
+else
+	export SUSUWU_SUDO="" # /* Fixes "The program sudo is not installed." on platforms such as smartphones */
+	export SUSUWU_SUDO_PREFIX="" # /* Fixes "The program sudo is not installed." on platforms such as smartphones */
+fi
 SUSUWU_SH_HAS_PARAM() ( #/* Usage: `if SUSUWU_SH_HAS_PARAM "--param [...]" "$@";`. [This processes params passed to `${0}`.] */
 	if [ "$#" -eq 1 ]; then                                    #/* If function was not passed `$@`,
 		SUSUWU_SH_HAS_PARAM "${1}" "${SUSUWU_SH_CONSOLE_PARAMS}" # * use stored values */
