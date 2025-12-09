@@ -30,7 +30,7 @@ SUSUWU_INCLUDES_LIBPUGIXML() { #/* If can include `libpugixml`, set `-DSUSUWU_US
 		SUSUWU_INSTALL_PACKAGES "libpugixml" #/* For Termux */
 	}
 	FLAGS_USER_BACKUP="${FLAGS_USER}" #/* Allows to undo `-I` insertion */
-	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libpugixml-dev" "pugixml/src/" "pugixml.hpp" "C++" "sudo apt install libpugixml-dev libpugixml1v5" && ! [ true = "${SUSUWU_INCLUDES_LIBPUGIXML_ERROR}" ]; then #/* If `libpugixml` was found */
+	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libpugixml-dev" "pugixml/src/" "pugixml.hpp" "C++" "${SUSUWU_SUDO} apt install libpugixml-dev libpugixml1v5" && ! [ true = "${SUSUWU_INCLUDES_LIBPUGIXML_ERROR}" ]; then #/* If `libpugixml` was found */
 #	&& ${LD} -llibpugixml #/* /usr/lib/libpugixml.so *?
 		SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH="libpugixmlTest.cxx.tmp"
 		if (SUSUWU_PATH_SHOULD_NOT_EXIST "$0" "${SUSUWU_INCLUDES_LIBPUGIXML_TEST_PATH}"); then
@@ -55,7 +55,7 @@ SUSUWU_INCLUDES_LIBXML2() { #/* If can include `libxml2`, set `-DSUSUWU_USE_LIBX
 		SUSUWU_INSTALL_PACKAGES "libxml2" #/* For Termux */
 	}
 	FLAGS_USER_BACKUP="${FLAGS_USER}" #/* Allows to undo `-I` insertion */
-	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libxml2-dev" "libxml2/" "libxml/parser.h" "C" "sudo apt install libxml2-dev libxml2" && ! [ true = "${SUSUWU_INCLUDES_LIBXML2_ERROR}" ]; then #/* If `libxml2` was found */
+	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libxml2-dev" "libxml2/" "libxml/parser.h" "C" "${SUSUWU_SUDO} apt install libxml2-dev libxml2" && ! [ true = "${SUSUWU_INCLUDES_LIBXML2_ERROR}" ]; then #/* If `libxml2` was found */
 #	&& ${LD} -lxml2 #/* /usr/lib/libxml2.so *?
 		SUSUWU_INCLUDES_LIBXML2_TEST_PATH="libxml2Test.cxx.tmp"
 		if (SUSUWU_PATH_SHOULD_NOT_EXIST "$0" "${SUSUWU_INCLUDES_LIBXML2_TEST_PATH}"); then
@@ -96,8 +96,8 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 				wget --no-verbose "https://storage.googleapis.com/tensorflow/libtensorflow/${LIBTENSORFLOW_TAR}" && \
 				tar xzf "${LIBTENSORFLOW_TAR}" && \
 				ls -a include && ls -a include/tensorflow && ls -a include/tensorflow/core && ls -a include/tensorflow/third-party && \
-				sudo mv lib/* /usr/lib/ #&& \
-#				sudo mv include/* /usr/include/ && \
+				${SUSUWU_SUDO} mv lib/* /usr/lib/ #&& \
+#				${SUSUWU_SUDO} mv include/* /usr/include/ && \
 #				ls /usr/include/tensorflow/
 				git clone https://github.com/openxla/xla.git --depth 1 #/* `libtensorflow` does not include `xla` */
 			elif [ true = "${SUSUWU_BUILD_TENSORFLOW}" ]; then #/* prepackaged `libtensorflow` does not have C++ headers; use shallow clone of TensorFlow source */
@@ -116,13 +116,13 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 				}
 			else #/* `libtensorflow` C++ package */
 				wget --no-verbose "https://github.com/ika-rwth-aachen/libtensorflow_cc/releases/download/v2.13.0/libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
-				sudo dpkg -i "libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
-				sudo ldconfig
+				${SUSUWU_SUDO} dpkg -i "libtensorflow-cc_2.13.0_$(dpkg --print-architecture).deb"
+				${SUSUWU_SUDO} ldconfig
 			fi
 		fi
 	fi
 
-	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libtensorflow" "./" "tensorflow/core/" "C++" "sudo apt install libtensorflow"; then
+	if SUSUWU_DEPENDENCY_INCLUDE "-I" "libtensorflow" "./" "tensorflow/core/" "C++" "${SUSUWU_SUDO} apt install libtensorflow"; then
 		TENSORFLOW_PATH_PREFIX=""
 	elif SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow" "tensorflow/" "tensorflow/core/" "C++" "git clone https://github.com/tensorflow/tensorflow.git --depth 1"; then
 		TENSORFLOW_PATH_PREFIX="tensorflow/third_party/"
@@ -140,7 +140,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 		}
 		SUSUWU_DEPENDENCY_INCLUDE "-I" "tensorflow:tsl" "${TENSORFLOW_PATH_PREFIX}xla/third_party/tsl/" "tsl/" "C++" ""
 		if [ -z "${EIGEN_INCLUDE_PATH}" ]; then
-			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "unsupported/Eigen/" "C++" "sudo apt -y install libeigen3-dev eigen" ||
+			SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "unsupported/Eigen/" "C++" "${SUSUWU_SUDO} apt -y install libeigen3-dev eigen" ||
 				SUSUWU_DEPENDENCY_INCLUDE "-I" "eigen" "eigen3/" "Eigen/" "C++" "git clone https://github.com/PX4/eigen.git --depth 1"
 			if [ -z "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ] &&
 				[ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
@@ -151,7 +151,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 			fi
 		fi
 		if [ -z "${ABSEIL_INCLUDE_PATH}" ]; then #/* Allows custom path with `ABSEIL_INCLUDE_PATH=path; ./build.sh` */
-			SUSUWU_DEPENDENCY_INCLUDE "-I" "abseil" "absl/" "status/status.h" "C++" "git clone https://github.com/abseil/abseil-cpp.git --depth 1 && sudo apt install libabsl-dev"
+			SUSUWU_DEPENDENCY_INCLUDE "-I" "abseil" "absl/" "status/status.h" "C++" "git clone https://github.com/abseil/abseil-cpp.git --depth 1 && ${SUSUWU_SUDO} apt install libabsl-dev"
 			if [ -z "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ] &&
 				[ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
 				git clone https://github.com/abseil/abseil-cpp.git --depth 1 && SUSUWU_INSTALL_PACKAGES "libabsl-dev"
@@ -194,7 +194,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 		SUSUWU_INCLUDES_LIBTENSORFLOW_HAS_PROTOS=$(test -f "${TENSORFLOW_INCLUDE_PATH}tensorflow/core/framework/types.pb.h")
 		if [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ] && ! ${SUSUWU_INCLUDES_LIBTENSORFLOW_HAS_PROTOS}; then
 			if ! command -v protoc >/dev/null; then
-				sudo apt install protobuf || sudo snap install protobuf
+				${SUSUWU_SUDO} apt install protobuf || ${SUSUWU_SUDO} snap install protobuf
 			fi
 			TENSORFLOW_FW="tensorflow/core/framework/"
 #			TENSORFLOW_INCLUDE_PATH_FW="${TENSORFLOW_INCLUDE_PATH}${TENSORFLOW_FW}"
