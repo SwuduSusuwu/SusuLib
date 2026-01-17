@@ -1633,4 +1633,5 @@ To improve torque (allow servo motors to lift more pounds of load), you can [cou
 - [_MathWorks_ `opticalFlowFarneback`](https://www.mathworks.com/help/vision/ref/opticalflowfarneback.html)
 - [_Consumer Depth Cameras for Computer Vision: Research Topics and Applications (Advances in Computer Vision and Pattern Recognition)_](https://www.amazon.com/Consumer-Depth-Cameras-Computer-Vision/dp/1447146395)
 - [_Sakura School Simulator_ howto](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/SakuraSchoolHowto.md) shows artist depictions of such tools, plus a synopsis with more references to such.
+- Wish to know if [this "*Unity Perception*" artificial-neural-network computer-vision tool](https://arxiv.org/abs/2107.04259) has use for formulas such as ["*Howto produce point clouds*"](#howto-produce-point-clouds) (which includes some artifiial neural networks which produce point clouds).
 
