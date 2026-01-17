@@ -68,9 +68,9 @@ Tools compatible with this howto:
 
 ******************************************
 # Howto route
-\[**Notice**\]: _Arduino_ (plus compatible _Elegoo_) circuitboard pins output at 5v with a max of 40milliamps, which must go to the stepper motor (or servo)'s control signal; [if used to power large motors, the circuitboard's internal resistors are damaged, so you must purchase a new circuitboard](https://docs.arduino.cc/learn/microcontrollers/digital-pins/#:~:text=milliamps,maximum).
-- For motors without control signals (motors with just 2 pins, "+" plus "-"), attach the circuitboard's output pins the control gates power transistors, plus have those transistors power such motors.
-  - Motors <500,000 volts (plus <200 amps) can use [power **MOSFET**s](https://wikipedia.org/wiki/Power_MOSFET) (which have a minimum gate control voltage of 3v, so you must ensure that the output pin does not power other circuits which cause more than 1 volt droop).
+\[**Notice**\]: _Arduino_ (plus compatible _Elegoo_) circuitboard pins output at 5v with a max of 40milliamps, which must go to the stepper motor's (or servo's) control signal; [if used to power large motors, the circuitboard's internal resistors are damaged, so you must purchase a new circuitboard](https://docs.arduino.cc/learn/microcontrollers/digital-pins/#:~:text=milliamps,maximum).
+- For motors without control signals (motors with just 2 pins, "+" plus "-"), attach the circuitboard's output pins to the control "gate"s ("base"s) of power transistors, plus attach those transistors' "emitter"s ("source"s) to "ground" of such motors, with transistors' "collector"s attached to the external power source's "ground".
+  - Motors <500,000 volts (plus <200 amps) can use [power **MOSFET**s](https://wikipedia.org/wiki/Power_MOSFET) (which have a minimum gate (base) control voltage of 3v, so you must ensure that the output pin does not power other circuits which cause more than 1 volt droop).
   - Motors >500,000 volts (or >500 amps) must use [insulated-gate bipolar transistors](https://wikipedia.org/wiki/Insulated-gate_bipolar_transistor) (which have a minimum gate control voltage of 4v, so you must ensure that the output pin does not also power status indicators or other circuits which can cause voltage drop).
 
 What follows is [code from _Assistant_](https://poe.com/s/bkHWeb6vWGFf3CdUzIch) (just examples of what this post is about; future versions of this post will include own code, once am more experienced with robotic tools).
