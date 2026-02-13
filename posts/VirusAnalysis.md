@@ -1,5 +1,8 @@
 **Howto: use local static analysis + heuristics + sandboxes + artificial CNS (central nervous systems) to secure computers; virus analysis tools improved**
+
 \[This post [from _SubStack_](https://swudususuwu.substack.com/p/howto-improve-virus-analysis) allows [all uses](https://creativecommons.org/licenses/by/2.0/).\]
+
+*Notice*: will consider to rename `VirusAnalysis` to "[Digital Immune System](https://futurecio.tech/how-to-build-a-digital-immune-system/)", "Cyber Immune System", "Synthetic Immune System", "Computer Immune System" or similar to thus (since the focus is not just virus removal, but is all unwanted code removal). Guess the most specific natural metaphor for this is to "macrophages".
 
 # Table of Contents
 - [Intro](#intro)
