@@ -91,7 +91,7 @@ SUSUWU_INCLUDES_LIBTENSORFLOW() { #/* If can include `libtensorflow`, set `-DSUS
 		SUSUWU_INSTALL_TENSORFLOW=false #/* `SUSUWU_TEST_BASH` should not reinstall. TODO: ensure compatible (does not prevent install) with ports to `/bin/bash` */
 	fi
 	if [ true = "${SUSUWU_INSTALL_TENSORFLOW}" ]; then
-		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "Was executed through one of GitHub's Workflows (or user set $(SUSUWU_SH_QUOTE "VAR" "SUSUWU_INSTALL_TENSORFLOW")), will auto-install $(SUSUWU_SH_QUOTE "CODE" "libeigen3-dev") plus $(SUSUWU_SH_QUOTE "CODE" "libtensorflow")."
+		SUSUWU_PRINT "$0" "$(SUSUWU_SH_NOTICE)" "Was executed through GitHub's virtual Workflows (or user set $(SUSUWU_SH_QUOTE "VAR" "SUSUWU_INSTALL_TENSORFLOW")), so will auto-install $(SUSUWU_SH_QUOTE "CODE" "libeigen3-dev") plus $(SUSUWU_SH_QUOTE "CODE" "libtensorflow")."
 		if ! (SUSUWU_INSTALL_PACKAGES "libtensorflow" || SUSUWU_INSTALL_PACKAGES "libtensorflow-dev" #|| git clone https://github.com/tensorflow/tensorflow.git --depth 1
 			); then #/* If system package manager is not sufficient to install `libtensorflow` */
 			if [ true = "${USE_GOOGLEAPIS_TENSORFLOW}" ]; then
