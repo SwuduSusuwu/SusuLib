@@ -98,7 +98,7 @@ void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &response
 		const ClassIoPath localDocumentSource = classWebBrowseDownloadDir + "index.html"; /* TODO: some hosts give `.xhtml` or `.htm`, deduce this */
 		questionsOrNull.signatures.push_back(host);
 		SUSUWU_WARNING("assistantCnsDownloadHosts: { /* TODO: [deduce `ClassIoPath localDocumentSource;` from `classWebBrowseWget(\"" + host + "\", \"\");`](https://poe.com/s/QpjvvHmETSVP6K4wRiU5) */}");
-		assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localDocumentSource);
+		/* assistantCnsProcessXhtml(questionsOrNull, responsesOrNull, localDocumentSource); *//* TODO: if <https://github.com/SwuduSusuwu/SusuLib/discussions/52#discussioncomment-15929185> has solutions, then uncomment this row */
 	}
 }
 void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml) {
