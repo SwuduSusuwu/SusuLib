@@ -62,7 +62,7 @@ const bool assistantCnsTests() {
 	assert(3 == responsesOrNull.hashes.size());
 	SUSUWU_NOTICE_EXECUTEVERBOSE(resultListDumpTo(questionsOrNull, std::cout, true, true, false));
 	SUSUWU_NOTICE_EXECUTEVERBOSE((resultListDumpTo(responsesOrNull, std::cout, false, false, false), std::cout << std::endl));
-	assistantCnsDownloadHosts(questionsOrNull, responsesOrNull);
+	/* assistantCnsDownloadHosts(questionsOrNull, responsesOrNull); *//* TODO: if <https://github.com/SwuduSusuwu/SusuLib/discussions/52#discussioncomment-15929185> has solutions, then uncomment this row */
 	produceAssistantCns(questionsOrNull, responsesOrNull, assistantCns);
 	return true;
 }
