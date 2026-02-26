@@ -31,9 +31,9 @@ TensorFlowCns assistantCns;
 Cns assistantCns;
 #endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 std::vector<ClassIoPath> assistantCnsDefaultHosts = {
-	"https://stackoverflow.com",
-	"https://superuser.com",
-	"https://www.quora.com"
+	"https://stackoverflow.com"/*,
+	"https://superuser.com"*//*,
+	"https://www.quora.com"*/
 };
 std::string assistantCnsResponseDelimiter = std::string("<delimiterSeparatesMultiplePossibleResponses>");
 
