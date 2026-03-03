@@ -4342,7 +4342,7 @@ const bool assistantCnsTests() {
 			ResultListBytecode("65536") + assistantCnsResponseDelimiter + "65,536", /* `+` is `concat()` for C++ */
 			ResultListBytecode(""),
 			ResultListBytecode(""),
-			ResultListBytecode("How do you do?") + assistantCnsResponseDelimiter + "Fanuc produces autonomous robots"
+			ResultListBytecode("How do you do?") + assistantCnsResponseDelimiter + "Fanuc produces autonomous tools"
 		};
 	}
 	resultListProduceHashes(questionsOrNull);
