@@ -421,7 +421,7 @@ If you want proof that your crypto/cash will go to produce specific systems, use
   - For example; "The **source code** (through `./build.sh`), must produce a **system** (a **shared object** or **executable**) which uses just half of the training data to [setup its neural network, which must produce virtual synapses](https://wikipedia.org/wiki/Backpropagation) which the **system** [uses to produce **accurate** results](https://wikipedia.org/wiki/Residual_neural_network#Forward_propagation) on the other half, where **accurate** (for [classifiers](https://wikipedia.org/wiki/Learning_classifier_system)) is less than 2% false negatives and less than 2% false positives, and **accurate** (for [generators](https://wikipedia.org/wiki/Generative_artificial_intelligence)) is [divergence](https://wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) of less than 2%." is a contract which an **escrow** can use for [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 
 ### Affiliates
-You can use [_Capital 1_'s affiliate program](https://i.capitalone.com/JgR02Y4pE) to allow us to produce more source codes.
+You can use [_Capital 1_'s affiliate program](https://www.capitalone.com/bank/referrals/checking300/friend/?referralCode=06BEGSDPR&programCode=RAFOFFER300) to support `SusuLib` (the revenue allows to publish more for users).
 
 ## Tools used
 For now, <https://github.com/SwuduSusuwu> just accepts anonymous sponsors. If thus is not suitable, sponsor tools used (which accept more popular sponsorship protocols) such as:
