@@ -60,20 +60,20 @@ void Cns::dumpTo(const ClassIoPath &modelPath) const {
 	file.write(reinterpret_cast<const char *>(&neuronsN), sizeof(neuronsN));
 	const double inAvg = inputNormsStorage.average;
 	const double inMag = inputNormsStorage.magnitude;
-	file.write(reinterpret_cast<const char *>(&inAvg), sizeof(inAvg));
-	file.write(reinterpret_cast<const char *>(&inMag), sizeof(inMag));
+	file.write(reinterpret_cast<const char *>(&inAvg), sizeof(inAvg)); /* cppcheck-suppress invalidPointerCast */
+	file.write(reinterpret_cast<const char *>(&inMag), sizeof(inMag)); /* cppcheck-suppress invalidPointerCast */
 #if SUSUWU_CNS_SEPARATE_NORMS
 	const double outAvg = outputNormsStorage.average;
 	const double outMag = outputNormsStorage.magnitude;
-	file.write(reinterpret_cast<const char *>(&outAvg), sizeof(outAvg));
-	file.write(reinterpret_cast<const char *>(&outMag), sizeof(outMag));
+	file.write(reinterpret_cast<const char *>(&outAvg), sizeof(outAvg)); /* cppcheck-suppress invalidPointerCast */
+	file.write(reinterpret_cast<const char *>(&outMag), sizeof(outMag)); /* cppcheck-suppress invalidPointerCast */
 #endif /* SUSUWU_CNS_SEPARATE_NORMS */
 	const uint64_t pat = static_cast<uint64_t>(patience);
 	file.write(reinterpret_cast<const char *>(&pat), sizeof(pat));
-	file.write(reinterpret_cast<const char *>(&minLossDelta), sizeof(minLossDelta));
-	file.write(reinterpret_cast<const char *>(&desiredLossThreshold), sizeof(desiredLossThreshold));
-	file.write(reinterpret_cast<const char *>(&validationFactor), sizeof(validationFactor));
-	file.write(reinterpret_cast<const char *>(&learningFactor), sizeof(learningFactor));
+	file.write(reinterpret_cast<const char *>(&minLossDelta), sizeof(minLossDelta)); /* cppcheck-suppress invalidPointerCast */
+	file.write(reinterpret_cast<const char *>(&desiredLossThreshold), sizeof(desiredLossThreshold)); /* cppcheck-suppress invalidPointerCast */
+	file.write(reinterpret_cast<const char *>(&validationFactor), sizeof(validationFactor)); /* cppcheck-suppress invalidPointerCast */
+	file.write(reinterpret_cast<const char *>(&learningFactor), sizeof(learningFactor)); /* cppcheck-suppress invalidPointerCast */
 	const uint8_t init = initialized ? 1 : 0;
 	file.write(reinterpret_cast<const char *>(&init), sizeof(init));
 	if(!file) {
@@ -105,21 +105,21 @@ void Cns::loadFrom(const ClassIoPath &modelPath) {
 	file.read(reinterpret_cast<char *>(&layersN), sizeof(layersN));
 	file.read(reinterpret_cast<char *>(&neuronsN), sizeof(neuronsN));
 	double inAvg = 0.0, inMag = 1.0;
-	file.read(reinterpret_cast<char *>(&inAvg), sizeof(inAvg));
-	file.read(reinterpret_cast<char *>(&inMag), sizeof(inMag));
+	file.read(reinterpret_cast<char *>(&inAvg), sizeof(inAvg)); /* cppcheck-suppress invalidPointerCast */
+	file.read(reinterpret_cast<char *>(&inMag), sizeof(inMag)); /* cppcheck-suppress invalidPointerCast */
 #if SUSUWU_CNS_SEPARATE_NORMS
 	double outAvg = 0.0, outMag = 1.0;
-	file.read(reinterpret_cast<char *>(&outAvg), sizeof(outAvg));
-	file.read(reinterpret_cast<char *>(&outMag), sizeof(outMag));
+	file.read(reinterpret_cast<char *>(&outAvg), sizeof(outAvg)); /* cppcheck-suppress invalidPointerCast */
+	file.read(reinterpret_cast<char *>(&outMag), sizeof(outMag)); /* cppcheck-suppress invalidPointerCast */
 	outputNormsStorage.average = outAvg;
 	outputNormsStorage.magnitude = outMag;
 #endif /* SUSUWU_CNS_SEPARATE_NORMS */
 	uint64_t pat = 0;
 	file.read(reinterpret_cast<char *>(&pat), sizeof(pat));
-	file.read(reinterpret_cast<char *>(&minLossDelta), sizeof(minLossDelta));
-	file.read(reinterpret_cast<char *>(&desiredLossThreshold), sizeof(desiredLossThreshold));
-	file.read(reinterpret_cast<char *>(&validationFactor), sizeof(validationFactor));
-	file.read(reinterpret_cast<char *>(&learningFactor), sizeof(learningFactor));
+	file.read(reinterpret_cast<char *>(&minLossDelta), sizeof(minLossDelta)); /* cppcheck-suppress invalidPointerCast */
+	file.read(reinterpret_cast<char *>(&desiredLossThreshold), sizeof(desiredLossThreshold)); /* cppcheck-suppress invalidPointerCast */
+	file.read(reinterpret_cast<char *>(&validationFactor), sizeof(validationFactor)); /* cppcheck-suppress invalidPointerCast */
+	file.read(reinterpret_cast<char *>(&learningFactor), sizeof(learningFactor)); /* cppcheck-suppress invalidPointerCast */
 	uint8_t init = 0;
 	file.read(reinterpret_cast<char *>(&init), sizeof(init));
 	if(!file) {
