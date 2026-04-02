@@ -113,12 +113,14 @@ public:
 		learningFactor = x; /* how much coefficients move (converge) per step of `setupSynapses` training loop. `0.0` is static, `1.0` is straight to the first reciprocal (or whatever form of gradient the optimizer uses) */
 	}
 
-	/* dump the connectome (the `tensorflow::Tensor` of synapse coefficients)
+	/* dump the connectome (the `tensorflow::Tensor` of synapse coefficients); base-class implementation serializes all `Cns` fields to `modelPath` in binary format.
+	 * Subclasses should call `Cns::dumpTo(modelPath + ".cns")` then serialize their own additional state.
 	 * @throw std::runtime_error */
-	virtual void dumpTo(const ClassIoPath &modelPath) const { throw std::runtime_error("ClassCns::dumpTo(\"" + modelPath + "\") pure virtual call"); }
-	/* load the connectome (the `tensorflow::Tensor` of synapse coefficients)
+	virtual void dumpTo(const ClassIoPath &modelPath) const;
+	/* load the connectome (the `tensorflow::Tensor` of synapse coefficients); base-class implementation deserializes all `Cns` fields from `modelPath` in binary format.
+	 * Subclasses should call `Cns::loadFrom(modelPath + ".cns")` then deserialize their own additional state.
 	 * @throw std::runtime_error */
-	virtual void loadFrom(const ClassIoPath &modelPath) { throw std::runtime_error("ClassCns::loadFrom(\"" + modelPath + "\") pure virtual call"); }
+	virtual void loadFrom(const ClassIoPath &modelPath);
 
 	/* Internal function, which outros of `setupSynapses()` use.
 	 * @throw std::bad_alloc std::runtime_error

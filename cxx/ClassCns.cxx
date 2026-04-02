@@ -5,12 +5,136 @@
 #ifndef INCLUDES_cxx_ClassCns_cxx
 #define INCLUDES_cxx_ClassCns_cxx
 #include "ClassCns.hxx" /* std::string std::tuple */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_OVERRIDE */
+#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_OVERRIDE SUSUWU_SH_ERROR */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
+#include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* uint8_t uint32_t uint64_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+#include <fstream> /* std::ifstream std::ofstream */
+#include <stdexcept> /* std::runtime_error */
 
 namespace Susuwu {
+
+/* Binary format for `Cns::dumpTo` / `Cns::loadFrom`:
+ * [4 bytes] magic "CNS\0"
+ * [1 byte]  format version (currently 1)
+ * [1 byte]  inputMode  (ObjectMode, which is `char`)
+ * [1 byte]  outputMode (ObjectMode, which is `char`)
+ * [8 bytes] inputNeurons   (uint64_t)
+ * [8 bytes] outputNeurons  (uint64_t)
+ * [8 bytes] layersOfNeurons  (uint64_t)
+ * [8 bytes] neuronsPerLayer  (uint64_t)
+ * [8 bytes] inputNormsStorage.average   (double)
+ * [8 bytes] inputNormsStorage.magnitude (double)
+ * [8 bytes] outputNormsStorage.average   (double, only if SUSUWU_CNS_SEPARATE_NORMS)
+ * [8 bytes] outputNormsStorage.magnitude (double, only if SUSUWU_CNS_SEPARATE_NORMS)
+ * [8 bytes] patience (uint64_t)
+ * [4 bytes] minLossDelta         (float)
+ * [4 bytes] desiredLossThreshold (float)
+ * [4 bytes] validationFactor     (float)
+ * [4 bytes] learningFactor       (float)
+ * [1 byte]  initialized (0 or 1)
+ */
+static const char cnsDumpMagic[4] = {'C', 'N', 'S', '\0'};
+static const uint8_t cnsDumpVersion = 1;
+
+void Cns::dumpTo(const ClassIoPath &modelPath) const {
+	std::ofstream file(modelPath, std::ios::binary | std::ios::trunc);
+	if(!file) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \"" + modelPath + "\") { !std::ofstream(modelPath, std::ios::binary | std::ios::trunc) }"));
+	}
+	file.write(cnsDumpMagic, sizeof(cnsDumpMagic));
+	file.write(reinterpret_cast<const char *>(&cnsDumpVersion), sizeof(cnsDumpVersion));
+	const char inMode = static_cast<char>(inputMode);
+	const char outMode = static_cast<char>(outputMode);
+	file.write(&inMode, sizeof(inMode));
+	file.write(&outMode, sizeof(outMode));
+	const uint64_t inN = static_cast<uint64_t>(inputNeurons);
+	const uint64_t outN = static_cast<uint64_t>(outputNeurons);
+	const uint64_t layersN = static_cast<uint64_t>(layersOfNeurons);
+	const uint64_t neuronsN = static_cast<uint64_t>(neuronsPerLayer);
+	file.write(reinterpret_cast<const char *>(&inN), sizeof(inN));
+	file.write(reinterpret_cast<const char *>(&outN), sizeof(outN));
+	file.write(reinterpret_cast<const char *>(&layersN), sizeof(layersN));
+	file.write(reinterpret_cast<const char *>(&neuronsN), sizeof(neuronsN));
+	const double inAvg = inputNormsStorage.average;
+	const double inMag = inputNormsStorage.magnitude;
+	file.write(reinterpret_cast<const char *>(&inAvg), sizeof(inAvg));
+	file.write(reinterpret_cast<const char *>(&inMag), sizeof(inMag));
+#if SUSUWU_CNS_SEPARATE_NORMS
+	const double outAvg = outputNormsStorage.average;
+	const double outMag = outputNormsStorage.magnitude;
+	file.write(reinterpret_cast<const char *>(&outAvg), sizeof(outAvg));
+	file.write(reinterpret_cast<const char *>(&outMag), sizeof(outMag));
+#endif /* SUSUWU_CNS_SEPARATE_NORMS */
+	const uint64_t pat = static_cast<uint64_t>(patience);
+	file.write(reinterpret_cast<const char *>(&pat), sizeof(pat));
+	file.write(reinterpret_cast<const char *>(&minLossDelta), sizeof(minLossDelta));
+	file.write(reinterpret_cast<const char *>(&desiredLossThreshold), sizeof(desiredLossThreshold));
+	file.write(reinterpret_cast<const char *>(&validationFactor), sizeof(validationFactor));
+	file.write(reinterpret_cast<const char *>(&learningFactor), sizeof(learningFactor));
+	const uint8_t init = initialized ? 1 : 0;
+	file.write(reinterpret_cast<const char *>(&init), sizeof(init));
+	if(!file) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \"" + modelPath + "\") { !file /* write failed */ }"));
+	}
+}
+
+void Cns::loadFrom(const ClassIoPath &modelPath) {
+	std::ifstream file(modelPath, std::ios::binary);
+	if(!file) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \"" + modelPath + "\") { !std::ifstream(modelPath, std::ios::binary) }"));
+	}
+	char magic[4] = {0, 0, 0, 0};
+	file.read(magic, sizeof(magic));
+	if(magic[0] != cnsDumpMagic[0] || magic[1] != cnsDumpMagic[1] || magic[2] != cnsDumpMagic[2] || magic[3] != cnsDumpMagic[3]) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \"" + modelPath + "\") { magic != \"CNS\\0\" /* unrecognized file format */ }"));
+	}
+	uint8_t version = 0;
+	file.read(reinterpret_cast<char *>(&version), sizeof(version));
+	if(version != cnsDumpVersion) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \"" + modelPath + "\") { version == " + std::to_string(version) + "; /* unsupported format version */ }"));
+	}
+	char inMode = 0, outMode = 0;
+	file.read(&inMode, sizeof(inMode));
+	file.read(&outMode, sizeof(outMode));
+	uint64_t inN = 0, outN = 0, layersN = 0, neuronsN = 0;
+	file.read(reinterpret_cast<char *>(&inN), sizeof(inN));
+	file.read(reinterpret_cast<char *>(&outN), sizeof(outN));
+	file.read(reinterpret_cast<char *>(&layersN), sizeof(layersN));
+	file.read(reinterpret_cast<char *>(&neuronsN), sizeof(neuronsN));
+	double inAvg = 0.0, inMag = 1.0;
+	file.read(reinterpret_cast<char *>(&inAvg), sizeof(inAvg));
+	file.read(reinterpret_cast<char *>(&inMag), sizeof(inMag));
+#if SUSUWU_CNS_SEPARATE_NORMS
+	double outAvg = 0.0, outMag = 1.0;
+	file.read(reinterpret_cast<char *>(&outAvg), sizeof(outAvg));
+	file.read(reinterpret_cast<char *>(&outMag), sizeof(outMag));
+	outputNormsStorage.average = outAvg;
+	outputNormsStorage.magnitude = outMag;
+#endif /* SUSUWU_CNS_SEPARATE_NORMS */
+	uint64_t pat = 0;
+	file.read(reinterpret_cast<char *>(&pat), sizeof(pat));
+	file.read(reinterpret_cast<char *>(&minLossDelta), sizeof(minLossDelta));
+	file.read(reinterpret_cast<char *>(&desiredLossThreshold), sizeof(desiredLossThreshold));
+	file.read(reinterpret_cast<char *>(&validationFactor), sizeof(validationFactor));
+	file.read(reinterpret_cast<char *>(&learningFactor), sizeof(learningFactor));
+	uint8_t init = 0;
+	file.read(reinterpret_cast<char *>(&init), sizeof(init));
+	if(!file) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \"" + modelPath + "\") { !file /* read failed or truncated */ }"));
+	}
+	inputMode = static_cast<ObjectMode>(inMode);
+	outputMode = static_cast<ObjectMode>(outMode);
+	inputNeurons = static_cast<size_t>(inN);
+	outputNeurons = static_cast<size_t>(outN);
+	layersOfNeurons = static_cast<size_t>(layersN);
+	neuronsPerLayer = static_cast<size_t>(neuronsN);
+	inputNormsStorage.average = inAvg;
+	inputNormsStorage.magnitude = inMag;
+	patience = static_cast<size_t>(pat);
+	initialized = (init != 0);
+}
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
  * Install: `pip install pynum && pip install json && pip install git+https://github.com/CarsonScott/HSOM.git`
