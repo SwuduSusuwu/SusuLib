@@ -28,12 +28,14 @@ namespace Susuwu {
 /* store the connectome (the synapse coefficients and biases); serialize from `TensorFlowCns::coefficients` (or `TensorFlowCns::graphDef`), into `modelPath`.
  * @throw std::runtime_error */
 void TensorFlowCns::dumpTo(const ClassIoPath &modelPath) const { /* TODO: the implementation is in the header to allow future `template<>` use; If `dumpTo` will not use C++ `template<>`s, implement in `ClassTensorFlowCns.cxx` to reduce `./build.sh` resource use */
-#if !SUSUWU_IN_MEMORY_COEFFICIENTS
+#if !SUSUWU_IN_MEMORY_COEFFICIENTS && !SUSUWU_CNS_USE_MLP
 	std::vector<tensorflow::Tensor> outputs;
 	TF_CHECK_OK(session->Run({}, {"coefficients", "biases"}, {}, &outputs));
 	const auto &coefficients = outputs[0];
 	const auto &biases = outputs[1];
-#endif /* !SUSUWU_IN_MEMORY_COEFFICIENTS */
+#elif !SUSUWU_IN_MEMORY_COEFFICIENTS && SUSUWU_CNS_USE_MLP
+#	pragma message("TODO: `dumpTo` with `SUSUWU_CNS_USE_MLP`: requires fetching per-layer coefficients (\"coefficients_0\", \"biases_0\", ...)")
+#endif /* !SUSUWU_IN_MEMORY_COEFFICIENTS && !SUSUWU_CNS_USE_MLP */
 #ifdef SUSUWU_TENSORFLOWCNS_PROTOBUF_FS
 	tensorflow::TensorProto tensorProto;
 #ifdef SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS
