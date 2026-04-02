@@ -257,10 +257,6 @@ public:
 	SUSUWU_OVERRIDE
 #endif /* SUSUWU_VIRTUAL_MEMBER_FUNCTION_TEMPLATES */
 	{ /* Initialize `coefficients` with pseudorandom (uses `rand()` or recipricals of `inputsToOutputs`) values */
-#if !SUSUWU_CNS_LOCAL_COEFFICIENTS
-		tensorflow::Tensor coefficients(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)}))); /* connectome coefficients ("synaptic strengths") */
-		tensorflow::Tensor biases(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(neuronsPerLayer)}))); /* connectome biases (membrane potentials) */
-#endif /* !SUSUWU_CNS_LOCAL_COEFFICIENTS */
 		const auto inputBegin = inputsToOutputs.cbegin(), inputEnd = inputsToOutputs.cend();
 		auto inputIt = inputBegin;
 #if defined(SUSUWU_CNS_HE_INIT) && SUSUWU_CNS_HE_INIT /* He initialization prevents saturation of `ReLU` functions. */
@@ -270,6 +266,37 @@ public:
 #else
 		const float scale = 1.0; /* placeholder */
 #endif /* !(defined(SUSUWU_CNS_HE_INIT) && SUSUWU_CNS_HE_INIT) */
+#if SUSUWU_CNS_USE_MLP
+		/* MLP: create and fill per-layer coefficient tensors, then assign via session->Run */
+		std::vector<std::pair<std::string, tensorflow::Tensor>> mlpFeeds;
+		std::vector<std::string> mlpTargets;
+		for(long mlpW = 0; static_cast<long>(layersOfNeurons) > mlpW; ++mlpW) {
+			const std::string mlpWs = std::to_string(mlpW);
+			const DimSz mlpInDim = (0 == mlpW) ? static_cast<DimSz>(inputNeurons) : static_cast<DimSz>(neuronsPerLayer);
+			const DimSz mlpOutDim = (static_cast<long>(layersOfNeurons) - 1 == mlpW) ? static_cast<DimSz>(outputNeurons) : static_cast<DimSz>(neuronsPerLayer);
+			tensorflow::Tensor wCoeff(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({mlpInDim, mlpOutDim})); /* per-layer coefficients ("synaptic strengths") */
+			tensorflow::Tensor wBias(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({mlpOutDim})); /* per-layer biases (membrane potentials), zero-initialized */
+			for(int i = 0; i < wCoeff.dim_size(0); ++i) {
+				for(int j = 0; j < wCoeff.dim_size(1); ++j) {
+					if(inputEnd != inputIt) {
+						++inputIt;
+					} else {
+						inputIt = inputBegin;
+					}
+					initCoefficient(wCoeff.tensor<CoefficientType, 2>()(i, j), inputIt, scale);
+				}
+			}
+			mlpFeeds.push_back({"randomCoefficients_" + mlpWs, wCoeff});
+			SUSUWU_CNS_IF_BIAS(mlpFeeds.push_back({"randomBiases_" + mlpWs, wBias});)
+			mlpTargets.push_back("assignCoefficients_" + mlpWs);
+			SUSUWU_CNS_IF_BIAS(mlpTargets.push_back("assignBiases_" + mlpWs);)
+		}
+		TF_CHECK_OK(session->Run(mlpFeeds, {}, mlpTargets, SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
+#else /* !SUSUWU_CNS_USE_MLP */
+#if !SUSUWU_CNS_LOCAL_COEFFICIENTS
+		tensorflow::Tensor coefficients(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)}))); /* connectome coefficients ("synaptic strengths") */
+		tensorflow::Tensor biases(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(neuronsPerLayer)}))); /* connectome biases (membrane potentials) */
+#endif /* !SUSUWU_CNS_LOCAL_COEFFICIENTS */
 		for(int i = 0; i < coefficients.dim_size(0); ++i) {
 			for(int j = 0; j < coefficients.dim_size(1); ++j) {
 				if(inputEnd != inputIt) {
@@ -284,18 +311,48 @@ public:
 					{"randomCoefficients", coefficients}, {"randomBiases", biases}
 					}, {}, {"assignCoefficients", "assignBiases"},
 					SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
+#endif /* !SUSUWU_CNS_USE_MLP */
 	}
 
 #if SUSUWU_CNS_USE_MLP
-#	pragma message("TODO: `SUSUWU_TENSORFLOWCNS_LOGITS` loop for `SUSUWU_CNS_USE_MLP`")
-//	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
-#endif /* SUSUWU_CNS_USE_MLP */
+/* MLP (Multiple-Layer-Perceptron) inference model. Supports `layersOfNeurons > 1` hidden layers.
+ * Layer 0: {inputDim, neuronsPerLayer}; hidden layers 1..L-2: {neuronsPerLayer, neuronsPerLayer}; output layer L-1: {neuronsPerLayer, outputDim}.
+ * Forward pass: hidden = Relu(MatMul(prev, W) + b) for each hidden layer; logits = MatMul(hidden, W_last) + b_last (no activation on output). */
+#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /* MLP inference model */ \
+		const auto inputDim = static_cast<DimSz>(inputNeurons), outputDim = static_cast<DimSz>(outputNeurons); \
+		root = tensorflow::Scope::NewRootScope(); \
+		auto input = tensorflow::ops::Placeholder(root.WithOpName("input"), /* `DataTypeToEnum<Input>::value` gives "INVALID_ARGUMENT: Inconsistent values" */coefficientFormat/*, Placeholder::Shape({-1, inputDim})*/); \
+		std::vector<tensorflow::ops::Variable> coeffVars, randCoeffVars; \
+		SUSUWU_CNS_IF_BIAS(std::vector<tensorflow::ops::Variable> biasVars; std::vector<tensorflow::ops::Variable> randBiasVars;) \
+		for(long mlpW = 0; static_cast<long>(layersOfNeurons) > mlpW; ++mlpW) { \
+			const std::string mlpWs = std::to_string(mlpW); \
+			const DimSz mlpInDim = (0 == mlpW) ? inputDim : static_cast<DimSz>(neuronsPerLayer); \
+			const DimSz mlpOutDim = (static_cast<long>(layersOfNeurons) - 1 == mlpW) ? outputDim : static_cast<DimSz>(neuronsPerLayer); \
+			coeffVars.push_back(tensorflow::ops::Variable(root.WithOpName("coefficients_" + mlpWs), tensorflow::TensorShape({mlpInDim, mlpOutDim}), coefficientFormat)); \
+			randCoeffVars.push_back(tensorflow::ops::Variable(root.WithOpName("randomCoefficients_" + mlpWs), tensorflow::TensorShape({mlpInDim, mlpOutDim}), coefficientFormat)); \
+			SUSUWU_CNS_IF_BIAS(biasVars.push_back(tensorflow::ops::Variable(root.WithOpName("biases_" + mlpWs), tensorflow::TensorShape({mlpOutDim}), coefficientFormat));) \
+			SUSUWU_CNS_IF_BIAS(randBiasVars.push_back(tensorflow::ops::Variable(root.WithOpName("randomBiases_" + mlpWs), tensorflow::TensorShape({mlpOutDim}), coefficientFormat));) \
+		} \
+		std::vector<tensorflow::Output> hiddens; \
+		hiddens.push_back(tensorflow::Output(input)); \
+		for(long mlpW = 0; static_cast<long>(layersOfNeurons) - 1 > mlpW; ++mlpW) { \
+			tensorflow::Output mlpZ = tensorflow::ops::MatMul(root, hiddens.back(), coeffVars[static_cast<size_t>(mlpW)]); \
+			SUSUWU_CNS_IF_BIAS(mlpZ = tensorflow::ops::Add(root, mlpZ, biasVars[static_cast<size_t>(mlpW)]);) \
+			hiddens.push_back(tensorflow::ops::Relu(root, mlpZ)); \
+		} \
+		const long mlpLastW = static_cast<long>(layersOfNeurons) - 1; \
+		tensorflow::Output mlpLogitsOut = tensorflow::ops::MatMul(root, hiddens.back(), coeffVars[static_cast<size_t>(mlpLastW)]); \
+		SUSUWU_CNS_IF_BIAS(mlpLogitsOut = tensorflow::ops::Add(root, mlpLogitsOut, biasVars[static_cast<size_t>(mlpLastW)]);) \
+		auto logits = tensorflow::ops::Identity(root.WithOpName("logits"), mlpLogitsOut); /* ensure output is named "logits" for processTo*() */ \
+		auto relu = tensorflow::ops::Relu(root.WithOpName("relu"), logits); /* [Rectified Linear Unit activation function](https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/relu) */
+#else /* !SUSUWU_CNS_USE_MLP */
+/* Simple (1 dense layer) inference model. */
 #if SUSUWU_CNS_USE_BIAS
 #	define SUSUWU_TENSORFLOWCNS_LOGITS tensorflow::ops::Add(root.WithOpName("logits"), tensorflow::ops::MatMul(root, input, coefficientsVar), biasesVar)
 #else /* !SUSUWU_CNS_USE_BIAS */
 #	define SUSUWU_TENSORFLOWCNS_LOGITS tensorflow::ops::MatMul(root.WithOpName("logits"), input, coefficientsVar)
 #endif /* !SUSUWU_CNS_USE_BIAS */
-#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /* Simple (1 dense layer) inference model. TODO: [choose how to implement `layersOfNeurons`](https://github.com/copilot/share/427f408e-08e0-8c80-9151-f24920212857) */\
+#define SUSUWU_TENSORFLOWCNS_INIT_SCOPE /* Simple (1 dense layer) inference model. */\
 		const auto inputDim = static_cast<DimSz>(inputNeurons), outputDim = static_cast<DimSz>(outputNeurons); /* TODO: assert `1` for base types? */ \
 		root = tensorflow::Scope::NewRootScope(); \
 		auto input = tensorflow::ops::Placeholder(root.WithOpName("input"), /* `DataTypeToEnum<Input>::value` gives "INVALID_ARGUMENT: Inconsistent values" */coefficientFormat/*, Placeholder::Shape({-1, inputDim})*/); \
@@ -303,8 +360,9 @@ public:
 		auto randomCoefficientsVar = tensorflow::ops::Variable(root.WithOpName("randomCoefficients"), tensorflow::TensorShape({inputDim, outputDim}), coefficientFormat); \
 		SUSUWU_CNS_IF_BIAS(auto biasesVar = tensorflow::ops::Variable(root.WithOpName("biases"), tensorflow::TensorShape({outputDim}), coefficientFormat);) \
 		SUSUWU_CNS_IF_BIAS(auto randomBiasesVar = tensorflow::ops::Variable(root.WithOpName("randomBiases"), tensorflow::TensorShape({outputDim}), coefficientFormat);) \
-		auto logits = SUSUWU_TENSORFLOWCNS_LOGITS; /* TODO: ensure that `"logits"` is usable as-is for `process*()`. For classification use `"relu"`? */ \
-		auto relu = tensorflow::ops::Relu(root.WithOpName("relu"), logits); /* TODO: benchmark test how accurate this is? [Rectified Linear Unit activation function](https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/relu) does; scaling, cutoff and `abs`. Gives non-linear version of `logits` (can use as input to hidden-layer `loss`). [Python version has better documents](https://www.tensorflow.org/api_docs/python/tf/keras/layers/ReLU). */
+		auto logits = SUSUWU_TENSORFLOWCNS_LOGITS; /* ensure that `"logits"` is usable as-is for `processTo*()` */ \
+		auto relu = tensorflow::ops::Relu(root.WithOpName("relu"), logits); /* [Rectified Linear Unit activation function](https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/relu) does; scaling, cutoff and `abs`. Gives non-linear version of `logits` (can use as input to hidden-layer `loss`). [Python version has better documents](https://www.tensorflow.org/api_docs/python/tf/keras/layers/ReLU). */
+#endif /* !SUSUWU_CNS_USE_MLP */
 	template<class Input, class Output>
 	void initScopeRootForward(tensorflow::DataType coefficientFormat) { /* Reusable graph logic (for `process*()`, `initScopeRootBack()`) */
 		SUSUWU_TENSORFLOWCNS_INIT_SCOPE /* TODO: merge macro into `initScopeRootBack` */
@@ -360,11 +418,7 @@ public:
 			SUSUWU_CNS_IF_BIAS(gradBiasesScaled = gradientOutputs[1]);
 		static_cast<void>(grad); /* "style: Variable 'grad' is assigned a value that is never used. [unreadVariable]" fix. */
 #else /* def TENSORFLOW_HAS_GRADIENTTAPE #else */
-		auto inputTranspose = tensorflow::ops::Transpose(root, input, {1, 0}); /* Transpose input: shape [input_dim, batch_size] */
-		auto gradCoefficients = tensorflow::ops::MatMul(root, inputTranspose, grad); /* MatMul: shape [input_dim, output_dim] */
-		SUSUWU_CNS_IF_BIAS(auto gradBiases = tensorflow::ops::Sum(root, grad, {0});) /* Sum over batch axis */ /* Notice: swapped order so dependency of `MatMul` on `inputTranspose` is masked with overhead of `Sum` */
-
-		/* Scalar batch size (to divide by) */
+		/* Scalar batch size (to divide by) - common to single-layer and MLP */
 		auto batchSize = tensorflow::ops::Shape(root, input /* With `inputDim`, does not converge. With `input`, diverges. TODO: improve */); /* shape: [batch_size, input_dim] */
 		auto batchSizeScalar = tensorflow::ops::Slice(root, batchSize, {0}, {1}); /* [batch_size] */
 		auto batchSizeFloat = tensorflow::ops::Cast(root, batchSizeScalar, coefficientFormat);
@@ -372,15 +426,54 @@ public:
 
 		auto scale = tensorflow::ops::Div(root, scaleNum, batchSizeReduced);
 
+#if SUSUWU_CNS_USE_MLP
+		/* MLP backpropagation: iterate layers in reverse to compute per-layer gradients and apply SGD */
+		tensorflow::Output gradCurrent = grad;
+		for(long mlpW = static_cast<long>(layersOfNeurons) - 1; mlpW >= 0; --mlpW) {
+			const std::string mlpWs = std::to_string(mlpW);
+			auto hTranspose = tensorflow::ops::Transpose(root, hiddens[static_cast<size_t>(mlpW)], {1, 0});
+			auto gradCoeff = tensorflow::ops::MatMul(root, hTranspose, gradCurrent); /* shape [layInDim, layOutDim] */
+			SUSUWU_CNS_IF_BIAS(auto gradBias = tensorflow::ops::Sum(root, gradCurrent, {0});) /* Sum over batch axis */
+			auto gradCoeffScaled = tensorflow::ops::Multiply(root, gradCoeff, scale);
+			SUSUWU_CNS_IF_BIAS(auto gradBiasScaled = tensorflow::ops::Multiply(root, gradBias, scale);)
+			tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients_" + mlpWs), coeffVars[static_cast<size_t>(mlpW)], learningFactor, gradCoeffScaled); /* Default is `SGD` (Stochastic Gradient Descent). */
+			SUSUWU_CNS_IF_BIAS(tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerBiases_" + mlpWs), biasVars[static_cast<size_t>(mlpW)], learningFactor, gradBiasScaled);)
+			if(mlpW > 0) { /* propagate gradient backwards through the ReLU activation */
+				auto coeffTranspose = tensorflow::ops::Transpose(root, tensorflow::Output(coeffVars[static_cast<size_t>(mlpW)]), {1, 0});
+				auto gradH = tensorflow::ops::MatMul(root, gradCurrent, coeffTranspose);
+				/* relu'(z) == (relu(z) > 0); hiddens[mlpW] == relu(z_{mlpW-1}), so (hiddens[mlpW] > 0) is the ReLU gradient mask */
+				const auto &mlpHidden = hiddens[static_cast<size_t>(mlpW)];
+				auto reluMask = tensorflow::ops::Cast(root, tensorflow::ops::Greater(root, mlpHidden, tensorflow::ops::ZerosLike(root, mlpHidden)), coefficientFormat);
+				gradCurrent = tensorflow::ops::Multiply(root, gradH, reluMask);
+			}
+		}
+		/* Per-layer init (constant 0.2f) and assign (from randomCoefficients_N) graph nodes */
+		std::vector<std::string> mlpInitOpNames;
+		for(long mlpW = 0; static_cast<long>(layersOfNeurons) > mlpW; ++mlpW) {
+			const std::string mlpWs = std::to_string(mlpW);
+			const DimSz mlpInDim = (0 == mlpW) ? inputDim : static_cast<DimSz>(neuronsPerLayer);
+			const DimSz mlpOutDim = (static_cast<long>(layersOfNeurons) - 1 == mlpW) ? outputDim : static_cast<DimSz>(neuronsPerLayer);
+			tensorflow::ops::Assign(root.WithOpName("initCoefficients_" + mlpWs), coeffVars[static_cast<size_t>(mlpW)], tensorflow::ops::Const(root, 0.2f /* gradients are all `0` if initial values are `0` */, tensorflow::TensorShape({mlpInDim, mlpOutDim})));
+			tensorflow::ops::Assign(root.WithOpName("assignCoefficients_" + mlpWs), coeffVars[static_cast<size_t>(mlpW)], randCoeffVars[static_cast<size_t>(mlpW)]);
+			SUSUWU_CNS_IF_BIAS(tensorflow::ops::Assign(root.WithOpName("initBiases_" + mlpWs), biasVars[static_cast<size_t>(mlpW)], tensorflow::ops::Const(root, 0.2f, tensorflow::TensorShape({mlpOutDim})));)
+			SUSUWU_CNS_IF_BIAS(tensorflow::ops::Assign(root.WithOpName("assignBiases_" + mlpWs), biasVars[static_cast<size_t>(mlpW)], randBiasVars[static_cast<size_t>(mlpW)]);)
+			mlpInitOpNames.push_back("initCoefficients_" + mlpWs);
+			SUSUWU_CNS_IF_BIAS(mlpInitOpNames.push_back("initBiases_" + mlpWs);)
+		}
+		/* Create and init the graph (`this->graphDef`) */
+		TF_CHECK_OK(root.ToGraphDef(&graphDef)); /* produce `tensorflow::GraphDef` */
+		TF_CHECK_OK(session->Create(graphDef));
+		TF_CHECK_OK(session->Run({}, {}, mlpInitOpNames, SUSUWU_NULLPTR)); /* Prevents "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" in case `pseudoRandomSynapses` is not used. */
+#else /* !SUSUWU_CNS_USE_MLP */
+		/* Single-layer: manually compute gradient of loss w.r.t. coefficients */
+		auto inputTranspose = tensorflow::ops::Transpose(root, input, {1, 0}); /* Transpose input: shape [input_dim, batch_size] */
+		auto gradCoefficients = tensorflow::ops::MatMul(root, inputTranspose, grad); /* MatMul: shape [input_dim, output_dim] */
+		SUSUWU_CNS_IF_BIAS(auto gradBiases = tensorflow::ops::Sum(root, grad, {0});) /* Sum over batch axis */ /* Notice: swapped order so dependency of `MatMul` on `inputTranspose` is masked with overhead of `Sum` */
+
 		/* Scaled grads (`ApplyGradientDescent`'s `delta` = `grad / scale`) */
 		auto gradCoefficientsScaled = tensorflow::ops::Multiply(root, gradCoefficients, scale);
 		SUSUWU_CNS_IF_BIAS(auto gradBiasesScaled = tensorflow::ops::Multiply(root, gradBiases, scale);) /* use same scale as above */
-#endif /* def TENSORFLOW_HAS_GRADIENTTAPE #else */
 
-#if SUSUWU_CNS_USE_MLP
-#	pragma message("TODO: `ApplyGradientDescent` loop for `SUSUWU_CNS_USE_MLP`")
-//	for(long w = 0; this->layersOfNeurons > w; ++w) { /* TODO */ }
-#endif /* SUSUWU_CNS_USE_MLP */
 	//		auto optimizer = tensorflow::ops::ApplyAdam(root, coefficientsVar, SUSUWU_CNS_IF_BIAS(biasesVar SUSUWU_COMMA), learningFactor); /* TODO? Heard this is just part of the Python TensorFlow */
 //		auto optimizer = tensorflow::ops::AdamOptimizer(learningFactor); /* TODO? */
 		auto optimizerCoefficients = tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients"), coefficientsVar, learningFactor, gradCoefficientsScaled /* gradients[0] */); /* TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */
@@ -396,6 +489,8 @@ public:
 		TF_CHECK_OK(root.ToGraphDef(&graphDef)); /* produce `tensorflow::GraphDef` */
 		TF_CHECK_OK(session->Create(graphDef));
 		TF_CHECK_OK(session->Run({}, {}, {"initCoefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "initBiases")}, SUSUWU_NULLPTR)); /* Prevents "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" in case `pseudoRandomSynapses` is not used. */
+#endif /* !SUSUWU_CNS_USE_MLP */
+#endif /* def TENSORFLOW_HAS_GRADIENTTAPE #else */
 	}
 	void printGraphNodes() const {
 		SUSUWU_INFO(getName() + "::" + __func__ + "() { for(const auto &node : graphDef.node()) { ");
@@ -459,6 +554,15 @@ public:
 		float bestLoss = std::numeric_limits<float>::max(),
 			bestLossAbs = std::abs(bestLoss);
 		size_t patienceCounter = 0;
+#if SUSUWU_CNS_USE_MLP
+		/* Build per-layer optimizer target names for MLP training loop */
+		std::vector<std::string> mlpOptimizerTargets;
+		for(long mlpW = 0; static_cast<long>(layersOfNeurons) > mlpW; ++mlpW) {
+			const std::string mlpWs = std::to_string(mlpW);
+			mlpOptimizerTargets.push_back("optimizerCoefficients_" + mlpWs);
+			SUSUWU_CNS_IF_BIAS(mlpOptimizerTargets.push_back("optimizerBiases_" + mlpWs);)
+		}
+#endif /* SUSUWU_CNS_USE_MLP */
 		for(size_t epoch = 0; epoch < trainingIterations; ++epoch) {
 			std::vector<tensorflow::Tensor> outputs;
 			tensorflow::Status status = session->Run(
@@ -467,7 +571,7 @@ public:
 					{"labels", expectedOutputTensor}
 				},
 				(0 == validationCount) ? outputTensors : std::vector<std::string>(),
-				{"optimizerCoefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "optimizerBiases")},
+				SUSUWU_CNS_IF_MLP(mlpOptimizerTargets, (std::vector<std::string>{"optimizerCoefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "optimizerBiases")})),
 				(0 == validationCount) ? &outputs : SUSUWU_NULLPTR
 			);
 			if(!status.ok()) {
@@ -530,6 +634,9 @@ public:
 			SUSUWU_WARNING(getName() + "::" + __func__ + "() { if(0 == graphDef.node_size()) { /* This path is unreachable unless `setupSynapsesPostProcess()` is called by user code, or is overridden but `setupSynapses()` is not overridden (such as if an unimplemented type of `setupSynapses()` was used) */ } } ");
 		} else {
 #if SUSUWU_CNS_LOCAL_COEFFICIENTS /* Store model values into `class TensorFlowCns`. */
+#if SUSUWU_CNS_USE_MLP
+#	pragma message("TODO: `setupSynapsesPostProcess` with `SUSUWU_CNS_LOCAL_COEFFICIENTS` + `SUSUWU_CNS_USE_MLP` requires `std::vector<tensorflow::Tensor> coefficients` member; not yet implemented.")
+#else /* !SUSUWU_CNS_USE_MLP */
 			std::vector<tensorflow::Tensor> outputs;
 			const tensorflow::Status status = session->Run({}, {"coefficients", "biases"}, {}, &outputs);
 			if(!status.ok()) {
@@ -538,6 +645,7 @@ public:
 			}
 			this->coefficients = outputs[0];
 			SUSUWU_CNS_IF_BIAS(this->biases = outputs[1];)
+#endif /* !SUSUWU_CNS_USE_MLP */
 #endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
 			setInitialized(true);
 		}
