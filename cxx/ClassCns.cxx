@@ -10,6 +10,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* uint8_t uint32_t uint64_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* std::memcmp */
 #include <fstream> /* std::ifstream std::ofstream */
 #include <stdexcept> /* std::runtime_error */
 
@@ -85,9 +86,9 @@ void Cns::loadFrom(const ClassIoPath &modelPath) {
 	if(!file) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \"" + modelPath + "\") { !std::ifstream(modelPath, std::ios::binary) }"));
 	}
-	char magic[4] = {0, 0, 0, 0};
+	char magic[4];
 	file.read(magic, sizeof(magic));
-	if(magic[0] != cnsDumpMagic[0] || magic[1] != cnsDumpMagic[1] || magic[2] != cnsDumpMagic[2] || magic[3] != cnsDumpMagic[3]) {
+	if(std::memcmp(magic, cnsDumpMagic, sizeof(cnsDumpMagic)) != 0) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \"" + modelPath + "\") { magic != \"CNS\\0\" /* unrecognized file format */ }"));
 	}
 	uint8_t version = 0;

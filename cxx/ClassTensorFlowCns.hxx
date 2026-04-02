@@ -6,6 +6,11 @@
 #ifndef INCLUDES_cxx_ClassTensorFlowCns_hxx
 #define INCLUDES_cxx_ClassTensorFlowCns_hxx
 #define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /* This is the most close to fit-for-use */
+#ifdef SUSUWU_TENSORFLOWCNS_PROTOBUF_FS
+#	ifndef SUSUWU_TENSORFLOWCNS_HAS_DUMPTO
+#		define SUSUWU_TENSORFLOWCNS_HAS_DUMPTO /* `SUSUWU_TENSORFLOWCNS_PROTOBUF_FS` implements `dumpTo`/`loadFrom` */
+#	endif /* ndef SUSUWU_TENSORFLOWCNS_HAS_DUMPTO */
+#endif /* def SUSUWU_TENSORFLOWCNS_PROTOBUF_FS */
 #include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassNumeral.hxx" /* numeralDenormalization() numeralNormalization() NumeralNormalizers::fromTuple */
@@ -158,7 +163,20 @@ public:
 #endif /* else !SUSUWU_CNS_LOCAL_COEFFICIENTS */
 //		return this->hashCode() == obj.hashCode();
 	}
-	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE SUSUWU_VIRTUAL_HASHCODE /* Shallow hash code. TODO: hash container values */
+	const SUSUWU_INTPTR hashCode() const SUSUWU_OVERRIDE { /* Content-based hash: consistent with `operator==` so that `equals(obj)` implies `hashCode() == obj.hashCode()` */
+#if SUSUWU_CNS_LOCAL_COEFFICIENTS
+		const tensorflow::StringPiece coeffData = coefficients.tensor_data();
+		SUSUWU_INTPTR h = static_cast<SUSUWU_INTPTR>(classObjectHashcodeVo64(reinterpret_cast<const unsigned char *>(coeffData.data()), coeffData.size()));
+#	if SUSUWU_CNS_USE_BIAS
+		const tensorflow::StringPiece biasData = biases.tensor_data();
+		h ^= static_cast<SUSUWU_INTPTR>(classObjectHashcodeVo64(reinterpret_cast<const unsigned char *>(biasData.data()), biasData.size()));
+#	endif /* SUSUWU_CNS_USE_BIAS */
+		return h;
+#else /* else !SUSUWU_CNS_LOCAL_COEFFICIENTS */
+		const std::string serialized = graphDef.SerializeAsString(); /* consistent with `operator==` which uses `graphDef.SerializeAsString()` */
+		return static_cast<SUSUWU_INTPTR>(classObjectHashcodeVo64(reinterpret_cast<const unsigned char *>(serialized.data()), serialized.size()));
+#endif /* else !SUSUWU_CNS_LOCAL_COEFFICIENTS */
+	}
 #endif /* SUSUWU_CNS_VALUE_SEMANTICS */
 	SUSUWU_PURE_VIRTUAL_DEFAULTS(Susuwu::TensorFlowCns) /* `getName()`, `isPureVirtual()`, `operator==()`, ... */
 
