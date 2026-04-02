@@ -49,7 +49,7 @@
 #endif /* ndef SUSUWU_TENSORFLOW_HAS_DATATYPETOENUM */
 /* NOLINTBEGIN(cppcoreguidelines-macro-usage) */
 #ifndef SUSUWU_CNS_USE_MLP
-#	define SUSUWU_CNS_USE_MLP true /* Multiple-Layer-Perceptron mode. No reason to disable this (if `1 == layersOfNeurons`, `setupSynapses()` and `processTo*()` act as Single-Layer-Perceptrons) */
+#	define SUSUWU_CNS_USE_MLP true /* Multiple-Layer-Perceptron mode. No reason to disable this (if `1 == layersOfNeurons`, `setupSynapses()` and `processTo*()` act as Single-Layer-Perceptrons). TODO: `SUSUWU_CNS_LOCAL_COEFFICIENTS && SUSUWU_CNS_USE_MLP` is not yet implemented (see pragma messages at those intersections). */
 #endif /* ndef SUSUWU_CNS_USE_MLP */
 #if SUSUWU_CNS_USE_MLP
 # define SUSUWU_CNS_IF_MLP(THEN, ELSE) THEN
@@ -270,26 +270,26 @@ public:
 		const float scale = 1.0; /* placeholder */
 #endif /* !(defined(SUSUWU_CNS_HE_INIT) && SUSUWU_CNS_HE_INIT) */
 #if SUSUWU_CNS_USE_MLP
-		std::vector<std::pair<std::string, tensorflow::Tensor>> _feedDict;
-		std::vector<std::string> _assignOps;
-		for(size_t _w = 0; _w < layersOfNeurons; ++_w) {
-			const std::string _suffix = "_" + std::to_string(_w);
-			const auto _inDim = (0 == _w) ? static_cast<DimSz>(inputNeurons) : static_cast<DimSz>(neuronsPerLayer);
-			const auto _outDim = (layersOfNeurons - 1 == _w) ? static_cast<DimSz>(outputNeurons) : static_cast<DimSz>(neuronsPerLayer);
-			tensorflow::Tensor _coeff(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({_inDim, _outDim}));
-			for(int i = 0; i < _coeff.dim_size(0); ++i) {
-				for(int j = 0; j < _coeff.dim_size(1); ++j) {
+		std::vector<std::pair<std::string, tensorflow::Tensor>> feedDict;
+		std::vector<std::string> assignOps;
+		for(size_t w = 0; w < layersOfNeurons; ++w) {
+			const std::string suffix = "_" + std::to_string(w);
+			const auto inDim = (0 == w) ? static_cast<DimSz>(inputNeurons) : static_cast<DimSz>(neuronsPerLayer);
+			const auto outDim = (layersOfNeurons - 1 == w) ? static_cast<DimSz>(outputNeurons) : static_cast<DimSz>(neuronsPerLayer);
+			tensorflow::Tensor layerCoeff(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({inDim, outDim}));
+			for(int i = 0; i < layerCoeff.dim_size(0); ++i) {
+				for(int j = 0; j < layerCoeff.dim_size(1); ++j) {
 					if(inputEnd != inputIt) { ++inputIt; } else { inputIt = inputBegin; }
-					initCoefficient(_coeff.tensor<CoefficientType, 2>()(i, j), inputIt, scale);
+					initCoefficient(layerCoeff.tensor<CoefficientType, 2>()(i, j), inputIt, scale);
 				}
 			}
-			tensorflow::Tensor _bias(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({_outDim}));
-			_feedDict.push_back({"randomCoefficients" + _suffix, _coeff});
-			SUSUWU_CNS_IF_BIAS(_feedDict.push_back({"randomBiases" + _suffix, _bias});)
-			_assignOps.push_back("assignCoefficients" + _suffix);
-			SUSUWU_CNS_IF_BIAS(_assignOps.push_back("assignBiases" + _suffix);)
+			tensorflow::Tensor layerBias(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({outDim})); /* zero-initialized: `pseudoRandomSynapses` only randomizes coefficients, not biases (matching original single-layer behavior) */
+			feedDict.push_back({"randomCoefficients" + suffix, layerCoeff});
+			SUSUWU_CNS_IF_BIAS(feedDict.push_back({"randomBiases" + suffix, layerBias});)
+			assignOps.push_back("assignCoefficients" + suffix);
+			SUSUWU_CNS_IF_BIAS(assignOps.push_back("assignBiases" + suffix);)
 		}
-		TF_CHECK_OK(session->Run(_feedDict, {}, _assignOps, SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
+		TF_CHECK_OK(session->Run(feedDict, {}, assignOps, SUSUWU_NULLPTR)); /* "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" fix */
 #else /* else !SUSUWU_CNS_USE_MLP */
 #if !SUSUWU_CNS_LOCAL_COEFFICIENTS
 		tensorflow::Tensor coefficients(tensorflow::Tensor(DataTypeToEnum<CoefficientType>::value, tensorflow::TensorShape({static_cast<DimSz>(inputNeurons), static_cast<DimSz>(neuronsPerLayer)}))); /* connectome coefficients ("synaptic strengths") */
@@ -431,19 +431,19 @@ public:
 	//		auto optimizer = tensorflow::ops::ApplyAdam(root, coefficientsVar, SUSUWU_CNS_IF_BIAS(biasesVar SUSUWU_COMMA), learningFactor); /* TODO? Heard this is just part of the Python TensorFlow */
 //		auto optimizer = tensorflow::ops::AdamOptimizer(learningFactor); /* TODO? */
 #if SUSUWU_CNS_USE_MLP
-		std::vector<std::string> _initOps;
-		for(size_t _w = 0; _w < layersOfNeurons; ++_w) {
-			const std::string _suffix = "_" + std::to_string(_w);
-			const auto _inDim = (0 == _w) ? inputDim : static_cast<DimSz>(neuronsPerLayer);
-			const auto _outDim = (layersOfNeurons - 1 == _w) ? outputDim : static_cast<DimSz>(neuronsPerLayer);
-			tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients" + _suffix), coefficientsVars[_w], learningFactor, gradCoefficientsScaled /* gradients[0], applied to all layers (square connectome approximation) */); /* TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */
-			SUSUWU_CNS_IF_BIAS(tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerBiases" + _suffix), biasesVars[_w], learningFactor, gradBiasesScaled /* gradients[1] */);) /* TODO: the derivative of `coefficients` is `n`, but the derivative of `biases` is `1`; use low-order optimizer for `biases`? */
-			tensorflow::ops::Assign(root.WithOpName("initCoefficients" + _suffix), coefficientsVars[_w], tensorflow::ops::Const(root, 0.2f /* gradients are all `0` if initial values are `0` */, tensorflow::TensorShape({_inDim, _outDim})));
-			tensorflow::ops::Assign(root.WithOpName("assignCoefficients" + _suffix), coefficientsVars[_w], randomCoefficientsVars[_w]);
-			SUSUWU_CNS_IF_BIAS(tensorflow::ops::Assign(root.WithOpName("initBiases" + _suffix), biasesVars[_w], tensorflow::ops::Const(root, 0.2f, tensorflow::TensorShape({_outDim})));)
-			SUSUWU_CNS_IF_BIAS(tensorflow::ops::Assign(root.WithOpName("assignBiases" + _suffix), biasesVars[_w], randomBiasesVars[_w]);)
-			_initOps.push_back("initCoefficients" + _suffix);
-			SUSUWU_CNS_IF_BIAS(_initOps.push_back("initBiases" + _suffix);)
+		std::vector<std::string> initOps;
+		for(size_t w = 0; w < layersOfNeurons; ++w) {
+			const std::string suffix = "_" + std::to_string(w);
+			const auto inDim = (0 == w) ? inputDim : static_cast<DimSz>(neuronsPerLayer);
+			const auto outDim = (layersOfNeurons - 1 == w) ? outputDim : static_cast<DimSz>(neuronsPerLayer);
+			tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients" + suffix), coefficientsVars[w], learningFactor, gradCoefficientsScaled /* final-layer gradient applied to all layers (square-connectome approximation; all layers share the same shape [neuronsPerLayer, neuronsPerLayer]) */); /* Op is added to the graph by name; `session->Run` references it via "optimizerCoefficients" + suffix. TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */
+			SUSUWU_CNS_IF_BIAS(tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerBiases" + suffix), biasesVars[w], learningFactor, gradBiasesScaled /* same approximation */);) /* TODO: the derivative of `coefficients` is `n`, but the derivative of `biases` is `1`; use low-order optimizer for `biases`? */
+			tensorflow::ops::Assign(root.WithOpName("initCoefficients" + suffix), coefficientsVars[w], tensorflow::ops::Const(root, 0.2f /* gradients are all `0` if initial values are `0` */, tensorflow::TensorShape({inDim, outDim})));
+			tensorflow::ops::Assign(root.WithOpName("assignCoefficients" + suffix), coefficientsVars[w], randomCoefficientsVars[w]);
+			SUSUWU_CNS_IF_BIAS(tensorflow::ops::Assign(root.WithOpName("initBiases" + suffix), biasesVars[w], tensorflow::ops::Const(root, 0.2f, tensorflow::TensorShape({outDim})));)
+			SUSUWU_CNS_IF_BIAS(tensorflow::ops::Assign(root.WithOpName("assignBiases" + suffix), biasesVars[w], randomBiasesVars[w]);)
+			initOps.push_back("initCoefficients" + suffix);
+			SUSUWU_CNS_IF_BIAS(initOps.push_back("initBiases" + suffix);)
 		}
 #else /* else !SUSUWU_CNS_USE_MLP */
 		auto optimizerCoefficients = tensorflow::ops::ApplyGradientDescent(root.WithOpName("optimizerCoefficients"), coefficientsVar, learningFactor, gradCoefficientsScaled /* gradients[0] */); /* TODO: allow to configure this? Default is `SGD` (Stochastic Gradient Descent). */
@@ -460,7 +460,7 @@ public:
 		TF_CHECK_OK(root.ToGraphDef(&graphDef)); /* produce `tensorflow::GraphDef` */
 		TF_CHECK_OK(session->Create(graphDef));
 #if SUSUWU_CNS_USE_MLP
-		TF_CHECK_OK(session->Run({}, {}, _initOps, SUSUWU_NULLPTR)); /* Prevents "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" in case `pseudoRandomSynapses` is not used. */
+		TF_CHECK_OK(session->Run({}, {}, initOps, SUSUWU_NULLPTR)); /* Prevents "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" in case `pseudoRandomSynapses` is not used. */
 #else /* else !SUSUWU_CNS_USE_MLP */
 		TF_CHECK_OK(session->Run({}, {}, {"initCoefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "initBiases")}, SUSUWU_NULLPTR)); /* Prevents "LoadError: Tensorflow error: Status: Attempting to use uninitialized value" in case `pseudoRandomSynapses` is not used. */
 #endif /* else !SUSUWU_CNS_USE_MLP */
@@ -529,10 +529,10 @@ public:
 		size_t patienceCounter = 0;
 #if SUSUWU_CNS_USE_MLP
 		std::vector<std::string> optimizerOps;
-		for(size_t _w = 0; _w < layersOfNeurons; ++_w) {
-			const std::string _suffix = "_" + std::to_string(_w);
-			optimizerOps.push_back("optimizerCoefficients" + _suffix);
-			SUSUWU_CNS_IF_BIAS(optimizerOps.push_back("optimizerBiases" + _suffix);)
+		for(size_t w = 0; w < layersOfNeurons; ++w) {
+			const std::string suffix = "_" + std::to_string(w);
+			optimizerOps.push_back("optimizerCoefficients" + suffix);
+			SUSUWU_CNS_IF_BIAS(optimizerOps.push_back("optimizerBiases" + suffix);)
 		}
 #else /* else !SUSUWU_CNS_USE_MLP */
 		const std::vector<std::string> optimizerOps = {"optimizerCoefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "optimizerBiases")};
@@ -549,7 +549,10 @@ public:
 				(0 == validationCount) ? &outputs : SUSUWU_NULLPTR
 			);
 			if(!status.ok()) {
-				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + __func__ + "() { const tensorflow::Status status = session->Run({{\"input\", inputTensor}, {\"labels\", expectedOutputTensor}}, {" + ((0 == validationCount) ? "\"loss\"" : "") + "}, optimizerOps, &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } } }"));
+				std::string optimizerOpsStr = "[";
+				for(const auto &op : optimizerOps) { optimizerOpsStr += "\"" + op + "\", "; }
+				optimizerOpsStr += "]";
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::" + __func__ + "() { const tensorflow::Status status = session->Run({{\"input\", inputTensor}, {\"labels\", expectedOutputTensor}}, {" + ((0 == validationCount) ? "\"loss\"" : "") + "}, " + optimizerOpsStr + ", &outputs); (!status.ok()) { epoch == " + std::to_string(epoch) + "; status.ToString() == \"" + status.ToString() + "\"; } } }"));
 			}
 			float lossVal;
 			if(0 == validationCount) {
