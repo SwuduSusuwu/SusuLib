@@ -6,6 +6,7 @@
 #ifndef INCLUDES_cxx_ClassTensorFlowCns_hxx
 #define INCLUDES_cxx_ClassTensorFlowCns_hxx
 #define SUSUWU_TENSORFLOWCNS_PROTOBUF_FS /* This is the most close to fit-for-use */
+#define SUSUWU_TENSORFLOWCNS_HAS_DUMPTO /* `TensorFlowCns::dumpTo` and `TensorFlowCns::loadFrom` are implemented */
 #include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassNumeral.hxx" /* numeralDenormalization() numeralNormalization() NumeralNormalizers::fromTuple */

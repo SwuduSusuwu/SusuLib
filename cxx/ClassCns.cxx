@@ -10,6 +10,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* uint32_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+#include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp */
 #include <fstream> /* std::ifstream std::ofstream */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string std::to_string */
@@ -76,7 +77,7 @@ void Cns::loadFrom(const ClassIoPath &modelPath) {
 	char magic[4];
 	uint32_t version;
 	is.read(magic, sizeof(magic));
-	if(!is || magic[0] != cnsFileMagic[0] || magic[1] != cnsFileMagic[1] || magic[2] != cnsFileMagic[2] || magic[3] != cnsFileMagic[3]) {
+	if(!is || 0 != std::memcmp(magic, cnsFileMagic, sizeof(magic))) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\"" + modelPath + "\") { invalid magic number; not a CNS binary file }"));
 	}
 	is.read(reinterpret_cast<char *>(&version), sizeof(version));
