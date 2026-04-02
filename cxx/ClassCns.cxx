@@ -4,13 +4,107 @@
  * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_ClassCns_cxx
 #define INCLUDES_cxx_ClassCns_cxx
-#include "ClassCns.hxx" /* std::string std::tuple */
-#include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_OVERRIDE */
+#include "ClassCns.hxx" /* Cns ClassIoPath NumeralNormalizers SUSUWU_CNS_SEPARATE_NORMS */
+#include "Macros.hxx" /* SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_OVERRIDE SUSUWU_SH_ERROR */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
+#include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* uint32_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+#include <fstream> /* std::ifstream std::ofstream */
+#include <stdexcept> /* std::runtime_error */
+#include <string> /* std::string std::to_string */
 
 namespace Susuwu {
+
+/* Binary file format for `Cns::dumpTo` / `Cns::loadFrom`:
+ * [4 bytes] magic: 'C','N','S','\0'
+ * [4 bytes] version: 1 (uint32_t, host byte order)
+ * [sizeof(ObjectMode)] inputMode
+ * [sizeof(ObjectMode)] outputMode
+ * [sizeof(size_t)] inputNeurons
+ * [sizeof(size_t)] outputNeurons
+ * [sizeof(size_t)] layersOfNeurons
+ * [sizeof(size_t)] neuronsPerLayer
+ * [sizeof(NumeralAccum)] inputNormsStorage.average
+ * [sizeof(NumeralAccum)] inputNormsStorage.magnitude
+ * [if SUSUWU_CNS_SEPARATE_NORMS: sizeof(NumeralAccum) x2] outputNormsStorage.{average,magnitude}
+ * [sizeof(size_t)] patience
+ * [sizeof(float)] minLossDelta
+ * [sizeof(float)] desiredLossThreshold
+ * [sizeof(float)] validationFactor
+ * [sizeof(float)] learningFactor
+ * [sizeof(bool)] initialized
+ */
+static const char cnsFileMagic[4] = {'C', 'N', 'S', '\0'};
+static const uint32_t cnsFileVersion = 1;
+
+void Cns::dumpTo(const ClassIoPath &modelPath) const {
+	std::ofstream os(modelPath, std::ios::binary);
+	if(!os) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(\"" + modelPath + "\") { failed to open file for writing }"));
+	}
+	os.write(cnsFileMagic, sizeof(cnsFileMagic));
+	os.write(reinterpret_cast<const char *>(&cnsFileVersion), sizeof(cnsFileVersion));
+	os.write(reinterpret_cast<const char *>(&inputMode), sizeof(inputMode));
+	os.write(reinterpret_cast<const char *>(&outputMode), sizeof(outputMode));
+	os.write(reinterpret_cast<const char *>(&inputNeurons), sizeof(inputNeurons));
+	os.write(reinterpret_cast<const char *>(&outputNeurons), sizeof(outputNeurons));
+	os.write(reinterpret_cast<const char *>(&layersOfNeurons), sizeof(layersOfNeurons));
+	os.write(reinterpret_cast<const char *>(&neuronsPerLayer), sizeof(neuronsPerLayer));
+	os.write(reinterpret_cast<const char *>(&inputNormsStorage.average), sizeof(inputNormsStorage.average));
+	os.write(reinterpret_cast<const char *>(&inputNormsStorage.magnitude), sizeof(inputNormsStorage.magnitude));
+#if SUSUWU_CNS_SEPARATE_NORMS
+	os.write(reinterpret_cast<const char *>(&outputNormsStorage.average), sizeof(outputNormsStorage.average));
+	os.write(reinterpret_cast<const char *>(&outputNormsStorage.magnitude), sizeof(outputNormsStorage.magnitude));
+#endif /* SUSUWU_CNS_SEPARATE_NORMS */
+	os.write(reinterpret_cast<const char *>(&patience), sizeof(patience));
+	os.write(reinterpret_cast<const char *>(&minLossDelta), sizeof(minLossDelta));
+	os.write(reinterpret_cast<const char *>(&desiredLossThreshold), sizeof(desiredLossThreshold));
+	os.write(reinterpret_cast<const char *>(&validationFactor), sizeof(validationFactor));
+	os.write(reinterpret_cast<const char *>(&learningFactor), sizeof(learningFactor));
+	os.write(reinterpret_cast<const char *>(&initialized), sizeof(initialized));
+	if(!os) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(\"" + modelPath + "\") { write failed }"));
+	}
+}
+
+void Cns::loadFrom(const ClassIoPath &modelPath) {
+	std::ifstream is(modelPath, std::ios::binary);
+	if(!is) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\"" + modelPath + "\") { failed to open file for reading }"));
+	}
+	char magic[4];
+	uint32_t version;
+	is.read(magic, sizeof(magic));
+	if(!is || magic[0] != cnsFileMagic[0] || magic[1] != cnsFileMagic[1] || magic[2] != cnsFileMagic[2] || magic[3] != cnsFileMagic[3]) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\"" + modelPath + "\") { invalid magic number; not a CNS binary file }"));
+	}
+	is.read(reinterpret_cast<char *>(&version), sizeof(version));
+	if(!is || cnsFileVersion != version) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\"" + modelPath + "\") { unsupported version == " + std::to_string(version) + " }"));
+	}
+	is.read(reinterpret_cast<char *>(&inputMode), sizeof(inputMode));
+	is.read(reinterpret_cast<char *>(&outputMode), sizeof(outputMode));
+	is.read(reinterpret_cast<char *>(&inputNeurons), sizeof(inputNeurons));
+	is.read(reinterpret_cast<char *>(&outputNeurons), sizeof(outputNeurons));
+	is.read(reinterpret_cast<char *>(&layersOfNeurons), sizeof(layersOfNeurons));
+	is.read(reinterpret_cast<char *>(&neuronsPerLayer), sizeof(neuronsPerLayer));
+	is.read(reinterpret_cast<char *>(&inputNormsStorage.average), sizeof(inputNormsStorage.average));
+	is.read(reinterpret_cast<char *>(&inputNormsStorage.magnitude), sizeof(inputNormsStorage.magnitude));
+#if SUSUWU_CNS_SEPARATE_NORMS
+	is.read(reinterpret_cast<char *>(&outputNormsStorage.average), sizeof(outputNormsStorage.average));
+	is.read(reinterpret_cast<char *>(&outputNormsStorage.magnitude), sizeof(outputNormsStorage.magnitude));
+#endif /* SUSUWU_CNS_SEPARATE_NORMS */
+	is.read(reinterpret_cast<char *>(&patience), sizeof(patience));
+	is.read(reinterpret_cast<char *>(&minLossDelta), sizeof(minLossDelta));
+	is.read(reinterpret_cast<char *>(&desiredLossThreshold), sizeof(desiredLossThreshold));
+	is.read(reinterpret_cast<char *>(&validationFactor), sizeof(validationFactor));
+	is.read(reinterpret_cast<char *>(&learningFactor), sizeof(learningFactor));
+	is.read(reinterpret_cast<char *>(&initialized), sizeof(initialized));
+	if(!is) {
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(\"" + modelPath + "\") { read failed; file truncated or corrupted }"));
+	}
+}
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
  * Install: `pip install pynum && pip install json && pip install git+https://github.com/CarsonScott/HSOM.git`

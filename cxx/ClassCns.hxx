@@ -11,6 +11,8 @@
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_INTPTR SUSUWU_DEFAULT SUSUWU_NOEXCEPT SUSUWU_OVERRIDE */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
+#include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* uint32_t */
+#include <fstream> /* std::ifstream std::ofstream */
 #include <functional> /* std::function */
 #include <limits> /* std::numeric_limits */
 #include <stdexcept> /* std::invalid_argument std::runtime_error */
@@ -115,10 +117,10 @@ public:
 
 	/* dump the connectome (the `tensorflow::Tensor` of synapse coefficients)
 	 * @throw std::runtime_error */
-	virtual void dumpTo(const ClassIoPath &modelPath) const { throw std::runtime_error("ClassCns::dumpTo(\"" + modelPath + "\") pure virtual call"); }
+	virtual void dumpTo(const ClassIoPath &modelPath) const; /* serialize base class fields to binary file `modelPath` */
 	/* load the connectome (the `tensorflow::Tensor` of synapse coefficients)
 	 * @throw std::runtime_error */
-	virtual void loadFrom(const ClassIoPath &modelPath) { throw std::runtime_error("ClassCns::loadFrom(\"" + modelPath + "\") pure virtual call"); }
+	virtual void loadFrom(const ClassIoPath &modelPath); /* deserialize base class fields from binary file `modelPath` */
 
 	/* Internal function, which outros of `setupSynapses()` use.
 	 * @throw std::bad_alloc std::runtime_error
