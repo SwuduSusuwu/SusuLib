@@ -499,7 +499,7 @@ SUSUWU_INSTALL_PACKAGES() ( #/* Usage: `SUSUWU_INSTALL_PACKAGES "<package [packa
 SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL() { #/* Usage: `SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL "<new CFLAGS>" "<new CXXFLAGS>" "<new LDFLAGS>" "<unit test path>" ["<troubleshoot-howto>"] */
 	SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH="${4}"
 	#shellcheck disable=SC2086 #`"${CXXFLAGS}"` gives "clang++: error: language not recognized"
-	if (${CXX} ${CXXFLAGS} -Wno-unused-variable ${2} ${LDFLAGS} ${3} -c "${SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH}"); then #/* TODO: ` 2>/dev/null; then` as soon as difficult-to-parse errors such as `fatal error: "unsupported/Eigen/CXX11/Tensor' file not found" have solutions */
+	if (${CXX} ${CXXFLAGS} -Wno-unused-variable ${2} ${LDFLAGS} ${3} -c "${SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH}"); then #/* TODO: ` 2>/dev/null; then` as soon as difficult-to-parse errors such as `fatal error: "unsupported/Eigen/CXX11/Tensor' file not found" have solutions. Notice: if `-c` is removed, then execution uses an extra ~100ms per invoke, plus you must remember to `rm a.out`. */
 		SUSUWU_PRINT "SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} ${SUSUWU_SETUP_BUILD_FLAGS_CONDITIONAL_PATH}") passed, will enable $(SUSUWU_SH_QUOTE "CODE" "CFLAGS=\"\${CFLAGS} ${1}\""); $(SUSUWU_SH_QUOTE "CODE" "CXXFLAGS=\"\${CXXFLAGS} ${2}\""); $(SUSUWU_SH_QUOTE "CODE" "LDFLAGS=\"\${LDFLAGS} ${3}\"") ."
 		CFLAGS="${CFLAGS} ${1}"
 		CXXFLAGS="${CXXFLAGS} ${2}"
