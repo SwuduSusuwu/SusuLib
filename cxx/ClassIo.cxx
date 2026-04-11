@@ -1,4 +1,7 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassIo.cxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_ClassIo_cxx
 #define INCLUDES_cxx_ClassIo_cxx
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_GREEN SUSUWU_SH_DEFAULT SUSUWU_SH_RED SUSUWU_UNIT_TESTS SUSUWU_WIN32 */
@@ -42,12 +45,12 @@ const ClassIoPath classIoGetOwnPath() {
 	return static_cast<ClassIoPath>(&path[0]); /* causes `PortableExecutableBytecode(classIoGetOwnPath())` to act as `PortableExecutableBytecode(argv[0])` */
 #elif defined SUSUWU_WIN32
 	const HMODULE hModule = GetModuleHandle(SUSUWU_NULLPTR);
-	const size_t nSize = GetModuleFileName(hModule, SUSUWU_NULLPTR, 0);
+	const size_t nSize = 65536 /* GetModuleFileName(hModule, SUSUWU_NULLPTR, 0) */;
 	static const std::string getModuleFileNameReturn = "classIoGetOwnPath(): { HMODULE hModule = GetModuleHandle(nullptr); size_t nSize = GetModuleFileName(hModule, nullptr, 0); (nSize == " SUSUWU_SH_PURPLE;
 	if(0 < nSize) {
 		char *const lpFilename = new char[nSize];
 		const size_t result = GetModuleFileName(hModule, lpFilename, nSize);
-		if(nSize == result) {
+		if(nSize >= /* == */ result) {
 			return ClassIoPath(lpFilename);
 		} else {
 			SUSUWU_ERROR(getModuleFileNameReturn + std::to_string(nSize) + SUSUWU_SH_DEFAULT "); char *const lpFilename = new char[nSize]; (GetModuleFileName(hModule, lpFileName, nSize) == " SUSUWU_SH_PURPLE + std::to_string(result) + SUSUWU_SH_DEFAULT " /* expected `== nSize` */); (GetLastError() == " SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "); }");
@@ -149,12 +152,22 @@ const bool classIoConsoleHasAnsiColors() {
 #	endif /* ndef SUSUWU_SH_SKIP_COLORS_BLACKLIST */
 #endif /* ndef _POSIX_VERSION */
 }
+const std::string classIoEscapeStr(const std::string &strValue, const bool printable /* notice: set to `false` if `strValue` has non-Latin1 codes, or has `"` */, const char *susuwuShCode /* `SUSUWU_SH_*` from `Macros.hxx` */) {
+		const std::string susuwuShCodeStr = susuwuShCode;
+		const std::string susuwuShDefStr = susuwuShCodeStr.size() ? SUSUWU_SH_DEFAULT : "";
+		if(strValue.empty()) {
+			return "\"\"" ;
+		} else if(printable) {
+			return "\"" + susuwuShCodeStr + strValue /* TODO: `echo $strValue | sed 's/"/\\"/' | sed 's/\\/\\\\/'` */ + susuwuShDefStr + "\"";
+		}
+		return susuwuShCodeStr + classIoHexStr(strValue) + susuwuShDefStr;
+}
 
 #if SUSUWU_UNIT_TESTS
 namespace { /* [misc-use-anonymous-namespace] */
 static void classIoHexOsSzTest(const std::string &value, const size_t hexSz, const bool printable) {
 	const size_t ss = classIoHexStr(value).size();
-	const std::string escapedValue = (printable ? ('"' + value + '"') : "value");
+	const std::string escapedValue = classIoEscapeStr(value, printable);
 	if(hexSz + SUSUWU_HEX_PREFIX_SZ != ss) {
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classIoHexStr(" + escapedValue + ").size() == " SUSUWU_SH_RED + std::to_string(value.size()) + SUSUWU_SH_DEFAULT "; classIoHexStr(" + escapedValue + ").size() != " SUSUWU_SH_GREEN + std::to_string(hexSz) + SUSUWU_SH_DEFAULT ";"));
 	}
@@ -180,8 +193,8 @@ static void classIoHexSsStrTest(const std::string &value, const bool printable) 
 	std::string newValue;
 	classIoHexIs(os, newValue);
 	if(value != newValue) {
-		const std::string escapedValue = (printable ? ("\"" SUSUWU_SH_GREEN + value + SUSUWU_SH_DEFAULT "\"") : (SUSUWU_SH_GREEN + classIoHexStr(value) + SUSUWU_SH_DEFAULT));
-		const std::string escapedNewValue = (newValue.empty() ? "\"\"" : (printable ? ("\"" SUSUWU_SH_RED + newValue + SUSUWU_SH_DEFAULT "\"") : SUSUWU_SH_RED + classIoHexStr(newValue) + SUSUWU_SH_DEFAULT)); /* NOLINT(readability-avoid-nested-conditional-operator): alternatives are much more verbose */
+		const std::string escapedValue = classIoEscapeStr(value, printable, SUSUWU_SH_GREEN);
+		const std::string escapedNewValue = classIoEscapeStr(newValue, printable, SUSUWU_SH_RED);
 		throw std::logic_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "std::string value = " + escapedValue + ", newValue; classIoHexOs(os, value); classIoHexIs(os, newValue); newValue != value; newValue == " + escapedNewValue + ';'));
 	}
 }
@@ -209,7 +222,7 @@ const bool classIoTests() {
 	return true;
 }
 /* NOLINTEND(google-runtime-int) */
-const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); }
+const bool classIoTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classIoTests, "classIoTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */

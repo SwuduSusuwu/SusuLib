@@ -1,7 +1,13 @@
 #!/bin/sh
 #
-#/* (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
-# * Builds `./c/` and `./cxx/` into `./obj/` and `./bin/`. Usage: "Console flags" from `./README.md#optionssetup`. */
+# /* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+#  * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./build.sh` (henceforth "*this source code*").
+#  * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+#  * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
+# /* This is alternative to `make config; make build; make test`.
+#  * Builds `./c/` and `./cxx/` into `./obj/` and `./bin/`. Usage: "Console flags" from `./README.md#optionssetup`.
+#  */
+
 GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #`git` does not set `${GIT_DIR}`, nor `${GIT_WORK_TREE}`
 SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
 	echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
@@ -20,7 +26,9 @@ SUSUWU_INCLUDE "./sh/make.sh" #/* SUSUWU_BUILD_CTAGS SUSUWU_BUILD_OBJECTS() SUSU
 SUSUWU_PRINT "$(SUSUWU_SH_NOTICE)" "(C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses."
 
 THIS_DEFAULT_BRANCH="$(SUSUWU_DEFAULT_BRANCH "trunk")"
-export FLAGS_USER="" #/* Usage: "Macro flags" from `./README.md#optionssetup`. */
+SUSUWU_REV_PARSE_HEAD="$(git rev-parse HEAD)"
+SUSUWU_PRINT "$(SUSUWU_SH_WARNING)" "$(SUSUWU_SH_QUOTE "CODE" "git branch") is \"$(SUSUWU_SH_QUOTE "CURRENT" "preview")\" (which is unstable, plus sets $(SUSUWU_SH_QUOTE "CODE" "-DSUSUWU_EXPERIMENTAL")); for production use, execute $(SUSUWU_SH_QUOTE "CODE" "git switch $(SUSUWU_SH_QUOTE "PROPOSED" "${THIS_DEFAULT_BRANCH}")")."
+export FLAGS_USER="-DSUSUWU_REV_PARSE_HEAD=\"${SUSUWU_REV_PARSE_HEAD}\" -DSUSUWU_EXPERIMENTAL -DSUSUWU_DEFAULT_BRANCH=\"${THIS_DEFAULT_BRANCH}\"" #/* Usage: "Macro flags" from `./README.md#optionssetup`. */
 export FLAGS_ANALYSIS="-Wall -Wno-unused-function -Wno-unused-function -Wextra -Wno-unused-parameter -Wno-ignored-qualifiers -Wpedantic" #/*TODO: -`-Wno-*`, +`-Werror` */
 export FLAGS_RELEASE="-fomit-frame-pointer -DNDEBUG -O2" #/* without frame pointer (pointer used for stacktraces), without `assert(...)`/`SUSUWU_DEBUG(...)`/`SUSUWU_NOTICE(...)`, with optimization level 2 */
 export CXXFLAGS_DEBUG="-std=c++11" #/* ensure unit tests pass with C++11 support as max */
@@ -32,9 +40,8 @@ export FLAGS_FSAN="-fsanitize=address -fno-sanitize-recover=all -fsanitize=float
 C_SOURCE_PATH="./c/" #/* Usage: replace with directory root for _C_ source code */
 CXX_SOURCE_PATH="./cxx/" #/* Usage: replace with directory root for _C++_ source code */
 
-
-SUSUWU_PROCESS_S $@ #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
-SUSUWU_PROCESS_VERBOSE $@ #/* Usage: `./build.sh --verbose`. Enables `SUSUWU_SH_DEBUG` ("Debug:") messages, forces `set -x`. */
+SUSUWU_PROCESS_S "$@" #/* Usage: `./build.sh -q`. Silences `SUSUWU_SH_NOTICE` ("Notice:") messages, prevents `set -x`. */
+SUSUWU_PROCESS_VERBOSE "$@" #/* Usage: `./build.sh --verbose`. Enables `SUSUWU_SH_DEBUG` ("Debug:") messages, forces `set -x`. */
 SUSUWU_PRODUCTION_USE "${THIS_DEFAULT_BRANCH}"
 SUSUWU_PROCESS_MINGW "$@" #/* Usage: `apt install mingw wine && ./build.sh --mingw`. [MinGW cross-builds to Windows.] */
 SUSUWU_SETUP_CXX #/* Analogous to `make config` */
@@ -47,6 +54,20 @@ SUSUWU_SETUP_OUTPUT "Susuwu" #/* Usage: replace with name of your program */
 SUSUWU_PROCESS_CLEAN_REBUILD "$@" #/* Usage: `./build.sh --clean` or `./build.sh --rebuild` */
 
 SUSUWU_SETUP_BUILD_FLAGS #/* Analogous to `make config` */
+
+if [ -n "${GITHUB_ACTIONS}" ]; then
+	if SUSUWU_IS_PREVIEW "${THIS_DEFAULT_BRANCH}"; then #/* Super active, so ... */
+		export SUSUWU_ABORT_ON_FIRST_ERROR=true #/* ... if there are errors don't waste resources on full build. */
+	fi
+	export SUSUWU_IS_VIRTUAL=true #/* `build.sh` is executed through [GitHub Workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: `|| <test for other amnesiac environments, such as Docker>` */
+else
+	export SUSUWU_IS_VIRTUAL=false
+fi
+SUSUWU_INCLUDE "./sh/Includes.sh" #/* CFLAGS, CXXFLAGS, LDFLAGS, SUSUWU_INCLUDES_LIBPUGIXML(), SUSUWU_INCLUDES_LIBXML2(), SUSUWU_INCLUDES_LIBTENSORFLOW(), USER_FLAGS */
+SUSUWU_INCLUDES_LIBPUGIXML
+SUSUWU_INCLUDES_LIBXML2
+SUSUWU_INCLUDES_LIBTENSORFLOW
+
 SUSUWU_PROCESS_INCLUDES "${CXX_SOURCE_PATH}Class*.hxx" "${CXX_SOURCE_PATH}Macros.hxx"
 #shellcheck disable=SC2119 #Specifics were removed from `SUSUWU_BUILD_CTAGS` call to match `./hooks/pre-commit`.
 SUSUWU_BUILD_CTAGS #/* Usage: `apt install ctags vim && vim -t tagToSearchFor` */

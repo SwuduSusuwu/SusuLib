@@ -1,4 +1,7 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassSys.cxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_ClassSys_cxx
 #define INCLUDES_cxx_ClassSys_cxx
 #include "Macros.hxx" /* SUSUWU_CXX20 SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE SUSUWU_NULLPTR SUSUWU_POSIX SUSUWU_SH_DEFAULT SUSUWU_SH_ERROR SUSUWU_SH_PURPLE SUSUWU_SH_WARNING SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_WIN32 */
@@ -59,7 +62,7 @@ const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::v
 	std::vector<char *> argv;
 	const std::vector<std::string> argvSmutable = {argvS.cbegin(), argvS.cend()};
 	argv.reserve(argvSmutable.size() + 1);
-	//for(auto x : argvSmutable) { /* with `fsanitize=address` this triggers "stack-use-after-scope" */
+	/* Do not remove `&`. `for(auto x : argvSmutable)` with `fsanitize=address` triggers `stack-use-after-scope` */
 	for(const auto &x: argvSmutable /* auto x = argvSmutable.cbegin(); argvSmutable.cend() != x; ++x */) {
 		argv.push_back(const_cast<char *>(x.c_str()));
 	}
@@ -87,7 +90,7 @@ const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::v
 	exit(EXIT_FAILURE); /* execv*() has `noreturn`. NOLINT(concurrency-mt-unsafe) */
 #else /* ndef SUSUWU_POSIX */
 	if(1 != argvS.size()) {
-		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */");
+		SUSUWU_ERROR("if(1 != argvS.size()) { /* TODO: non-POSIX systems (such as Win32) with multiple commands */ }");
 		return -1;
 	}
 	STARTUPINFO si;
@@ -107,11 +110,11 @@ const pid_t execvesForkThrow(const std::vector<std::string> &argvS, const std::v
 		&si,     /* Pointer to STARTUPINFO structure */
 		&pi)     /* Pointer to PROCESS_INFORMATION structure */
 	) {
-		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, non-blocking }}}");
+		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(CreateProcess(...)) { /* started, non-blocking */ }}}");
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	} else {
-		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execvesFork(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(!CreateProcess(...)) { /* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...); }}");
 	}
 	return 0;
 #endif /* ndef SUSUWU_POSIX */
@@ -126,20 +129,19 @@ const int execves(const std::vector<std::string> &argvS, const std::vector<std::
 	waitpid(pid, &wstatus, 0);
 /* NOLINTBEGIN(misc-include-cleaner): `clang-tidy` can't detect `sys/wait.h` definitions of macros */
 	if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { SUSUWU_NOTICE(... \"WEXITSTATUS(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WEXITSTATUS(wstatus)) + SUSUWU_SH_DEFAULT "\" ...); }}");
 	} else if(WIFSIGNALED(wstatus)) {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFSIGNALED(wstatus)) {SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...);}}");
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFSIGNALED(wstatus)) { SUSUWU_NOTICE(... \"WTERMSIG(wstatus) is " SUSUWU_SH_PURPLE + std::to_string(WTERMSIG(wstatus)) + SUSUWU_SH_DEFAULT "\" ...); }}");
 	} /* NOLINTEND(misc-include-cleaner): `clang-tidy` on */
 	return wstatus;
 #else /* ndef SUSUWU_POSIX */
-	if(1 != argvS.size()) {
-		throw std::invalid_argument(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "execves: if(1 != argvS.size()) { /* TODO: non-POSIX systems with multiple commands */"));
+	std::string execution;
+	for(const auto &w : argvS) {
+		execution += (execution.empty() ? w : (std::string(" ") + w));
 	}
-	const int status = system(argvS[0].c_str());
-	if(status) {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(!CreateProcess(...)) {/* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...);}}");
-	} else {
-		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") {if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) {/* EXPERIMENTAL Win32 code */ if(CreateProcess(...)) {/* started, blocking }}}");
+	const int status = system(execution.c_str());
+	if(status) { /* cppcheck-suppress duplicateBranch */
+		SUSUWU_NOTICE("execves(" + classIoColoredParamStr(argvS) + ", " + classIoColoredParamStr(envpS) + ") { if(WIFEXITED(wstatus) && 0 != WEXITSTATUS(wstatus)) { /* (preview) Win32 code */ if(!CreateProcess(...)) { /* failed to launch */ \"GetLastError()\" == \"" SUSUWU_SH_PURPLE + std::to_string(GetLastError()) + SUSUWU_SH_DEFAULT "\" ...); }}}");
 	}
 	return status;
 #endif /* ndef SUSUWU_POSIX */
@@ -176,7 +178,8 @@ const bool classSysSetRoot(bool root) {
 #	else /* !def linux */
 		uid_t sudoUid = getuid();
 		if(0 == sudoUid) {
-			char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */, *sudoUidStrIt = SUSUWU_NULLPTR;
+			const char *sudoUidStr = getenv("SUDO_UID") /* NOLINT(concurrency-mt-unsafe) */;
+			char *sudoUidStrIt = SUSUWU_NULLPTR;
 			if(SUSUWU_NULLPTR == sudoUidStr) {
 				SUSUWU_WARNING("classSysSetRoot(false) {(SUSUWU_NULLPTR == getenv(\"SUDO_UID\")) /* stuck as root */}");
 				return true;
@@ -205,10 +208,27 @@ const bool classSysSetRoot(bool root) {
 #if SUSUWU_UNIT_TESTS
 const bool classSysTests() {
 	bool retval = true; /* TODO: choose all errors throw exceptions, or choose all errors return error values. Most of the other unit tests use exceptions, but `echo` is the best test for `execves`/`execvex`. */
-	std::cout << "	execves(): " << std::flush;
-	(EXIT_SUCCESS == execves({"/bin/echo", "pass"})) || (retval = false) || (std::cout << "error" << std::endl);
-	std::cout << "	execvex(): " << std::flush;
-	(EXIT_SUCCESS == execvex("/bin/echo pass")) || (retval = false) || (std::cout << "error" << std::endl);
+	std::cout << '\n'; /* New row, since `classSysTests();` follows `std::cout << "classSysTests():" << std::flush;` in the unit test harness (which expects 1-row results for all tests). TODO: remove tabs (plus use `echo -n`), so result is 1-row? */
+	std::cout << "	execves({\"/bin/echo\", \"passes\"}) " << std::flush;
+	int exitCode = execves({
+#ifndef SUSUWU_WIN32
+			"/bin/"
+#endif /* ndef SUSUWU_WIN32 */
+			"echo", "passes"});
+	if(EXIT_SUCCESS != exitCode) {
+		retval = false;
+		std::cout << "== " << std::to_string(exitCode) << std::endl;
+	}
+	std::cout << "	execvex(\"/bin/echo passes\") " << std::flush;
+	exitCode = execvex({
+#ifndef SUSUWU_WIN32
+			"/bin/"
+#endif /* ndef SUSUWU_WIN32 */
+			"echo passes"});
+	if(EXIT_SUCCESS != exitCode) {
+		retval = false;
+		std::cout << "== " << std::to_string(exitCode) << std::endl;
+	}
 	return retval;
 }
 #endif /* SUSUWU_UNIT_TESTS */

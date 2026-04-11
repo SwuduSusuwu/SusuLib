@@ -2,17 +2,20 @@
 #pragma once
 #ifndef INCLUDES_cxx_VirusAnalysis_hxx
 #define INCLUDES_cxx_VirusAnalysis_hxx
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_USE_TENSORFLOW */
 #include <map> /* std::map */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
-/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus [artificial *central nervous systems*](./ClassCns.hxx) (such as [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)) */
 namespace Susuwu {
 typedef enum VirusAnalysisHook : unsigned char {
 	virusAnalysisHookDefault = 0,      /* "real-time" virus scans not initialized */
@@ -35,7 +38,11 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 } VirusAnalysisResult; /* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == static_cast<bool>(VirusAnalysisResult));} */
 
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW /* `cxx/ClassTensorFlowCns.hxx` specialization of `class Cns` */
+extern TensorFlowCns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 
 extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
 /* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
@@ -54,10 +61,10 @@ void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list);
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
-static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 const bool virusAnalysisInitTests(const ClassIoPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
-static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"
@@ -83,8 +90,8 @@ const VirusAnalysisResult signatureAnalysis(const PortableExecutable &file, cons
 
 /* Static analysis */
 /* @throw bad_alloc */
-const std::vector<std::string> importedFunctionsList(const PortableExecutable &file);
-extern std::vector<std::string> syscallPotentialDangers;
+const std::vector<PortableExecutableFunctionSig> importedFunctionsList(const PortableExecutable &file);
+extern std::vector<PortableExecutableFunctionSig> syscallPotentialDangers;
 const VirusAnalysisResult staticAnalysis(const PortableExecutable &file, const ResultListHash &fileHash); /* if(intersection(importedFunctionsList(file), dangerFunctionsList)) {return RequiresReview;} return Continue;` */
 
 /* Analysis sandbox */

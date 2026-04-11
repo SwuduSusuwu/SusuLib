@@ -1,13 +1,20 @@
-/* Dual licenses: choose "Creative Commons" or "Apache 2" (allows all uses) */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassTensorFlowCns.cxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_VirusAnalysis_cxx
 #define INCLUDES_cxx_VirusAnalysis_cxx
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoBytecode ClassIoPath classIoGetOwnPath classIoHexStr */
+#include "ClassObject.hxx" /* ObjectMode */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable PortableExecutableBytecode */
 #include "ClassResultList.hxx" /* size_t listMaxSize listHasValue listProduceSignature listFindSignatureOfValue ResultList resultListDumpTo resultListLoadFrom resultListProduceHashes */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* classSysHasRoot classSysSetRoot classSysKernelSetHook execvex */
-#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "Macros.hxx" /* SUSUWU_ERROR SUSUWU_ERRSTR SUSUWU_IF_CPLUSPLUS SUSUWU_NOTICE SUSUWU_EXECUTEVERBOSE SUSUWU_NOTICE_EXECUTEVERBOSE SUSUWU_POSIX SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_USE_TENSORFLOW */
 #include "VirusAnalysis.hxx" /* abortList passList *AnalyisCaches */
 #include <algorithm> /* std::sort */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
@@ -29,12 +36,16 @@
 #include <processthreadsapi.h> /* CreateProcessA BOOL DWORD LPCSTR LPPROCESS_INFORMATION LPSECURITY_ATTRIBUTES LPSTARTUPINFOA LPSTR LPVOID */
 #endif /* elif DEFINED(SUSUWU_WIN32) */
 #include <vector> /* std::vector */
-/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus artificial CNS (central nervous systems) */
+/* (Work-in-progress) virus analysis: uses hashes, signatures, static analysis, sandboxes, plus [artificial *central nervous systems*](./ClassCns.hxx) (such as [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)) */
 namespace Susuwu {
 VirusAnalysisHook globalVirusAnalysisHook = virusAnalysisHookDefault; /* Just use virusAnalysisHook() to set+get this, virusAnalysisGetHook() to get this */
 ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW /* `cxx/ClassTensorFlowCns.hxx` specialization of `class Cns` */
+TensorFlowCns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
-std::vector<std::string> syscallPotentialDangers = {
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
+std::vector<PortableExecutableFunctionSig> syscallPotentialDangers = {
 	"memopen", "fwrite", "socket", "GetProcAddress", "IsVmPresent"
 };
 std::vector<std::string> stracePotentialDangers = {"write(*)"};
@@ -151,27 +162,27 @@ const bool virusAnalysisHookTests() {
 	VirusAnalysisHook hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec);
 	if(virusAnalysisHookExec != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookExec)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookNewFile);
 	if(virusAnalysisHookNewFile != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear | virusAnalysisHookNewFile)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookClear);
 	if(virusAnalysisHookDefault != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookExec | virusAnalysisHookNewFile);
 	if((virusAnalysisHookExec | virusAnalysisHookNewFile) != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisExec | virusAnalysisHookNewFile)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	hookStatus = virusAnalysisHook(virusAnalysisHookClear | originalHookStatus);
 	if(originalHookStatus != hookStatus) {
 		throw std::runtime_error("`virusAnalysisHook(virusAnalysisHookClear | originalHookStatus)` == " + std::to_string(hookStatus));
-		return false;
+		return false; /* cppcheck-suppress duplicateBreak */
 	}
 	return true;
 }
@@ -200,7 +211,7 @@ const VirusAnalysisHook virusAnalysisHook(VirusAnalysisHook hookStatus) { /* Ign
 	}
 	if(virusAnalysisHookExec & hookStatus) {
 #ifdef SUSUWU_POSIX
-		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */
+		auto lambdaScanExecv = [](const char *pathname, char *const argv[]) { /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this is the standard function signature. */ /* cppcheck-suppress constParameter */
 			return static_cast<int>(virusAnalysisImpl(PortableExecutable(pathname)));
 		};
 		classSysKernelSetHook(execv, lambdaScanExecv);
@@ -309,21 +320,15 @@ void produceAbortListSignatures(const ResultList &passList, ResultList &abortLis
 	} /* The most simple signature is a substring, but some analyses use regexes. */
 }
 
-const std::vector<std::string> importedFunctionsList(const PortableExecutable &file) {
-	return {}; /* fixes crash, until importedFunctionsList is implemented/finished */
-/* TODO
- * Resources; “Portable Executable” for Windows ( https://learn.microsoft.com/en-us/windows/win32/debug/pe-format https://wikipedia.org/wiki/Portable_Executable ,
- * “Extended Linker Format” for most others such as UNIX/Linuxes ( https://wikipedia.org/wiki/Executable_and_Linkable_Format ),
- * shows how to analyse lists of libraries(.DLL's/.SO's) the SW uses,
- * plus what functions (new syscalls) the SW can goto through `jmp`/`call` instructions.
+const std::vector<PortableExecutableFunctionSig> importedFunctionsList(const PortableExecutable &file) {
+	return file.importedFunctionsList(); /* List of lib functions which the SW `call`s (or `jmp`s to). */
+/* TODO: use [**x86** instruction list for _Intel_+_AMD_](https://wikipedia.org/wiki/x86),
+ * plus [**arm64** instruction list for most tablets+smartphones](https://wikipedia.org/wiki/aarch64),
+ * to produce lists of OS functions the SW uses without libs; `int`s (or `syscall`s) to.
+ * Plus, instructions lists show how to parse which arguments the SW gives to functions/syscalls (simple for constant arguments such as `push 0x2; call function;`,
+ * but if SW uses registers/addresses as arguments (such as `push eax; push [address]; call [address2];`) must guess what is `[eax]`/`[address]`/`[address2]` (or use `strace` or such debug tools).
  *
- * "x86" instruction list for Intel/AMD ( https://wikipedia.org/wiki/x86 ),
- * "aarch64" instruction list for most smartphones/tablets ( https://wikipedia.org/wiki/aarch64 ),
- * shows how to analyse what OS functions the SW goes to without libraries (through `int`/`syscall`, old; most new SW uses `jmp`/`call`.)
- * Plus, instructions lists show how to analyse what args the apps/SW pass to functions/syscalls (simple for constant args such as "push 0x2; call functions;",
- * but if registers/addresses as args such as "push eax; push [address]; call [address2];" must guess what is *"eax"/"[address]"/"[address2]", or use sandboxes.
- *
- * https://www.codeproject.com/Questions/338807/How-to-get-list-of-all-imported-functions-invoked shows how to analyse dynamic loads of functions (if do this, `syscallPotentialDangers[]` does not include `GetProcAddress()`.)
+ * If this tool [parses `GetProcAddress` arguments to know which functions are used](https://www.codeproject.com/Questions/338807/How-to-get-list-of-all-imported-functions-invoked), `syscallPotentialDangers[]` does not have to include `GetProcAddress()`.
  */
 }
 
@@ -383,10 +388,10 @@ Cns &cns /* = analysisCns */
 	const size_t maxAbortSize = listMaxSize(abort.bytecodes);
 	const size_t maxDepthOfOpcodes = 6666; /* is not max depth of callstack, but of instruction pointer. TODO: compute this */
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeFloat);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeFloat);
 	cns.setInputNeurons(maxWidthOfOpcodes);
-	cns.setOutputNeurons(1);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : 1);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
 	cns.setNeuronsPerLayer(maxWidthOfOpcodes /* TODO: reduce this */);
 	inputsToOutputs.reserve(pass.bytecodes.size());
@@ -431,10 +436,10 @@ void produceVirusFixCns(const ResultList &passOrNull, const ResultList &abortOrN
 	const size_t maxPassSize = listMaxSize(passOrNull.bytecodes);
 	const size_t maxAbortSize = listMaxSize(abortOrNull.bytecodes);
 	const size_t maxWidthOfOpcodes = (maxPassSize > maxAbortSize ? maxPassSize : maxAbortSize);
-	cns.setInputMode(cnsModeString);
-	cns.setOutputMode(cnsModeString);
-	cns.setInputNeurons(maxAbortSize);
-	cns.setOutputNeurons(maxPassSize);
+	cns.setInputMode(objectModeString);
+	cns.setOutputMode(objectModeString);
+	cns.setInputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : maxAbortSize);
+	cns.setOutputNeurons(cns.isSquareConnectome() ? maxWidthOfOpcodes : maxPassSize);
 	cns.setLayersOfNeurons(maxDepthOfOpcodes);
 	cns.setNeuronsPerLayer(maxWidthOfOpcodes /* TODO: reduce this */);
 	assert(passOrNull.bytecodes.size() == abortOrNull.bytecodes.size());

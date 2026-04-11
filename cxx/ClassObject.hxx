@@ -1,18 +1,20 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassObject.hxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #pragma once
 #ifndef INCLUDES_cxx_ClassObject_hxx
 #define INCLUDES_cxx_ClassObject_hxx
 #include "ClassIo.hxx" /* classIoHexStr gsl::owner */
-#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CXX11 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
+#include "Macros.hxx" /* SUSUWU_C11 SUSUWU_CONSTEXPR SUSUWU_CXX11 SUSUWU_CXX17 SUSUWU_CXX20 SUSUWU_DEFAULT SUSUWU_FINAL SUSUWU_IF_CPLUSPLUS SUSUWU_INLINE SUSUWU_INTPTR SUSUWU_NOEXCEPT SUSUWU_NULLPTR SUSUWU_OVERRIDE SUSUWU_UNIT_TESTS */
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
-#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-#	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */
-#endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) */
 #include SUSUWU_IF_CPLUSPLUS(<cstring>, <string.h>) /* memcmp memcpy */
 #include <new> /* ::operator new */
 #include <stdexcept> /* std::runtime_error */
 #include <string> /* std::string */
+#include <vector> /* std::vector */
+
 /* Gives: `Susuwu::Class` (a C++ port of [`java.lang.Class`](https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html)),
  * plus `Susuwu::Object` (a C++ port of [Java's `Object`](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html) [superclass](https://docs.oracle.com/javase%2Ftutorial%2F/java/IandI/objectclass.html)),
 * to [assist future Java ports](https://github.com/SwuduSusuwu/SusuLib/issues/10) */
@@ -22,6 +24,51 @@ namespace Susuwu {
 const bool classObjectTests();
 const bool classObjectTestsNoexcept() SUSUWU_NOEXCEPT;
 #endif /* SUSUWU_UNIT_TESTS */
+
+typedef enum ObjectMode : char {
+	objectModeBool /* binary classification */, objectModeChar, objectModeEnum /* multi-class indices */, objectModeInt, objectModeUint, objectModeFloat, objectModeDouble,
+	objectModeVectorBool /* one-hot binary-classification */, objectModeVectorChar, objectModeVectorEnum /* multi-label multi-class indices */, objectModeVectorInt, objectModeVectorUint, objectModeVectorFloat, objectModeVectorDouble,
+#if defined(SUSUWU_CXX17) && defined(SUSUWU_PREFER_STRING_VIEW /* TODO */)
+	objectModeString = objectModeVectorChar /* std::string == std::vector<char> */
+#else /* else !def SUSUWU_CXX17 */
+/* https://stackoverflow.com/questions/5115166/how-to-construct-a-stdstring-from-a-stdvectorchar */
+	objectModeString
+#endif /* def SUSUWU_CXX17 else */
+} ObjectMode;
+template<class Q>
+struct ToObjectMode; /* Usage: `template<class Type>\nObjectMode objectMode = ToObjectMode<Type>::value;` */
+// typedef struct ToObjectMode { static ObjectMode value; } ToObjectMode; /* TODO: fix `error: expected ';' after struct` */
+template<>
+struct ToObjectMode<bool> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeBool; };
+template<>
+struct ToObjectMode<char> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeChar; };
+enum ObjectEnum {};
+template<>
+struct ToObjectMode<enum ObjectEnum> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeEnum; };
+template<>
+struct ToObjectMode<int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeInt; };
+template<>
+struct ToObjectMode<unsigned int> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeUint; };
+template<>
+struct ToObjectMode<float> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeFloat; };
+template<>
+struct ToObjectMode<double> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeDouble; };
+template<>
+struct ToObjectMode<std::vector<bool>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorBool; };
+template<>
+struct ToObjectMode<std::vector<char>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorChar; };
+template<>
+struct ToObjectMode<std::vector<enum ObjectEnum>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorEnum; };
+template<>
+struct ToObjectMode<std::vector<int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorInt; };
+template<>
+struct ToObjectMode<std::vector<unsigned int>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorUint; };
+template<>
+struct ToObjectMode<std::vector<float>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorFloat; };
+template<>
+struct ToObjectMode<std::vector<double>> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeVectorDouble; };
+template<>
+struct ToObjectMode<std::string> { static SUSUWU_CONSTEXPR ObjectMode value = objectModeString; };
 
 typedef class Instrumentation { /* Produced this unaware of `Instrumentation`. TODO: match `Instrumentation` protocols (as `getObjectSize()` does). For now, this is just whatever run-time type information/reflection which does not map to `java.lang.Class`. */
 public:
@@ -68,6 +115,20 @@ public:
 #else /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
 #	define SUSUWU_CLASS_OPERATOREQUALTO(SUBCLASS) SUSUWU_VIRTUAL_ bool operator==(const Class &obj) const SUSUWU_CLASS_OVERRIDE SUSUWU_VIRTUAL_OPERATOREQUALTO_WITHOUT_VPTR
 #endif /* else !SUSUWU_VIRTUAL_OPERATORS_USE_VPTRS */
+
+/* NOLINTBEGIN(hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix,google-runtime-int) */
+SUSUWU_INLINE const unsigned long long classObjectHashcodeVo64(const unsigned char *data, const size_t objectSz) { /* [Fowler-Noll-Vo hashcode](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash) */
+	const unsigned long long fowlerNollVo64OffsetBasis = 14695981039346656037ull;
+	const unsigned long long fowlerNollVo64Prime = 1099511628211ull; /* NOLINT(hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix) */
+	unsigned long long hash = fowlerNollVo64OffsetBasis;
+	for (const unsigned char *const dataEnd = &data[objectSz]; data != dataEnd; ++data) { /* NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic): TODO, replace pointers with some sort of `_view`? */
+	    hash ^= *data; /* the "1a" version does exclusive-or first, so that even if `1 == objectSz`, single-bit-input-differences still flip half the output-bits (cause avalanches) */
+	    hash *= fowlerNollVo64Prime;
+	}
+	return hash;
+} /* NOLINTEND(hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix,google-runtime-int) */
+#define SUSUWU_VIRTUAL_HASHCODE { return static_cast<SUSUWU_INTPTR>(classObjectHashcodeVo64(reinterpret_cast<const unsigned char *>(this), this->getObjectSize())); }
+
 #define SUSUWU_CLASS_GETNAME(SUBCLASS) SUSUWU_VIRTUAL_ const std::string /* returns as value so subclasses can return dynamic values */ getName() const SUSUWU_CLASS_OVERRIDE { return #SUBCLASS; }
 #define SUSUWU_CLASS_GETOBJECTSIZE(SUBCLASS) SUSUWU_VIRTUAL_ const size_t getObjectSize() const SUSUWU_OVERRIDE { return sizeof(SUBCLASS); } /* Run-time type information */
 #define SUSUWU_CLASS_ISINSTANCE(SUBCLASS) SUSUWU_VIRTUAL_ const bool isInstance(const Class &obj) const SUSUWU_CLASS_OVERRIDE { auto ptr = dynamic_cast<const SUBCLASS *>(&obj); return SUSUWU_NULLPTR != ptr; } /* port of Java's */
@@ -130,9 +191,9 @@ public:
 	virtual gsl::owner<Object *> cloneAs(ObjectCloneAs cloneAs) const {
 //		return &(*(new Object) = stackCloneAs(cloneAs));
 		if(!isCloneableAs(objectCloneAsShallow)) { throw std::runtime_error("`" + getName() + "::cloneAs(" + std::to_string(cloneAs) + ")`: unsupported default use."); }
-		auto clone = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
-		memcpy(clone, static_cast<const void *>(this), getObjectSize());
-		return static_cast<Object *>(clone);
+		auto clonePtr = ::operator new(getObjectSize()); /* NOLINT(cppcoreguidelines-owning-memory) */
+		memcpy(clonePtr, static_cast<const void *>(this), getObjectSize());
+		return static_cast<Object *>(clonePtr);
 	}
 #if SUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES /* If you interpret `Java`'s standard as "Addresses must match". */
 	virtual const bool equals(const Object &obj) const { return this == &obj; } /* Java's contract requires you to override this version of `equals` */
@@ -143,11 +204,7 @@ public:
 		this->~Object();
 	}
 	const Class &getClass() const { return *this; }
-#if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
-	virtual const intptr_t hashCode() const { return reinterpret_cast<intptr_t>(this); }
-#else /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
-	virtual const long hashCode() const { return reinterpret_cast<long>(this); } /* NOLINT(google-runtime-int) */
-#endif /* else !(defined(SUSUWU_C11) || defined(SUSUWU_CXX11)) */
+	virtual const SUSUWU_INTPTR hashCode() const { return reinterpret_cast<SUSUWU_INTPTR>(this); }
 	virtual const std::string toString() const {
 		return getName() + '@' + classIoHexStr(hashCode()); /* TODO: if `SUSUWU_HEX_DOES_PREFIX`, remove "0x"? */
 	}

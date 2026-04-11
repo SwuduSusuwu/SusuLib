@@ -1,4 +1,7 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassIo.hxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #pragma once
 #ifndef INCLUDES_cxx_ClassIo_hxx
 #define INCLUDES_cxx_ClassIo_hxx
@@ -351,6 +354,7 @@ static void classIoCheckStr(const std::string &func, const std::string &expected
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, func + ": expected '" SUSUWU_SH_GREEN + expected + SUSUWU_SH_DEFAULT "', got '" + SUSUWU_SH_RED + got + SUSUWU_SH_DEFAULT "'"));
 	}
 }
+const std::string classIoEscapeStr(const std::string &strValue, const bool printable /* notice: set to `false` if `strValue` has non-Latin1 codes, or has `"` */, const char *susuwuShCode = "" /* `SUSUWU_SH_*` from `Macros.hxx` */);
 
 #if SUSUWU_UNIT_TESTS
 /* @throw std::runtime_error */

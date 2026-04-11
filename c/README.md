@@ -1,8 +1,11 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+
+*Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/c/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
+- This `preview` branch is for [beta tests](../README.md#beta-tests--preview-builds) / [continuous integration](https://google.com?q=continuous-integration-branch).
 # [Table of contents](../README.md#table-of-contents)
 - [Purposes](#purposes)
 - [Progress](#progress)
-- [Issue/workaround](#issueworkaround)
+- [Issue / workaround](#issue--workaround)
 - [Progress](#progress)
 
 # Purposes
@@ -10,7 +13,7 @@
 - [`./c/rfc6234/`](./c/rfc6234) is [vendored code](./.gitattributes) (direct from the official [_RFC6234_](https://www.rfc-editor.org/rfc/rfc6234#section-8)), which is used for {`classSha128()`, `classSha256()`, `classSha512()`}.
 - TODO: [issue #3 produce analogous _C_ versions of source code](https://github.com/SwuduSusuwu/SusuLib/issues/3) which you can [contribute to](#how-to-contribute), or can request that more resources go to this issue
 
-# Issue/workaround
+# Issue / workaround
 If your project can not use [_C++_](../cxx/) includes,
 
 and you cannot wait for [issue #3](https://github.com/SwuduSusuwu/SusuLib/issues/3) ([_C_](https://wikipedia.org/wiki/C_(programming_language)) port) to close (or [contribute to this](https://github.com/SwuduSusuwu/SusuLib?tab=readme-ov-file#How-to-contribute)),

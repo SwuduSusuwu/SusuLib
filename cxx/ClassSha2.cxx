@@ -1,9 +1,12 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassSha2.cxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_ClassSha2_cxx
 #define INCLUDES_cxx_ClassSha2_cxx
 #include "ClassIo.hxx" /* ClassIoBytecode ClassIoHash classIoHexStr SUSUWU_HEX_DOES_PREFIX */
 #include "ClassSha2.hxx"
-#include "ClassSys.hxx" /* classSysUSecondClock templateCatchAll */
+#include "ClassSys.hxx" /* classSysMuSecondClock templateCatchAll */
 #include "Macros.hxx" /* SUSUWU_IF_CPLUSPLUS SUSUWU_NOEXCEPT SUSUWU_NOTICE_EXECUTE SUSUWU_INFO SUSUWU_NOTICE SUSUWU_SH_ERROR SUSUWU_UNIT_TESTS SUSUWU_WARNING */
 #include SUSUWU_IF_CPLUSPLUS(<climits>, <limits.h>) /* CHAR_BIT */
 #include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
@@ -48,9 +51,9 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	const size_t benchmarkSz = 65536; /* 65536 == 2^16 == 64kb */
 	const char nulls[benchmarkSz] = {0}; /* NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays); this was used to allow zero-initialism semantics with no runtime cost */
 	const std::string nullStr(static_cast<const char *>(nulls), &nulls[benchmarkSz]);
-	const ClassSysUSeconds tsDrift = classSysUSecondClock(), ts2Drift = classSysUSecondClock() - tsDrift, ts = classSysUSecondClock();
+	const ClassSysMuSeconds tsDrift = classSysMuSecondClock(), ts2Drift = classSysMuSecondClock() - tsDrift, ts = classSysMuSecondClock();
 	const ClassIoHash hash = classSha2(nullStr);
-	const ClassSysUSeconds ts2 = classSysUSecondClock() - ts2Drift;
+	const ClassSysMuSeconds ts2 = classSysMuSecondClock() - ts2Drift;
 	const std::string hashStrCompute = (SUSUWU_HEX_DOES_PREFIX ? "" : "0x") + classIoHexStr(hash);
 	const std::string hashStrTrue = "0xde2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31";
 	if(ts == ts2) {
@@ -62,15 +65,15 @@ const bool classSha2Tests() { /* is just to test glue code (which wraps rfc6234)
 	if(0 == hash.size()) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`0 == classSha2(std::string()).size();"));
 	} else if(hashStrTrue.size() != hashStrCompute.size() && classSha256 == classSha2) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`"));
+		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "`classSha2 = classSha256;`, but `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`"));
 	} else if(hashStrTrue.size() != hashStrCompute.size()) {
-		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == sha2(std::string()).size())`");
+		SUSUWU_INFO("`(classSha256 != classSha2)`, `(" + std::to_string(hash.size()) + " == classSha2(std::string()).size())`");
 	} else if(hashStrTrue != hashStrCompute) {
 		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, "classSha2(char nulls[65535] = {0}) did not compute " + hashStrTrue));
 	}
 	return true;
 }
-const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(classSha2Tests, "classSha2Tests()");}
+const bool classSha2TestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classSha2Tests, "classSha2Tests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 }; /* namespace Susuwu */

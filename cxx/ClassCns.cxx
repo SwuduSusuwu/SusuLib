@@ -1,4 +1,7 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassCns.cxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_ClassCns_cxx
 #define INCLUDES_cxx_ClassCns_cxx
 #include "ClassCns.hxx" /* std::string std::tuple */
@@ -6,6 +9,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+
 namespace Susuwu {
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
@@ -62,20 +66,20 @@ samples = []");
 	self_organizing_network.train(samples)");
 #else /* else !USE_PYRUN */
 		PyObject *module = PyImport_ImportModule("hsom")
-		if(NULL == module) {throw "'hsom' module not found";}
-		PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module, (char*)"SelfOrganizingNetwork"); /* or	"PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, (char*)"SelfOrganizingNetwork");" */
-		if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) {throw "'SelfOrganizingNetwork' object not found";}
-		double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or "PyObject *pValue=Py_BuildValue("(z)",(char*)"args");	PyObject *pResult=PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) {throw "PyObject_CallObject failed";} double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);" */
+		if(NULL == module) { throw "'hsom' module not found"; }
+		PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module, const_cast<char *>("SelfOrganizingNetwork")); /* or `PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, const_cast<char *>("SelfOrganizingNetwork"));` */
+		if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) { throw "'SelfOrganizingNetwork' object not found"; }
+		double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or `PyObject *pValue = Py_BuildValue("(z)",const_cast<char *>("args"));	PyObject *pResult = PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) { throw "PyObject_CallObject failed"; } double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);` */
 		Py_DECREF(module);
-	}
- ~HsomCns() {
-#if PYTHON3
-	Py_FinalizeEx();
-#else /* else !PYTHON */
-	Py_Finalize();
-#endif /* PYTHON3 else */
- }
 #endif /* USE_PYRUN else */
+	}
+	~HsomCns() {
+#if PYTHON3
+		Py_FinalizeEx();
+#else /* else !PYTHON */
+		Py_Finalize();
+#endif /* PYTHON3 else */
+	}
 } HsomCns;
 #endif /* USE_HSOM_CNS */
 

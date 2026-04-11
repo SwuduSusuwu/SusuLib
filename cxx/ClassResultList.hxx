@@ -1,4 +1,7 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/ClassResultList.hxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #pragma once
 #ifndef INCLUDES_cxx_ClassResultList_hxx
 #define INCLUDES_cxx_ClassResultList_hxx
@@ -15,6 +18,8 @@
 #if SUSUWU_PREFER_CSTR
 #	include <cstring> /* strlen memmem */
 #endif /* SUSUWU_PREFER_CSTR */
+//#include <mutex> /* std::mutex */
+#include <set> /* std::set */
 #include <string> /* std::string */
 #include <tuple> /* std::tuple std::get */
 #include <unordered_set> /* std::unordered_set */
@@ -24,21 +29,26 @@ typedef ClassIoHash ResultListHash;
 typedef ClassIoBytecode ResultListBytecode; /* Should have structure of ClassIoBytecode, but is not just for files, can use for UTF8/webpages, so have a new type for this */
 typedef ClassIoPath ResultListSignature; /* TODO: `typedef ResultListBytecode ResultListSignature; ResultListSignature("string literal");` */
 typedef ptrdiff_t BytecodeOffset; /* all tests of `ResultListBytecode` should return `{BytecodeOffset, X}` (with the most common `X` as `ResultListHash` or `ResultListSignature`). `offset = -1` if no match */
-typedef struct ResultList : public Object { /* Lists of {metadata, executables (or pages)} */
-	SUSUWU_VIRTUAL_DEFAULTS(Susuwu::ResultList) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
+
+template<class Set> /* Usage: `ResultListBase<std::[unordered_]set<ResultListHash>>` */
+struct ResultListBase : public Object { /* Lists of {metadata, executables (or pages)} */
+	SUSUWU_VIRTUAL_DEFAULTS(ResultListBase) /* `getName()`, `isPureVirtual()`, `operator==`()`, ... */
 /* `clang-tidy` off: NOLINTBEGIN(misc-non-private-member-variables-in-classes) */
-	typedef std::unordered_set<ResultListHash> Hashes;
+//	std::mutex mutexRW; /* Notice: if multiple executors have RW access to this, use `std::lock_down<std::mutex> guard(resultList.mutexRW);` before RW accesses. `mutexRW` is not used for RO accesses. */ /* TODO: fix "copy constructor of 'ResultListBase<std::unordered_set<std::basic_string<char>>>' is implicitly deleted because field 'mutexRW' has a deleted copy constructor" */
+	typedef Set Hashes;
 	Hashes hashes; /* Checksums of executables (or pages); to avoid duplicates, plus to do constant ("O(1)") test for which executables (or pages) exists */
 	typedef std::vector<ResultListSignature> Signatures;
 	Signatures signatures; /* Smallest substrings (or regexes, or Universal Resource Locators) which can identify `bytecodes`; has uses close to `hashes`, but can match if executables (or pages) have small differences */
 	typedef std::vector<ResultListBytecode> Bytecodes;
 	Bytecodes bytecodes; /* Whole executables (for `VirusAnalysis`) or webpages (for `AssistantCns`); huge disk usage, just load this for signature synthesis (or CNS backpropagation). */
 /* `clang-tidy` on: NOLINTEND(misc-non-private-member-variables-in-classes) */
-} ResultList;
+};
+typedef struct ResultListBase<std::unordered_set<ResultListHash>> ResultList; /* `unordered_set` is the O(1) formula. */
+typedef struct ResultListBase<std::set<ResultListHash>> ResultListSorted; /* `set` is an O(log n) formula, but is deterministic (sorted). */
 
 #if SUSUWU_UNIT_TESTS
 const bool classResultListTests(); /* TODO: test most of `ClassResultList*` */
-static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); }
+static const bool classResultListTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(classResultListTests, "classResultListTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 template<class List>
@@ -296,7 +306,7 @@ template<class List, class List2>
 /*	@pre @code !(list.empty() || hashes.full()) @endcode
  *	@post @code !hashes.empty() @endcode */
 void listToHashes(const List &list /* ResultList::bytecodes or ResultList::hex*/, List2 &hashes /* ResultList::hashess */) {
-	SUSUWU_OMP_PRAGMA(omp parallel for) /* TODO: ensure OpenMP won't cause problems if `List` has dependence on previous values (such as if `List`: is sorted, is a binary tree or heap, or is a hashmap) */
+//	SUSUWU_OMP_PRAGMA(omp parallel for) /* Causes `==PID==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (...)\n==PID==The signal is caused by a WRITE memory access.\n...#6 0x... in std::unordered_set<...>\n#7 0x... in void Susuwu::listToHashes<...>*`. Does `hashes` have dependence on previous values (such as if `List2`: is sorted, is a binary tree or heap, or is a hashmap)? */
 	for(const auto &value : list) {
 		hashes.insert(classSha2(value));
 	}
@@ -354,7 +364,7 @@ template<class List>
 const std::tuple<typename List::value_type::const_iterator, typename List::value_type::const_iterator> listProduceSignature(const List &list, const typename List::value_type &value) {
 	ptrdiff_t smallest = value.size();
 	auto itBegin = value.cbegin(), itEnd = value.cend();
-	SUSUWU_OMP_PRAGMA(omp parallel for) /* TODO: ensure OpenMP won't cause problems if `List` has dependence on previous values (such as if `List`: is sorted, is a binary tree or heap, or is a hashmap) */
+	SUSUWU_OMP_PRAGMA(omp parallel for) /* constant for loop */
 	for(auto first = itBegin; value.cend() != first; ++first) {
 		for(auto last = value.cend(); first != last; --last) {
 			if((last - first) < smallest) {

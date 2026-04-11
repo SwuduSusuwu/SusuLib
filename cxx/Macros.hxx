@@ -56,7 +56,9 @@
 #endif /* ndef SUSUWU_UNIT_TESTS */
 
 #ifndef SUSUWU_OPENMP /* if no environment flag to use */
-#	if defined(_OPENMP /* `-fopenmp` */) || (defined(__has_include) && __has_include(<omp.h>) /* `clang++` */)
+#	if defined(_OPENMP /* `/fopenmp` or `-fopenmp` */) /* TODO: parse version? ["In implementations that support a preprocessor, the _OPENMP macro name is defined to have the decimal value yyyymm where yyyy and mm are the year and month designations of the version of the OpenMP API that the implementation supports."](https://www.openmp.org/spec-html/5.0/openmpse10.html) */
+#		define SUSUWU_OPENMP true /* supports `#pragma omp <directive>` */
+#	elif (defined(__has_include) && __has_include(<omp.h>) /* `clang++` */)
 #		define SUSUWU_OPENMP true /* supports `#pragma omp <directive>` */
 #	else /* !(defined(_OPENMP) || (defined(__has_include) && __has_include(<omp.h>))) */
 #		define SUSUWU_OPENMP false /* `#pragma omp <directive>` can trigger `[-Wunknown-pragma]` */
@@ -76,6 +78,7 @@
 #	endif /* (199901 <= __cplusplus) */
 #	if 201102 < __cplusplus
 #		define SUSUWU_CXX11
+#		include <atomic> /* std::atomic */ /* NOLINT(misc-include-cleaner): is used if `SUSUWU_ATOMIC` is used */
 #	endif /* (201102 < __cplusplus) */
 #	if 201402 <= __cplusplus
 #		define SUSUWU_CXX14
@@ -133,9 +136,13 @@
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)
 #	define SUSUWU_NORETURN [[noreturn]] /* Usage: `SUSUWU_NORETURN void exit();` is close to `void exit() [[ensures:: false]];` or `exit(); SUSUWU_UNREACHABLE;` */ /* TODO? || SUSUWU_HAS_ATTRIBUTE(noreturn) or [Cmake test for `\[\[noreturn\]\]`](https://stackoverflow.com/a/33517293/24473928) */
 #	define SUSUWU_CONSTEXPR constexpr /* Usage: `SUSUWU_CONSTEXPR bool passes(); SUSUWU_STATIC_ASSERT(passes());` is close to `#define PASSES\nSUSUWU_STATIC_ASSERT(PASSES)` */
+#	include SUSUWU_IF_CPLUSPLUS(<cstdint>, <stdint.h>) /* intptr_t */ /* NOLINT(misc-include-cleaner): this is used if `SUSUWU_INTPTR` is used */
+#	define SUSUWU_INTPTR intptr_t
 #else
 #	define SUSUWU_NORETURN /* No-op; old `g++` "error: 'SUSUWU_NORETURN' does not name a type" / old `clang++` "error: unknown type name 'SUSUWU_NORETURN'" fix */
 #	define SUSUWU_CONSTEXPR /* No-op */
+#	include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* size_t */
+#	define SUSUWU_INTPTR size_t /* is supposed to hold a positive pointer (a memory address), and `size_t` can hold all positive memory address offsets. */
 #endif /* defined(SUSUWU_C11) || defined(SUSUWU_CXX11) else */
 
 #ifdef USE_CONTRACTS /* Pass `-DUSE_CONTRACTS` once compiler has C++26 (Contracts) */
@@ -164,6 +171,7 @@
 #	define SUSUWU_NULLPTR nullptr /* Usage: `Macros.cxx` has tests for this */
 #	define SUSUWU_OVERRIDE override /* Usage: `Macros.cxx` has tests for this */
 		/* Usage 2: `void versionInfo() SUSUWU_NOEXCEPT(std::is_nothrow_constructible<U>::value); {versionInfo();}` is close to `{try {versionInfo();} catch(...) {if(std::is_nothrow_constructible<U>::value) {SUSUWU_UNREACHABLE;}}}` */
+#	define SUSUWU_ATOMIC(U) std::atomic<U>
 #else /* SUSUWU_CXX11 else */
 #	define SUSUWU_NOEXCEPT /* No-op: "error: expected function body after function declarator" fix */
 #	define SUSUWU_DEFAULT {} /* allows default constructors/destructors. TODO: default operators? */
@@ -171,7 +179,16 @@
 #	define SUSUWU_FINAL /* No-op */
 #	define SUSUWU_NULLPTR NULL /* fallback to C-style macro for `0`. */
 #	define SUSUWU_OVERRIDE /* No-op */
+#	define SUSUWU_ATOMIC(U) U /* TODO: warn? Abort? */
 #endif /* SUSUWU_CXX11 else */
+#if defined(SUSUWU_POSIX)
+#	include <sys/types.h> /* ssize_t */ /* NOLINT(misc-include-cleaner): used if SUSUWU_SSIZE_T is used */
+#	define SUSUWU_SSIZE_T ssize_t
+#else /* else !defined(SUSUWU_POSIX) */
+# include SUSUWU_IF_CPLUSPLUS(<cstddef>, <stddef.h>) /* ptrdiff_t */ /* NOLINT(misc-include-cleaner): used if SUSUWU_SSIZE_T is used */
+#	define SUSUWU_SSIZE_T ptrdiff_t
+/* [The most important difference of `ssize_t` versus `ptrdiff_t` is semantics](https://stackoverflow.com/questions/8649018/what-is-the-difference-between-ssize-t-and-ptrdiff-t) */
+#endif /* else !defined(SUSUWU_POSIX) */
 
 /* `SUSUWU_UNREACHABLE` is close to `SUSUWU_ASSUME(false)` */
 #if !defined(NDEBUG_)
@@ -195,7 +212,7 @@
 namespace Susuwu { /* Is good practice to wrap all of a project's functions namespaces to prevent collisions. Macros above this can never be replaced with `constexpr` functions, or have `#include` */
 #endif /* ifdef __cplusplus */
 #if SUSUWU_UNIT_TESTS
-const int macrosTestsNoexcept() SUSUWU_NOEXCEPT;
+const int macrosTestsNoexcept() SUSUWU_NOEXCEPT; /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 #if defined(SUSUWU_C11) || defined(SUSUWU_CXX11)

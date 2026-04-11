@@ -1,4 +1,7 @@
-/* (C) 2024 Swudu Susuwu, dual licenses: choose [GPLv2](./LICENSE_GPLv2) or [Apache 2](./LICENSE), allows all uses. */
+/* Attribution (henceforth "*this attribution*", whose syntax is *Markdown*): 2024 [Swudu Susuwu](https://swudususuwu.substack.com)
+ * <https://github.com/SwuduSusuwu/SusuLib/> has the newest version of `./cxx/main.cxx` (henceforth "*this source code*").
+ * If *this attribution* is shown, *this source code* allows all uses. *This attribution* constitutes the most permissive which is compatible with [*GPLv2*](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) + [*Apache 2*](https://www.apache.org/licenses/LICENSE-2.0.html), which is suitable for personal use (also suitable for school use).
+ * If *this attribution* is not professional enough for business use: businesses can use *this source code* through included versions of [*GPLv2*](./LICENSE_GPLv2), [*Apache 2*](./LICENSE), or through both of those. */
 #ifndef INCLUDES_cxx_main_cxx
 #define INCLUDES_cxx_main_cxx
 #include "main.hxx"
@@ -8,7 +11,11 @@
 #include "ClassResultList.hxx" /* classResultListTestsNoexcept */
 #include "ClassSha2.hxx" /* classSha2TestsNoexcept */
 #include "ClassSys.hxx" /* classSysTestsNoexcept */
-#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* classTensorFlowCnsTestsNoexcept */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "ClassWebBrowse.hxx" /* classWebBrowseTestsNoexcept */
+#include "Macros.hxx" /* macrosTestsNoexcept SUSUWU_EXPECTS SUSUWU_EXPERIMENTAL_ISSUES SUSUWU_ENSURES SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_WARNING SUSUWU_USE_TENSORFLOW */
 #if SUSUWU_UNIT_TESTS
 #include "VirusAnalysis.hxx" /* virusAnalysisTestsNoexcept */
 #endif /* SUSUWU_UNIT_TESTS */
@@ -28,7 +35,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 	SUSUWU_NOEXCEPT(std::is_nothrow_invocable<decltype(std::cout << ""), decltype(std::cout), decltype("")>::value)
 #endif /* def SUSUWU_CXX17 */
 { /* if the function names (or line numbers) change, update `SECURITY.md` to new values */
-	int susuwuUnitTestsErrno = 0;
+	SusuwuUnitTestsBitmask susuwuUnitTestsErrno = 0;
 #if SUSUWU_UNIT_TESTS
 	if(!std::cout.good()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
@@ -41,7 +48,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
 	std::cout << "macrosTestsNoexcept(): " << std::flush /* flush, to show which test starts last if it crashes */;
-	const int macrosTestsErrno =  macrosTestsNoexcept();
+	const SusuwuUnitTestsBitmask macrosTestsErrno = macrosTestsNoexcept();
 	if(0 == macrosTestsErrno) {
 		std::cout << "pass" << std::endl;
 	} else {
@@ -62,7 +69,7 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassIoBit;
 	}
-	std::cout << "classSysTestsNoexcept(): " << std::flush;
+	std::cout << "classSysTestsNoexcept():" << std::flush;
 	if(true != classSysTestsNoexcept()) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassSysBit;
 	}
@@ -80,13 +87,24 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsClassResultListBit;
 	}
+	std::cout << "classWebBrowseTestsNoexcept(): " << std::flush;
+	if(classWebBrowseTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassWebBrowseBit;
+	}
 	std::cout << "virusAnalysisTestsNoexcept(): " << std::flush;
+# ifdef SUSUWU_FORCE_VIRUS_ANALYSIS_TESTS
 	if(virusAnalysisTestsNoexcept()) {
 		std::cout << "pass" << std::endl;
 	} else {
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsVirusAnalysisBit;
 	}
+# else /* ifdef SUSUWU_FORCE_VIRUS_ANALYSIS_TESTS ... else */
+	std::cout << "GitHub's workflow now stalls (was just a few seconds to execute, but now (for unknown reasons) is >6 hours to execute), use `-DSUSUWU_FORCE_VIRUS_ANALYSIS_TESTS` to enable thus" << std::endl;
+# endif /* def SUSUWU_FORCE_VIRUS_ANALYSIS_TESTS */
 	if(consoleHasInput && false == classIoSetConsoleInput(true)) {
 		susuwuUnitTestsErrno |= susuwuUnitTestsConsoleBit;
 	}
@@ -97,6 +115,19 @@ static const SusuwuUnitTestsBitmask unitTestsCxx() SUSUWU_EXPECTS(std::cout.good
 		std::cout << "error" << std::endl;
 		susuwuUnitTestsErrno |= susuwuUnitTestsAssistantCnsBit;
 	}
+#	ifdef SUSUWU_USE_TENSORFLOW
+	std::cout << "classTensorFlowCnsTestsNoexcept" << std::flush;
+# ifdef SUSUWU_FORCE_CLASS_TENSORFLOW_CNS_TESTS
+	if(classTensorFlowCnsTestsNoexcept()) {
+		std::cout << "pass" << std::endl;
+	} else {
+		std::cout << "error" << std::endl;
+		susuwuUnitTestsErrno |= susuwuUnitTestsClassTensorFlowCnsBit;
+	}
+#  else /* ifdef SUSUWU_FORCE_CLASS_TENSORFLOW_CNS_TESTS ... else */
+	std::cout << "GitHub's workflow now stalls (was just a few seconds to execute, but now (for unknown reasons) is >6 hours to execute), use `-DSUSUWU_FORCE_CLASS_TENSORFLOW_CNS_TESTS` to enable thus" << std::endl;
+#  endif /* def SUSUWU_FORCE_CLASS_TENSORFLOW_CNS_TESTS */
+#	endif /* def SUSUWU_USE_TENSORFLOW */
 #else /* else !SUSUWU_UNIT_TESTS */
 	SUSUWU_NOTICE('`' + std::string(Susuwu::classIoGetOwnPath()) + "` was built with `-DSUSUWU_UNIT_TESTS=false`; tests skipped.");
 #endif /* else !SUSUWU_UNIT_TESTS */
@@ -111,6 +142,9 @@ SusuwuUnitTestsBitmask main(int argc, const char **args) {
 	if(true != Susuwu::classSysInit(argc, args)) {
 		return susuwuUnitTestsClassSysBit;
 	}
+#ifdef SUSUWU_REV_PARSE_HEAD
+	SUSUWU_NOTICE("`$(git rev-parse HEAD)` == `"+ std::string(SUSUWU_REV_PARSE_HEAD) + "`");
+#endif /* SUSUWU_REV_PARSE_HEAD */
 #ifdef SUSUWU_EXPERIMENTAL
 	SUSUWU_WARNING('`' + std::string(Susuwu::classIoGetOwnPath()) + "` " SUSUWU_EXPERIMENTAL_ISSUES);
 #endif

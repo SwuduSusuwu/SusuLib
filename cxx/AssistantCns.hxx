@@ -2,18 +2,25 @@
 #pragma once
 #ifndef INCLUDES_cxx_AssistantCns_hxx
 #define INCLUDES_cxx_AssistantCns_hxx
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoPath ClassIoBytecode */
 #include "ClassResultList.hxx" /* ResultList */
 #include "ClassSys.hxx" /* templateCatchAll */
-#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
+#include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS SUSUWU_USE_TENSORFLOW */
 #include <iostream> /* std::cout */
 #include <ostream> /* std::ostream */
 #include <string> /* std::string */
 #include <vector> /* std::vector */
-/* (Work-in-progress) assistant bots with artificial CNS ("HSOM" (the simple Python artificial CNS) is enough to do this), which should have results almost as complex as "ChatGPT 4.0" (or as "Claude-3 Opus"); */
+/* (Work-in-progress) system which uses tuples of inputs (questions, or `git commit` messages) plus solutions (answers, or computer source codes), to setup artificial neural tissue (such as [**HSOM**](https://github.com/SwuduSusuwu/SusuLib/blob/5eff71e6486562b1d5c7b349618fba9634d479cd/cxx/ClassCns.cxx#L11-L81) or [*TensorFlow*](https://github.com/SwuduSusuwu/SusuLib/blob/preview/cxx/ClassTensorFlowCns.hxx)), which then uses new inputs to produce new solutions (similar to _OpenLM Research_'s "[_OpenLLaMA_](https://github.com/openlm-research/open_llama)", "[_LLaMA 2_](https://www.llama.com/llama2/)" or _Tesla_'s "[_Grok-2__](https://www.segmind.com/models/grok-2])") */
 namespace Susuwu {
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns assistantCns;
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns assistantCns;
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern std::string assistantCnsResponseDelimiter;
 
 #if SUSUWU_UNIT_TESTS
@@ -22,12 +29,13 @@ extern std::string assistantCnsResponseDelimiter;
  * @throw std::logic_error
  * @pre @code !assistantCns.isPureVirtual() @endcode */
 const bool assistantCnsTests();
-static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(assistantCnsTests, "assistantCnsTests()");}
+static const bool assistantCnsTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(assistantCnsTests, "assistantCnsTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
-/* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses
- * Wikipedia is a special case; has compressed downloads of databases ( https://wikipedia.org/wiki/Wikipedia:Database_download )
- * Github is a special case; has compressed downloads of repositories ( https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github )
+/* Universal Resources Locators of hosts which `assistantCnsDownloadHosts()` uses. `extern`s are set in `AssistantCns.cxx`.
+ * To downloads those as datasets, ensure to register with services such as <https://dash.cloudflare.com/?to=/:account/configurations/verified-bots>
+ * Wikipedia is special; [has compressed downloads of databases for such uses](https://wikipedia.org/wiki/Wikipedia:Database_download)
+ * Github is special; [has compressed downloads of repositories for such uses](https://docs.github.com/en/get-started/start-your-journey/downloading-files-from-github)
  */
 extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
 
@@ -35,10 +43,10 @@ extern std::vector<ClassIoPath> assistantCnsDefaultHosts;
  * @post If no question, `0 == questionsOrNull.bytecodes[x].size()` (new message synthesis).
  * If no responses, `0 == responsesOrNull.bytecodes[x].size()` (ignore).
  * `questionsOrNull.signatures[x] = Universal Resource Locator`
- * @code sha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
+ * @code classSha2(ResultList.bytecodes[x]) == ResultList.hashes[x] @endcode */
 void assistantCnsDownloadHosts(ResultList &questionsOrNull, ResultList &responsesOrNull, const std::vector<ClassIoPath> &hosts = assistantCnsDefaultHosts);
 void assistantCnsProcessXhtml(ResultList &questionsOrNull, ResultList &responsesOrNull, const ClassIoPath &localXhtml = "index.xhtml");
-const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: for XML/XHTML could just use [ https://www.boost.io/libraries/regex/ https://github.com/boostorg/regex ] or [ https://www.boost.org/doc/libs/1_85_0/doc/html/property_tree/parsers.html#property_tree.parsers.xml_parser https://github.com/boostorg/property_tree/blob/develop/doc/xml_parser.qbk ] */
+const std::vector<ClassIoPath> assistantCnsProcessUrls(const ClassIoPath &localXhtml = "index.xhtml"); /* returns list of Uniform Resource Identifiers from `localXhtml` */
 const ClassIoBytecode assistantCnsProcessQuestion(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 const std::vector<ClassIoBytecode> assistantCnsProcessResponses(const ClassIoPath &localXhtml = "index.xhtml"); /* TODO: regex or XML parser */
 
