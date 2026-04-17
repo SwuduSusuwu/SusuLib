@@ -28,24 +28,63 @@ namespace Susuwu {
 /* store the connectome (the synapse coefficients and biases); serialize from `TensorFlowCns::coefficients` (or `TensorFlowCns::graphDef`), into `modelPath`.
  * @throw std::runtime_error */
 void TensorFlowCns::dumpTo(const ClassIoPath &modelPath) const { /* TODO: the implementation is in the header to allow future `template<>` use; If `dumpTo` will not use C++ `template<>`s, implement in `ClassTensorFlowCns.cxx` to reduce `./build.sh` resource use */
-#if !SUSUWU_IN_MEMORY_COEFFICIENTS
-	std::vector<tensorflow::Tensor> outputs;
-	TF_CHECK_OK(session->Run({}, {"coefficients", "biases"}, {}, &outputs));
-	const auto &coefficients = outputs[0];
-	const auto &biases = outputs[1];
-#endif /* !SUSUWU_IN_MEMORY_COEFFICIENTS */
+	/* Save base-class fields (inputMode, outputMode, inputNeurons, normalizers, etc.) */
+	Cns::dumpTo(modelPath + ".cns");
 #ifdef SUSUWU_TENSORFLOWCNS_PROTOBUF_FS
-	tensorflow::TensorProto tensorProto;
-#ifdef SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS
-	coefficients.AsProtoField(&tensorProto);
-	biases.AsProtoField(&tensorProto);
-	const tensorflow::Status status = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath, tensorProto);
-#else /* !def SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS */
-	const tensorflow::Status status = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath, graphDef);
-#endif /* !def SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS */
-	if (!status.ok()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath, graphDef).ToString() == \"" + status.ToString() + "\" }"));
+	/* Save the computation graph (GraphDef) */
+	{
+		const tensorflow::Status status = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath + ".graphdef", graphDef);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath + \".graphdef\", graphDef).ToString() == \"" + status.ToString() + "\" }"));
+		}
 	}
+	/* Save model weights (coefficients and biases) */
+#if SUSUWU_CNS_LOCAL_COEFFICIENTS
+	{
+		tensorflow::TensorProto coeffProto;
+		coefficients.AsProtoField(&coeffProto);
+		const tensorflow::Status status = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath + ".tensors", coeffProto);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { tensorflow::WriteBinaryProto(..., modelPath + \".tensors\", coeffProto).ToString() == \"" + status.ToString() + "\" }"));
+		}
+	}
+#	if SUSUWU_CNS_USE_BIAS
+	{
+		tensorflow::TensorProto biasProto;
+		biases.AsProtoField(&biasProto);
+		const tensorflow::Status status = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath + ".biases", biasProto);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { tensorflow::WriteBinaryProto(..., modelPath + \".biases\", biasProto).ToString() == \"" + status.ToString() + "\" }"));
+		}
+	}
+#	endif /* SUSUWU_CNS_USE_BIAS */
+#else /* !SUSUWU_CNS_LOCAL_COEFFICIENTS */
+	{
+		std::vector<tensorflow::Tensor> outputs;
+		const tensorflow::Status status = session->Run({}, {"coefficients" SUSUWU_CNS_IF_BIAS(SUSUWU_COMMA "biases")}, {}, &outputs);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { session->Run({}, {\"coefficients\"...}, {}, &outputs).ToString() == \"" + status.ToString() + "\" }"));
+		}
+		tensorflow::TensorProto coeffProto;
+		outputs[0].AsProtoField(&coeffProto);
+		{
+			const tensorflow::Status writeStatus = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath + ".tensors", coeffProto);
+			if(!writeStatus.ok()) {
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { tensorflow::WriteBinaryProto(..., modelPath + \".tensors\", coeffProto).ToString() == \"" + writeStatus.ToString() + "\" }"));
+			}
+		}
+#	if SUSUWU_CNS_USE_BIAS
+		tensorflow::TensorProto biasProto;
+		outputs[1].AsProtoField(&biasProto);
+		{
+			const tensorflow::Status writeStatus = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), modelPath + ".biases", biasProto);
+			if(!writeStatus.ok()) {
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::dumpTo(.modelPath = \""+ modelPath + "\") { tensorflow::WriteBinaryProto(..., modelPath + \".biases\", biasProto).ToString() == \"" + writeStatus.ToString() + "\" }"));
+			}
+		}
+#	endif /* SUSUWU_CNS_USE_BIAS */
+	}
+#endif /* !SUSUWU_CNS_LOCAL_COEFFICIENTS */
 #elif defined(SUSUWU_TENSORFLOWCNS_ROCM_FS)
 	const tensorflow::Status status = tensorflow::SaveTensorToFile(modelPath, coefficients); /* TODO: Assistant suggested to use this function, but don't know what to include. [All Google found was ROCm](https://rocm.docs.amd.com/projects/rocPyDecode/en/latest/reference/decoderClass.html#savetensortofile-output-file-path-frame-adrs-width-height-rgb-format-surface-info) */ /* TODO: biases */
 	if(!status.ok()) {
@@ -61,23 +100,88 @@ void TensorFlowCns::dumpTo(const ClassIoPath &modelPath) const { /* TODO: the im
 /* load the connectome (the synapse coefficients and biases); deserialize into `TensorFlowCns::const` (or `TensorFlowCns::graphDef`), from `modelPath`.
  * @throw std::runtime_error, tensorflow::errors::Internal, tensorflow::errors::Unavailable */
 void TensorFlowCns::loadFrom(const ClassIoPath &modelPath) { /* TODO: the implementation is in the header to allow future `template<>` use; If `loadFrom` will not use C++ `template<>`s, implement in `ClassTensorFlowCns.cxx` to reduce `./build.sh` resource use */
-	switch(inputMode) { /* TODO: support more types, or replace `template<class Input>` on `initScopeRootForward` with an argument (such as `ObjectMode input`) */
-		case objectModeFloat:	initScopeRootForward<float, float>(DataTypeToEnum<float>::value); break;
-		case objectModeInt:	initScopeRootForward<int, int>(DataTypeToEnum<int>::value); break;
-		default:	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { inputMode == " + std::to_string(inputMode) + "; /* unsupported `ObjectMode` */ }"));
-	}
+	/* Restore base-class fields (inputMode, outputMode, inputNeurons, normalizers, etc.) */
+	Cns::loadFrom(modelPath + ".cns");
 #ifdef SUSUWU_TENSORFLOWCNS_PROTOBUF_FS
-//	tensorflow::GraphDef graphDef; /* TODO: uncomment (use temp `tensorflow::GraphDef`) or remove (settle on `TensorFlowCns::graphDef`) */
-#	ifdef SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS
-	throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { /* TODO; `SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS`. Solution: unset that macro for now. */ }"));
-#	else /* !def SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS */
-	const tensorflow::Status status = ReadBinaryProto(tensorflow::Env::Default(), modelPath, &graphDef);
-	if(!status.ok()) {
-		throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { !tensorflow::ReadBinaryProto(tensorflow::Env::Default(), modelPath, &graphDef).ok() }"));
+	/* Load the computation graph from disk */
+	{
+		const tensorflow::Status status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), modelPath + ".graphdef", &graphDef);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { tensorflow::ReadBinaryProto(tensorflow::Env::Default(), modelPath + \".graphdef\", &graphDef).ToString() == \"" + status.ToString() + "\" }"));
+		}
 	}
-//		TF_CHECK_OK(root.ToGraphDef(&graphDef)); /* uncomment if `ReadBinaryProto` loads `tensorflow::Scope root` */
-//		TF_CHECK_OK(session->Create(graphDef)); /* uncomment to reload `tensorflow::GraphDef` */
-#	endif /* !def SUSUWU_TENSORFLOWCNS_BACKUP_TENSORS */
+	/* Close the old session and create a fresh one with the loaded graph */
+	if(SUSUWU_NULLPTR != session) {
+		TF_CHECK_OK(session->Close());
+		delete session;
+		session = SUSUWU_NULLPTR;
+	}
+	{
+		const tensorflow::SessionOptions sessionOptions;
+		const tensorflow::Status status = tensorflow::NewSession(sessionOptions, &session);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { tensorflow::NewSession(sessionOptions, &session).ToString() == \"" + status.ToString() + "\" }"));
+		}
+	}
+	{
+		const tensorflow::Status status = session->Create(graphDef);
+		if(!status.ok()) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { session->Create(graphDef).ToString() == \"" + status.ToString() + "\" }"));
+		}
+	}
+	/* Load and restore model weights (coefficients and biases) */
+	{
+		tensorflow::TensorProto coeffProto;
+		{
+			const tensorflow::Status status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), modelPath + ".tensors", &coeffProto);
+			if(!status.ok()) {
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { tensorflow::ReadBinaryProto(..., modelPath + \".tensors\", &coeffProto).ToString() == \"" + status.ToString() + "\" }"));
+			}
+		}
+		tensorflow::Tensor coeffTensor;
+		if(!coeffTensor.FromProto(coeffProto)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { !coeffTensor.FromProto(coeffProto) /* malformed coefficients proto */ }"));
+		}
+#	if SUSUWU_CNS_LOCAL_COEFFICIENTS
+		coefficients = coeffTensor;
+#	endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
+#	if SUSUWU_CNS_USE_BIAS
+		tensorflow::TensorProto biasProto;
+		{
+			const tensorflow::Status status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), modelPath + ".biases", &biasProto);
+			if(!status.ok()) {
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { tensorflow::ReadBinaryProto(..., modelPath + \".biases\", &biasProto).ToString() == \"" + status.ToString() + "\" }"));
+			}
+		}
+		tensorflow::Tensor biasTensor;
+		if(!biasTensor.FromProto(biasProto)) {
+			throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { !biasTensor.FromProto(biasProto) /* malformed biases proto */ }"));
+		}
+#		if SUSUWU_CNS_LOCAL_COEFFICIENTS
+		biases = biasTensor;
+#		endif /* SUSUWU_CNS_LOCAL_COEFFICIENTS */
+		/* Restore weights into the session variables using the assign ops from the training graph */
+		{
+			const tensorflow::Status status = session->Run(
+				{{"randomCoefficients", coeffTensor}, {"randomBiases", biasTensor}},
+				{}, {"assignCoefficients", "assignBiases"}, SUSUWU_NULLPTR);
+			if(!status.ok()) {
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { session->Run({randomCoefficients, randomBiases}, {}, {assignCoefficients, assignBiases}, nullptr).ToString() == \"" + status.ToString() + "\" }"));
+			}
+		}
+#	else /* !SUSUWU_CNS_USE_BIAS */
+		/* Restore coefficients-only into the session variable (bias-free build) */
+		{
+			const tensorflow::Status status = session->Run(
+				{{"randomCoefficients", coeffTensor}},
+				{}, {"assignCoefficients"}, SUSUWU_NULLPTR);
+			if(!status.ok()) {
+				throw std::runtime_error(SUSUWU_ERRSTR(SUSUWU_SH_ERROR, getName() + "::loadFrom(.modelPath = \""+ modelPath + "\") { session->Run({randomCoefficients}, {}, {assignCoefficients}, nullptr).ToString() == \"" + status.ToString() + "\" }"));
+			}
+		}
+#	endif /* !SUSUWU_CNS_USE_BIAS */
+	}
+	setInitialized(true);
 #elif defined(SUSUWU_TENSORFLOWCNS_ROCM_FS)
 	const tensorflow::Status status = tensorflow::ReadTensorFromFile(modelPath, &coefficients); /* Assistant suggested to use this function, but don't know what to include. All Google found was [ShuffleNetV2Plus from MindX SDK](https://zhuanlan.zhihu.com/p/558676663) */ /* TODO: biases */
 #elif defined(SUSUWU_TENSORFLOWCNS_SAVEDMODEL_FS)
