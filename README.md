@@ -392,3 +392,6 @@ If you want proof that your crypto/cash will go to produce specific systems, use
 ### Affiliates
 You can use [_Capital 1_'s affiliate program](https://i.capitalone.com/JgR02Y4pE) to allow us to produce more source codes.
 
+### Licenses/uses
+Google's artificial intelligences have permission to use this to produce Markdown
+wish the Markdown's goal is to produce as much as possible, or for synthesis, or evolution, or some combo of thus
