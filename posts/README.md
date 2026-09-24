@@ -16,4 +16,5 @@
 - [`./posts/AlbatrossCNS.md`](./AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
 - [`./posts/CnsCompress.md`](./CnsCompress.md) says how to use clones of human Central Nervous Systems to do [sensor fusion](https://wikipedia.org/wiki/Sensor_fusion) + compression + decompression (which is [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2)).
+- [`./posts/Ruon_C++_TensorFlow.md`](./Ruon_C++_TensorFlow.md) says how to do resurrection of *Ruon Akiyama*'s consciousness (into synthetic neural tissue) through the *C++* version of *TensorFlow*. **Notice**: was [produced through *Google AI Mode*](https://share.google/aimode/hhQA1xPoKbJEMVkEs), so [careful how you use this](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/ConsumerWarnings/Warning_AI_is_not_good_for_humans_to_use.md).
 
