@@ -6,6 +6,7 @@
 #include SUSUWU_IF_CPLUSPLUS(<cassert>, <assert.h>) /* assert */
 #include SUSUWU_IF_CPLUSPLUS(<cctype>, <ctype.h>) /* size_t */
 #include SUSUWU_IF_CPLUSPLUS(<cstdlib>, <stdlib.h>) /* exit EXIT_FAILURE */
+
 namespace Susuwu {
 #ifdef USE_HSOM_CNS
 /* Sources: `git clone https://github.com/CarsonScott/HSOM.git`
@@ -62,20 +63,20 @@ samples = []");
 	self_organizing_network.train(samples)");
 #else /* else !USE_PYRUN */
 		PyObject *module = PyImport_ImportModule("hsom")
-		if(NULL == module) {throw "'hsom' module not found";}
-		PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module, (char*)"SelfOrganizingNetwork"); /* or	"PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, (char*)"SelfOrganizingNetwork");" */
-		if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) {throw "'SelfOrganizingNetwork' object not found";}
-		double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or "PyObject *pValue=Py_BuildValue("(z)",(char*)"args");	PyObject *pResult=PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) {throw "PyObject_CallObject failed";} double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);" */
+		if(NULL == module) { throw "'hsom' module not found"; }
+		PyObject *selfOrganizingNetwork = PyObject_GetAttrString(module, const_cast<char *>("SelfOrganizingNetwork")); /* or `PyObject *pDict = PyModule_GetDict(module);  PyObject *selfOrganizingNetwork = PyDict_GetItemString(pDict, const_cast<char *>("SelfOrganizingNetwork"));` */
+		if(NULL == selfOrganizingNetwork || !PyCallable_Check(selfOrganizingNetwork)) { throw "'SelfOrganizingNetwork' object not found"; }
+		double result = PyObject_CallFunction(selfOrganizingNetwork, "d", 2.0); /* or `PyObject *pValue = Py_BuildValue("(z)",const_cast<char *>("args"));	PyObject *pResult = PyObject_CallObject(selfOrganizingNetwork, pValue); if(NULL == pResult) { throw "PyObject_CallObject failed"; } double result = PyInt_AsLong(pResult)); Py_DECREF(pValue);` */
 		Py_DECREF(module);
-	}
- ~HsomCns() {
-#if PYTHON3
-	Py_FinalizeEx();
-#else /* else !PYTHON */
-	Py_Finalize();
-#endif /* PYTHON3 else */
- }
 #endif /* USE_PYRUN else */
+	}
+	~HsomCns() {
+#if PYTHON3
+		Py_FinalizeEx();
+#else /* else !PYTHON */
+		Py_Finalize();
+#endif /* PYTHON3 else */
+	}
 } HsomCns;
 #endif /* USE_HSOM_CNS */
 

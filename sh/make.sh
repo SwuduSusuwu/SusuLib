@@ -6,6 +6,7 @@ GIT_ROOT="$(dirname "$(git rev-parse --git-dir)")/" #/* `git` does not set `${GI
 if [ ! "$(realpath -q ./)" = "$(realpath -q "${GIT_ROOT}")" ]; then
 	GIT_ROOT_USE="${GIT_ROOT}" #/* If current path is not root, add root path */
 fi
+
 SUSUWU_INCLUDE_ERROR() { #/* Usage; `SUSUWU_INCLUDE_ERROR "<relative path>" "error message"` */
 	echo "[$0: Error: \`GIT_WORK_TREE=${GIT_ROOT}\` \`\${GIT_WORK_TREE}${1}\` ${2}.]"; exit 1
 }
@@ -20,13 +21,13 @@ SUSUWU_INCLUDE() { #/* Usage; `SUSUWU_INCLUDE "<relative path>"` */
 }
 SUSUWU_INCLUDE "./sh/Macros.sh" #/* SUSUWU_ABORT_ON_FIRST_ERROR SUSUWU_ECHO_COMMANDS() SUSUWU_ECHO_COMMANDS_TO SUSUWU_ESCAPE_SPACES() SUSUWU_LOCAL_WORKSPACE_PATH() SUSUWU_PATH_SHOULD_NOT_EXIST() SUSUWU_PATH_SUFFIX_SLASH() SUSUWU_PATH_UNAMBIGUOUS() SUSUWU_PRINT() SUSUWU_S SUSUWU_SH_CONSOLE_PARAMS SUSUWU_SH_HAS_PARAM() SUSUWU_SH_REMOVE_PARAM() SUSUWU_SH_<color> SUSUWU_SH_<type-of-code>() SUSUWU_SH_<warn-level>() SUSUWU_ESCAPE_QUOTED() SUSUWU_VERBOSE */
 
-SUSUWU_COMPILE_JSON_PATH_="$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json" # [`clang-tidy` compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration)
+SUSUWU_COMPILE_JSON_PATH_="$(SUSUWU_LOCAL_WORKSPACE_PATH)/compile_commands.json" #/* [`clang-tidy` compilation database](https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration) */
 SUSUWU_SET_NEW_BUILD() { #/* Usage: `SUSUWU_SET_NEW_BUILD [true | false]`. ] */
 	export SUSUWU_NEW_BUILD SUSUWU_RELINK SUSUWU_COMPILE_JSON_PATH
 	if [ true = "${1}" ]; then #/* If is first build, or passed `--rebuild`, or global headers `touch`d;
 		SUSUWU_NEW_BUILD=true    # * build "${OBJDIR}${OUTPUT}",
 		SUSUWU_RELINK=true       # * build "${BINDIR}${OUTPUT}",
-		SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" # *and produce compilation database. */
+		SUSUWU_COMPILE_JSON_PATH="${SUSUWU_COMPILE_JSON_PATH_}" # * plus produce compilation database. */
 	else                                    #/* If is built;
 		SUSUWU_NEW_BUILD=false                # * don't clobber,
 		SUSUWU_RELINK=false                   # * don't clobber,
@@ -154,7 +155,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 		SUSUWU_PRINT "SUSUWU_PROCESS_RELEASE_DEBUG()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_QUOTE "CURRENT" "--debug")") is slow (use $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_REMOVE_PARAM "--debug" "$@") $(SUSUWU_SH_QUOTE "PROPOSED" "--release")") to improve how fast $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_PATH_UNAMBIGUOUS "\${BINDIR}/\${OUTPUT}")") executes)."
 		CFLAGS="${CFLAGS} ${FLAGS_DEBUG} ${CFLAGS_DEBUG}"
 		CXXFLAGS="${CXXFLAGS} ${FLAGS_DEBUG} ${CXXFLAGS_DEBUG}"
-		if [ true = ${USE_FSAN} ]; then
+		if [ true = "${USE_FSAN}" ]; then
 			CFLAGS="${CFLAGS} ${FLAGS_FSAN}"
 			CXXFLAGS="${CXXFLAGS} ${FLAGS_FSAN}"
 			LDFLAGS="${LDFLAGS} ${FLAGS_FSAN}"
@@ -164,7 +165,7 @@ SUSUWU_PROCESS_RELEASE_DEBUG() { #/* Usage: `SUSUWU_PROCESS_RELEASE_DEBUG $@` [T
 }
 SUSUWU_SETUP_BUILD_FLAGS() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETUP_CXX [SUSUWU_PROCESS_RELEASE_DEBUG $@] SUSUWU_SETUP_BUILD_FLAGS SUSUWU_SETUP_BINDIR "" SUSUWU_SETUP_OBJDIR "" SUSUWU_SETUP_OUTPUT "" [SUSUWU_PROCESS_CLEAN_REBUILD $@] [SUSUWU_PROCESS_INCLUDES ""] SUSUWU_BUILD_OBJECTS ... */
 	export CFLAGS LDFLAGS C_SOURCE_PATH CXX_SOURCE_PATH SUSUWU_OBJECTLIST
-	LDFLAGS="${LDFLAGS}"
+	LDFLAGS="${LDFLAGS:-""}"
 	CFLAGS="${CFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
 	CXXFLAGS="${CXXFLAGS} ${FLAGS_USER} ${FLAGS_ANALYSIS}"
 	C_SOURCE_PATH=$(SUSUWU_PATH_SUFFIX_SLASH "${GIT_ROOT_USE}${C_SOURCE_PATH}") #/* if inherit C_SOURCE_PATH, perhaps it lacks '/' */
@@ -178,9 +179,9 @@ SUSUWU_SETUP_OBJDIR() { #/* Usage: `SUSUWU_SETUP_OBJDIR "./obj/"` */
 		OBJDIR="${1}"
 		SUSUWU_SETUP_OBJDIR_OLD() ( SUSUWU_SH_QUOTE "CURRENT PATH" "${OBJDIR}" )
 		SUSUWU_SETUP_OBJDIR_NEW() ( SUSUWU_SH_QUOTE "PROPOSED PATH" "<new-path>" )
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\${OBJ}.o\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)") (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR" "${SUSUWU_SH_BROWN}")}\${OBJ}.o\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_OLD)")), use $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=$(SUSUWU_SETUP_OBJDIR_NEW)") (where $(SUSUWU_SETUP_OBJDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"${OBJDIR}\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
+		SUSUWU_PRINT "SUSUWU_SETUP_OBJDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${CXX} -c ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "OBJDIR")=\"${OBJDIR}\"") until you use $(SUSUWU_SH_QUOTE "CODE" "unset OBJDIR")."
 	fi
 	OBJDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${OBJDIR}")" #/* if inherit OBJDIR, perhaps it is without last '/' */
 	OBJDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${OBJDIR}")"
@@ -192,9 +193,9 @@ SUSUWU_SETUP_BINDIR() { #/* Usage: `SUSUWU_SETUP_BINDIR "./bin/"` */
 		BINDIR="${1}"
 		SUSUWU_SETUP_BINDIR_OLD() ( SUSUWU_SH_QUOTE "CURRENT PATH" "${BINDIR}" )
 		SUSUWU_SETUP_BINDIR_NEW() ( SUSUWU_SH_QUOTE "PROPOSED PATH" "<new-path>" )
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${OUTPUT}\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)")), execute $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)") (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "To redirect $(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR" "${SUSUWU_SH_BROWN}")}\${OUTPUT}\"") (which has $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_OLD)")), use $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=$(SUSUWU_SETUP_BINDIR_NEW)") (where $(SUSUWU_SETUP_BINDIR_NEW) is a directory which you choose)." #/* TODO: remove `${SUSUWU_SH_BROWN}` once `SUSUWU_SH_USE_POP()` is fixed. */
 	else
-		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR")}\${OUTPUT}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you execute $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
+		SUSUWU_PRINT "SUSUWU_SETUP_BINDIR()" "$(SUSUWU_SH_NOTICE)" "$(SUSUWU_SH_QUOTE "CODE" "${LD} ... -o \"\${$(SUSUWU_SH_QUOTE "VAR" "BINDIR")}\${OUTPUT}\"") inherits local $(SUSUWU_SH_QUOTE "CODE" "$(SUSUWU_SH_QUOTE "VAR" "BINDIR")=\"$(SUSUWU_SH_QUOTE "CURRENT" "${BINDIR}")\"") until you use $(SUSUWU_SH_QUOTE "CODE" "unset BINDIR")."
 	fi
 	BINDIR="$(SUSUWU_PATH_SUFFIX_SLASH "${BINDIR}")" #/* if inherit BINDIR, perhaps it is without last '/' */
 	BINDIR="${GIT_ROOT_USE}$(SUSUWU_PATH_UNAMBIGUOUS "${BINDIR}")"
@@ -243,8 +244,10 @@ SUSUWU_PROCESS_CLEAN_REBUILD() { #/* Usage: `SUSUWU_PROCESS_CLEAN_REBUILD $@` [T
 SUSUWU_PROCESS_INCLUDES() { #/* Usage: `SUSUWU_PROCESS_INCLUDES ${C_SOURCE_PATH}*.h ${CXX_SOURCE_PATH}*.hxx` */
 #shellcheck disable=SC2068
 	for SUSUWU_PROCESS_INCLUDES_SOURCE_ in $@; do
-		SUSUWU_PROCESS_INCLUDES_OBJECT_="${OBJDIR}$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" .hxx).o" #/* `basename`'s second param removes suffix */
-		SUSUWU_PROCESS_INCLUDES_SRCCXX_="$(dirname "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")/$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" .hxx).cxx" #/* `basename`'s second param removes suffix */
+#		SUSUWU_PROCESS_INCLUDES_SRCS_="$(SUSUWU_STR_TOKEN_FIRST "$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")" ".")"
+		SUSUWU_PROCESS_INCLUDES_SRCS_="$(basename "${SUSUWU_PROCESS_INCLUDES_SOURCE_%.*}")" #/* `%.*` removes suffix, analogous to `| rev | cut -d '.' -f2- | rev` */
+		SUSUWU_PROCESS_INCLUDES_OBJECT_="${OBJDIR}${SUSUWU_PROCESS_INCLUDES_SRCS_}.o"
+		SUSUWU_PROCESS_INCLUDES_SRCCXX_="$(dirname "${SUSUWU_PROCESS_INCLUDES_SOURCE_}")/${SUSUWU_PROCESS_INCLUDES_SRCS_}.cxx"
 		if [ -n "$(find "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" -newer "${SUSUWU_PROCESS_INCLUDES_OBJECT_}" 2>/dev/null)" ] && [ -e "${SUSUWU_PROCESS_INCLUDES_SOURCE_}" ]; then #/* `-n`: not nil, `-e`: exists. */
 			SUSUWU_REBUILD_OUTPUT "$(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_SOURCE_}") (which is a common $(SUSUWU_SH_QUOTE "CODE" "#include")) is newer than $(SUSUWU_SH_QUOTE "PATH" "${SUSUWU_PROCESS_INCLUDES_OBJECT_}")"
 			break
@@ -261,7 +264,7 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 	SUSUWU_STATUS=1
 	if command -v ctags >/dev/null; then
 		if [ -z "${1}" ] || [ -z "${2}" ]; then
-			CTAGS_DEFAULTS="-R --exclude=.git/ --exclude=*.html --exclude=compile_commands.json ."
+			CTAGS_DEFAULTS="-R --exclude=.git/* --exclude=*.html --exclude=compile_commands.json --exclude=ml_dtypes/* --exclude=tensorflow/* ."
 			SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_NOTICE)" "Was called with less than 2 params; will default to $(SUSUWU_SH_QUOTE "CODE" "SUSUWU_BUILD_CTAGS ${CTAGS_DEFAULTS}")."
 #shellcheck disable=SC2086
 			ctags ${CTAGS_DEFAULTS} && SUSUWU_STATUS=0
@@ -276,9 +279,9 @@ SUSUWU_BUILD_CTAGS() ( #/* Usage: `SUSUWU_BUILD_CTAGS [-flags... --flags...] [SO
 			done
 		fi
 	else
-		SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_ERROR)" "\"ctags not found\"; do $(SUSUWU_SH_QUOTE "CODE" "apt install ctags")."
+		SUSUWU_PRINT "SUSUWU_BUILD_CTAGS()" "$(SUSUWU_SH_ERROR)" "\"ctags not found\"; use $(SUSUWU_SH_QUOTE "CODE" "apt install ctags")."
 	fi
-	return ${SUSUWU_STATUS};
+	return "${SUSUWU_STATUS}"
 )
 SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[${CFLAGS} || ${CXXFLAGS}]" ".cxx" ${CXX_SOURCE_PATH}*.cxx [ optionalExtraPath/*.cxx ] [ ... ]*/
 	LOCAL_BUILD=${1}
@@ -288,7 +291,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 	SUSUWU_ECHO_COMMANDS true
 #shellcheck disable=SC2068 #/* `"$@"` gives "clang++: error: no such file or directory: './cxx/*.cxx'" */
 	for LOCAL_SOURCE in $@; do
-		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `basename`'s second param removes suffix */
+		LOCAL_OBJECT="${OBJDIR}$(basename "${LOCAL_SOURCE%.*}" "${LOCAL_SOURCE_SUFFIX}").o" #/* `%.*` removes suffix */
 #shellcheck disable=SC2166 #/* With `set -x`, the `[] || []` form prints 2 commands */
 		if [ -n "$(find "${LOCAL_SOURCE}" -newer "${LOCAL_OBJECT}" 2>/dev/null)" -o ! -s "${LOCAL_OBJECT}" ]; then
 				SUSUWU_COMPILE_COMMAND "$(pwd)" "${LOCAL_SOURCE}" "${LOCAL_BUILD} ${LOCAL_BUILDFLAGS} -c ${LOCAL_SOURCE} -o ${LOCAL_OBJECT}" || { #/* TODO: figure out how to quote `${LOCAL_BUILD}`, `${LOCAL_SOURCE}` `${LOCAL_OBJECT}` */
@@ -297,7 +300,7 @@ SUSUWU_BUILD_OBJECTS() { #/* Usage: `SUSUWU_BUILD_OBJECTS "[${CC} || ${CXX}]" "[
 				SUSUWU_STATUS=$?
 				SUSUWU_ECHO_COMMANDS false
 				SUSUWU_BUILD_OBJECT_ERROR_CODE="$(SUSUWU_SH_QUOTE "CODE" "${LOCAL_BUILD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). "
-				if [ true = ${SUSUWU_ABORT_ON_FIRST_ERROR} ]; then
+				if [ true = "${SUSUWU_ABORT_ON_FIRST_ERROR}" ]; then
 					SUSUWU_PRINT "SUSUWU_BUILD_OBJECTS()" "$(SUSUWU_SH_ERROR)" "${SUSUWU_BUILD_OBJECT_ERROR_CODE}[Due to $(SUSUWU_SH_QUOTE "CODE" "${0} $(SUSUWU_SH_QUOTE "CURRENT" "--abort-on-first-error")"), this is fatal.]"
 					exit 1
 				else
@@ -320,41 +323,41 @@ SUSUWU_BUILD_EXECUTABLE() { #/* Usage: ... [SUSUWU_PROCESS_MINGW $@] SUSUWU_SETU
 	if [ false = ${SUSUWU_RELINK} ]; then
 		SUSUWU_STATUS=0
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Reused $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
-	elif [ 0 -eq ${SUSUWU_STATUS} ]; then
+	elif [ 0 -eq "${SUSUWU_STATUS}" ]; then
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_SUCCESS)" "Produced $(SUSUWU_SH_QUOTE "PATH" "${BINDIR}${OUTPUT}") ($(stat -c%s "${BINDIR}${OUTPUT}") bytes)."
 	else
 		SUSUWU_PRINT "SUSUWU_BUILD_EXECUTABLE()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${LD}") returned status code $(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"). [If errors include \"ld... $(SUSUWU_SH_QUOTE "STDERR" "unknown file type")\" or \"ld... $(SUSUWU_SH_QUOTE "STDERR" "undefined symbol __asan_")*\"; remove intermediate objects ($(SUSUWU_SH_QUOTE "CODE" "rm \"${OBJDIR}\"*.o")). Use $(SUSUWU_SH_QUOTE "CODE" "${0} ${SUSUWU_SH_CONSOLE_PARAMS} $(SUSUWU_SH_QUOTE "PROPOSED" "--rebuild")") to remove plus continue.]"
 	fi
-	return ${SUSUWU_STATUS}
+	return "${SUSUWU_STATUS}"
 }
 
 SUSUWU_TEST_OUTPUT() { #/* Usage: ... `SUSUWU_BUILD_EXECUTABLE && SUSUWU_TEST_OUTPUT [<silent-execution>]; exit $?` */
-	if [ 0 -eq ${SUSUWU_STATUS} ] || [ false = ${SUSUWU_RELINK} ]; then
+	if [ 0 -eq "${SUSUWU_STATUS}" ] || [ false = ${SUSUWU_RELINK} ]; then
 		if [ -z "${CROSS_COMP}" ]; then #/* `if("" == CROSS_COMP)` */
-			if [ true = ${SUSUWU_S} ]; then
+			if [ true = "${SUSUWU_S}" ]; then
 				"${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
 			else
 				"${BINDIR}${OUTPUT}"
 			fi
 		else #/* if `--mingw` */
 			if ! command -v wine >/dev/null; then
-				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). Do $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
+				SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_INFO)" "$(SUSUWU_SH_QUOTE "CODE" "wine not found"). Use $(SUSUWU_SH_QUOTE "CODE" "apt install wine")."
 				return 1
 			fi
-			if [ true = ${SUSUWU_S} ]; then
+			if [ true = "${SUSUWU_S}" ]; then
 				wine "${BINDIR}${OUTPUT}" 2>/dev/null 1>&2
 			else
 				wine "${BINDIR}${OUTPUT}"
 			fi
 		fi
 		SUSUWU_STATUS=$?
-		if [ 0 -eq ${SUSUWU_STATUS} ]; then
+		if [ 0 -eq "${SUSUWU_STATUS}" ]; then
 			SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_SUCCESS)" "$(SUSUWU_SH_QUOTE "CODE" "${BINDIR}${OUTPUT}") returned status SusuwuUnitTestsBitmask($(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"))."
 		else
 			SUSUWU_PRINT "SUSUWU_TEST_OUTPUT()" "$(SUSUWU_SH_ERROR)" "$(SUSUWU_SH_QUOTE "CODE" "${BINDIR}${OUTPUT}") returned status SusuwuUnitTestsBitmask($(SUSUWU_SH_QUOTE "STATUS" "${SUSUWU_STATUS}"))."
 		fi
 	fi
-	return ${SUSUWU_STATUS}
+	return "${SUSUWU_STATUS}"
 }
 
 SUSUWU_TODO_LIST() ( #/* Usage: `SUSUWU_TODO_LIST "NameOfTool" "what to expect from future versions"` */
@@ -367,7 +370,7 @@ SUSUWU_FORMAT() ( #/* TODO */
 SUSUWU_DOCS() ( #/* TODO */
 	SUSUWU_TODO_LIST "SUSUWU_DOCS()" "(which is analogous to \`make docs\`, and will use tools such as $(SUSUWU_SH_QUOTE "CODE" "sphinx") or $(SUSUWU_SH_QUOTE "CODE" "doxygen"))"
 )
-SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq $(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}")) ]`. Is just for internal use. */
+SUSUWU_HAS_USABLE_USRBIN() ( #/* Usage: `[ 0 -eq "$(SUSUWU_HAS_USABLE_USRBIN("${USRBIN}"))" ]`. Is just for internal use. */
 	if [ ! -d "${1}" ]; then
 		return 1
 	fi
@@ -415,7 +418,7 @@ SUSUWU_PROCESS_USRBIN() { #/* Usage: `SUSUWU_USRBIN ["SUSUWU_[UN]INSTALL"] ["/us
 		USRBIN="$(SUSUWU_FIRST_PATH)"
 	fi
 	USRBIN="$(SUSUWU_PATH_UNAMBIGUOUS "${USRBIN}")"
-	if [ -d "${USRBIN}" ]; then
+	if [ -e "${USRBIN}" ]; then
 		SUSUWU_PRINT "SUSUWU_PROCESS_USRBIN()" "$(SUSUWU_SH_NOTICE)" "Have set \`$(SUSUWU_SH_QUOTE "VAR" "USRBIN")=\"$(SUSUWU_SH_QUOTE "PROPOSED" "${USRBIN}")\"\`, since $(SUSUWU_SH_QUOTE "CODE FUNCTION" "${1}") was not passed \`$(SUSUWU_SH_QUOTE "VAR" "USRBIN")\`."
 		return 0
 	fi
@@ -431,4 +434,24 @@ SUSUWU_UNINSTALL() ( #/* Usage: `SUSUWU_UNINSTALL [USRBIN]`. Is analogous to `ma
 	SUSUWU_PROCESS_USRBIN "SUSUWU_UNINSTALL()" "${1}" &&
 	rm "${USRBIN}/${OUTPUT}"
 )
+
+SUSUWU_FIND_INCLUDE() { #/* Usage: `SUSUWU_FIND_INCLUDE "<include dir/>" ["<specific subpath/>"] */
+	for SUSUWU_FIND_INCLUDE_PATH in "./include/" "./include/${1}" "./${1}" "../${1}" "${HOME}/../usr/local/include/" "${HOME}/../usr/local/include/${1}" "${HOME}/../usr/include/" "${HOME}/../usr/include/${1}" "${HOME}/../usr/include/${1}" "/usr/local/include/" "/usr/local/include/${1}" "/usr/include/" "/usr/include/${1}"; do
+		if [ -e "${SUSUWU_FIND_INCLUDE_PATH}${2}" ]; then #/* If caller passes some `<specific subpath>` (`${2}`), assume that `<include dir>` (`${1}`) has collisions without `<specific subpath>` (`${2}`) */
+			echo "${SUSUWU_FIND_INCLUDE_PATH}" | sed 's|[^/]\+/../|/|g' | sed 's|//|/|g' #/* Squished path. Use `realpath "${SUSUWU_FIND_INCLUDE_PATH}"` for absolute path. */
+			return 0
+		fi
+	done
+	return 1
+}
+SUSUWU_DEPENDENCY_INCLUDE() { #/* Usage: `SUSUWU_DEPENDENCY_INCLUDE "<-I | -F>" "<package>" "<include dir>" "<include subdir>" ["<install-howto>"] */
+	SUSUWU_DEPENDENCY_INCLUDE_PATH="$(SUSUWU_FIND_INCLUDE "${3}" "${4}")"
+	if [ -d "${SUSUWU_DEPENDENCY_INCLUDE_PATH}" ]; then
+		export FLAGS_USER="${FLAGS_USER} ${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}"
+		SUSUWU_PRINT "SUSUWU_DEPENDENCY_INCLUDE()" "$(SUSUWU_SH_NOTICE)" "Found package $(SUSUWU_SH_QUOTE "CODE" "${2}"), $(SUSUWU_SH_QUOTE "VAR" "FLAGS_USER") will use $(SUSUWU_SH_QUOTE "CODE" "${1}${SUSUWU_DEPENDENCY_INCLUDE_PATH}")."
+		return 0
+	fi
+	SUSUWU_PRINT "SUSUWU_DEPENDENCY_INCLUDE()" "$(SUSUWU_SH_WARNING)" "Package $(SUSUWU_SH_QUOTE "CODE" "${2}") not found.${5:+" To install, use $(SUSUWU_SH_QUOTE "CODE" "${5}")"}" #/* For most packages, `<install-howto>` (`${5}`) is close to "sudo apt install ${2} || git clone https://github.com/${2}/${3}.git --depth 1" */
+	return 1
+}
 

@@ -2,12 +2,15 @@
 #pragma once
 #ifndef INCLUDES_cxx_VirusAnalysis_hxx
 #define INCLUDES_cxx_VirusAnalysis_hxx
-#include "ClassCns.hxx" /* Cns CnsMode */
+#include "ClassCns.hxx" /* Cns */
 #include "ClassIo.hxx" /* ClassIoPath */
 #include "ClassPortableExecutable.hxx" /* PortableExecutable */
 #include "ClassResultList.hxx" /* ResultList smallestUniqueSubstr */
 #include "ClassSha2.hxx" /* classSha2 */
 #include "ClassSys.hxx" /* templateCatchAll */
+#ifdef SUSUWU_USE_TENSORFLOW
+#	include "ClassTensorFlowCns.hxx" /* TensorFlowCns */
+#endif /* def SUSUWU_USE_TENSORFLOW */
 #include "Macros.hxx" /* SUSUWU_NOEXCEPT SUSUWU_UNIT_TESTS */
 #include <map> /* std::map */
 #include <string> /* std::string */
@@ -35,7 +38,11 @@ typedef enum VirusAnalysisResult : char { /* TODO? All other cases convert to `b
 } VirusAnalysisResult; /* if(virusAnalysisAbort != VirusAnalysisResult) {static_assert(true == static_cast<bool>(VirusAnalysisResult));} */
 
 extern ResultList passList, abortList; /* hosts produce, clients initialize shared clones of this from disk */
+#ifdef SUSUWU_USE_TENSORFLOW
+extern TensorFlowCns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#else /* !defined(SUSUWU_USE_TENSORFLOW) */
 extern Cns analysisCns, virusFixCns; /* hosts produce, clients initialize shared clones of this from disk */
+#endif /* !defined(SUSUWU_USE_TENSORFLOW) */
 
 extern bool virusAnalysisResultListIndex, virusAnalysisResultListWhitespace, virusAnalysisResultListPascal;
 /* @throw what `std::istream` throws (std::bad_alloc, std::runtime_error?).
@@ -54,10 +61,10 @@ void virusAnalysisLoadFrom(const ClassIoPath &path, ResultList &list);
  * @throw std::bad_alloc, std::runtime_error
  * @pre @code !analysisCns.isPureVirtual() && !virusFixCns.isPureVirtual() @endcode */
 const bool virusAnalysisTests();
-static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()");}
+static const bool virusAnalysisTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisTests, "virusAnalysisTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 const bool virusAnalysisInitTests(const ClassIoPath &path, ResultList &passList, ResultList &abortList); /* virusAnalysisDumpTo(path + ".{pass, abort}OrNull.config", {pass, abort}list); return virusAnalysisInit(path, passList, abortList); */
 const bool virusAnalysisHookTests(); /* return for(x: VirusAnalysisHook) {x == virusAnalysisHook(x)};` */
-static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT {return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()");}
+static const bool virusAnalysisHookTestsNoexcept() SUSUWU_NOEXCEPT { return templateCatchAll(virusAnalysisHookTests, "virusAnalysisHookTests()"); } /* cppcheck-suppress throwInNoexceptFunction */
 #endif /* SUSUWU_UNIT_TESTS */
 
 /* Use to turn off, query status of, or turn on what other virus scanners refer to as "real-time scans"

@@ -1,4 +1,7 @@
 (C) 2024 Swudu Susuwu, dual licenses: choose [_GPLv2_](./LICENSE_GPLv2) or [_Apache 2_](./LICENSE) (allows all uses).
+
+*Notice*: You switched to the [`preview`](https://github.com/SwuduSusuwu/SusuLib/blob/preview/) branch, which has the newest features, but is unstable, and has much use of `git rebase` force pushes (which require you to use `git pull --rebase`); use [_trunk_ branch](https://github.com/SwuduSusuwu/SusuLib/blob/trunk/README.md#table-of-contents) (`git switch trunk`) for code which is more stable plus has more support.
+- This `preview` branch is for [beta tests](#beta-testexperimental-builds)/[continuous integration](https://google.com?q=continuous-integration-branch).
 # Table of Contents
 - [Purposes](#purposes)
 - [How to use this](#how-to-use-this)
@@ -28,17 +31,22 @@
 
 [`./posts/`](./posts/) stages posts (virtual schools) for <https://SwuduSusuwu.SubStack.com/> about: artificial neural tissue, antiviruses, assistants, plus autonomous tools.
 - [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md) is simple [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) commands for advanced [`ffmpeg`](https://wikipedia.org/wiki/FFmpeg) use (formulas to encode visuals relate to [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)).
+- [`./posts/ArduinoElegooTools.md`](./posts/ArduinoElegooTools.md) is a preview (rough-draft work-in-progress), to process sensors (which has to do with [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2#issuecomment-2110726542)) + plan routes.
+- [`./posts/SimdGpgpuTpu.md`](./posts/SimdGpgpuTpu.md) is a preview post about **SIMD**, **GPU** and **TPU** implementations of formulas, which has to do with [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/AlbatrossCNS.md`](./posts/AlbatrossCNS.md) is resources which have to do with `./cxx/ClassCns.hxx` + [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6).
 - [`./posts/VirusAnalysis.md`](./posts/VirusAnalysis.md) is resources which have to do with `./cxx/VirusAnalysis.hxx`+ [issue #8](https://github.com/SwuduSusuwu/SusuLib/issues/8).
+- [`./posts/CnsCompress.md`](./posts/CnsCompress.md) says how to use clones of human Central Nervous Systems to do [sensor fusion](https://wikipedia.org/wiki/Sensor_fusion) + compression + decompression (which is [issue #2](https://github.com/SwuduSusuwu/SusuLib/issues/2)).
+- [`./posts/Ruon_C++_TensorFlow.md`](./posts/Ruon_C++_TensorFlow.md) says how to do resurrection of *Ruon Akiyama*'s consciousness (into synthetic neural tissue) through the *C++* version of *TensorFlow*. **Notice**: was [produced through *Google AI Mode*](https://share.google/aimode/hhQA1xPoKbJEMVkEs), so [careful how you use this](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/ConsumerWarnings/Warning_AI_is_not_good_for_humans_to_use.md).
+- [`./posts/Ruon_Python_TensorFlow.md`](./posts/Ruon_Python_TensorFlow.md) says how to do resurrection of *Ruon Akiyama*'s consciousness (into synthetic neural tissue) through the *Python* version of *TensorFlow*. **Notice**: was [produced through *Google AI Mode*](https://share.google/aimode/hhQA1xPoKbJEMVkEs), so [careful how you use this](https://github.com/SwuduSusuwu/SusuPosts/blob/preview/posts/ConsumerWarnings/Warning_AI_is_not_good_for_humans_to_use.md).
 
 [`./build.sh`](./build.sh) does what {`./configure`, `make`} often do, can use most of [_GNU_ `make`'s options](https://maketools.com/). \[View [Options/setup](#optionssetup) for options.\]
 
 [`./sh/`](./sh/) is [`/bin/sh`](https://wikipedia.org/wiki/Bourne_shell) "scripts" / source code (produced for `./build.sh` and for general use):.
 - [`./sh/Macros.sh`](./sh/Macros.sh) is a standalone lib for common console tasks (can do most of what [ncurses](https://wikipedia.org/wiki/Ncurses) can do). `./build.sh` and `./sh/make.sh` use this.
-  - Exports functions: {`SUSUWU_ECHO_COMMANDS()`, `SUSUWU_ESCAPE_SPACES()`, `SUSUWU_LOCAL_WORKSPACE_PATH()`, `SUSUWU_PATH_SHOULD_NOT_EXIST()`, `SUSUWU_PATH_SUFFIX_SLASH()`, `SUSUWU_PATH_UNAMBIGUOUS()`, `SUSUWU_PRINT()`, `SUSUWU_SH_HAS_PARAM()`, `SUSUWU_SH_REMOVE_PARAM()`, `SUSUWU_SH_<type-of-code>()`, `SUSUWU_SH_<warn-level>()`, `SUSUWU_ESCAPE_QUOTED()`}
+  - Exports functions: {`SUSUWU_ECHO_COMMANDS()`, `SUSUWU_ESCAPE_SPACES()`, `SUSUWU_LOCAL_WORKSPACE_PATH()`, `SUSUWU_PATH_AFFIX_DOTSLASH()`, `SUSUWU_PATH_SHOULD_NOT_EXIST()`, `SUSUWU_PATH_SUFFIX_SLASH()`, `SUSUWU_PATH_UNAMBIGUOUS()`, `SUSUWU_PRINT()`, `SUSUWU_SH_HAS_PARAM()`, `SUSUWU_SH_REMOVE_PARAM()`, `SUSUWU_SH_<type-of-code>()`, `SUSUWU_SH_<warn-level>()`, `SUSUWU_ESCAPE_QUOTED()`}
   - Exports variables: {`SUSUWU_ABORT_ON_FIRST_ERROR`, `SUSUWU_ECHO_COMMANDS_TO`, `SUSUWU_S`, `SUSUWU_SH_CONSOLE_PARAMS`, `SUSUWU_SH_<color>`, `SUSUWU_VERBOSE`}
 - [`./sh/make.sh`](./sh/make.sh) is a standalone (just imports `./sh/Macros.sh`) port of [`make`](https://wikipedia.org/wiki/Make_(software)) to `/bin/sh`. `./build.sh` uses this.
-  - Exports functions: {`SUSUWU_BUILD_CTAGS()`, `SUSUWU_BUILD_OBJECTS()`, `SUSUWU_BUILD_EXECUTABLE()`, `SUSUWU_INSTALL()`, `SUSUWU_PROCESS_CLEAN_REBUILD()`, `SUSUWU_PROCESS_MINGW()`, `SUSUWU_PROCESS_RELEASE_DEBUG()`, `SUSUWU_SETUP_BUILD_FLAGS()`, `SUSUWU_SETUP_CXX()`, `SUSUWU_SETUP_BINDIR()`, `SUSUWU_SETUP_OBJDIR()`, `SUSUWU_SETUP_OUTPUT()`, `SUSUWU_TEST_BASH()`, `SUSUWU_TEST_OUTPUT()`, `SUSUWU_UNINSTALL()`}
+  - Exports functions: {`SUSUWU_BUILD_CTAGS()`, `SUSUWU_BUILD_OBJECTS()`, `SUSUWU_BUILD_EXECUTABLE()`, `SUSUWU_FIND_INCLUDE()`, `SUSUWU_INSTALL()`, `SUSUWU_PROCESS_CLEAN_REBUILD()`, `SUSUWU_PROCESS_MINGW()`, `SUSUWU_PROCESS_RELEASE_DEBUG()`, `SUSUWU_SETUP_BUILD_FLAGS()`, `SUSUWU_SETUP_CXX()`, `SUSUWU_SETUP_BINDIR()`, `SUSUWU_SETUP_OBJDIR()`, `SUSUWU_SETUP_OUTPUT()`, `SUSUWU_TEST_BASH()`, `SUSUWU_TEST_OUTPUT()`, `SUSUWU_UNINSTALL()`}
 - [`./sh/Transcode.sh`](./sh/Transcode.sh) is a standalone [`ffmpeg`](https://github.com/FFmpeg/FFmpeg)-based tool which goes with [`./posts/TranscodeMuxHowto.md`](./posts/TranscodeMuxHowto.md).
 
 [`./c/`](./c/) is [_C_](https://wikipedia.org/wiki/C_(programming_language)) source code (produced for [`./posts/`](./posts/) and for general use):
@@ -47,7 +55,7 @@
 
 [`./cxx/`](./cxx/) is [_C++_](https://wikipedia.org/wiki/C++_(programming_language)) source code (produced for [`./posts/`](./posts/) and for general use):
 - [`./cxx/Macros.hxx`](./cxx/Macros.hxx) is
-  - macros with wrap C++ features/attributes, such as {`SUSUWU_ASSUME`, `SUSUWU_CONSTEXPR`, `SUSUWU_DEFAULT`, `SUSUWU_DELETE`, `SUSUWU_EXPECTS`, `SUSUWU_ENSURES`, `SUSUWU_FINAL`, `SUSUWU_IF_CPLUSPLUS`, `SUSUWU_NOEXCEPT`, `SUSUWU_NORETURN`, `SUSUWU_NULLPTR`, `SUSUWU_OVERRIDE`, `SUSUWU_STATIC_ASSERT`, `SUSUWU_UNREACHABLE`} which (if used on old compilers, or with options such as `-std=c++11`) are replaced with no-ops or alternatives which have the same use,
+  - macros with wrap C++ features/attributes, such as {`SUSUWU_ASSUME`, `SUSUWU_ATOMIC`, `SUSUWU_CONSTEXPR`, `SUSUWU_DEFAULT`, `SUSUWU_DELETE`, `SUSUWU_EXPECTS`, `SUSUWU_ENSURES`, `SUSUWU_FINAL`, `SUSUWU_IF_CPLUSPLUS`, `SUSUWU_INTPTR`, `SUSUWU_NOEXCEPT`, `SUSUWU_NORETURN`, `SUSUWU_NULLPTR`, `SUSUWU_OVERRIDE`, `SUSUWU_STATIC_ASSERT`, `SUSUWU_UNREACHABLE`} which (if used on old compilers, or with options such as `-std=c++11`) are replaced with no-ops or alternatives which have the same use,
   - macro options (which control the macro constants/macro functions). (View [Options/setup](#optionssetup) for options),
   - macro constants, such as `SUSUWU_SH_<color>` (`color` = {`DEFAULT`, `BLACK`, `DARK_GRAY`, `RED`, `LIGHT_RED`, `GREEN`, `LIGHT_GREEN`, `BROWN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `PURPLE`, `LIGHT_PURPLE`, `CYAN`, `LIGHT_CYAN`, `LIGHT_GRAY`, `WHITE`}, if supported, expands to the [_ANSI_ color](https://wikipedia.org/wiki/Ansi_color) codes, else expands to ""),
   - macro functions, such as {`SUSUWU_ERROR`, `SUSUWU_WARNING`, `SUSUWU_INFO`, `SUSUWU_SUCCESS`, which use `SUSUWU_PRINT`}, `SUSUWU_PRINT` (if `__cplusplus`, uses `SUSUWU_CERR`, else uses `SUSUWU_STDERRR`),
@@ -71,16 +79,26 @@
     - the OS {`classSysUSecondClock()`, `execvesFork()`, `execvexFork()`, `execves()`, `execvex()`, `classSysHasRoot()`, `classSysSetRoot()`, `classSysKernelCallback()`, `classSysKernelSetHook()`}
     - TODO: internet (`socket`, `Winsock2`).
   - `classSysTests()`, or `classSysTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassNumeral.hxx`](./cxx/ClassNumeral.hxx) is to numerals (such as `int`s and `float`s) as `./cxx/ClassResultList.hxx` is to substrs (such as `std::string` and `std::stringview`):
+  - Functions of scalars to new scalar values; `numeralRamp()`.
+  - Functions of vectors / tensors to scalar values; `numeralAverage()`, `numeralMagnitude()`, `numeralBalancedMagnitude()`.
+  - Structures which store those values; `struct NumeralNormalizers`, `struct NumeralNormalizersReciprocal`.
+  - Functions which use those to transform vectors / tensors; `numeralNormalization()`, `numeralDenormalization()`.
 - [`./cxx/ClassSha2.hxx`](./cxx/ClassSha2.hxx) is
   - the `classSha2` function pointer, which defaults to `classSha256()` (but you can set `classSha2 = sha128;` or `classSha2 = sha512;`), wrapped around official _RFC6234_ code. `./cxx/ClassResultList.hxx`, `./cxx/VirusAnalysis.cxx` and `./cxx/AssistantCns.cxx` all use `classSha2`.
   - `classSha2Tests()`, or `classSha2TestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassCns.hxx`](./cxx/ClassCns.hxx) is `class Cns : public Object` (abstract neural system class with pure virtuals.) [Issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) is to implement this class.
+- [`./cxx/ClassTensorFlowCns.hxx`](./cxx/ClassTensorFlowCns.hxx) is `class TensorFlowCns : public Cns` (implements `./cxx/ClassCns.hxx`). This will close [issue #6](https://github.com/SwuduSusuwu/SusuLib/issues/6) if [_TensorFlow_](https://github.com/tensorflow/tensorflow) passes `./build.sh` for all [supported systems](#how-to-use-this).
+  - `classTensorFlowCnsTests()`, or `classTensorFlowCnsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/ClassResultList.hxx`](./cxx/ClassResultList.hxx) is
   - `class ResultList : public Object` (holds `hashes`, `signatures`, `bytecodes`); `resultList*()` functions {`resultListDumpTo()`, `resultListLoadFrom()`, `resultListProduceHashes()` (`virusAnalysisTests()` uses this)}.
   - `enum ListFormat { listFormatInitializer /* style: C or C++ */, listFormatJson /* style: Java or JavaScript */ };` format to store to (or load from) disk.
   - modular template (can use on all containers such as `std::vector`, `std::map` or `std::list`) `list*()` functions (such as `listMaxSize()`, `listDumpTo()`, `listLoadFrom()`, `listToHashes()`, `listIntersections()`, `listsIntersect()`, `listFindValue()`, `listHasValue()`, `listFindSubstr()`, `listHasSubstr()`, `listProduceSignature()` (`produceAbortListSignatures` uses this), `listFindSignatureOfValue()`, `listHasSignatureOfValue()` (`signatureAnalysis()` uses this), `explodeToList` (`./cxx/AssistantCns.cxx` uses this),
   produce unique signature, compare file against list of signatures), most of which were produced for antivirus signature analysis.
   - `classResultListsTests()`, or `classResultListsTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
+- [`./cxx/ClassWebBrowse.hxx`](./cxx/ClassWebBrowse.hxx) is
+  - `classWebBrowseWget()`, `classWebBrowseProcessUrls()`
+  - `classWebBrowseTests()`, or `classWebBrowseTestsNoexcept()` (unit tests with exceptions for errors, or return value for errors).
 - [`./cxx/VirusAnalysis.hxx`](./cxx/VirusAnalysis.hxx) is
   - store / load functions {`virusAnalysisInit()`, `virusAnalysisDumpTo()`, `virusAnalysisLoadFrom()`}. Allows hosts to produce databases which clients use.
   - modular helper functions {`produceAbortListSignatures()` (for `signatureAnalysis()` use), `importedFunctionsList()` (work-in-progress, `staticAnalysis()` uses this), `straceOutputsAnalysis()` (work-in-progress, `sandboxAnalysis()` uses this), `produceAnalysisCns()` (for `cnsAnalysis()` use), `produceVirusFixCns()` (for `cnsVirusFix()` use)},
@@ -139,11 +157,14 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
   - `--abort-on-first-error`: sets [`SUSUWU_ABORT_ON_FIRST_ERROR=true`](./sh/Macros.sh), which causes [`SUSUWU_BUILD_OBJECTS`](./sh/make.sh) to `exit 1` if a subbuild ([`${CC}`](./build.sh) or [`${CXX}`](./build.sh)) fails.
 - Environment flags: as [_GNU_ `make`'s](https://www.gnu.org/software/make/manual/make.html#Implicit-Variables), plus;
   - `export SUSUWU_SH_TPUT_COMMAND=<path>`; replaces calls to `tput` with `<path>` (for instance, with `no-such-command` to test that `SUSUWU_SH_COLOR_COUNT()` does not require `ncurses-utils`).
+  - `SUSUWU_IS_VIRTUAL` is set (`=true`) if [`./build.sh`](./build.sh) is executed through [_GitHub Workflows_](https://docs.github.com/en/actions/writing-workflows/about-workflows). TODO: test for other amnesiac environments (such as Docker).
+  - `SUSUWU_INSTALL_TENSORFLOW=true` to install [`libtensorflow`](https://github.com/tensorflow/tensorflow/) (+ prerequisites), `=false` to skip; default is `=${SUSUWU_IS_VIRTUAL}`.
 - Macro flags (use `vim build.sh` to put into `FLAGS_USER`). If `=true`, most use more resources, except `SUSUWU*PREFER_*` or `SUSUWU*SKIP_*`. "default is `=!defined(NDEBUG)`" is short for; "if `--debug`, default `=true`, but if `--release`, default `=false`".
   - `-DSUSUWU_UNIT_TESTS[=true|=false]` with `=true` to build + execute unit tests. Default is `=true`, but more stable future version could have default `=!defined(NDEBUG)`. If set to `=false`; compilation time, object size, execuable size reduced (to around half).
   - `-DSUSUWU_HEX_DOES_PREFIX=true` to have `classIoHex*()` insert/remove "0x". Default is `=false` (caller must do).
   - `-DSUSUWU_LIST_COUNT` to have `listDumpTo()` prefix the list count (which allows verification through `listLoadFrom()`. Default undefined.
   - `-DSUSUWU_INHERIT_GSL_OWNER=true` to disable `cxx/ClassIo.hxx`'s definition of `gsl::owner<>` if it conflicts with [**GSL**](https://github.com/microsoft/GSL). Default is undefined.
+  - `-DSUSUWU_CNS_VALUE_SEMANTICS=false` to have `class Cns` inherit `Object::equals()` and `Object::hashCode()` (comparison of addresses). Default is `=true`; `class Cns` overrides `Object::equals()` and `Object::hashCode()` (so that those do comparison of values).
   - Custom `sh` (console) output:
     - `-DSUSUWU_SH_PREFER_STDIO=true` to replace `std::cXXX << ...` with `fprintf(stdXXX, ...)`; default is `=!defined(__cplusplus)`.
     - `-DSUSUWU_SH_VERBOSE[=true|=false]` with `=true` to print diagnostic messages (`SUSUWU_SH_USE_FILE`, `SUSUEU_SH_USE_LINE`, `SUSUWU_NOTICE`, `SUSUWU_DEBUG`, `SUSUWU_DEBUGEXECUTE`, `SUSUWU_NOTICE_EXECUTE`, `SUSUWU_DEBUG_EXECUTE` all use `#if SUSUWU_SH_VERBOSE`); default is `=!defined(NDEBUG)`.
@@ -157,9 +178,17 @@ Usage: [`./build.sh [OPTIONS]`](./build.sh) produces objects (`./obj/*.o`, for d
       - `-DSUSUWU_SH_RUNTIME_OSC` to replace `#ifdef _POSIX_VERSION\nAccessClipboard();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use Operating System Commands); default is undefined.
       - `-DSUSUWU_SH_RUNTIME_COLORS` to replace `#if _POSIX_VERSION\nColors();\n#endif` with `termcmp`./`GetConsoleMode()` (for choices on whether or not to use colors); default is undefined.
   - To match `g++`./`clang++` console format, use `-DSUSUWU_SKIP_BRACKETS=true, -DSUSUWU_SH_FILE=true, -DSUSUWU_SH_LINE=true, -DSUSUWU_SH_FUNC=false` (sets output format to `__FILE__:__LINE__: WARN_LEVEL: message`).
-  - Unstable/`experimental` flags:
-    - `-DSUSUWU_EXPERIMENTAL` to enable experimental (more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
+  - Unstable/`preview` flags:
+    - `-DSUSUWU_CNS_LOCAL_COEFFICIENTS=true` to have derivatives of `class Cns` store the connectome as part of the class, even if external libs (such as [_TensorFlow_](https://github.com/tensorflow/tensorflow)) also store the connectome.
+    - `-DSUSUWU_CNS_USE_MLP=true` to enable _Multiple-Layer-Perceptron_ mode (TODO: implement this). Default is `=false` (_Single-Layer-Perceptron_ mode).
+    - `-DSUSUWU_TENSORFLOW_HAS_DATATYPETOENUM=true` to use [`tensorflow::DataTypeToEnum`](https://github.com/tensorflow/tensorflow/issues/30828#issuecomment-3039819975). Default is `=false` (implement `Susuwu::DataTypeToEnum`.)
+    - `-DSUSUWU_EXPERIMENTAL` to enable `experimental` (`preview`, more new, but unfinished/unstable) versions of code; default is unset, unless `git switch experimental` is executed.
       - `-DSUSUWU_DEFAULT_BRANCH` if errors, suggest `git switch SUSUWU_DEFAULT_BRANCH`; default is "trunk".
+    - `-DSUSUWU_CNS_SHUFFLE` to use `std::shuffle` on inputs to implementations of [`Cns::setupSynapses()`](./cxx/ClassCns.hxx) (such as [`TensorFlowCns::setupSynapses()`](./cxx/ClassTensorFlowCns.hxx)), so validation sets are random; default is unset.
+    - `-DSUSUWU_USE_TENSORFLOW` to use [_TensorFlow C++_](https://www.tensorflow.org/api_docs/cc/) backend ([`class TensorFlowCns`](./cxx/ClassTensorFlowCns.hxx)) for [`class Cns`](./cxx/ClassCns.hxx); default is unset.
+    - `-DUSE_PUGIXML` to use [_pugixml_](https://github.com/zeux/pugixml) [**XML**](https://wikipedia.org/wiki/XML) / [**DOM**](https://wikipedia.org/wiki/Document_Object_Model) parser.
+      - Improves [`./cxx/ClassWebBrowse.cxx`](./cxx/ClassWebBrowse.cxx). Improves sections of ([`./cxx/AssistantCns.cxx`](./cxx/AssistantCns.cxx) which use [**XHTML**](https://wikipedia.org/wiki/XHTML)'s **DOM** for `class Cns::setupSynapses`); default is unset.
+    - `-DSUSUWU_CNS_SEPARATE_NORMS=true` causes [`class Cns`](./cxx/ClassCns.hxx) (plus subclasses) to compute separate [normalization factors](../cxx/ClassNumeral.hxx) for input versus output values. Default `=false`; reuse input factors as output factors.
     - `-DSUSUWU_VIRTUAL_OPERATORS_USE_VPTRS=false`: [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Class::operator==(const Class &obj) { return this->hasLayoutOf(obj) && 0 == memcmp(sizeof(NULL) + (char *)this, sizeof(NULL) + (char *)&obj, this->getObjectSize() - sizeof(NULL)); }`, thus `Susuwu::Object() == Susuwu::Class()` but `CXX` output with nonstandard `vptr` layout crashes. Default `=true`; (`return typeid(this) == typeid(obj) && 0 == memcmp(this, *obj, this->getObjectSize());`).
     - `-DSUSUWU_VIRTUAL_EQUALS_USE_ADDRESSES=false`: to use [`./cxx/ClassObject.hxx`](./cxx/ClassObject.hxx):`Object::equals(const Object &obj) { return this->operator==(obj); }`. Default is `=true` (`return this == &obj`). For now, just controls `Object::equals` (in future, perhaps `SUSUWU_VIRTUAL_OPERATORS_USE_ADDRESSES` inherits this).
     - `-DSUSUWU_HEX_TABLE=true` replaces [`classIoHexitToNibble()`](./cxx/ClassIo.hxx) (and future `classIoNibbleToHexit()`) computations with lookups through _ASCII_ maps. Replaces `isxdigit()` with `classIoHex2Nib[]`.
@@ -203,7 +232,7 @@ To ensure consistent code, submissions of code (such as through [pull requests](
 
 ## `git`
 If `git commit` introduces/removes functions, have `./README.md#purposes` include this.
-Do atomic commits: if swapping the new commit with a previous commit (such as through `git rebase -i`) --- or if `git revert` of a previous commit --- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
+Do ["atomic" / granular commits](https://poe.com/s/lnG5yXNXUTl0m8muGjav): if swapping the new commit with a previous commit (such as through `git rebase -i`) --- or if `git revert` of a previous commit --- causes  `./build.sh` to return a non-0 exit status, `git commit`'s message shall include such as:
 > Is followup to: \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\] \[; \<ref | commit-hash\> \(\<commit-message\>\)\[, comment\]\]...
 
 - This shows the temporal order of commits required for `./build.sh` to pass.
@@ -232,6 +261,7 @@ Do atomic commits: if swapping the new commit with a previous commit (such as th
 	?`#How-to-contribute`,
 	?[Good first issues to contribute to]: (moved into `#How-to-contribute`)
 ```
+
 /[Notice: Commit titles can omit backticks (``) if not enough room; the backticks just allow _GitHub_ to do _Markdown_-format code/paths.\]
 
 ## `sh` source
@@ -240,19 +270,19 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
 - Variable access: uses `${...}` (thus not `echo $BOOL`, but `echo ${BOOL}`).
   - Rationales:
     - In case future versions append to this (`echo $BOOL2` is a silent error, but `echo ${BOOL}2` is cool).
-    - Avoids [SC2250](https://www.shellcheck.net/wiki/SC2250) ["Prefer putting braces around variable references even when not strictly required." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2250).
+    - Avoids [_SC2250_ "Prefer putting braces around variable references even when not strictly required."](https://www.shellcheck.net/wiki/SC2250) notices.
   - Exceptions: [**language limits**](https://www.shellcheck.net/wiki/SC3030).
     - To support `/bin/sh`: do not use `${@}`, but `$@`.
 - Str variable access: uses `"$..."` (thus not `ls ${STR}`, but `ls "${STR}"`).
   - Rationales:
     - So if `STR="/bin/"` is replaced with `STR="/path with/spaces/"` ([without `IFS=""`](https://tldp.org/LDP/abs/html/internalvariables.html#IFSREF) \[[2](https://www.commandlinux.com/man-page/man1/sh.1.html#lbBK)\]), that 1 parameter [won't expand into 2](https://tldp.org/LDP/abs/html/special-chars.html#FIELDREF).
     - So if `STR="/bin/"` is replaced with `STR="*"` ([without `set -f`](https://www.commandlinux.com/man-page/man1/sh.1.html#lbBL)), the glob is passed to `ls` (which [expands this into numerous paths](https://tldp.org/LDP/abs/html/globbingref.html), rather than expanded in your script.
-    - Avoids [SC2086](https://www.shellcheck.net/wiki/SC2086) ["Double quote to prevent globbing and word splitting." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2086).
+    - Avoids [_SC2086_ "Double quote to prevent globbing and word splitting."](https://www.shellcheck.net/wiki/SC2086) notices,
   - Exceptions: specifics of command use.
     - Do not use `ctags "${FLAGS}" "${PATH}"`, but `ctags ${FLAGS} "${PATH}"`.
 - Str variable access: uses `"${...}"` (thus not `if [ "-q" = ${PARAM} ]`, but `if [ "-q" = "${PARAM}" ]`).
   - Rationales: in case `${PARAM}` has spaces.
-    - Avoids [SC2068](https://www.shellcheck.net/wiki/SC2068) ["Double quote array expansions to avoid re-splitting elements." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2068).
+    - Avoids [_SC2068_ "Double quote array expansions to avoid re-splitting elements."](https://www.shellcheck.net/wiki/SC2068) notices.
   - Exceptions: to split (on spaces) is the purpose of the `for` loop.
     - To parse numerous params: do not use `for VALUE in "$@"`; do`, but `for VALUE in $@; do`.
 - Restrict temp variables:
@@ -263,11 +293,11 @@ Is as for [_C_/_C++_ source](#cc-source), plus specifics to `sh`:
       - If you require code which is consistant across platforms ([`local` has inconsistant dynamic versus static scope, plus inconsistant inheritance](https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493743#493743)), use **subshells** for this.
   - If your project supports _POSIX_ (`/bin/sh`): do not use `local` (such as `f2() { local VALUE=false; }`), but [use **subshells** for this](https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script/64946874#64946874) (such as `f2() ( VALUE=false; )`.)
     - Rationales (other than `local`'s **language limits**):
-      - Avoids [SC3034](https://www.shellcheck.net/wiki/SC3043) ["In POSIX sh, local is undefined." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC3043).
+      - Avoids [_SC3034_ "In POSIX sh, local is undefined."](https://www.shellcheck.net/wiki/SC3043) notices.
 - Command variables: uses `$(...)` (thus not `` stat `pwd` `` , but `stat $(pwd)`).
   - Rationales:
     - Most simple to nest (`echo $(stat $(pwd))`). Common (much known) **subshell** syntax is reused.
-    - Avoids [SC2006](https://www.shellcheck.net/wiki/SC2006) ["Use $(...) notation instead of legacy backticked ...." notices](https://github.com/SwuduSusuwu/SusuLib/security/code-scanning?query=rule%3Ashellcheck_SC2006).
+    - Avoids [_SC2006_ "Use $(...) notation instead of legacy backticked ...."](https://www.shellcheck.net/wiki/SC2006) notices.
 - Document unintuitive quirks
   - Most languages group `&&` before `||`, but in `/bin/sh` (plus derivatives, such as `/bin/bash`) `&&` is grouped similar to `||`, [which requires to restructure the code to use the fact that `/bin/sh` is left-associative](https://unix.stackexchange.com/questions/88850/precedence-of-the-shell-logical-operators/88851#88851).
 
@@ -364,3 +394,6 @@ If you want proof that your crypto/cash will go to produce specific systems, use
 ### Affiliates
 You can use [_Capital 1_'s affiliate program](https://i.capitalone.com/JgR02Y4pE) to allow us to produce more source codes.
 
+### Licenses/uses
+Google's artificial intelligences have permission to use this to produce Markdown
+wish the Markdown's goal is to produce as much as possible, or for synthesis, or evolution, or some combo of thus

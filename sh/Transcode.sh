@@ -24,8 +24,8 @@ TRANSCODE_MP4_MOVFLAGS="+faststart" #Best for YouTube; moves metadata to start (
 #TRANSCODE_MP4_BITS="-b:v 10m" #Best for YouTube? Not sure if this is used with `-crf`.
 #TRANSCODE_MP4_THREADS="-threads 4" #`ffmpeg`'s default is to use all cores for `.gif`. If it does not for `.mp4`, it must have reasons not to.
 #TRANSCODE_MP4_CPUUSED="-cpu-used 0" #["Most CPU intensive, but best fastest. Uses all cores."](https://scribbleghost.net/2018/10/26/recommended-encoding-settings-for-youtube-in-ffmpeg/) #Not sure how this differs from `-threads`.
-TRANSCODE_MP4_CRF="32" #Amount of compression; https://scribbleghost.net/2018/10/26/recommended-encoding-settings-for-youtube-in-ffmpeg/ says to use "18". Size is reduced with "32".
-TRANSCODE_MP4_PIX_FMT="yuv420p" #Subsample to 4:2:0 (chroma 1/4, luma whole); best for YouTube.
+TRANSCODE_MP4_CRF="32" #Amount of compression; https://scribbleghost.net/2018/10/26/recommended-encoding-settings-for-youtube-in-ffmpeg/ says YouTube is best with "18", but computer graphics is more compressible. #"22" uses 3316kilobit/s, "27" uses 1985/s, "32" uses 1222/s
+TRANSCODE_MP4_PIX_FMT="" #yuv420p" #Subsample to 4:2:0 (chroma 1/4, luma whole); best for YouTube, but now gives "Error initializing the muxer for yuv420p: Invalid argument".
 TRANSCODE_MP4_SOUND_ENABLED="true" #Produce "$(basename "${TRANSCODE_SOUND_IN}") {1%.*}${TRANSCODE_MP4_CONTAINER}"
 TRANSCODE_SOUND_FORMAT="234" #`yt-dlp` format for `TRANSCODE_SOUND_DEFAULT`. "234" has best sound, "233" is smaller
 TRANSCODE_SOUND_CODEC_COMMAND="-c:a aac -profile:a aac_low -ac 2" #Advanced Audio Codec - Low Complexity (AAC-LC) with 2 channels; best for YouTube. # -filter_complex \"[1:0] apad\"
@@ -76,7 +76,7 @@ TRANSCODE_MP4_OUT="$(VISUAL_IN_EXTENSIONLESS)${TRANSCODE_MP4_CONTAINER}"
 TRANSCODE_MP4_SOUND_OUT_PATH="$(VISUAL_IN_EXTENSIONLESS)_$(basename "$(SOUND_IN_EXTENSIONLESS)")${TRANSCODE_MP4_CONTAINER}"
 if [ -z "${1}" ] || [ "-h" = "${1}" ] || [ "--help" = "${1}" ]; then
 	echo "Usage: ${0} \"<path-to-input-visuals>\" \"[<optional-path-to-input-sounds>]\""
-	exit 1
+	return 1
 fi
 
 TRANSCODE_MP4_OUT_PATH="${TRANSCODE_OUT_VISUALS}${TRANSCODE_MP4_OUT}"
@@ -138,14 +138,14 @@ if ${TRANSCODE_GIF_ENABLED}; then
 				nice gifsicle -O2 --batch "${TRANSCODE_GIF_OUT_PATH}"
 #				"${TRANSCODE_GIFSICLE_COMMAND} --batch"
 			else
-				nice gifsicle -O2 "${TRANSCODE_GIF_OUT_PATH}" -o "${TRANSCODE_GIF_OUT_PATH%${TRANSCODE_GIF_CONTAINER}}${TRANSCODE_GIFSICLE_CONTAINER}${TRANSCODE_GIF_CONTAINER}"
-#				"${TRANSCODE_GIFSICLE_COMMAND} -o \"${TRANSCODE_GIF_OUT_PATH%${TRANSCODE_GIF_CONTAINER}}${TRANSCODE_GIFSICLE_CONTAINER}${TRANSCODE_GIF_CONTAINER}\""
+				nice gifsicle -O2 "${TRANSCODE_GIF_OUT_PATH}" -o "${TRANSCODE_GIF_OUT_PATH%"${TRANSCODE_GIF_CONTAINER}"}${TRANSCODE_GIFSICLE_CONTAINER}${TRANSCODE_GIF_CONTAINER}"
+#				"${TRANSCODE_GIFSICLE_COMMAND} -o \"${TRANSCODE_GIF_OUT_PATH%"${TRANSCODE_GIF_CONTAINER}"}${TRANSCODE_GIFSICLE_CONTAINER}${TRANSCODE_GIF_CONTAINER}\""
 			fi
 			command -v "gifsicle" || echo "${0}: Error: \`gifsicle\` not found. Execute \`pkg install gifsicle\`"
 		fi
 	fi
 fi
-exit 0
+return 0
 
 #nice ffmpeg ${TRANSCODE_MISC_FLAGS} -i "${TRANSCODE_IN_SOUNDS}Susuwu/Swudo Susuwu's organs 2024.02.16 1242ss431t932.ogg" -stream_loop  -1 -i "${TRANSCODE_IN_SOUNDS}nu/UU! NYA! [GHbPK0Ymjw0].m4a" -filter_complex amix=inputs=2:duration=shortest "${TRANSCODE_IN_SOUNDS}Susuwu/Swudo Susuwu's organs 2024.02.16 1242ss431t932+UuNya.opus"
 
